@@ -1,6 +1,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import Element from 'element-ui'
+import errorMap from '@/utilities/errorMap'
 const specialAPIs = ['/api/directory/userss/search', '/api/aslan/delivery/artifacts']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
 const reqExps = /api\/aslan\/environment\/environments\/[a-z-0-9]+\/groups$/
@@ -56,6 +57,29 @@ http.interceptors.request.use((config) => {
   return config
 })
 
+function displayError (error) {
+  const response = error.response.data
+  if (errorMap[response.resultCode]) {
+    Element.Message({
+      message: errorMap[response.resultCode],
+      type: 'error',
+      dangerouslyUseHTMLString: false
+    })
+    return
+  }
+  let msg = `${error.response.status} API 请求错误`
+  if (error.response.data.errorMsg) {
+    msg = `${error.response.status} : ${error.response.data.errorMsg}`
+  } else if (error.response.data.message) {
+    msg = `${error.response.status} : ${error.response.data.message} ${error.response.data.description}`
+  }
+  Element.Message({
+    message: msg,
+    type: 'error',
+    dangerouslyUseHTMLString: false
+  })
+}
+
 http.interceptors.response.use(
   (response) => {
     const req = response.config.url.split(/[?#]/)[0]
@@ -74,65 +98,44 @@ http.interceptors.response.use(
       }
       return Promise.reject('CANCEL')
     }
+    // 不暴露上报 API 错误
     if (
       error.response &&
       error.response.config.url !== analyticsReq &&
       error.response.config.url !== installationAnalysisReq &&
       !error.response.config.url.includes(ignoreErrReq)
     ) {
-      /* The request was made and the server responded with a status code
-         that falls out of the range of 2xx */
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
       console.log(error.response)
+      // Checking installation status
+      if (error.response.data.resultCode === 10009) {
+        router.push('/setup/license?installed=true')
+        return Promise.reject(error)
+      } else if (error.response.data.resultCode === 10012) {
+        router.push('/setup/license')
+        return Promise.reject(error)
+      }
       if (document.title !== '登录' && document.title !== '系统初始化') {
+        // unauthorized 401
         if (error.response.status === 401) {
           const redirectPath = window.location.pathname + window.location.search
           Element.Message.error('登录信息失效, 请返回重新登录')
-          if (redirectPath.includes('/setup')) {
-            window.location.href = '/signin'
+          if (redirectPath.includes('/setup/')) {
+            window.location.href = `/signin`
           } else {
             window.location.href = `/signin?redirect=${redirectPath}`
           }
-        }
-        if (error.response.status === 403) {
+        } else if (error.response.status === 403) {
           Element.Message.error('暂无权限')
-        } else {
-          if (error.response.data.code !== 6168) {
-            let msg = `${error.response.status} API 请求错误`
-            if (error.response.data.errorMsg) {
-              msg = `${error.response.status} : ${error.response.data.errorMsg}`
-            } else if (error.response.data.message) {
-              msg = `${error.response.status} : ${error.response.data.message} ${error.response.data.description}`
-            }
-            Element.Message({
-              message: msg,
-              type: 'error',
-              dangerouslyUseHTMLString: false
-            })
-          }
+        } else if (error.response.data.code !== 6168) {
+          displayError(error)
         }
-      } else if (document.title === '登录' || document.title === '系统初始化') {
-        let msg = `${error.response.status} API 请求错误`
-        if (error.response.data.errorMsg) {
-          msg = `${error.response.status} : ${error.response.data.errorMsg}`
-        } else if (error.response.data.message) {
-          msg = `${error.response.status} : ${error.response.data.message} ${error.response.data.description}`
-        }
-        if (error.response.config.url !== '/api/directory/user/detail') {
-          Element.Message({
-            message: msg,
-            type: 'error',
-            dangerouslyUseHTMLString: false
-          })
-        }
+      } else if (error.response.config.url !== '/api/directory/user/detail') {
+        displayError(error)
       }
-    } else if (error.request) {
-      /* The request was made but no response was received
-         `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-         http.ClientRequest in node.js */
-      Element.Message.error(error.request)
     } else {
       // Something happened in setting up the request that triggered an Error
-      Element.Message.error(error.message)
       console.log('Error', error.message)
     }
     return Promise.reject(error.response)
@@ -1147,4 +1150,12 @@ export function getVersionProductListAPI (organization_id) {
 
 export function productHostingNamespaceAPI (clusterId) {
   return http.get(`/api/aslan/environment/kube/available_namespaces?clusterId=${clusterId}`)
+}
+
+// 重置密码
+export function retrievePassword (payload) {
+  return http.post('/api/directory/retrievePassword', payload)
+}
+export function changePassword (payload) {
+  return http.put('/api/directory/changePassword', payload)
 }

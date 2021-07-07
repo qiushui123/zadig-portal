@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-lg-7 col-md-12 col-pad-0 form-section">
-          <div class="login-inner-form">
+          <div class="login-inner-form"  v-show="isLogin">
             <div class="details">
               <header>
                 <span class="name">Zadig</span>
@@ -33,6 +33,7 @@
                 </el-form>
                 <el-button type="submit"
                            @click="login"
+                            v-loading="loading"
                            class="btn-md btn-theme btn-block login-btn">
                   登录
                 </el-button>
@@ -44,13 +45,17 @@
                   </el-button>
                 </a>
               </section>
-              <transition name="fade">
-                <div class="login-loading"
-                     :class="{'show':loading}">
-                  <i class="el-icon-loading"></i>
-                </div>
-              </transition>
+              <div class="bottom">
+                  <a  v-if="showOpensourceOauth"
+                      @click="accountPassLogin=!accountPassLogin">{{accountPassLogin ? '第三方登录' : '账号密码登录'}}</a>
+
+                  <a  @click="isLogin=false">找回密码</a>
+                  <a style="border: none;" @click="routerTo('/signup')" v-if="openRegistration && !showOpensourceOauth">注册</a>
+              </div>
             </div>
+          </div>
+          <div class="login-inner-form" v-show="!isLogin">
+            <ForgetPassword :openLogin="()=> isLogin=true" />
           </div>
         </div>
         <div class="col-lg-5 col-md-12 col-pad-0 bg-img none-992">
@@ -73,9 +78,15 @@ import { mapGetters } from 'vuex'
 import { userLoginAPI, getCurrentUserInfoAPI } from '@api'
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
+import ForgetPassword from './components/forgetPassword.vue'
+
 export default {
+  components: {
+    ForgetPassword
+  },
   data () {
     return {
+      isLogin: true,
       username: '',
       password: '',
       redirectUrl: '',
@@ -178,6 +189,24 @@ export default {
 </script>
 <style lang="less" scoped>
 @import url('~@assets/css/quote/bootstarp.less');
+
+.bottom {
+  display: flex;
+  align-items: center;
+  float: right;
+  padding: 0 10px;
+
+  a {
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 14px;
+    cursor: pointer !important;
+
+    &:hover {
+      color: #007bff !important;
+    }
+  }
+}
 
 .login {
   .information {
