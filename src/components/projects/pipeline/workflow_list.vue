@@ -435,10 +435,10 @@ export default {
   }
 
   .pipeline-loading {
-    height: calc(~"100vh - 100px");
+    height: calc(~"100vh - 150px");
 
     .virtual-list-container {
-      height: calc(~"100vh - 100px");
+      height: 100%;
       overflow-y: auto;
     }
 

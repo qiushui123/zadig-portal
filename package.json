@@ -10,7 +10,7 @@
     "build": "eslint --ext .js,.vue src && stylelint src && node build/build.js",
     "eslint": "eslint --fix --ext .js,.vue src",
     "stylelint": "stylelint --fix src",
-    "prepare": "cd .. && husky install zadig-portal/.husky"
+    "postinstall": "husky install"
   },
   "dependencies": {
     "axios": "0.18.0",
