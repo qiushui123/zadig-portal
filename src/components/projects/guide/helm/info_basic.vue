@@ -13,7 +13,7 @@
       <div class="current-step-container">
         <div class="title-container">
           <span class="first">第一步</span>
-          <span class="second">对项目的流程做初步定义后，后续可在项目中进行调整。当您创建好服务后，我们会为你做如下的智能交付准备。KodeRover
+          <span class="second">对项目的流程做初步定义后，后续可在项目中进行调整。当您创建好服务后，我们会为你做如下的智能交付准备。Zadig
             会自动生成以下资源：</span>
         </div>
         <div class="account-integrations cf-block__list">
