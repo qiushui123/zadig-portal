@@ -45,6 +45,8 @@ export default {
       } else {
         this.$router.push('/setup')
       }
+    }).catch(() => {
+      this.$router.push('/loading')
     })
   }
 }
