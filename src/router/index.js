@@ -778,7 +778,7 @@ const routes = [
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
-          title: 'Registry 设置'
+          title: '镜像仓库'
         }
       },
       {

@@ -11,42 +11,80 @@
                  width="35%">
         <el-form ref="registry"
                  :rules="rules"
-                 label-width="120px"
-                 tab-position="left"
+                 label-width="150px"
+                 label-position="left"
                  :model="registry">
           <el-form-item label="默认使用"
                         prop="is_default">
             <el-checkbox v-model="registry.is_default"></el-checkbox>
           </el-form-item>
+          <el-form-item label="提供商"
+                        prop="reg_provider">
+            <el-select v-model="registry.reg_provider"
+                       style="width: 100%;"
+                       size="small"
+                       placeholder="请选择镜像仓库提供商">
+              <el-option value="acr"
+                         label="阿里云 ACR">
+                <i class="iconfont iconaliyun"></i> <span>阿里云 ACR</span>
+              </el-option>
+
+              <el-option value="swr"
+                         label="华为云 SWR">
+                <i class="iconfont iconhuawei"></i> <span>华为云 SWR</span>
+              </el-option>
+              <el-option value="tcr"
+                         label="腾讯云 TCR">
+                <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
+              </el-option>
+              <el-option value="native"
+                         label="其它">
+                <i class="iconfont iconaff"></i> <span>其它</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="registry.reg_provider === 'swr'"
+                        label="区域"
+                        prop="region">
+            <el-input size="small"
+                      clearable
+                      v-model="registry.region"></el-input>
+          </el-form-item>
           <el-form-item label="地址"
                         prop="reg_addr">
             <el-input size="small"
+                      clearable
                       v-model="registry.reg_addr"></el-input>
           </el-form-item>
           <el-form-item label="Namespace"
                         prop="namespace">
             <el-input size="small"
+                      clearable
                       v-model="registry.namespace"></el-input>
           </el-form-item>
-          <el-form-item :rules="{required: false}"
-                        label="Docker 用户名"
+          <el-form-item :label="registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'"
+                        :rules="{ required: true, message: `请输入 ${registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'}`, trigger: 'blur' }"
                         prop="access_key">
             <el-input size="small"
+                      clearable
                       v-model="registry.access_key"></el-input>
           </el-form-item>
-          <el-form-item :rules="{required: false}"
-                        label="Docker 密码"
+          <el-form-item :label="registry.reg_provider === 'swr'?'Secret Key':'Docker 密码'"
+                        :rules="{ required: true, message: `请输入 ${registry.reg_provider === 'swr'?'Secret Key':'Docker 密码'}`, trigger: 'blur' }"
                         prop="secret_key">
             <el-input size="small"
+                      clearable
                       type="passsword"
                       v-model="registry.secret_key"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer"
              class="dialog-footer">
-          <el-button @click="dialogRegistryCreateFormVisible = false">取 消</el-button>
+          <el-button size="small"
+                     @click="dialogRegistryCreateFormVisible = false">取 消</el-button>
           <el-button :plain="true"
                      type="success"
+                     size="small"
                      @click="registryOperation('add')">保存</el-button>
         </div>
       </el-dialog>
@@ -60,41 +98,80 @@
                  width="35%">
         <el-form ref="swapRegistry"
                  :rules="rules"
-                 label-width="120px"
-                 tab-position="left"
+                 label-width="150px"
+                 label-position="left"
                  :model="swapRegistry">
           <el-form-item label="默认使用"
                         prop="is_default">
             <el-checkbox v-model="swapRegistry.is_default"></el-checkbox>
           </el-form-item>
+          <el-form-item label="提供商"
+                        prop="reg_provider">
+            <el-select v-model="swapRegistry.reg_provider"
+                       style="width: 100%;"
+                       size="small"
+                       placeholder="请选择镜像仓库提供商">
+              <el-option value="acr"
+                         label="阿里云 ACR">
+                <i class="iconfont iconaliyun"></i> <span>阿里云 ACR</span>
+              </el-option>
+
+              <el-option value="swr"
+                         label="华为云 SWR">
+                <i class="iconfont iconhuawei"></i> <span>华为云 SWR</span>
+              </el-option>
+              <el-option value="tcr"
+                         label="腾讯云 TCR">
+                <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
+              </el-option>
+              <el-option value="native"
+                         label="其它">
+                <i class="iconfont iconaff"></i> <span>其它</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="swapRegistry.reg_provider === 'swr'"
+                        label="区域"
+                        prop="region">
+            <el-input size="small"
+                      clearable
+                      v-model="swapRegistry.region"></el-input>
+          </el-form-item>
           <el-form-item label="地址"
                         prop="reg_addr">
             <el-input size="small"
+                      clearable
                       v-model="swapRegistry.reg_addr"></el-input>
           </el-form-item>
           <el-form-item label="Namespace"
                         prop="namespace">
             <el-input size="small"
+                      clearable
                       v-model="swapRegistry.namespace"></el-input>
           </el-form-item>
-          <el-form-item :rules="{required: false}"
-                        label="Docker 用户名"
+          <el-form-item :label="swapRegistry.reg_provider === 'swr'?'Access Key':'Docker 用户名'"
+                        :rules="{ required: true, message: `请输入 ${swapRegistry.reg_provider === 'swr'?'Access Key':'Docker 用户名'}`, trigger: 'blur' }"
                         prop="access_key">
             <el-input size="small"
+                      clearable
                       v-model="swapRegistry.access_key"></el-input>
           </el-form-item>
-          <el-form-item :rules="{required: false}"
-                        label="Docker 密码"
+          <el-form-item :label="swapRegistry.reg_provider === 'swr'?'Secret Key':'Docker 密码'"
+                        :rules="{ required: true, message: `请输入 ${swapRegistry.reg_provider === 'swr'?'Secret Key':'Docker 密码'}`, trigger: 'blur' }"
                         prop="secret_key">
             <el-input size="small"
+                      clearable
+                      type="passsword"
                       v-model="swapRegistry.secret_key"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer"
              class="dialog-footer">
-          <el-button @click="dialogRegistryEditFormVisible = false">取 消</el-button>
+          <el-button size="small"
+                     @click="dialogRegistryEditFormVisible = false">取 消</el-button>
           <el-button :plain="true"
                      type="success"
+                     size="small"
                      @click="registryOperation('update')">保存</el-button>
         </div>
       </el-dialog>
@@ -110,15 +187,17 @@
           <template>
             <el-table :data="allRegistry"
                       style="width: 100%;">
-              <el-table-column label="地址/Namespace">
+              <el-table-column label="提供商/地址/Namespace">
                 <template slot-scope="scope">
+                  <i :class="getProviderMap(scope.row.reg_provider,'icon')"></i>
                   <span>{{`${scope.row.reg_addr.split('://')[1]}/${scope.row.namespace}`}}</span>
                 </template>
               </el-table-column>
               <el-table-column width="150px"
                                label="默认使用">
                 <template slot-scope="scope">
-                  <el-tag v-if="scope.row.is_default">默认使用</el-tag>
+                  <el-tag size="small"
+                          v-if="scope.row.is_default">默认使用</el-tag>
                   <span v-else>-</span>
                 </template>
               </el-table-column>
@@ -150,7 +229,6 @@
           </template>
         </div>
       </div>
-
     </div>
 </template>
 
@@ -167,21 +245,42 @@ export default {
         reg_addr: '',
         access_key: '',
         secret_key: '',
-        reg_provider: 'native',
+        reg_provider: '',
+        region: '',
         is_default: false
       },
       swapRegistry: {
         namespace: '',
         reg_addr: '',
         reg_provider: 'native',
+        region: '',
         access_key: '',
         secret_key: '',
         is_default: false
+      },
+      providerMap: {
+        native: {
+          icon: 'iconfont logo iconaff',
+          name: '其它'
+        },
+        swr: {
+          icon: 'iconfont logo iconhuawei',
+          name: '华为云 SWR'
+        },
+        acr: {
+          icon: 'iconfont logo iconaliyun ',
+          name: '阿里云 ACR'
+        },
+        tcr: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云 TCR'
+        }
       },
       dialogRegistryCreateFormVisible: false,
       dialogRegistryEditFormVisible: false,
       loading: true,
       rules: {
+        reg_provider: [{ required: true, message: '请选择镜像仓库提供商', trigger: 'blur' }],
         reg_addr: [{
           required: true,
           message: '请输入 URL',
@@ -192,13 +291,17 @@ export default {
           message: '请输入正确的 URL，包含协议',
           trigger: ['blur', 'change']
         }],
-        namespace: [{ required: true, message: '请输入 Namespace', trigger: 'blur' }],
-        access_key: [{ required: true, message: '请输入 Access Key', trigger: 'blur' }],
-        secret_key: [{ required: true, message: '请输入 Secret Key', trigger: 'blur' }]
+        region: [{ required: true, message: '请输入区域', trigger: 'blur' }],
+        namespace: [{ required: true, message: '请输入 Namespace', trigger: 'blur' }]
       }
     }
   },
   methods: {
+    getProviderMap (name, type) {
+      if (name && type) {
+        return this.providerMap[name][type]
+      }
+    },
     registryOperation (operate, current_registry) {
       if (operate === 'add') {
         this.$refs.registry.validate(valid => {
@@ -324,6 +427,10 @@ export default {
 
     .registry-list {
       padding-bottom: 30px;
+
+      .logo {
+        font-size: 20px;
+      }
     }
 
     .dialog-style {

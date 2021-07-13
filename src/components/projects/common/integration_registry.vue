@@ -23,23 +23,56 @@
                       prop="is_default">
           <el-checkbox v-model="registry.is_default"></el-checkbox>
         </el-form-item>
+        <el-form-item label="提供商"
+                      prop="reg_provider">
+          <el-select v-model="registry.reg_provider"
+                     style="width: 100%;"
+                     placeholder="请选择镜像仓库提供商">
+            <el-option value="acr"
+                       label="阿里云 ACR">
+              <i class="iconfont iconaliyun"></i> <span>阿里云 ACR</span>
+            </el-option>
+
+            <el-option value="swr"
+                       label="华为云 SWR">
+              <i class="iconfont iconhuawei"></i> <span>华为云 SWR</span>
+            </el-option>
+            <el-option value="tcr"
+                       label="腾讯云 TCR">
+              <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
+            </el-option>
+            <el-option value="native"
+                       label="其它">
+              <i class="iconfont iconaff"></i> <span>其它</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="registry.reg_provider === 'swr'"
+                      label="区域"
+                      prop="region">
+          <el-input clearable
+                    v-model="registry.region"></el-input>
+        </el-form-item>
         <el-form-item label="地址"
                       prop="reg_addr">
-          <el-input v-model="registry.reg_addr"></el-input>
+          <el-input clearable
+                    v-model="registry.reg_addr"></el-input>
         </el-form-item>
         <el-form-item label="Namespace"
                       prop="namespace">
           <el-input v-model="registry.namespace"></el-input>
         </el-form-item>
-        <el-form-item :rules="{required: false}"
-                      label="Docker 用户名"
+        <el-form-item :label="registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'"
+                      :rules="{ required: true, message: `请输入 ${registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'}`, trigger: 'blur' }"
                       prop="access_key">
-          <el-input v-model="registry.access_key"></el-input>
+          <el-input clearable
+                    v-model="registry.access_key"></el-input>
         </el-form-item>
-        <el-form-item :rules="{required: false}"
-                      label="Docker 密码"
+        <el-form-item :label="registry.reg_provider === 'swr'?'Secret Key':'Docker 密码'"
+                      :rules="{ required: true, message: `请输入 ${registry.reg_provider === 'swr'?'Secret Key':'Docker 密码'}`, trigger: 'blur' }"
                       prop="secret_key">
-          <el-input type="passsword"
+          <el-input clearable
+                    type="passsword"
                     v-model="registry.secret_key"></el-input>
         </el-form-item>
       </el-form>
@@ -66,10 +99,30 @@ export default {
         reg_addr: '',
         access_key: '',
         secret_key: '',
-        reg_provider: 'native',
+        reg_provider: '',
+        region: '',
         is_default: false
       },
+      providerMap: {
+        native: {
+          icon: 'iconfont logo iconaff',
+          name: '其它'
+        },
+        swr: {
+          icon: 'iconfont logo iconhuawei',
+          name: '华为云 SWR'
+        },
+        acr: {
+          icon: 'iconfont logo iconaliyun ',
+          name: '阿里云 ACR'
+        },
+        tcr: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云 TCR'
+        }
+      },
       rules: {
+        reg_provider: [{ required: true, message: '请选择镜像仓库提供商', trigger: 'blur' }],
         reg_addr: [{
           required: true,
           message: '请输入 URL',
@@ -80,9 +133,9 @@ export default {
           message: '请输入正确的 URL，包含协议',
           trigger: ['blur', 'change']
         }],
-        namespace: [{ required: true, message: '请输入 Namespace', trigger: 'blur' }],
-        access_key: [{ required: true, message: '请输入 Access Key', trigger: 'blur' }],
-        secret_key: [{ required: true, message: '请输入 Secret Key', trigger: 'blur' }]
+        region: [{ required: true, message: '请输入区域', trigger: 'blur' }],
+        namespace: [{ required: true, message: '请输入 Namespace', trigger: 'blur' }]
+
       }
     }
   },
@@ -92,6 +145,11 @@ export default {
     }
   },
   methods: {
+    getProviderMap (name, type) {
+      if (name && type) {
+        return this.providerMap[name][type]
+      }
+    },
     registryOperation () {
       this.$refs.registry.validate(valid => {
         if (valid) {
