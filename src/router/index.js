@@ -10,6 +10,9 @@ import not_found from '../components/entry/404.vue'
 // setup
 import setup_admin from '../components/setup/admin.vue'
 
+// loading
+import loading from '../components/entry/loading.vue'
+
 // home
 import onboarding_home from '../components/entry/home.vue'
 
@@ -515,6 +518,10 @@ const routes = [
     meta: {
       title: '系统初始化'
     }
+  },
+  {
+    path: '/loading',
+    component: loading
   },
   {
     path: '/v1/tests',
