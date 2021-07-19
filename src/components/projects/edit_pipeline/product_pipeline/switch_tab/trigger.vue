@@ -8,11 +8,25 @@
                @close="closeWebhookDialog"
                custom-class="add-trigger-dialog"
                center>
-      <el-form :model="webhook"
+      <el-form :model="webhookSwap"
                label-position="left"
                label-width="80px">
+        <el-form-item label="名称">
+          <el-input size="small"
+                    autofocus
+                    ref="webhookNamedRef"
+                    v-model="webhookSwap.name"
+                    placeholder="请输入名称"></el-input>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input size="small"
+                    type="textarea"
+                    v-model="webhookSwap.description"
+                    placeholder="请输入描述"></el-input>
+        </el-form-item>
         <el-form-item label="代码库">
-          <el-select v-model="webhookSwap.repo"
+          <el-select style="width: 100%;"
+                     v-model="webhookSwap.repo"
                      size="small"
                      @change="repoChange(webhookSwap.repo)"
                      filterable
@@ -27,7 +41,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="目标分支">
-          <el-select v-model="webhookSwap.repo.branch"
+          <el-select style="width: 100%;"
+                     v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
                      clearable
@@ -40,7 +55,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="部署环境">
-          <el-select v-model="webhookSwap.namespace"
+          <el-select style="width: 100%;"
+                     v-model="webhookSwap.namespace"
                      multiple
                      filterable
                      @change="changeNamespace"
@@ -97,7 +113,8 @@
         </div>
         <el-form-item v-if="webhookSwap.env_update_policy === 'base' && showPrEnv && webhookSwap.repo.source==='gitlab' && showEnvUpdatePolicy"
                       label="销毁策略">
-          <el-select v-model="webhookSwap.env_recycle_policy"
+          <el-select style="width: 100%;"
+                     v-model="webhookSwap.env_recycle_policy"
                      size="small"
                      placeholder="请选择销毁策略">
             <el-option label="工作流成功之后销毁"
@@ -112,7 +129,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="部署服务">
-          <el-select v-model="webhookSwap.targets"
+          <el-select style="width: 100%;"
+                     v-model="webhookSwap.targets"
                      multiple
                      filterable
                      value-key="key"
@@ -258,6 +276,16 @@
             <el-table class="add-border"
                       :data="webhook.items"
                       style="width: 100%;">
+              <el-table-column label="名称">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.main_repo.name?scope.row.main_repo.name:'' }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="描述">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.main_repo.description?scope.row.main_repo.description:'' }}</span>
+                </template>
+              </el-table-column>
               <el-table-column label="代码库拥有者">
                 <template slot-scope="scope">
                   <span>{{ scope.row.main_repo.repo_owner }}</span>
@@ -502,8 +530,12 @@ export default {
       this.showEnvUpdatePolicy = true
       this.currenteditWebhookIndex = index
       const webhookSwap = this.$utils.cloneObj(this.webhook.items[index])
-      this.getBranchInfoById(webhookSwap.main_repo.codehost_id, webhookSwap.main_repo.repo_owner, webhookSwap.main_repo.repo_name)
+      if (webhookSwap.main_repo.codehost_id && webhookSwap.main_repo.repo_owner && webhookSwap.main_repo.repo_name) {
+        this.getBranchInfoById(webhookSwap.main_repo.codehost_id, webhookSwap.main_repo.repo_owner, webhookSwap.main_repo.repo_name)
+      }
       this.webhookSwap = {
+        name: webhookSwap.main_repo.name,
+        description: webhookSwap.main_repo.description,
         repo: Object.assign({ key: `${webhookSwap.main_repo.repo_owner}/${webhookSwap.main_repo.repo_name}` }, webhookSwap.main_repo),
         namespace: webhookSwap.workflow_args.namespace.split(','),
         env_update_policy: webhookSwap.workflow_args.env_update_policy ? webhookSwap.workflow_args.env_update_policy : (webhookSwap.workflow_args.base_namespace ? 'base' : 'all'),
@@ -520,8 +552,9 @@ export default {
       }
     },
     addWebhookBtn () {
-      this.webhookAddMode = true
       this.webhookSwap = {
+        name: `trigger${this.webhook.items.length + 1}`,
+        description: '',
         repo: {},
         events: [],
         targets: [],
@@ -533,11 +566,17 @@ export default {
         env_recycle_policy: 'success',
         match_folders: '/\n!.md'
       }
+      this.webhookAddMode = true
+      this.$nextTick(() => {
+        this.$refs.webhookNamedRef.focus()
+      })
     },
     addWebhook () {
       const webhookSwap = this.$utils.cloneObj(this.webhookSwap)
       webhookSwap.repo.match_folders = webhookSwap.match_folders.split('\n')
       webhookSwap.repo.events = webhookSwap.events
+      webhookSwap.repo.name = webhookSwap.name
+      webhookSwap.repo.description = webhookSwap.description
       this.webhook.items.push({
         main_repo: webhookSwap.repo,
         auto_cancel: webhookSwap.auto_cancel,
@@ -551,6 +590,8 @@ export default {
         }
       })
       this.webhookSwap = {
+        name: '',
+        description: '',
         repo: {},
         events: [],
         targets: [],
@@ -569,6 +610,8 @@ export default {
       const webhookSwap = this.$utils.cloneObj(this.webhookSwap)
       webhookSwap.repo.match_folders = webhookSwap.match_folders.split('\n')
       webhookSwap.repo.events = webhookSwap.events
+      webhookSwap.repo.name = webhookSwap.name
+      webhookSwap.repo.description = webhookSwap.description
       this.$set(this.webhook.items, index, {
         main_repo: webhookSwap.repo,
         auto_cancel: webhookSwap.auto_cancel,
@@ -582,6 +625,8 @@ export default {
         }
       })
       this.webhookSwap = {
+        name: '',
+        description: '',
         repo: {},
         events: [],
         targets: [],
