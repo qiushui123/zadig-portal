@@ -65,23 +65,38 @@
             </div>
           </el-col>
           <el-col :span="6">
-            <el-tooltip :content="`在 ${build.source} 上查看 Branch`"
+            <el-tooltip :content="build.source==='gerrit'?`暂不支持在该类型上查看 Release`:`在 ${build.source} 上查看 Release`"
                         placement="top"
                         effect="dark">
-              <span v-if="build.branch"
+              <span v-if="build.tag"
                     class="link">
-                <a v-if="build.source==='github'"
+                <a v-if="build.source==='github'||build.source==='gitlab'"
+                   :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tags/${build.tag}`"
+                   target="_blank">{{build.tag}}
+                </a>
+                <span v-if="build.source==='gerrit'">{{build.tag}}</span>
+              </span>
+            </el-tooltip>
+            <el-tooltip :content="build.source==='gerrit'||build.source==='codehub'?`暂不支持在该类型上查看 Branch`:`在 ${build.source} 上查看 Branch`"
+                        placement="top"
+                        effect="dark">
+              <span v-if="build.branch && !build.tag"
+                    class="link">
+                <a v-if="build.source==='github'||build.source==='gitlab'"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tree/${build.branch}`"
                    target="_blank">{{"Branch-"+build.branch}}
                 </a>
-                <a v-if="build.source==='gitlab'"
-                   :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tree/${build.branch}`"
-                   target="_blank">{{"Branch-"+build.branch}}
-                </a>
+                <span v-if="build.source==='gerrit'">{{"Branch-"+build.branch}}
+                </span>
                 <a v-if="!build.source"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tree/${build.branch}`"
                    target="_blank">{{"Branch-"+build.branch}}
                 </a>
+                <!-- <a v-else-if="build.source ==='codehub'"
+                               :href="`${build.address}/codehub/project${build.project_uuid}/codehub/${build.repo_id}/home?ref=${build.branch}`"
+                               target="_blank">{{"Branch-"+build.branch}}
+                  </a> -->
+                <span v-else-if="build.source ==='codehub'">{{"Branch-"+build.branch}}</span>
               </span>
             </el-tooltip>
             <el-tooltip :content="`在 ${build.source} 上查看 PR`"
@@ -103,7 +118,7 @@
                 </a>
               </span>
             </el-tooltip>
-            <el-tooltip :content="`在 ${build.source} 上查看 Commit`"
+            <el-tooltip :content="build.source==='gerrit'||build.source==='codehub'?`暂不支持在该类型上查看 Commit`:`在 ${build.source} 上查看 Commit`"
                         placement="top"
                         effect="dark">
               <span v-if="build.commit_id"
@@ -121,6 +136,12 @@
                   </a>
                   {{build.commit_id.substring(0, 8)}}
                 </span>
+                <!-- <a v-else-if="build.source==='codehub'"
+                               :href="`${build.address}/codehub/project/${build.project_uuid}/codehub/${build.repo_id}/${build.commit_id}/commitdetail`"
+                               target="_blank">{{build.commit_id.substring(0, 8)}}
+                  </a> -->
+                <span
+                      v-else-if="build.source==='codehub'">{{build.commit_id.substring(0, 8)}}</span>
               </span>
             </el-tooltip>
           </el-col>

@@ -4,7 +4,28 @@
               :closable="false"
               type="warning">
     </el-alert>
-    <el-alert type="info"
+    <el-alert v-if="codeAdd.type === 'codehub'"
+              type="info"
+              :closable="false">
+      <slot>
+        <span class="tips">点击
+          <el-link style="font-size: 14px; vertical-align: baseline;"
+                   type="primary"
+                   href="https://support.huaweicloud.com/devg-apisign/api-sign-provide-aksk.html"
+                   :underline="false"
+                   target="_blank">帮助</el-link> 查看如何获取 Access Key 和 Secret Key
+        </span>
+        <span class="tips">点击
+          <el-link style="font-size: 14px; vertical-align: baseline;"
+                   type="primary"
+                   href="https://support.huaweicloud.com/usermanual-codehub/codehub_ug_8003.html"
+                   :underline="false"
+                   target="_blank">帮助</el-link> 查看如何获取用户名和密码
+        </span>
+      </slot>
+    </el-alert>
+    <el-alert v-else
+              type="info"
               :closable="false">
       <slot>
         <span class="tips">{{`- 应用授权的回调地址请填写:`}}</span>
@@ -38,6 +59,8 @@
                      value="gitlab"></el-option>
           <el-option label="GitHub"
                      value="github"></el-option>
+          <el-option label="CodeHub"
+                     value="codehub"></el-option>
           <el-option label="Gerrit"
                      value="gerrit"></el-option>
         </el-select>
@@ -90,6 +113,49 @@
                     auto-complete="off"></el-input>
         </el-form-item>
       </template>
+      <template v-else-if="codeAdd.type==='codehub'">
+        <el-form-item label="CodeHub 服务 URL"
+                      prop="address">
+          <el-input v-model="codeAdd.address"
+                    placeholder="CodeHub 服务 URL"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="区域"
+                      prop="region">
+          <el-input v-model="codeAdd.region"
+                    placeholder="区域"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item :rules="{required: true,message: '请填写 Access Key',trigger: ['blur']}"
+                      label="Access Key"
+                      prop="applicationId">
+          <el-input v-model="codeAdd.applicationId"
+                    placeholder="Access Key"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item :rules="{required: true,message: '请填写 Secret Key',trigger: ['blur']}"
+                      label="Secret Key"
+                      prop="clientSecret">
+          <el-input v-model="codeAdd.clientSecret"
+                    placeholder="Secret Key"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item :rules="{required: true,message: '请填写用户名',trigger: ['blur']}"
+                      label="用户名"
+                      prop="username">
+          <el-input v-model="codeAdd.username"
+                    placeholder="用户名"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item :rules="{required: true,message: '请填写密码',trigger: ['blur']}"
+                      label="密码"
+                      prop="password">
+          <el-input v-model="codeAdd.password"
+                    placeholder="密码"
+                    auto-complete="off"></el-input>
+        </el-form-item>
+
+      </template>
     </el-form>
     <div slot="footer"
          class="dialog-footer">
@@ -97,8 +163,8 @@
                  native-type="submit"
                  size="small"
                  class="start-create"
-                 @click="createCodeConfig">{{codeAdd.type==='gerrit'?'确定':'前往授权'}}</el-button>
-
+                 @click="createCodeConfig">
+        {{(codeAdd.type==='gerrit'||codeAdd.type==='codehub')?'确定':'前往授权'}}</el-button>
       <el-button plain
                  native-type="submit"
                  size="small"
@@ -127,6 +193,7 @@ export default {
       codeAdd: {
         name: '',
         namespace: '',
+        region: '',
         type: 'gitlab',
         address: '',
         accessToken: '',
@@ -161,6 +228,11 @@ export default {
         clientSecret: {
           required: true,
           message: '请填写 Secret',
+          trigger: ['blur']
+        },
+        region: {
+          required: true,
+          message: '请填写区域',
           trigger: ['blur']
         },
         namespace: {

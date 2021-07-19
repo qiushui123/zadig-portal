@@ -664,6 +664,13 @@ export default {
           this.test.pre_test.image_id = image.id
           this.test.pre_test.image_from = image.image_from
         }
+        this.test.repos.forEach(repo => {
+          this.allCodeHosts.forEach(codehost => {
+            if (repo.codehost_id === codehost.id) {
+              repo.source = codehost.type
+            }
+          })
+        });
         (this.isEdit ? updateTestAPI : createTestAPI)(this.test).then(res => {
           this.$message({
             message: '保存成功',

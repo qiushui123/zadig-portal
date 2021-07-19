@@ -642,15 +642,23 @@ export function getRepoOwnerByIdAPI (id, key = '') {
   return http.get(`/api/aslan/code/codehost/${id}/namespaces?key=${key}`)
 }
 
-export function getRepoNameByIdAPI (id, type, repo_owner, key = '') {
+export function getRepoNameByIdAPI (id, type, repo_owner, key = '', project_uuid = '') {
   const repoOwner = repo_owner.includes('/') ? encodeURIComponent(encodeURIComponent(repo_owner)) : repo_owner
-  return http.get(`/api/aslan/code/codehost/${id}/namespaces/${repoOwner}/projects?type=${type}&key=${key}`)
+  if (project_uuid) {
+    return http.get(`/api/aslan/code/codehost/${id}/namespaces/${project_uuid}/projects?type=${type}&key=${key}`)
+  } else {
+    return http.get(`/api/aslan/code/codehost/${id}/namespaces/${repoOwner}/projects?type=${type}&key=${key}`)
+  }
 }
 
-export function getBranchInfoByIdAPI (id, repo_owner, repo_name) {
+export function getBranchInfoByIdAPI (id, repo_owner, repo_name, repo_uuid = '') {
   const repoOwner = repo_owner.includes('/') ? encodeURIComponent(encodeURIComponent(repo_owner)) : repo_owner
   const repoName = repo_name.includes('/') ? encodeURIComponent(encodeURIComponent(repo_name)) : repo_name
-  return http.get(`/api/aslan/code/codehost/${id}/namespaces/${repoOwner}/projects/${repoName}/branches`)
+  if (repo_uuid) {
+    return http.get(`/api/aslan/code/codehost/${id}/namespaces/${repoOwner}/projects/${repo_uuid}/branches`)
+  } else {
+    return http.get(`/api/aslan/code/codehost/${id}/namespaces/${repoOwner}/projects/${repoName}/branches`)
+  }
 }
 
 // GitHub App

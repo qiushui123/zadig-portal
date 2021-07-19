@@ -51,7 +51,7 @@
                          size="small"
                          placeholder="代码库拥有者"
                          filterable>
-                <el-option v-for="(repo_owner,index) in codeInfo[repo_index]['repo_owners']"
+                <el-option v-for="(repo_owner,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repo_owners'] : []"
                            :key="index"
                            :label="repo_owner.path"
                            :value="repo_owner.path">
@@ -63,7 +63,7 @@
             <el-form-item :label="repo_index === 0 ? (shortDescription?'名称':'代码库名称') : ''"
                           :prop="'repos.' + repo_index + '.repo_name'"
                           :rules="{required: true, message: '名称不能为空', trigger: 'blur'}">
-              <el-select @change="getBranchInfoById(repo_index,config.repos[repo_index].codehost_id,config.repos[repo_index].repo_owner,config.repos[repo_index].repo_name)"
+              <el-select @change="getBranchInfoById(repo_index,config.repos[repo_index].codehost_id,config.repos[repo_index].repo_owner,config.repos[repo_index].repo_name,config.repos[repo_index].project_uuid)"
                          v-model.trim="config.repos[repo_index].repo_name"
                          remote
                          :remote-method="(query)=>{searchProject(repo_index,query)}"
@@ -73,7 +73,7 @@
                          size="small"
                          placeholder="请选择代码库"
                          filterable>
-                <el-option v-for="(repo,index) in codeInfo[repo_index]['repos']"
+                <el-option v-for="(repo,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repos'] : []"
                            :key="index"
                            :label="repo.name"
                            :value="repo.name">
@@ -91,7 +91,7 @@
                          filterable
                          allow-create
                          clearable>
-                <el-option v-for="(branch,branch_index) in codeInfo[repo_index]['branches']"
+                <el-option v-for="(branch,branch_index) in codeInfo[repo_index] ? codeInfo[repo_index]['branches'] : []"
                            :key="branch_index"
                            :label="branch.name"
                            :value="branch.name">
@@ -347,7 +347,7 @@ export default {
       const codehostType = (this.allCodeHosts.find(item => { return item.id === id })).type
       if (codehostType === 'github' && query !== '') {
         const items = this.$utils.filterObjectArrayByKey('name', query, this.codeInfo[index].origin_repo_owners)
-        this.$set(this.codeInfo[index], 'repo_owners', items)
+        this.$set(this.codeInfo[index], 'repo_owners', items || [])
         if (this.allCodeHosts && this.allCodeHosts.length > 1) {
           this.config.repos[index].repo_owner = ''
           this.config.repos[index].repo_name = ''
@@ -360,21 +360,28 @@ export default {
     getRepoNameById (index, id, repo_owner, key = '') {
       const item = (this.codeInfo[index].repo_owners.find(item => { return item.path === repo_owner }))
       const type = item ? item.kind : 'group'
+      const project_uuid = item.project_uuid ? item.project_uuid : ''
       if (repo_owner) {
-        getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key).then((res) => {
+        getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key, project_uuid).then((res) => {
           this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
           this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
         })
       }
+      this.$set(this.config.repos[index], 'project_uuid', project_uuid)
       this.config.repos[index].repo_name = ''
       this.config.repos[index].branch = ''
     },
     getBranchInfoById (index, id, repo_owner, repo_name) {
+      const repoItem = (this.codeInfo[index].repos.find(item => { return item.name === repo_name }))
+      const repoId = repoItem.repo_id ? repoItem.repo_id : ''
+      const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
       if (repo_owner && repo_name) {
-        getBranchInfoByIdAPI(id, repo_owner, repo_name).then((res) => {
-          this.$set(this.codeInfo[index], 'branches', res)
+        getBranchInfoByIdAPI(id, repo_owner, repo_name, repoUUID).then((res) => {
+          this.$set(this.codeInfo[index], 'branches', res || [])
         })
       }
+      this.$set(this.config.repos[index], 'repo_uuid', repoUUID)
+      this.$set(this.config.repos[index], 'repo_id', repoId)
       this.config.repos[index].branch = ''
     },
     getRepoOwnerById (index, id, key = '') {
@@ -393,6 +400,7 @@ export default {
         const codehostId = element.codehost_id
         const repoOwner = element.repo_owner
         const repoName = element.repo_name
+        const uuid = element.repo_uuid
         this.$set(this.codeInfo, index, {
           repo_owners: [],
           repos: [],
@@ -404,13 +412,14 @@ export default {
             this.$set(this.codeInfo[index], 'origin_repo_owners', orderBy(res, ['name']))
             const item = this.codeInfo[index].repo_owners.find(item => { return item.path === repoOwner })
             const type = item ? item.kind : 'group'
-            getRepoNameByIdAPI(codehostId, type, encodeURI(repoOwner)).then((res) => {
+            const project_uuid = item.project_uuid ? item.project_uuid : ''
+            getRepoNameByIdAPI(codehostId, type, encodeURI(repoOwner), '', project_uuid).then((res) => {
               this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
               this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
             })
           })
-          getBranchInfoByIdAPI(codehostId, repoOwner, repoName).then((res) => {
-            this.$set(this.codeInfo[index], 'branches', res)
+          getBranchInfoByIdAPI(codehostId, repoOwner, repoName, uuid).then((res) => {
+            this.$set(this.codeInfo[index], 'branches', res || [])
           })
         }
       })
@@ -447,7 +456,7 @@ export default {
     getCodeSourceAPI(orgId).then((response) => {
       this.allCodeHosts = response
     });
-    (this.showFirstLine) && this.addFirstBuildRepo()
+    (this.showFirstLine && this.config.repos.length === 0) && this.addFirstBuildRepo()
   },
   watch: {
     config (new_val, old_val) {

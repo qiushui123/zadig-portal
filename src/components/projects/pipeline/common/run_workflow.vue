@@ -405,12 +405,28 @@ export default {
       )
     },
     allReposForQuery () {
-      return this.allReposDeduped.map(re => ({
-        repo_owner: re.repo_owner,
-        repo: re.repo_name,
-        default_branch: re.branch,
-        codehost_id: re.codehost_id
-      }))
+      return this.allReposDeduped.map(re => {
+        if (re.source === 'codehub') {
+          return {
+            source: re.source,
+            repo_owner: re.repo_owner,
+            repo: re.repo_name,
+            default_branch: re.branch,
+            project_uuid: re.project_uuid,
+            repo_uuid: re.repo_uuid,
+            repo_id: re.repo_id,
+            codehost_id: re.codehost_id
+          }
+        } else {
+          return {
+            source: re.source,
+            repo_owner: re.repo_owner,
+            repo: re.repo_name,
+            default_branch: re.branch,
+            codehost_id: re.codehost_id
+          }
+        }
+      })
     },
     haveForcedInput () {
       return !this.$utils.isEmpty(this.forcedUserInput)
