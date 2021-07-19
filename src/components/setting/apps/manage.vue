@@ -422,7 +422,7 @@ export default {
     changeProxy (value) {
       if (!this.proxyInfo.id || this.proxyInfo.type === 'no') {
         this.proxyInfo.enable_application_proxy = false
-        this.$message.error('未配置代理，请前往「系统配置」-「代理配置」配置代理！')
+        this.$message.error('未配置代理，请前往「系统配置」->「代理配置」配置代理！')
         return
       }
       this.proxyInfo.enable_application_proxy = value
