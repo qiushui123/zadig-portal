@@ -218,7 +218,7 @@ export default {
         env_names: this.checkedEnvList
       }
       const projectName = this.projectName
-      const force = true
+      const force = false
       autoUpgradeEnvAPI(projectName, payload, force).then((res) => {
         this.$router.push(`/v1/projects/detail/${projectName}/envs`)
         this.$message({

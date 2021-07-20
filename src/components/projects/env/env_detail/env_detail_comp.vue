@@ -996,7 +996,7 @@ export default {
           const envName = product_info.env_name
           const envType = this.isProd ? 'prod' : ''
           const payload = { vars: product_info.vars }
-          const force = true
+          const force = false
           updateK8sEnvAPI(projectName, envName, payload, envType, force).then(
             response => {
               this.fetchAllData()
