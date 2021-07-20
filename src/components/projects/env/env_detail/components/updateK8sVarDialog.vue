@@ -119,8 +119,13 @@ export default {
             message: '更新环境变量成功，请等待服务升级',
             type: 'success'
           })
+        }).catch(error => {
+        const description = error.data.description
+        const res = description.match('the following services are modified since last update')
+        if (res) {
+          this.updateEnv(error.data.description)
         }
-      )
+      })
     },
     updateEnv (res) {
       const message = JSON.parse(res.match(/{.+}/g)[0])
