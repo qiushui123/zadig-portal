@@ -230,98 +230,105 @@
     </el-dialog>
     <!--end of add account dialog-->
     <div class="tab-container">
+      <template>
+        <el-alert type="info"
+                  :closable="false">
           <template>
-            <el-alert type="info"
-                      :closable="false"
-                      description="为系统定义用户来源，默认支持 LDAP、AD、以及 SSO 集成">
-            </el-alert>
+            为系统定义用户来源，默认支持 LDAP、AD、以及 SSO 集成，详情可参考
+            <el-link style="font-size: 14px; vertical-align: baseline;"
+                     type="primary"
+                     :href="`/zadig/settings/account/`"
+                     :underline="false"
+                     target="_blank">帮助文档</el-link> 。
           </template>
-          <div class="sync-container">
-            <el-button v-if="(accounts.length+sso.length) < 2"
-                       size="small"
-                       type="primary"
+        </el-alert>
+      </template>
+      <div class="sync-container">
+        <el-button v-if="(accounts.length+sso.length) < 2"
+                   size="small"
+                   type="primary"
+                   plain
+                   @click="handleUserAccountAdd()">添加</el-button>
+      </div>
+      <el-table v-if="accounts.length>0"
+                :data="accounts"
+                style="width: 100%;">
+        <el-table-column label="账号系统">
+          <template slot-scope="scope">
+            {{scope.row.type}}
+          </template>
+        </el-table-column>
+        <el-table-column label="主机名">
+          <template slot-scope="scope">
+            {{scope.row.address}}
+          </template>
+        </el-table-column>
+        <el-table-column label="端口">
+          <template slot-scope="scope">
+            {{scope.row.port}}
+          </template>
+        </el-table-column>
+        <el-table-column label="DN">
+          <template slot-scope="scope">
+            {{scope.row.dn}}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="300">
+          <template slot-scope="scope">
+            <el-button type="primary"
+                       size="mini"
+                       :loading="syncAccountUserLoading"
+                       @click="syncAccountUser()"
+                       plain>同步用户数据</el-button>
+            <el-button type="primary"
+                       size="mini"
                        plain
-                       @click="handleUserAccountAdd()">添加</el-button>
-          </div>
-          <el-table v-if="accounts.length>0"
-                    :data="accounts"
-                    style="width: 100%;">
-            <el-table-column label="账号系统">
-              <template slot-scope="scope">
-                {{scope.row.type}}
-              </template>
-            </el-table-column>
-            <el-table-column label="主机名">
-              <template slot-scope="scope">
-                {{scope.row.address}}
-              </template>
-            </el-table-column>
-            <el-table-column label="端口">
-              <template slot-scope="scope">
-                {{scope.row.port}}
-              </template>
-            </el-table-column>
-            <el-table-column label="DN">
-              <template slot-scope="scope">
-                {{scope.row.dn}}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="300">
-              <template slot-scope="scope">
-                <el-button type="primary"
-                           size="mini"
-                           :loading="syncAccountUserLoading"
-                           @click="syncAccountUser()"
-                           plain>同步用户数据</el-button>
-                <el-button type="primary"
-                           size="mini"
-                           plain
-                           @click="handleUserAccountEdit(scope.row)">编辑</el-button>
-                <el-button type="danger"
-                           size="mini"
-                           @click="handleUserAccountDelete()"
-                           plain>删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-          <el-table v-if="sso.length>0"
-                    :data="sso"
-                    style="width: 100%;">
-            <el-table-column label="账号系统">
-              <template>
-                <span>SSO</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="Client Id">
-              <template slot-scope="scope">
-                {{scope.row.clientId}}
-              </template>
-            </el-table-column>
-            <el-table-column label="Redirect">
-              <template slot-scope="scope">
-                {{scope.row.redirect}}
-              </template>
-            </el-table-column>
-            <el-table-column label="Secret">
-              <template slot-scope="scope">
-                {{scope.row.secret}}
-              </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="300">
-              <template slot-scope="scope">
-                <el-button type="primary"
-                           size="mini"
-                           plain
-                           @click="handleSSOEdit(scope.row)">编辑</el-button>
-                <el-button type="danger"
-                           size="mini"
-                           @click="handleSSODelete()"
-                           plain>删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+                       @click="handleUserAccountEdit(scope.row)">编辑</el-button>
+            <el-button type="danger"
+                       size="mini"
+                       @click="handleUserAccountDelete()"
+                       plain>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-if="sso.length>0"
+                :data="sso"
+                style="width: 100%;">
+        <el-table-column label="账号系统">
+          <template>
+            <span>SSO</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Client Id">
+          <template slot-scope="scope">
+            {{scope.row.clientId}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Redirect">
+          <template slot-scope="scope">
+            {{scope.row.redirect}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Secret">
+          <template slot-scope="scope">
+            {{scope.row.secret}}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="300">
+          <template slot-scope="scope">
+            <el-button type="primary"
+                       size="mini"
+                       plain
+                       @click="handleSSOEdit(scope.row)">编辑</el-button>
+            <el-button type="danger"
+                       size="mini"
+                       @click="handleSSODelete()"
+                       plain>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>

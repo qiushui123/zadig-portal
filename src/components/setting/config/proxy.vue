@@ -3,8 +3,15 @@
     <!-- 这里是代理配置的内容-->
     <template>
       <el-alert type="info"
-                :closable="false"
-                description="为系统配置代理，配置后可以在「代码源集成」和「应用设置」中选择使用代理">
+                :closable="false">
+        <template>
+          为系统配置代理，配置后可以在「代码源集成」和「应用设置」中选择使用代理，参考
+          <el-link style="font-size: 14px; vertical-align: baseline;"
+                   type="primary"
+                   :href="`/zadig/settings/system-settings/`"
+                   :underline="false"
+                   target="_blank">帮助文档</el-link>
+        </template>
       </el-alert>
     </template>
     <div class="sync-container form-container">

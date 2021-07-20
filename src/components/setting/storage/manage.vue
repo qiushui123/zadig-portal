@@ -1,206 +1,219 @@
 <template>
-    <div v-loading="loading"
-         element-loading-text="加载中..."
-         element-loading-spinner="iconfont iconfont-loading iconduixiangcunchu"
-         class="setting-storage-container">
-      <!--storage-create-dialog-->
-      <el-dialog title='添加'
-                 :visible.sync="dialogStorageCreateFormVisible"
-                 custom-class="dialog-style"
-                 :close-on-click-modal="false"
-                 width="35%">
-        <el-form ref="storage"
-                 :rules="rules"
-                 label-width="120px"
-                 tab-position="left"
-                 :model="storage">
-          <el-form-item label="接入点地址"
-                        prop="endpoint">
-            <el-input size="small"
-                      v-model="storage.endpoint"
-                      placeholder="请输入接入点地址"></el-input>
-          </el-form-item>
-          <el-form-item label="AK"
-                        prop="ak">
-            <el-input size="small"
-                      v-model="storage.ak"
-                      placeholder="请输入 Access Key"></el-input>
-          </el-form-item>
-          <el-form-item label="SK"
-                        prop="sk">
-            <el-input size="small"
-                      v-model="storage.sk"
-                      placeholder="请输入 Secret Key"></el-input>
-          </el-form-item>
-          <el-form-item label="Bucket"
-                        prop="bucket">
-            <el-input size="small"
-                      v-model="storage.bucket"
-                      placeholder="请输入 Bucket"></el-input>
-          </el-form-item>
-          <el-form-item label="存储相对路径"
-                        prop="subfolder">
-            <el-input size="small"
-                      v-model="storage.subfolder"
-                      placeholder="请输入存储相对路径"></el-input>
-          </el-form-item>
-          <el-form-item label="协议"
-                        prop="insecure">
-            <el-radio v-model="storage.insecure"
-                      :label="true">HTTP</el-radio>
-            <el-radio v-model="storage.insecure"
-                      :label="false">HTTPS</el-radio>
-          </el-form-item>
-          <el-form-item label="默认使用"
-                        prop="is_default">
-            <el-checkbox size="small"
-                         v-model="storage.is_default"></el-checkbox>
-          </el-form-item>
-        </el-form>
-        <div slot="footer"
-             class="dialog-footer">
-          <el-button size="small"
-                     @click="dialogStorageCreateFormVisible = false">取 消</el-button>
-          <el-button size="small"
-                     :plain="true"
-                     type="success"
-                     @click="storageOperation('add')">保存</el-button>
-        </div>
-      </el-dialog>
-      <!--storage-create-dialog-->
-
-      <!--storage-edit-dialog-->
-      <el-dialog title='修改'
-                 :visible.sync="dialogStorageEditFormVisible"
-                 custom-class="dialog-style"
-                 :close-on-click-modal="false"
-                 width="35%">
-        <el-form ref="swapStorage"
-                 :rules="rules"
-                 label-width="120px"
-                 tab-position="left"
-                 :model="swapStorage">
-          <el-form-item label="接入点地址"
-                        prop="endpoint">
-            <el-input size="small"
-                      v-model="swapStorage.endpoint"
-                      placeholder="请输入接入点地址"></el-input>
-          </el-form-item>
-          <el-form-item label="AK"
-                        prop="ak">
-            <el-input size="small"
-                      v-model="swapStorage.ak"
-                      placeholder="请输入 Access Key"></el-input>
-          </el-form-item>
-          <el-form-item label="SK"
-                        prop="sk">
-            <el-input size="small"
-                      v-model="swapStorage.sk"
-                      placeholder="请输入 Secret Key"></el-input>
-          </el-form-item>
-          <el-form-item label="Bucket"
-                        prop="bucket">
-            <el-input size="small"
-                      v-model="swapStorage.bucket"
-                      placeholder="请输入 Bucket"></el-input>
-          </el-form-item>
-          <el-form-item label="存储相对路径"
-                        prop="subfolder">
-            <el-input size="small"
-                      v-model="swapStorage.subfolder"
-                      placeholder="请输入存储相对路径"></el-input>
-          </el-form-item>
-          <el-form-item label="协议"
-                        prop="insecure">
-            <el-radio v-model="swapStorage.insecure"
-                      :label="true">HTTP</el-radio>
-            <el-radio v-model="swapStorage.insecure"
-                      :label="false">HTTPS</el-radio>
-          </el-form-item>
-          <el-form-item label="默认使用"
-                        prop="is_default">
-            <el-checkbox size="small"
-                         v-model="swapStorage.is_default"></el-checkbox>
-          </el-form-item>
-        </el-form>
-        <div slot="footer"
-             class="dialog-footer">
-          <el-button size="small"
-                     @click="dialogStorageEditFormVisible = false">取 消</el-button>
-          <el-button size="small"
-                     :plain="true"
-                     type="success"
-                     @click="storageOperation('update')">保存</el-button>
-        </div>
-      </el-dialog>
-      <!--storage-edit-dialog-->
-      <div class="section">
-        <div class="sync-container">
-          <el-button :plain="true"
-                     size="small"
-                     @click="dialogStorageCreateFormVisible=true"
-                     type="success">新建</el-button>
-        </div>
-        <div class="storage-list">
-          <template>
-            <el-table :data="allStorage"
-                      style="width: 100%;">
-              <el-table-column label="接入点地址">
-                <template slot-scope="scope">
-                  <span>{{scope.row.endpoint}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="Bucket">
-                <template slot-scope="scope">
-                  <span>{{scope.row.bucket}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="相对路径">
-                <template slot-scope="scope">
-                  <span v-if="scope.row.subfolder">{{scope.row.subfolder}}</span>
-                  <span v-else>-</span>
-                </template>
-              </el-table-column>
-              <el-table-column width="80"
-                               label="HTTPS">
-                <template slot-scope="scope">
-                  <span>{{!scope.row.insecure?'是':'否'}}</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column width="100" label="默认使用">
-                <template slot-scope="scope">
-                  <el-tag v-if="scope.row.is_default">默认使用</el-tag>
-                  <span v-else>-</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="创建时间">
-                <template slot-scope="scope">
-                  <i class="el-icon-time"></i>
-                  <span>{{ $utils.convertTimestamp(scope.row.update_time) }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="最后修改">
-                <template slot-scope="scope">
-                  <span>{{ scope.row.updated_by}}</span>
-                </template>
-              </el-table-column>
-
-              <el-table-column label="操作">
-                <template slot-scope="scope">
-                  <el-button @click="storageOperation('edit',scope.row)"
-                             size="mini">编辑</el-button>
-                  <el-button @click="storageOperation('delete',scope.row)"
-                             size="mini"
-                             type="danger">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </template>
-        </div>
+  <div v-loading="loading"
+       element-loading-text="加载中..."
+       element-loading-spinner="iconfont iconfont-loading iconduixiangcunchu"
+       class="setting-storage-container">
+    <!--storage-create-dialog-->
+    <el-dialog title='添加'
+               :visible.sync="dialogStorageCreateFormVisible"
+               custom-class="dialog-style"
+               :close-on-click-modal="false"
+               width="35%">
+      <el-form ref="storage"
+               :rules="rules"
+               label-width="120px"
+               tab-position="left"
+               :model="storage">
+        <el-form-item label="接入点地址"
+                      prop="endpoint">
+          <el-input size="small"
+                    v-model="storage.endpoint"
+                    placeholder="请输入接入点地址"></el-input>
+        </el-form-item>
+        <el-form-item label="AK"
+                      prop="ak">
+          <el-input size="small"
+                    v-model="storage.ak"
+                    placeholder="请输入 Access Key"></el-input>
+        </el-form-item>
+        <el-form-item label="SK"
+                      prop="sk">
+          <el-input size="small"
+                    v-model="storage.sk"
+                    placeholder="请输入 Secret Key"></el-input>
+        </el-form-item>
+        <el-form-item label="Bucket"
+                      prop="bucket">
+          <el-input size="small"
+                    v-model="storage.bucket"
+                    placeholder="请输入 Bucket"></el-input>
+        </el-form-item>
+        <el-form-item label="存储相对路径"
+                      prop="subfolder">
+          <el-input size="small"
+                    v-model="storage.subfolder"
+                    placeholder="请输入存储相对路径"></el-input>
+        </el-form-item>
+        <el-form-item label="协议"
+                      prop="insecure">
+          <el-radio v-model="storage.insecure"
+                    :label="true">HTTP</el-radio>
+          <el-radio v-model="storage.insecure"
+                    :label="false">HTTPS</el-radio>
+        </el-form-item>
+        <el-form-item label="默认使用"
+                      prop="is_default">
+          <el-checkbox size="small"
+                       v-model="storage.is_default"></el-checkbox>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button size="small"
+                   @click="dialogStorageCreateFormVisible = false">取 消</el-button>
+        <el-button size="small"
+                   :plain="true"
+                   type="success"
+                   @click="storageOperation('add')">保存</el-button>
       </div>
+    </el-dialog>
+    <!--storage-create-dialog-->
 
+    <!--storage-edit-dialog-->
+    <el-dialog title='修改'
+               :visible.sync="dialogStorageEditFormVisible"
+               custom-class="dialog-style"
+               :close-on-click-modal="false"
+               width="35%">
+      <el-form ref="swapStorage"
+               :rules="rules"
+               label-width="120px"
+               tab-position="left"
+               :model="swapStorage">
+        <el-form-item label="接入点地址"
+                      prop="endpoint">
+          <el-input size="small"
+                    v-model="swapStorage.endpoint"
+                    placeholder="请输入接入点地址"></el-input>
+        </el-form-item>
+        <el-form-item label="AK"
+                      prop="ak">
+          <el-input size="small"
+                    v-model="swapStorage.ak"
+                    placeholder="请输入 Access Key"></el-input>
+        </el-form-item>
+        <el-form-item label="SK"
+                      prop="sk">
+          <el-input size="small"
+                    v-model="swapStorage.sk"
+                    placeholder="请输入 Secret Key"></el-input>
+        </el-form-item>
+        <el-form-item label="Bucket"
+                      prop="bucket">
+          <el-input size="small"
+                    v-model="swapStorage.bucket"
+                    placeholder="请输入 Bucket"></el-input>
+        </el-form-item>
+        <el-form-item label="存储相对路径"
+                      prop="subfolder">
+          <el-input size="small"
+                    v-model="swapStorage.subfolder"
+                    placeholder="请输入存储相对路径"></el-input>
+        </el-form-item>
+        <el-form-item label="协议"
+                      prop="insecure">
+          <el-radio v-model="swapStorage.insecure"
+                    :label="true">HTTP</el-radio>
+          <el-radio v-model="swapStorage.insecure"
+                    :label="false">HTTPS</el-radio>
+        </el-form-item>
+        <el-form-item label="默认使用"
+                      prop="is_default">
+          <el-checkbox size="small"
+                       v-model="swapStorage.is_default"></el-checkbox>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button size="small"
+                   @click="dialogStorageEditFormVisible = false">取 消</el-button>
+        <el-button size="small"
+                   :plain="true"
+                   type="success"
+                   @click="storageOperation('update')">保存</el-button>
+      </div>
+    </el-dialog>
+    <!--storage-edit-dialog-->
+    <div class="section">
+      <el-alert type="info"
+                :closable="false">
+        <template>
+          对象存储支持标准的 Amazon S3(Amazon Simple Storage Service) (opens new window)协议<br />
+          集成和使用对象存储可参考
+          <el-link style="font-size: 14px; vertical-align: baseline;"
+                   type="primary"
+                   :href="`/zadig/settings/object-storage/`"
+                   :underline="false"
+                   target="_blank">帮助文档</el-link>
+        </template>
+      </el-alert>
+      <div class="sync-container">
+        <el-button :plain="true"
+                   size="small"
+                   @click="dialogStorageCreateFormVisible=true"
+                   type="success">新建</el-button>
+      </div>
+      <div class="storage-list">
+        <template>
+          <el-table :data="allStorage"
+                    style="width: 100%;">
+            <el-table-column label="接入点地址">
+              <template slot-scope="scope">
+                <span>{{scope.row.endpoint}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Bucket">
+              <template slot-scope="scope">
+                <span>{{scope.row.bucket}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="相对路径">
+              <template slot-scope="scope">
+                <span v-if="scope.row.subfolder">{{scope.row.subfolder}}</span>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column width="80"
+                             label="HTTPS">
+              <template slot-scope="scope">
+                <span>{{!scope.row.insecure?'是':'否'}}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column width="100"
+                             label="默认使用">
+              <template slot-scope="scope">
+                <el-tag v-if="scope.row.is_default">默认使用</el-tag>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="创建时间">
+              <template slot-scope="scope">
+                <i class="el-icon-time"></i>
+                <span>{{ $utils.convertTimestamp(scope.row.update_time) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="最后修改">
+              <template slot-scope="scope">
+                <span>{{ scope.row.updated_by}}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button @click="storageOperation('edit',scope.row)"
+                           size="mini">编辑</el-button>
+                <el-button @click="storageOperation('delete',scope.row)"
+                           size="mini"
+                           type="danger">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+      </div>
     </div>
+
+  </div>
 </template>
 
 <script>

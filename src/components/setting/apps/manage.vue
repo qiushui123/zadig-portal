@@ -136,7 +136,18 @@
       </el-dialog>
       <!--apps-edit-dialog-->
       <div class="section">
-
+        <el-alert type="info"
+                  :closable="false">
+          <template>
+            运行构建及测试步骤，一般都需要用户根据实际业务去安装必要的应用环境来进行构建或者编译<br/>
+            配置和使用应用可参考
+            <el-link style="font-size: 14px; vertical-align: baseline;"
+                     type="primary"
+                     :href="`/zadig/settings/app/`"
+                     :underline="false"
+                     target="_blank">帮助文档</el-link>
+          </template>
+        </el-alert>
         <div class="sync-container">
           <el-button :plain="true"
                      @click="dialogAppCreateFormVisible=true"

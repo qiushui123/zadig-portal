@@ -153,6 +153,18 @@
       </el-dialog>
       <!--Cluster-edit-dialog-->
       <div class="section">
+        <el-alert type="info"
+                  :closable="false">
+          <template>
+            基于本地集群安装，同时支持外部多个 K8s 集群资源的接入和使用<br />
+            详细配置可参考
+            <el-link style="font-size: 14px; vertical-align: baseline;"
+                     type="primary"
+                     :href="`/zadig/pages/c325d8/`"
+                     :underline="false"
+                     target="_blank">帮助文档</el-link>
+          </template>
+        </el-alert>
         <div class="sync-container">
           <el-button size="small"
                      :plain="true"

@@ -3,8 +3,15 @@
     <el-alert
       type="info"
       :closable="false"
-      description="为系统配置 Jenkins server，配置后的服务可以使用 Jenkins job 构建镜像"
     >
+      <template>
+        为系统配置 Jenkins server，配置后的服务可以使用 Jenkins job 构建镜像，详情可参考
+        <el-link style="font-size: 14px; vertical-align: baseline;"
+                 type="primary"
+                 :href="`/zadig/settings/jenkins/`"
+                 :underline="false"
+                 target="_blank">帮助文档</el-link> 。
+      </template>
     </el-alert>
     <div class="sync-container">
       <el-button

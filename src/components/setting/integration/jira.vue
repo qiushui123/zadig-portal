@@ -100,50 +100,57 @@
     </el-dialog>
     <!--end of edit jira dialog-->
     <div class="tab-container">
+      <template>
+        <el-alert type="info"
+                  :closable="false">
           <template>
-            <el-alert type="info"
-                      :closable="false"
-                      description="为系统定义 Jira 集成，配置后工作流可以追踪到 Jira Issue">
-            </el-alert>
+            为系统定义 Jira 集成，配置后工作流可以追踪到 Jira Issue，详情可参考
+            <el-link style="font-size: 14px; vertical-align: baseline;"
+                     type="primary"
+                     :href="`/zadig/settings/jira/`"
+                     :underline="false"
+                     target="_blank">帮助文档</el-link> 。
           </template>
-          <div class="sync-container">
-            <el-button v-if="jira.length === 0"
-                       size="small"
-                       type="primary"
+        </el-alert>
+      </template>
+      <div class="sync-container">
+        <el-button v-if="jira.length === 0"
+                   size="small"
+                   type="primary"
+                   plain
+                   @click="handleJiraAdd">添加</el-button>
+      </div>
+      <el-table :data="jira"
+                style="width: 100%;">
+        <el-table-column label="Jira 地址">
+          <template slot-scope="scope">
+            {{scope.row.host}}
+          </template>
+        </el-table-column>
+        <el-table-column label="用户名">
+          <template slot-scope="scope">
+            {{scope.row.user}}
+          </template>
+        </el-table-column>
+        <el-table-column label="密码">
+          <template>
+            **********
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="160">
+          <template slot-scope="scope">
+            <el-button type="primary"
+                       size="mini"
                        plain
-                       @click="handleJiraAdd">添加</el-button>
-          </div>
-          <el-table :data="jira"
-                    style="width: 100%;">
-            <el-table-column label="Jira 地址">
-              <template slot-scope="scope">
-                {{scope.row.host}}
-              </template>
-            </el-table-column>
-            <el-table-column label="用户名">
-              <template slot-scope="scope">
-                {{scope.row.user}}
-              </template>
-            </el-table-column>
-            <el-table-column label="密码">
-              <template>
-                **********
-              </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="160">
-              <template slot-scope="scope">
-                <el-button type="primary"
-                           size="mini"
-                           plain
-                           @click="handleJiraEdit(scope.row)">编辑</el-button>
-                <el-button type="danger"
-                           size="mini"
-                           @click="handleJiraDelete"
-                           plain>删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+                       @click="handleJiraEdit(scope.row)">编辑</el-button>
+            <el-button type="danger"
+                       size="mini"
+                       @click="handleJiraDelete"
+                       plain>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
