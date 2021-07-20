@@ -267,13 +267,14 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import _, { orderBy } from 'lodash'
 import virtualListItem from './virtual_list_item'
 import workflowBuildRows from '@/components/common/workflow_build_rows.vue'
 import workflowTestRows from '@/components/common/workflow_test_rows.vue'
 import deployIcons from '@/components/common/deploy_icons'
 import { listProductAPI, precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getBuildTargetsAPI, getRegistryWhenBuildAPI, imagesAPI, getSingleProjectAPI } from '@api'
 import virtualScrollList from 'vue-virtual-scroll-list'
+
 export default {
   data () {
     return {
@@ -354,7 +355,7 @@ export default {
         }), 'service_name')
       }
       this.getServiceImgs(allNames.filter(service => service.has_build).map(service => service.name))
-      return allNames
+      return orderBy(allNames, 'name')
     },
     targetsMap () {
       return _.keyBy(this.runner.targets, (i) => {
