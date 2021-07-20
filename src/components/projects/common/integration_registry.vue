@@ -146,8 +146,10 @@ export default {
   },
   methods: {
     getProviderMap (name, type) {
-      if (name && type) {
+      if (this.providerMap[name] && type) {
         return this.providerMap[name][type]
+      } else {
+        return this.providerMap.native.icon
       }
     },
     registryOperation () {
