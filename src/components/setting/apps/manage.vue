@@ -143,7 +143,7 @@
             配置和使用应用可参考
             <el-link style="font-size: 14px; vertical-align: baseline;"
                      type="primary"
-                     :href="`/zadig/settings/app/`"
+                     :href="`https://docs.koderover.com/zadig/settings/app/`"
                      :underline="false"
                      target="_blank">帮助文档</el-link>
           </template>

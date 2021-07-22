@@ -237,7 +237,7 @@
             为系统定义用户来源，默认支持 LDAP、AD、以及 SSO 集成，详情可参考
             <el-link style="font-size: 14px; vertical-align: baseline;"
                      type="primary"
-                     :href="`/zadig/settings/account/`"
+                     :href="`https://docs.koderover.com/zadig/settings/account/`"
                      :underline="false"
                      target="_blank">帮助文档</el-link> 。
           </template>

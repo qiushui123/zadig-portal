@@ -51,7 +51,7 @@ key：镜像仓库/项目名/镜像名 : 标签名<br>
         <el-col :span="8">
           <li class="pipelines-aside-help__step-list-item">
             <a target="_blank"
-               href="/zadig/project/service/#%E6%97%A0%E7%8A%B6%E6%80%81%E6%9C%8D%E5%8A%A1"
+               href="https://docs.koderover.com/zadig/project/service/#服务-yaml-样例"
                class="pipelines-aside-help__step-list-item-link">
               <i class="icon el-icon-link"></i>
               <span class="pipelines-aside-help__step-list-item-link-text">
@@ -61,7 +61,7 @@ key：镜像仓库/项目名/镜像名 : 标签名<br>
         </el-col>
         <el-col :span="8">
           <li class="pipelines-aside-help__step-list-item">
-            <a href="/zadig/project/service/#%E6%9C%89%E7%8A%B6%E6%80%81%E6%9C%8D%E5%8A%A1"
+            <a href="https://docs.koderover.com/zadig/project/service/#服务-yaml-样例"
                target="_blank"
                class="pipelines-aside-help__step-list-item-link">
               <i class="icon el-icon-link"></i>
@@ -72,7 +72,7 @@ key：镜像仓库/项目名/镜像名 : 标签名<br>
         <el-col :span="8">
           <li class="pipelines-aside-help__step-list-item">
             <a target="_blank"
-               href="/zadig/project/service/#helm-chart-服务"
+               href="https://docs.koderover.com/zadig/project/service/#helm-chart-服务"
                class="pipelines-aside-help__step-list-item-link">
               <i class="icon el-icon-link"></i>
               <span class="pipelines-aside-help__step-list-item-link-text">
@@ -85,7 +85,7 @@ key：镜像仓库/项目名/镜像名 : 标签名<br>
       <el-row :gutter="20">
         <el-col :span="8">
           <li class="pipelines-aside-help__step-list-item">
-            <a href="/zadig/project/build/"
+            <a href="https://docs.koderover.com/zadig/project/build/"
                target="_blank"
                class="pipelines-aside-help__step-list-item-link">
               <i class="icon el-icon-link"></i>

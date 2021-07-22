@@ -92,7 +92,7 @@
         </h3>
         <ul class="pipelines-aside-help__step-list">
           <li class="pipelines-aside-help__step-list-item"><a target="_blank"
-               href="/zadig/project/workflow/#git-webhook"
+               href="https://docs.koderover.com/zadig/project/workflow/#git-webhook"
                class="pipelines-aside-help__step-list-item-link"><i class="icon el-icon-link"></i>
               <span class="pipelines-aside-help__step-list-item-link-text">
                 配置 Git Webhook 自动触发服务升级</span></a></li>
