@@ -214,23 +214,23 @@ export default {
       await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
     },
     autoUpgradeEnv () {
-      this.$confirm('更新环境, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const payload = {
-          env_names: this.checkedEnvList
-        }
-        const projectName = this.projectName
-        const force = true
-        autoUpgradeEnvAPI(projectName, payload, force).then((res) => {
-          this.$router.push(`/v1/projects/detail/${projectName}/envs`)
-          this.$message({
-            message: '更新环境成功',
-            type: 'success'
-          })
+      const payload = {
+        env_names: this.checkedEnvList
+      }
+      const projectName = this.projectName
+      const force = false
+      autoUpgradeEnvAPI(projectName, payload, force).then((res) => {
+        this.$router.push(`/v1/projects/detail/${projectName}/envs`)
+        this.$message({
+          message: '更新环境成功',
+          type: 'success'
         })
+      }).catch(error => {
+        const description = error.data.description
+        const res = description.match('the following services are modified since last update')
+        if (res) {
+          this.updateEnv(error.data.description)
+        }
       })
     },
     updateEnv (res) {

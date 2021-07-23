@@ -108,7 +108,7 @@ export default {
       const envName = this.productInfo.env_name
       const envType = this.productInfo.isProd ? 'prod' : ''
       const payload = { vars: this.vars }
-      const force = true
+      const force = false
       this.updataK8sEnvVarLoading = true
       updateK8sEnvAPI(projectName, envName, payload, envType, force).then(
         (response) => {
@@ -119,8 +119,13 @@ export default {
             message: '更新环境变量成功，请等待服务升级',
             type: 'success'
           })
+        }).catch(error => {
+        const description = error.data.description
+        const res = description.match('the following services are modified since last update')
+        if (res) {
+          this.updateEnv(error.data.description)
         }
-      )
+      })
     },
     updateEnv (res) {
       const message = JSON.parse(res.match(/{.+}/g)[0])
