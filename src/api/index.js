@@ -138,7 +138,7 @@ http.interceptors.response.use(
       // Something happened in setting up the request that triggered an Error
       console.log('Error', error.message)
     }
-    return Promise.reject(error.response)
+    return Promise.reject(error)
   }
 )
 
