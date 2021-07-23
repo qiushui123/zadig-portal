@@ -354,7 +354,7 @@ export default {
           return element
         }), 'service_name')
       }
-      this.getServiceImgs(allNames.filter(service => service.has_build).map(service => service.name))
+      this.getServiceImgs(allNames.map(service => service.name)) // .filter(service => service.has_build)
       return orderBy(allNames, 'name')
     },
     targetsMap () {
@@ -487,7 +487,7 @@ export default {
     changeRegistry (val) {
       if (val) {
         this.imageMap = []
-        const allClickableServeiceNames = this.allServiceNames.filter(service => service.has_build).map(service => service.name)
+        const allClickableServeiceNames = this.allServiceNames.map(service => service.name) // .filter(service => service.has_build)
         imagesAPI(uniq(allClickableServeiceNames), val).then((images) => {
           images = images || []
           for (const image of images) {
