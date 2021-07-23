@@ -267,13 +267,14 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { sortBy, keyBy, uniq, orderBy } from 'lodash'
 import virtualListItem from './virtual_list_item'
 import workflowBuildRows from '@/components/common/workflow_build_rows.vue'
 import workflowTestRows from '@/components/common/workflow_test_rows.vue'
 import deployIcons from '@/components/common/deploy_icons'
 import { listProductAPI, precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getBuildTargetsAPI, getRegistryWhenBuildAPI, imagesAPI, getSingleProjectAPI } from '@api'
 import virtualScrollList from 'vue-virtual-scroll-list'
+
 export default {
   data () {
     return {
@@ -334,7 +335,7 @@ export default {
     allServiceNames () {
       let allNames = []
       if (this.buildDeployEnabled) {
-        allNames = _.sortBy(this.runner.targets.map(element => {
+        allNames = sortBy(this.runner.targets.map(element => {
           element.key = element.name + '/' + element.service_name
           return element
         }), 'service_name')
@@ -348,16 +349,16 @@ export default {
           }
           return false
         })
-        allNames = _.sortBy(k8sServices.map(element => {
+        allNames = sortBy(k8sServices.map(element => {
           element.key = element.name + '/' + element.service_name
           return element
         }), 'service_name')
       }
       this.getServiceImgs(allNames.filter(service => service.has_build).map(service => service.name))
-      return allNames
+      return orderBy(allNames, 'name')
     },
     targetsMap () {
-      return _.keyBy(this.runner.targets, (i) => {
+      return keyBy(this.runner.targets, (i) => {
         return i.service_name + '/' + i.name
       })
     },
@@ -434,11 +435,11 @@ export default {
     forcedInputTargetMap () {
       if (this.haveForcedInput) {
         if (this.artifactDeployEnabled) {
-          return _.keyBy(this.forcedUserInput.artifactArgs, (i) => {
+          return keyBy(this.forcedUserInput.artifactArgs, (i) => {
             return i.service_name + '/' + i.name
           })
         }
-        return _.keyBy(this.forcedUserInput.targets, (i) => {
+        return keyBy(this.forcedUserInput.targets, (i) => {
           return i.service_name + '/' + i.name
         })
       }
@@ -487,7 +488,7 @@ export default {
       if (val) {
         this.imageMap = []
         const allClickableServeiceNames = this.allServiceNames.filter(service => service.has_build).map(service => service.name)
-        imagesAPI(_.uniq(allClickableServeiceNames), val).then((images) => {
+        imagesAPI(uniq(allClickableServeiceNames), val).then((images) => {
           images = images || []
           for (const image of images) {
             image.full = `${image.name}:${image.tag}`
@@ -503,7 +504,7 @@ export default {
     getServiceImgs (val) {
       return new Promise((resolve, reject) => {
         const registryId = this.pickedRegistry
-        imagesAPI(_.uniq(val), registryId).then((images) => {
+        imagesAPI(uniq(val), registryId).then((images) => {
           images = images || []
           for (const image of images) {
             image.full = `${image.name}:${image.tag}`
