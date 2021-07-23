@@ -90,45 +90,52 @@
     <!--end of edit github dialog-->
     <div class="tab-container">
 
+      <template>
+        <el-alert type="info"
+                  :closable="false">
           <template>
-            <el-alert type="info"
-                      :closable="false"
-                      description="为系统定义 GitHub App 集成，配置后可以在 GitHub 上追踪工作流状态">
-            </el-alert>
+            为系统定义 GitHub App 集成，配置后可以在 GitHub 上追踪工作流状态，详情可参考
+            <el-link style="font-size: 14px; vertical-align: baseline;"
+                     type="primary"
+                     :href="`https://docs.koderover.com/zadig/settings/webhook-config/`"
+                     :underline="false"
+                     target="_blank">帮助文档</el-link> 。
           </template>
-          <div class="sync-container">
-            <el-button v-if="githubApp.length === 0"
-                       size="small"
-                       type="primary"
+        </el-alert>
+      </template>
+      <div class="sync-container">
+        <el-button v-if="githubApp.length === 0"
+                   size="small"
+                   type="primary"
+                   plain
+                   @click="handleGithubAppAdd">添加</el-button>
+      </div>
+      <el-table :data="githubApp"
+                style="width: 100%;">
+        <el-table-column label="App ID">
+          <template slot-scope="scope">
+            {{scope.row.app_id}}
+          </template>
+        </el-table-column>
+        <el-table-column label="App Key">
+          <template>
+            **********
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"
+                         width="160">
+          <template slot-scope="scope">
+            <el-button type="primary"
+                       size="mini"
                        plain
-                       @click="handleGithubAppAdd">添加</el-button>
-          </div>
-          <el-table :data="githubApp"
-                    style="width: 100%;">
-            <el-table-column label="App ID">
-              <template slot-scope="scope">
-                {{scope.row.app_id}}
-              </template>
-            </el-table-column>
-            <el-table-column label="App Key">
-              <template>
-                **********
-              </template>
-            </el-table-column>
-            <el-table-column label="操作"
-                             width="160">
-              <template slot-scope="scope">
-                <el-button type="primary"
-                           size="mini"
-                           plain
-                           @click="handleGithubAppEdit(scope.row)">编辑</el-button>
-                <el-button type="danger"
-                           size="mini"
-                           @click="handleGithubAppDelete(scope.row)"
-                           plain>删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+                       @click="handleGithubAppEdit(scope.row)">编辑</el-button>
+            <el-button type="danger"
+                       size="mini"
+                       @click="handleGithubAppDelete(scope.row)"
+                       plain>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
