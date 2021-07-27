@@ -21,6 +21,31 @@
                     v-model="host.name"
                     placeholder="请输入主机名称"></el-input>
         </el-form-item>
+        <el-form-item label="主机提供商"
+                      prop="provider">
+          <el-select v-model="host.provider"
+                     style="width: 100%;"
+                     size="small"
+                     placeholder="请选择主机提供商">
+            <el-option :value="1"
+                       label="阿里云">
+              <i class="iconfont iconaliyun"></i> <span>阿里云</span>
+            </el-option>
+
+            <el-option :value="2"
+                       label="腾讯云">
+              <i class="iconfont icontengxunyun"></i> <span>腾讯云</span>
+            </el-option>
+            <el-option :value="3"
+                       label="华为云">
+              <i class="iconfont iconhuawei"></i> <span>华为云</span>
+            </el-option>
+            <el-option :value="0"
+                       label="其它">
+              <i class="iconfont iconqita"></i> <span>其它</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="用户名"
                       prop="user_name">
           <el-input size="small"
@@ -82,6 +107,31 @@
           <el-input size="small"
                     v-model="swapHost.name"
                     placeholder="请输入主机名称"></el-input>
+        </el-form-item>
+        <el-form-item label="主机提供商"
+                      prop="provider">
+          <el-select v-model="swapHost.provider"
+                     style="width: 100%;"
+                     size="small"
+                     placeholder="请选择主机提供商">
+            <el-option :value="1"
+                       label="阿里云">
+              <i class="iconfont iconaliyun"></i> <span>阿里云</span>
+            </el-option>
+
+            <el-option :value="2"
+                       label="腾讯云">
+              <i class="iconfont icontengxunyun"></i> <span>腾讯云</span>
+            </el-option>
+            <el-option :value="3"
+                       label="华为云">
+              <i class="iconfont iconhuawei"></i> <span>华为云</span>
+            </el-option>
+            <el-option :value="0"
+                       label="其它">
+              <i class="iconfont iconqita"></i> <span>其它</span>
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="用户名"
                       prop="user_name">
@@ -147,12 +197,13 @@
                    @click=" dialogHostCreateFormVisible=true"
                    type="success">新建</el-button>
       </div>
-      <div class="cluster-list">
+      <div class="host-list">
         <template>
           <el-table :data="allHost"
                     style="width: 100%;">
             <el-table-column label="主机名称">
               <template slot-scope="scope">
+                <i :class="getProviderMap(scope.row.provider,'icon')"></i>
                 <span>{{scope.row.name}}</span>
               </template>
             </el-table-column>
