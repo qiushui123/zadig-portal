@@ -1,5 +1,4 @@
 import 'normalize.css'
-import 'ionicons/css/ionicons.css'
 import 'loaders.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'vant/lib/index.css'

@@ -64,7 +64,7 @@
                    type="primary"
                    plain
                    size="mini"
-                   icon="ion-android-list">历史配置</el-button>
+                   icon="el-icon-notebook-2">历史配置</el-button>
       </div>
       <el-table :data="config.current.data"
                 style="width: 100%;">
@@ -105,7 +105,7 @@
                    type="primary"
                    plain
                    size="mini"
-                   icon="ion-eye">比较所选版本</el-button>
+                   icon="el-icon-view">比较所选版本</el-button>
       </div>
 
       <el-table :data="histories"
