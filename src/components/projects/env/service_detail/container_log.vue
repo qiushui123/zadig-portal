@@ -22,7 +22,7 @@
           <template v-if="realtimeLog.status==='connected'">
             <el-button @click="showRealTimeLog('','','close')"
                        size="small"
-                       icon="ion-android-checkbox-blank"
+                       icon="icon iconfont iconstop"
                        type="primary">
               停止连接
             </el-button>
@@ -42,7 +42,7 @@
             <el-button @click="scrollToBottom"
                        class="go-to"
                        type="text"
-                       icon="ion-arrow-down-c">
+                       icon="fs-24 iconfont iconArrowDown1-24px">
             </el-button>
           </el-tooltip>
           <el-tooltip content="去顶部"
@@ -51,7 +51,7 @@
             <el-button @click="scrollToTop"
                        class="go-to"
                        type="text"
-                       icon="ion-arrow-up-c">
+                       icon="fs-24 iconfont iconArrowUp1-24px">
             </el-button>
           </el-tooltip>
         </div>

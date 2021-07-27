@@ -76,7 +76,7 @@
         <template>
           <router-link
                        :to="`/v1/projects/detail/${this.projectName}/envs/detail/${this.serviceName}/config${window.location.search}`">
-            <el-button icon="ion-android-open"
+            <el-button icon="iconfont iconshare1"
                        type="primary"
                        size="small"
                        plain>
@@ -84,7 +84,7 @@
             </el-button>
           </router-link>
           <el-button @click="showExport"
-                     icon="ion-android-download icon-bold"
+                     icon="iconfont iconcloud icon-bold"
                      type="primary"
                      size="small"
                      plain>
@@ -92,7 +92,7 @@
           </el-button>
           <router-link
                        :to="`/v1/projects/detail/${originProjectName}/services?service_name=${serviceName}&rightbar=var`">
-            <el-button icon="ion-link icon-bold"
+            <el-button icon="iconfont iconlink1 icon-bold"
                        type="primary"
                        size="small"
                        plain>

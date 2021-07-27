@@ -1,9 +1,11 @@
-@font-face {font-family: "iconfont";
-  src: url('~@assets/fonts/iconfont.eot'); /* IE9 */
-  src: url('~@assets/fonts/iconfont.eot') format('embedded-opentype'), 
-  url('~@assets/fonts/iconfont.woff') format('woff'),
-  url('~@assets/fonts/iconfont.ttf') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
-  url('~@assets/icons/font/iconfont.svg') format('svg'); /* iOS 4.1- */
+@font-face {
+  font-family: "iconfont"; /* Project id 1282370 */
+  src: url('~@assets/fonts/iconfont.eot?t=1627374121123'); /* IE9 */
+  src: url('~@assets/fonts/iconfont.eot?t=1627374121123#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('~@assets/fonts/iconfont.woff2?t=1627374121123') format('woff2'),
+       url('~@assets/fonts/iconfont.woff?t=1627374121123') format('woff'),
+       url('~@assets/fonts/iconfont.ttf?t=1627374121123') format('truetype'),
+       url('~@assets/icons/font/iconfont.svg?t=1627374121123#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +14,38 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.iconlink1:before {
+  content: "\e6fe";
+}
+
+.iconshare1:before {
+  content: "\e764";
+}
+
+.iconcloud:before {
+  content: "\e6cd";
+}
+
+.iconstop:before {
+  content: "\e686";
+}
+
+.iconArrowDown1-24px:before {
+  content: "\e612";
+}
+
+.iconArrowUp1-24px:before {
+  content: "\e61f";
+}
+
+.iconqita:before {
+  content: "\e617";
+}
+
+.iconqiniu:before {
+  content: "\e66b";
 }
 
 .iconaliyun:before {
@@ -401,3 +435,4 @@
 .iconjiaofu1:before {
   content: "\e694";
 }
+

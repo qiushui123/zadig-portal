@@ -36,7 +36,7 @@
               <el-button
                 @click="showRealTimeLog('', '', 'close')"
                 size="small"
-                icon="ion-android-checkbox-blank"
+                icon="icon iconfont iconstop"
                 type="primary"
               >
                 停止连接
@@ -58,7 +58,7 @@
                 @click="scrollToBottom"
                 class="go-to"
                 type="text"
-                icon="ion-arrow-down-c"
+                icon="fs-24 iconfont iconArrowDown1-24px"
               >
               </el-button>
             </el-tooltip>
@@ -67,7 +67,7 @@
                 @click="scrollToTop"
                 class="go-to"
                 type="text"
-                icon="ion-arrow-up-c"
+                icon="fs-24 iconfont iconArrowUp1-24px"
               >
               </el-button>
             </el-tooltip>
@@ -267,6 +267,15 @@ export default {
       padding: 0.5em 0.8em 0.4em;
       text-align: left;
       background-color: #dfe5ec;
+
+      .icon {
+        vertical-align: text-bottom;
+      }
+
+      .fs-24 {
+        font-weight: 600;
+        font-size: 24px;
+      }
 
       .tip {
         color: #999;
