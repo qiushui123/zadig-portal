@@ -58,7 +58,8 @@
                        type="primary"
                        :href="`https://docs.koderover.com/zadig/pages/c325d8/`"
                        :underline="false"
-                       target="_blank">帮助</el-link> 查看 Agent 部署样例</span>
+                       target="_blank">帮助</el-link> 查看 Agent 部署样例
+            </span>
           </slot>
         </el-alert>
         <el-form ref="cluster"
@@ -72,7 +73,33 @@
                       v-model="cluster.name"
                       placeholder="请输入集群名称"></el-input>
           </el-form-item>
-          <el-form-item label="命名空间"
+          <el-form-item label="集群提供商"
+                        prop="provider">
+            <el-select v-model="cluster.provider"
+                       style="width: 100%;"
+                       size="small"
+                       placeholder="请选择集群提供商">
+              <el-option :value="1"
+                         label="阿里云 ACK">
+                <i class="iconfont iconaliyun"></i> <span>阿里云 ACK</span>
+              </el-option>
+
+              <el-option :value="2"
+                         label="腾讯云 TKE">
+                <i class="iconfont icontengxunyun"></i> <span>腾讯云 TKE</span>
+              </el-option>
+              <el-option :value="3"
+                         label="华为云 CCE">
+                <i class="iconfont iconhuawei"></i> <span>华为云 CCE</span>
+              </el-option>
+              <el-option :value="0"
+                         label="其它">
+                <i class="iconfont iconqita"></i> <span>其它</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="showNamespace"
+                        label="命名空间"
                         prop="namespace">
             <el-input size="small"
                       v-model="cluster.namespace"
@@ -121,7 +148,33 @@
                       v-model="swapCluster.name"
                       placeholder="请输入集群名称"></el-input>
           </el-form-item>
-          <el-form-item label="命名空间"
+          <el-form-item label="集群提供商"
+                        prop="provider">
+            <el-select v-model="swapCluster.provider"
+                       style="width: 100%;"
+                       size="small"
+                       placeholder="请选择集群提供商">
+              <el-option :value="1"
+                         label="阿里云 ACK">
+                <i class="iconfont iconaliyun"></i> <span>阿里云 ACK</span>
+              </el-option>
+
+              <el-option :value="2"
+                         label="腾讯云 TKE">
+                <i class="iconfont icontengxunyun"></i> <span>腾讯云 TKE</span>
+              </el-option>
+              <el-option :value="3"
+                         label="华为云 CCE">
+                <i class="iconfont iconhuawei"></i> <span>华为云 CCE</span>
+              </el-option>
+              <el-option :value="0"
+                         label="其它">
+                <i class="iconfont iconqita"></i> <span>其它</span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item v-if="showNamespace"
+                        label="命名空间"
                         prop="namespace">
             <el-input size="small"
                       v-model="swapCluster.namespace"
@@ -171,12 +224,13 @@
                      @click="dialogClusterCreateFormVisible=true"
                      type="success">新建</el-button>
         </div>
-        <div class="Cluster-list">
+        <div class="cluster-list">
           <template>
             <el-table :data="allCluster"
                       style="width: 100%;">
               <el-table-column label="名称">
                 <template slot-scope="scope">
+                  <i :class="getProviderMap(scope.row.provider,'icon')"></i>
                   <span>{{scope.row.name}}</span>
                 </template>
               </el-table-column>
@@ -264,15 +318,36 @@ export default {
       deployType: 'DaemonSet',
       cluster: {
         name: '',
+        provider: null,
         production: false,
         description: '',
         namespace: ''
       },
       swapCluster: {
         name: '',
+        provider: null,
         production: false,
         description: '',
         namespace: ''
+      },
+      providerMap: {
+        0: {
+          icon: 'iconfont logo iconqita',
+          name: '其它'
+        },
+
+        1: {
+          icon: 'iconfont logo iconaliyun ',
+          name: '阿里云'
+        },
+        2: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云'
+        },
+        3: {
+          icon: 'iconfont logo iconhuawei',
+          name: '华为云'
+        }
       },
       accessCluster: {
         yaml: 'init',
@@ -289,6 +364,7 @@ export default {
           validator: validateClusterName,
           trigger: 'change'
         }],
+        provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }],
         production: [{
           type: 'boolean',
           required: true,
@@ -298,6 +374,13 @@ export default {
     }
   },
   methods: {
+    getProviderMap (name, type) {
+      if (name && type) {
+        return this.providerMap[name][type]
+      } else {
+        return this.providerMap[0].icon
+      }
+    },
     getYamlUrl () {
       return `kubectl apply -f "${this.$utils.getOrigin()}/api/aslan/cluster/agent/${this.accessCluster.id}/agent.yaml${this.deployType === 'Deployment' ? '?type=deploy' : ''}"`
     },
@@ -465,8 +548,12 @@ export default {
       }
     }
 
-    .Cluster-list {
+    .cluster-list {
       padding-bottom: 30px;
+
+      .logo {
+        font-size: 20px;
+      }
     }
   }
 

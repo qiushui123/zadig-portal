@@ -198,6 +198,7 @@ export default {
       allHost: [],
       host: {
         name: '',
+        provider: null,
         label: '',
         ip: '',
         user_name: '',
@@ -205,11 +206,31 @@ export default {
       },
       swapHost: {
         name: '',
+        provider: null,
         label: '',
         ip: '',
         user_name: '',
         private_key: '',
         origin_private_key: ''
+      },
+      providerMap: {
+        0: {
+          icon: 'iconfont logo iconqita',
+          name: '其它'
+        },
+
+        1: {
+          icon: 'iconfont logo iconaliyun ',
+          name: '阿里云 OSS'
+        },
+        2: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云 COS'
+        },
+        3: {
+          icon: 'iconfont logo iconhuawei',
+          name: '华为云 OBS'
+        }
       },
       dialogHostCreateFormVisible: false,
       dialogHostEditFormVisible: false,
@@ -221,6 +242,7 @@ export default {
           message: '请输入主机名称',
           trigger: 'change'
         }],
+        provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }],
         label: [{
           type: 'string',
           required: false,
@@ -246,6 +268,13 @@ export default {
     }
   },
   methods: {
+    getProviderMap (name, type) {
+      if (name && type) {
+        return this.providerMap[name][type]
+      } else {
+        return this.providerMap[0].icon
+      }
+    },
     hostOperation (operate, current_host) {
       if (operate === 'add') {
         this.$refs.host.validate(valid => {
@@ -324,8 +353,6 @@ export default {
       })
     }
   },
-  computed: {
-  },
   created () {
     this.getHost()
     bus.$emit(`set-topbar-title`, { title: '主机管理', breadcrumb: [] })
@@ -372,8 +399,12 @@ export default {
       }
     }
 
-    .cluster-list {
+    .host-list {
       padding-bottom: 30px;
+
+      .logo {
+        font-size: 20px;
+      }
     }
   }
 
