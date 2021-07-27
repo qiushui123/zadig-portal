@@ -12,8 +12,37 @@
       <el-form ref="storage"
                :rules="rules"
                label-width="120px"
-               tab-position="left"
+               label-position="left"
                :model="storage">
+        <el-form-item label="提供商"
+                      prop="provider">
+          <el-select v-model="storage.provider"
+                     style="width: 100%;"
+                     size="small"
+                     placeholder="请选择对象存储提供商">
+            <el-option :value="1"
+                       label="阿里云 OSS">
+              <i class="iconfont iconaliyun"></i> <span>阿里云 OSS</span>
+            </el-option>
+
+            <el-option :value="2"
+                       label="腾讯云 COS">
+              <i class="iconfont icontengxunyun"></i> <span>腾讯云 COS</span>
+            </el-option>
+            <el-option :value="3"
+                       label="七牛云 Kodo">
+              <i class="iconfont iconqiniu"></i> <span>七牛云 Kodo</span>
+            </el-option>
+            <el-option :value="4"
+                       label="华为云 OBS">
+              <i class="iconfont iconhuawei"></i> <span>华为云 OBS</span>
+            </el-option>
+            <el-option :value="0"
+                       label="其它">
+              <i class="iconfont iconqita"></i> <span>其它</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="接入点地址"
                       prop="endpoint">
           <el-input size="small"
@@ -78,8 +107,37 @@
       <el-form ref="swapStorage"
                :rules="rules"
                label-width="120px"
-               tab-position="left"
+               label-position="left"
                :model="swapStorage">
+        <el-form-item label="提供商"
+                      prop="provider">
+          <el-select v-model="swapStorage.provider"
+                     style="width: 100%;"
+                     size="small"
+                     placeholder="请选择对象存储提供商">
+            <el-option :value="1"
+                       label="阿里云 OSS">
+              <i class="iconfont iconaliyun"></i> <span>阿里云 OSS</span>
+            </el-option>
+
+            <el-option :value="2"
+                       label="腾讯云 COS">
+              <i class="iconfont icontengxunyun"></i> <span>腾讯云 COS</span>
+            </el-option>
+            <el-option :value="3"
+                       label="七牛云 Kodo">
+              <i class="iconfont iconqiniu"></i> <span>七牛云 Kodo</span>
+            </el-option>
+            <el-option :value="4"
+                       label="华为云 OBS">
+              <i class="iconfont iconhuawei"></i> <span>华为云 OBS</span>
+            </el-option>
+            <el-option :value="0"
+                       label="其它">
+              <i class="iconfont iconqita"></i> <span>其它</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="接入点地址"
                       prop="endpoint">
           <el-input size="small"
@@ -138,7 +196,7 @@
       <el-alert type="info"
                 :closable="false">
         <template>
-          对象存储支持标准的 Amazon S3(Amazon Simple Storage Service) (opens new window)协议<br />
+          对象存储支持标准的 Amazon S3(Amazon Simple Storage Service)协议<br />
           集成和使用对象存储可参考
           <el-link style="font-size: 14px; vertical-align: baseline;"
                    type="primary"
@@ -157,8 +215,9 @@
         <template>
           <el-table :data="allStorage"
                     style="width: 100%;">
-            <el-table-column label="接入点地址">
+            <el-table-column label="提供商/接入点地址">
               <template slot-scope="scope">
+                <i :class="getProviderMap(scope.row.provider,'icon')"></i>
                 <span>{{scope.row.endpoint}}</span>
               </template>
             </el-table-column>
@@ -183,11 +242,13 @@
             <el-table-column width="100"
                              label="默认使用">
               <template slot-scope="scope">
-                <el-tag v-if="scope.row.is_default">默认使用</el-tag>
+                <el-tag size="small"
+                        v-if="scope.row.is_default">默认使用</el-tag>
                 <span v-else>-</span>
               </template>
             </el-table-column>
-            <el-table-column label="创建时间">
+            <el-table-column width="220px"
+                             label="创建时间">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
                 <span>{{ $utils.convertTimestamp(scope.row.update_time) }}</span>
@@ -199,7 +260,8 @@
               </template>
             </el-table-column>
 
-            <el-table-column label="操作">
+            <el-table-column width="180px"
+                             label="操作">
               <template slot-scope="scope">
                 <el-button @click="storageOperation('edit',scope.row)"
                            size="mini">编辑</el-button>
