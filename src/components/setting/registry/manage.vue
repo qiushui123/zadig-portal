@@ -39,7 +39,7 @@
             </el-option>
             <el-option value="native"
                        label="其它">
-              <i class="iconfont iconaff"></i> <span>其它</span>
+              <i class="iconfont iconqita"></i> <span>其它</span>
             </el-option>
           </el-select>
         </el-form-item>
@@ -126,7 +126,7 @@
             </el-option>
             <el-option value="native"
                        label="其它">
-              <i class="iconfont iconaff"></i> <span>其它</span>
+              <i class="iconfont iconqita"></i> <span>其它</span>
             </el-option>
           </el-select>
         </el-form-item>
