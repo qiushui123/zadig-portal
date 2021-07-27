@@ -273,7 +273,7 @@ export default {
       },
       providerMap: {
         native: {
-          icon: 'iconfont logo iconaff',
+          icon: 'iconfont logo iconqita',
           name: '其它'
         },
         swr: {

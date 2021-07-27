@@ -225,6 +225,7 @@ export default {
     return {
       allStorage: [],
       storage: {
+        provider: null,
         ak: '',
         sk: '',
         endpoint: '',
@@ -234,6 +235,7 @@ export default {
         is_default: true
       },
       swapStorage: {
+        provider: null,
         ak: '',
         sk: '',
         endpoint: '',
@@ -242,10 +244,34 @@ export default {
         insecure: true,
         is_default: true
       },
+      providerMap: {
+        0: {
+          icon: 'iconfont logo iconqita',
+          name: '其它'
+        },
+
+        1: {
+          icon: 'iconfont logo iconaliyun ',
+          name: '阿里云 OSS'
+        },
+        2: {
+          icon: 'iconfont logo icontengxunyun',
+          name: '腾讯云 COS'
+        },
+        3: {
+          icon: 'iconfont logo iconqiniu',
+          name: '七牛云 Kodo'
+        },
+        4: {
+          icon: 'iconfont logo iconhuawei',
+          name: '华为云 OBS'
+        }
+      },
       dialogStorageCreateFormVisible: false,
       dialogStorageEditFormVisible: false,
       loading: true,
       rules: {
+        provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }],
         ak: [{ required: true, message: '请输入 Access Key', trigger: 'blur' }],
         sk: [{ required: true, message: '请输入 Secret Key', trigger: 'blur' }],
         endpoint: [{
@@ -258,6 +284,13 @@ export default {
     }
   },
   methods: {
+    getProviderMap (name, type) {
+      if (name && type) {
+        return this.providerMap[name][type]
+      } else {
+        return this.providerMap[0].icon
+      }
+    },
     storageOperation (operate, current_storage) {
       if (operate === 'add') {
         this.$refs.storage.validate(valid => {
@@ -388,6 +421,10 @@ export default {
 
     .storage-list {
       padding-bottom: 30px;
+
+      .logo {
+        font-size: 20px;
+      }
     }
   }
 
