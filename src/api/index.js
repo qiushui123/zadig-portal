@@ -394,6 +394,8 @@ export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, pa
     return http.get(`/api/aslan/code/workspace/gitlab/${codehostId}/${encodeRepoName}/${branchName}?path=${path}&repoOwner=${repoOwner}`)
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)
+  } else if (type === 'codehub') {
+    return http.get(`/api/aslan/code/workspace/codehub/${codehostId}/${encodeRepoName}/${branchName}?&path=${path}`)
   }
 }
 
@@ -408,15 +410,22 @@ export function getRepoFileServiceAPI (codehostId, repoOwner, repoName, branchNa
   )
 }
 
-export function loadRepoServiceAPI (codehostId, repoOwner, repoName, branchName, remoteName = '', payload) {
-  const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  return http.post(`/api/aslan/service/loader/load/${codehostId}/${branchName}?repoOwner=${repoOwner}&repoName=${encodeRepoName}&remoteName=${remoteName}`, payload)
+export function getCodehubRepoFileServiceAPI (codehostId, repoUUID, repoName, branchName, path, isDir) {
+  return http.get(`/api/aslan/service/loader/preload/${codehostId}/${branchName}?repoUUID=${repoUUID}&repoName=${repoName}&path=${path}&isDir=${isDir}`)
 }
 
-export function validPreloadService (codehostId, repoOwner, repoName, branchName, path, serviceName, isDir = false, remoteName = '') {
+export function loadRepoServiceAPI (codehostId, repoOwner, repoName, branchName, remoteName = '', repoUUID = '', payload) {
+  const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
+  return http.post(
+    `/api/aslan/service/loader/load/${codehostId}/${branchName}?repoOwner=${repoOwner}&repoName=${encodeRepoName}&remoteName=${remoteName}&repoUUID=${repoUUID}`,
+    payload
+  )
+}
+
+export function validPreloadService (codehostId, repoOwner, repoName, branchName, path, serviceName, isDir = false, remoteName = '', repoUUID = '') {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
   return http.get(
-    `/api/aslan/service/loader/validateUpdate/${codehostId}/${branchName}?repoOwner=${repoOwner}&repoName=${encodeRepoName}&path=${path}&serviceName=${serviceName}&isDir=${isDir}&remoteName=${remoteName}`
+    `/api/aslan/service/loader/validateUpdate/${codehostId}/${branchName}?repoOwner=${repoOwner}&repoName=${encodeRepoName}&path=${path}&serviceName=${serviceName}&isDir=${isDir}&remoteName=${remoteName}&repoUUID=${repoUUID}`
   )
 }
 
