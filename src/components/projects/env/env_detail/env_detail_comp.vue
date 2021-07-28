@@ -1005,10 +1005,10 @@ export default {
                 type: 'success'
               })
             }).catch(error => {
-            const description = error.data.description
+            const description = error.response.data.description
             const res = description.match('the following services are modified since last update')
             if (res) {
-              this.updateEnv(error.data.description, product_info)
+              this.updateEnv(description, product_info)
             }
           })
         })
