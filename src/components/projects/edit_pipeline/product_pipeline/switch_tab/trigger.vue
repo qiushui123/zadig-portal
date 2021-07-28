@@ -189,14 +189,14 @@
             </el-tooltip>
           </el-checkbox>
         </el-form-item>
-        <el-form-item v-if="webhookSwap.repo.source!=='gerrit'"
+        <el-form-item v-if="webhookSwap.repo.source!=='gerrit' && webhookSwap.repo.source!=='codehub'"
                       label="文件目录">
           <el-input :autosize="{ minRows: 4, maxRows: 10}"
                     type="textarea"
                     v-model="webhookSwap.match_folders"
                     placeholder="输入目录时，多个目录请用回车换行分隔"></el-input>
         </el-form-item>
-        <ul v-if="webhookSwap.repo.source!=='gerrit'"
+        <ul v-if="webhookSwap.repo.source!=='gerrit' && webhookSwap.repo.source!=='codehub'"
             style="padding-left: 80px;">
           <li> "/" 表示代码库中的所有文件</li>
           <li> 用 "!" 符号开头可以排除相应的文件</li>

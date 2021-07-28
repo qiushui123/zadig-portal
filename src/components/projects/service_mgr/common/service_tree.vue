@@ -28,6 +28,7 @@
       <gitfile-tree ref="worktree"
                     :codehostId="source.codehostId"
                     :repoName="source.repoName"
+                    :repoUUID="source.repoUUID"
                     :repoOwner="source.repoOwner"
                     :branchName="source.branchName"
                     :remoteName="source.remoteName"
@@ -82,8 +83,8 @@
                        filterable>
               <el-option v-for="(repo,index) in codeInfo['repoOwners']"
                          :key="index"
-                         :label="repo.name"
-                         :value="repo.name">
+                         :label="repo.path"
+                         :value="repo.path">
               </el-option>
             </el-select>
           </el-form-item>
@@ -285,7 +286,7 @@
                            icon="el-icon-close"
                            @click="() => deleteSharedService(node, data)">
                 </el-button>
-                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab'||data.source==='github') && data.type==='k8s' && data.product_name=== projectName "
+                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
                            type="text"
                            size="mini"
                            icon="el-icon-refresh"
@@ -473,6 +474,7 @@ export default {
       source: {
         codehostId: null,
         repoOwner: '',
+        repoUUID: '',
         repoName: '',
         branchName: '',
         remoteName: '',
@@ -615,13 +617,14 @@ export default {
       const codehostId = this.source.codehostId
       const repoOwner = this.source.repoOwner
       const repoName = this.source.repoName
+      const repoUUID = this.source.repoUUID
       const branchName = this.source.branchName
       const remoteName = this.source.remoteName
       const serviceName = this.source.serviceName
       const path = val.path
       const isDir = this.source.isDir
       if (serviceName) {
-        validPreloadService(codehostId, repoOwner, repoName, branchName, path, serviceName, isDir, remoteName).then((res) => {
+        validPreloadService(codehostId, repoOwner, repoName, branchName, path, serviceName, isDir, remoteName, repoUUID).then((res) => {
           this.disabledReload = false
         }, () => {
           this.disabledReload = true
@@ -632,6 +635,7 @@ export default {
       const codehostId = this.source.codehostId
       const repoOwner = this.source.repoOwner
       const repoName = this.source.repoName
+      const repoUUID = this.source.repoUUID
       const branchName = this.source.branchName
       const remoteName = this.source.remoteName
       const path = this.source.path
@@ -646,7 +650,7 @@ export default {
       this.$refs.sourceForm.validate((valid) => {
         if (valid) {
           this.importLoading = true
-          loadRepoServiceAPI(codehostId, repoOwner, repoName, branchName, remoteName, payload).then((res) => {
+          loadRepoServiceAPI(codehostId, repoOwner, repoName, branchName, remoteName, repoUUID, payload).then((res) => {
             this.$emit('onRefreshService')
             this.$emit('onRefreshSharedService')
             this.$emit('update:showNext', true)
@@ -672,6 +676,7 @@ export default {
       this.source = {
         codehostId: null,
         repoOwner: '',
+        repoUUID: '',
         repoName: '',
         branchName: '',
         remoteName: '',
@@ -849,10 +854,11 @@ export default {
     },
     clearRepoName () {
       const repoOwner = this.source.repoOwner
-      const item = (this.codeInfo.repoOwners.find(item => { return item.path === repoOwner }))
+      const item = (this.codeInfo.repoOwners.find(item => { return item.path === repoOwner || item.name === repoOwner }))
       const type = item ? item.kind : 'group'
+      const project_uuid = item.project_uuid ? item.project_uuid : ''
       const id = this.source.codehostId
-      getRepoNameByIdAPI(id, type, encodeURI(repoOwner)).then((res) => {
+      getRepoNameByIdAPI(id, type, encodeURI(repoOwner), '', project_uuid).then((res) => {
         this.$set(this.codeInfo, 'repos', res)
       })
       this.source.branchName = ''
@@ -861,11 +867,12 @@ export default {
       this.$set(this.codeInfo, 'branches', [])
     },
     getRepoNameById (id, repoOwner, key = '') {
-      const item = (this.codeInfo.repoOwners.find(item => { return item.path === repoOwner }))
+      const item = (this.codeInfo.repoOwners.find(item => { return item.path === repoOwner || item.name === repoOwner }))
       const type = item ? item.kind : 'group'
+      const project_uuid = item.project_uuid ? item.project_uuid : ''
       this.$refs.sourceForm.clearValidate()
       if (repoOwner) {
-        getRepoNameByIdAPI(id, type, encodeURI(repoOwner), key).then((res) => {
+        getRepoNameByIdAPI(id, type, encodeURI(repoOwner), key, project_uuid).then((res) => {
           this.$set(this.codeInfo, 'repos', res)
         })
       }
@@ -919,8 +926,11 @@ export default {
       this.source.services = []
     },
     getBranchInfoById (id, repoOwner, repoName) {
+      const repoItem = (this.codeInfo.repos.find(item => { return item.name === repoName }))
+      const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
+      this.source.repoUUID = repoUUID
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(id, repoOwner, repoName).then((res) => {
+        getBranchInfoByIdAPI(id, repoOwner, repoName, repoUUID).then((res) => {
           this.$set(this.codeInfo, 'branches', res)
         })
         this.source.branchName = ''
@@ -933,13 +943,14 @@ export default {
       this.source.codehostId = data.codehost_id
       this.source.repoOwner = data.repo_owner
       this.source.repoName = data.repo_name
+      this.source.repoUUID = data.repo_uuid
       this.source.branchName = data.branch_name
       this.source.path = data.load_path
       this.source.gitType = data.source
       this.source.isDir = data.is_dir
       this.source.serviceName = data.service_name
       this.getInitRepoInfo(this.source)
-      validPreloadService(data.codehost_id, data.repo_owner, data.repo_name, data.branch_name, data.load_path, data.service_name, data.is_dir).then((res) => {
+      validPreloadService(data.codehost_id, data.repo_owner, data.repo_name, data.branch_name, data.load_path, data.service_name, data.is_dir, data.remote_name, data.repo_uuid).then((res) => {
         this.disabledReload = false
       }, () => {
         this.disabledReload = true

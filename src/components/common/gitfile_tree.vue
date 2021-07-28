@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getRepoFilesAPI, getRepoFileServiceAPI } from '@api'
+import { getRepoFilesAPI, getCodehubRepoFileServiceAPI, getRepoFileServiceAPI } from '@api'
 export default {
   props: {
     codehostId: {
@@ -57,6 +57,11 @@ export default {
       type: String,
       default: '',
       required: true
+    },
+    repoUUID: {
+      type: String,
+      default: '',
+      required: false
     },
     repoOwner: {
       type: String,
@@ -103,7 +108,7 @@ export default {
     loadNode (node, resolve) {
       const codehostId = this.codehostId
       const repoOwner = this.repoOwner
-      const repoName = this.repoName
+      const repoName = this.gitType === 'codehub' ? this.repoUUID : this.repoName
       const branchName = this.branchName
       const type = this.gitType
       let path = ''
@@ -147,13 +152,24 @@ export default {
       const path = this.selectPath
       const isDir = this.isDir
       const remoteName = this.remoteName
-      getRepoFileServiceAPI(codehostId, repoOwner, repoName, branchName, path, isDir, remoteName).then((res) => {
-        this.$emit('getPreloadServices', {
-          path: path,
-          services: res,
-          isDir: isDir
+      const repoUUID = this.repoUUID
+      if (this.gitType === 'codehub') {
+        getCodehubRepoFileServiceAPI(codehostId, repoUUID, repoName, branchName, path, isDir, remoteName).then((res) => {
+          this.$emit('getPreloadServices', {
+            path: path,
+            services: res,
+            isDir: isDir
+          })
         })
-      })
+      } else {
+        getRepoFileServiceAPI(codehostId, repoOwner, repoName, branchName, path, isDir, remoteName).then((res) => {
+          this.$emit('getPreloadServices', {
+            path: path,
+            services: res,
+            isDir: isDir
+          })
+        })
+      }
     }
   },
   computed: {},
