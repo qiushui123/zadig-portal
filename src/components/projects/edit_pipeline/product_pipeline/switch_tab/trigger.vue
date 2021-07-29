@@ -314,8 +314,8 @@
               <el-table-column label="文件目录">
                 <template slot-scope="scope">
                   <span
-                        v-if="scope.row.main_repo.source!=='gerrit'">{{ scope.row.main_repo.match_folders.join() }}</span>
-                  <span v-else-if="scope.row.main_repo.source==='gerrit'"> N/A </span>
+                        v-if="scope.row.main_repo.source!=='gerrit' && scope.row.main_repo.source!=='codehub'">{{ scope.row.main_repo.match_folders.join() }}</span>
+                  <span v-else> N/A </span>
                 </template>
               </el-table-column>
               <el-table-column label="操作">
