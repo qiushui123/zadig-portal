@@ -355,7 +355,7 @@
           <el-alert type="info"
                     :closable="false">
             <template>
-              为系统定义代码源，默认支持 GitHub、GitLab 集成，详情可参考
+              为系统定义代码源，默认支持 GitLab、GitHub、CodeHub、Gerrit 集成，详情可参考
               <el-link style="font-size: 14px; vertical-align: baseline;"
                        type="primary"
                        :href="`https://docs.koderover.com/zadig/settings/codehost/`"
