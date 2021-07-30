@@ -417,19 +417,24 @@
 
           <el-tooltip effect="dark"
                       placement="top-start">
-            <div slot="content">
-              当前可用环境变量如下，可在构建脚本中进行引用<br>
-              $WORKSPACE 工作目录<br>
-              $IMAGE
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输出镜像名称<br>
-              $SERVICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建的服务名称<br>
-              $PKG_FILE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 构建出的 tar 包名称<br>
-              $ENV_NAME &nbsp;&nbsp;&nbsp; 执行的环境名称 <br>
-              $BUILD_URL &nbsp;&nbsp;&nbsp; 构建任务的 URL<br>
-              &lt;REPONAME&gt;_PR 构建过程中指定代码仓库使用的pull request信息<br>
-              &lt;REPONAME&gt;_BRANCH 构建过程中指定代码仓库使用的分支信息<br>
-              &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用tag信息
-            </div>
+              <div slot="content">
+                当前可用环境变量如下，可在构建脚本中进行引用<br>
+                $WORKSPACE&nbsp;&nbsp;工作目录<br>
+                $TASK_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工作流 ID<br>
+                $IMAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输出镜像名称<br>
+                $SERVICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建的服务名称<br>
+                $DIST_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建出的 Tar 包的目的目录<br>
+                $PKG_FILE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建出的 Tar 包名称<br>
+                $ENV_NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;执行的环境名称<br>
+                $BUILD_URL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建任务的 URL<br>
+                $CI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                值恒等于 true，表示当前环境是 CI/CD 环境<br>
+                $ZADIG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;值恒等于
+                true，表示在 Zadig 系统上执行脚本<br>
+                &lt;REPONAME&gt;_PR 构建过程中指定代码仓库使用的 Pull Request 信息<br>
+                &lt;REPONAME&gt;_BRANCH 构建过程中指定代码仓库使用的分支信息<br>
+                &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用 Tag 信息
+              </div>
             <span class="variable">变量</span>
           </el-tooltip>
           <div class="divider item"></div>
