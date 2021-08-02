@@ -4,179 +4,26 @@
        element-loading-spinner="iconfont iconfont-loading iconzhuji"
        class="setting-host-container">
 
-    <!--Host-create-dialog-->
-    <el-dialog title='创建主机资源'
-               :visible.sync="dialogHostCreateFormVisible"
+    <!--Host-create-edit-dialog-->
+    <el-dialog :title='title'
+               :visible.sync="dialogHostFormVisible"
                custom-class="dialog-style"
                :close-on-click-modal="false"
                width="45%">
-      <el-form ref="host"
-               :rules="rules"
-               label-width="120px"
-               label-position="left"
-               :model="host">
-        <el-form-item label="主机名称"
-                      prop="name">
-          <el-input size="small"
-                    v-model="host.name"
-                    placeholder="请输入主机名称"></el-input>
-        </el-form-item>
-        <el-form-item label="主机提供商"
-                      prop="provider">
-          <el-select v-model="host.provider"
-                     style="width: 100%;"
-                     size="small"
-                     placeholder="请选择主机提供商">
-            <el-option :value="1"
-                       label="阿里云">
-              <i class="iconfont iconaliyun"></i> <span>阿里云</span>
-            </el-option>
-
-            <el-option :value="2"
-                       label="腾讯云">
-              <i class="iconfont icontengxunyun"></i> <span>腾讯云</span>
-            </el-option>
-            <el-option :value="3"
-                       label="华为云">
-              <i class="iconfont iconhuawei"></i> <span>华为云</span>
-            </el-option>
-            <el-option :value="0"
-                       label="其它">
-              <i class="iconfont iconqita"></i> <span>其它</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用户名"
-                      prop="user_name">
-          <el-input size="small"
-                    v-model="host.user_name"
-                    placeholder="请输入用户名"></el-input>
-        </el-form-item>
-        <el-form-item label="IP 地址"
-                      prop="ip">
-          <el-input size="small"
-                    v-model="host.ip"
-                    placeholder="请输入主机 IP"></el-input>
-        </el-form-item>
-        <el-form-item label="标签"
-                      prop="label">
-          <el-input size="small"
-                    v-model="host.label"
-                    placeholder="请输入标签"></el-input>
-        </el-form-item>
-        <el-form-item label="是否生产"
-                      prop="is_prod">
-          <el-radio-group v-model="host.is_prod">
-            <el-radio :label="true">是</el-radio>
-            <el-radio :label="false">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="私钥"
-                      prop="private_key">
-          <el-input size="small"
-                    type="textarea"
-                    v-model="host.private_key"
-                    placeholder="请输入私钥"></el-input>
-        </el-form-item>
-      </el-form>
+      <AddHost ref="add-host"
+               :host="host"></AddHost>
       <div slot="footer"
            class="dialog-footer">
         <el-button size="small"
-                   @click="dialogHostCreateFormVisible = false">取 消</el-button>
+                   @click="dialogHostFormVisible = false">取 消</el-button>
         <el-button :plain="true"
                    size="small"
                    type="success"
-                   @click="hostOperation('add')">保存</el-button>
+                   @click="hostOperation">保存</el-button>
       </div>
     </el-dialog>
-    <!--Host-create-dialog-->
+    <!--Host-create-edit-dialog-->
 
-    <!--Host-edit-dialog-->
-    <el-dialog title='修改主机资源'
-               :visible.sync="dialogHostEditFormVisible"
-               custom-class="dialog-style"
-               :close-on-click-modal="false"
-               width="35%">
-      <el-form ref="swapHost"
-               :rules="rules"
-               label-width="120px"
-               label-position="left"
-               :model="swapHost">
-        <el-form-item label="主机名称"
-                      prop="name">
-          <el-input size="small"
-                    v-model="swapHost.name"
-                    placeholder="请输入主机名称"></el-input>
-        </el-form-item>
-        <el-form-item label="主机提供商"
-                      prop="provider">
-          <el-select v-model="swapHost.provider"
-                     style="width: 100%;"
-                     size="small"
-                     placeholder="请选择主机提供商">
-            <el-option :value="1"
-                       label="阿里云">
-              <i class="iconfont iconaliyun"></i> <span>阿里云</span>
-            </el-option>
-
-            <el-option :value="2"
-                       label="腾讯云">
-              <i class="iconfont icontengxunyun"></i> <span>腾讯云</span>
-            </el-option>
-            <el-option :value="3"
-                       label="华为云">
-              <i class="iconfont iconhuawei"></i> <span>华为云</span>
-            </el-option>
-            <el-option :value="0"
-                       label="其它">
-              <i class="iconfont iconqita"></i> <span>其它</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用户名"
-                      prop="user_name">
-          <el-input size="small"
-                    v-model="swapHost.user_name"
-                    placeholder="请输入用户名"></el-input>
-        </el-form-item>
-        <el-form-item label="IP"
-                      prop="ip">
-          <el-input size="small"
-                    v-model="swapHost.ip"
-                    placeholder="请输入主机 IP"></el-input>
-        </el-form-item>
-
-        <el-form-item label="标签"
-                      prop="label">
-          <el-input size="small"
-                    v-model="swapHost.label"
-                    placeholder="请输入主机标签"></el-input>
-        </el-form-item>
-        <el-form-item label="是否生产"
-                      prop="is_prod">
-          <el-radio-group v-model="swapHost.is_prod">
-            <el-radio :label="true">是</el-radio>
-            <el-radio :label="false">否</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="私钥"
-                      prop="private_key">
-          <el-input size="small"
-                    type="textarea"
-                    v-model="swapHost.origin_private_key"
-                    placeholder="请输入私钥"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer"
-           class="dialog-footer">
-        <el-button size="small"
-                   @click="dialogHostEditFormVisible = false">取 消</el-button>
-        <el-button size="small"
-                   :plain="true"
-                   type="success"
-                   @click="hostOperation('update')">保存</el-button>
-      </div>
-    </el-dialog>
     <!--Host-edit-dialog-->
     <div class="section">
       <el-alert type="info"
@@ -194,7 +41,7 @@
       <div class="sync-container">
         <el-button size="small"
                    :plain="true"
-                   @click=" dialogHostCreateFormVisible=true"
+                   @click="hostOperation('add')"
                    type="success">新建</el-button>
       </div>
       <div class="host-list">
@@ -226,7 +73,7 @@
             <el-table-column width="240"
                              label="操作">
               <template slot-scope="scope">
-                <el-button @click="hostOperation('edit',scope.row)"
+                <el-button @click="hostOperation('update',scope.row)"
                            size="mini">编辑</el-button>
                 <el-button @click="hostOperation('delete',scope.row)"
                            size="mini"
@@ -241,28 +88,22 @@
 </template>
 
 <script>
-import { getHostListAPI, createHostAPI, updateHostAPI, deleteHostAPI } from '@api'
+import AddHost from '@/components/projects/common/not_k8s/add_host.vue'
+import { getHostListAPI, deleteHostAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
   data () {
     return {
       allHost: [],
-      host: {
+      host: null,
+      addHostData: null,
+      initHost: {
         name: '',
         provider: null,
         label: '',
         ip: '',
         user_name: '',
         private_key: ''
-      },
-      swapHost: {
-        name: '',
-        provider: null,
-        label: '',
-        ip: '',
-        user_name: '',
-        private_key: '',
-        origin_private_key: ''
       },
       providerMap: {
         0: {
@@ -283,39 +124,9 @@ export default {
           name: '华为云 OBS'
         }
       },
-      dialogHostCreateFormVisible: false,
-      dialogHostEditFormVisible: false,
-      loading: false,
-      rules: {
-        name: [{
-          type: 'string',
-          required: true,
-          message: '请输入主机名称',
-          trigger: 'change'
-        }],
-        provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }],
-        label: [{
-          type: 'string',
-          required: false,
-          message: '请输入主机标签',
-          trigger: 'change'
-        }],
-        user_name: [{
-          type: 'string',
-          required: true,
-          message: '请输入用户名'
-        }],
-        ip: [{
-          type: 'string',
-          required: true,
-          message: '请输入主机 IP'
-        }],
-        private_key: [{
-          type: 'string',
-          required: true,
-          message: '请输入私钥'
-        }]
-      }
+      dialogHostFormVisible: false,
+      operate: '',
+      loading: false
     }
   },
   methods: {
@@ -327,33 +138,10 @@ export default {
       }
     },
     hostOperation (operate, current_host) {
-      if (operate === 'add') {
-        this.$refs.host.validate(valid => {
-          if (valid) {
-            const payload = this.host
-            payload.private_key = window.btoa(payload.private_key)
-            this.dialogHostCreateFormVisible = false
-            this.addHost(payload)
-          } else {
-            return false
-          }
-        })
-      } else if (operate === 'edit') {
-        this.swapHost = this.$utils.cloneObj(current_host)
-        this.dialogHostEditFormVisible = true
-      } else if (operate === 'update') {
-        this.$refs.swapHost.validate(valid => {
-          if (valid) {
-            const id = this.swapHost.id
-            const payload = this.swapHost
-            payload.private_key = window.btoa(payload.origin_private_key)
-            delete payload.origin_private_key
-            this.dialogHostEditFormVisible = false
-            this.updateHost(id, payload)
-          } else {
-            return false
-          }
-        })
+      if (operate === 'add' || operate === 'update') {
+        this.operate = operate
+        this.dialogHostFormVisible = true
+        operate === 'update' && (this.host = this.$utils.cloneObj(current_host))
       } else if (operate === 'delete') {
         const id = current_host.id
         this.$confirm(`确定要删除 ${current_host.label} ?`, '确认', {
@@ -369,39 +157,46 @@ export default {
             })
           })
         })
+      } else {
+        const fn = this.operate === 'add' ? 'saveHost' : 'updateHost'
+        this.$refs['add-host'][fn]()
+          .then(() => {
+            this.dialogHostFormVisible = false
+            this.getHost()
+          })
       }
-    },
-    addHost (payload) {
-      createHostAPI(payload).then((res) => {
-        this.$refs.host.resetFields()
-        this.getHost()
-        this.accessCluster = res
-        this.dialogClusterAccessVisible = true
-        this.$message({
-          type: 'success',
-          message: '新增主机信息成功'
-        })
-      })
-    },
-    updateHost (id, payload) {
-      updateHostAPI(id, payload).then((res) => {
-        this.$refs.swapHost.resetFields()
-        this.getHost()
-        this.$message({
-          type: 'success',
-          message: '更新主机信息成功'
-        })
-      })
     },
     getHost () {
       this.loading = true
       getHostListAPI().then((res) => {
         this.loading = false
         res.forEach(element => {
-          element.origin_private_key = window.atob(element.private_key)
+          element.private_key = window.atob(element.private_key)
         })
         this.allHost = res
       })
+    }
+  },
+  computed: {
+    title () {
+      if (this.operate === 'add') {
+        return '创建主机资源'
+      } else if (this.operate === 'update') {
+        return '修改主机资源'
+      } else {
+        return ''
+      }
+    }
+  },
+  watch: {
+    dialogHostFormVisible (newV) {
+      if (!newV) {
+        if (this.operate === 'add') {
+          this.addHostData = this.$utils.cloneObj(this.host)
+        }
+        this.host = this.$utils.cloneObj(this.addHostData)
+        this.$refs['add-host'].$refs.host.resetFields()
+      }
     }
   },
   created () {
@@ -411,6 +206,10 @@ export default {
       title: '',
       routerList: []
     })
+    this.addHostData = this.host = this.$utils.cloneObj(this.initHost)
+  },
+  components: {
+    AddHost
   }
 }
 </script>
