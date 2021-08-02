@@ -102,7 +102,7 @@
                               content="更新环境中引用的变量"
                               effect="dark"
                               placement="top">
-                    <template v-if="!isPmService">
+                    <template v-if="!isPmService && productInfo.status !== 'Updating'">
                       <el-button v-if="(envSource===''||envSource==='spock') "
                                  type="text"
                                  @click="openUpdateK8sVar()">更新环境变量</el-button>
