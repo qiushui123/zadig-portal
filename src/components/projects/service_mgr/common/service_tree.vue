@@ -272,7 +272,7 @@
                          icon="el-icon-edit-outline"
                          @click="() => reEditServiceName(node, data)">
               </el-button>
-              <span v-if="showHover[data.service_name]"
+              <span :style="{'visibility': showHover[data.service_name] ? 'visible': 'hidden'}"
                     class="operation-container">
                 <el-button v-if="(data.product_name===projectName||data.status === 'named')"
                            type="text"
