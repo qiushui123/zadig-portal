@@ -1,6 +1,17 @@
 <template>
   <div class="not-k8s-config-container" v-loading="loading"
        @scroll="onScroll">
+    <el-drawer :visible.sync="dialogHostCreateFormVisible" custom-class="host-drawer">
+      <AddHost ref="add-host"></AddHost>
+      <div class="drawer-footer">
+        <el-button size="small"
+                   @click="dialogHostCreateFormVisible = false">取 消</el-button>
+        <el-button :plain="true"
+                   size="small"
+                   type="success"
+                   @click="addHostOperation">保存</el-button>
+      </div>
+    </el-drawer>
     <!--Host-create-dialog-->
     <div class="anchor-container">
       <el-tabs v-model="anchorTab"
@@ -708,10 +719,11 @@
   </div>
 </template>
 <script>
-import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI, createHostAPI } from '@api'
+import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI } from '@api'
 import aceEditor from 'vue2-ace-bind'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
+import AddHost from './add_host.vue'
 const validateServiceName = (rule, value, callback) => {
   if (value === '') {
     callback(new Error('请输入服务名称'))
@@ -1011,25 +1023,13 @@ export default {
       this.dialogHostCreateFormVisible = true
     },
     addHostOperation () {
-      this.$refs['add-host'].validate(valid => {
-        if (valid) {
-          const payload = this.host
-          payload.private_key = window.btoa(payload.private_key)
-          this.dialogHostCreateFormVisible = false
-          createHostAPI(payload).then((res) => {
-            this.$refs['add-host'].resetFields()
-            getHostListAPI().then((res) => {
-              this.allHost = res
-            })
-            this.$message({
-              type: 'success',
-              message: '新增主机信息成功'
-            })
+      this.$refs['add-host'].saveHost()
+        .then(() => {
+          getHostListAPI().then((res) => {
+            this.dialogHostCreateFormVisible = false
+            this.allHost = res
           })
-        } else {
-          return false
-        }
-      })
+        })
     },
     changeAdvancedShow (index) {
       if (this.showCheckStatusAdvanced[index]) {
@@ -1568,7 +1568,8 @@ export default {
   },
   components: {
     editor: aceEditor,
-    Resize
+    Resize,
+    AddHost
   }
 }
 </script>
@@ -1721,6 +1722,15 @@ export default {
     .el-form-item {
       margin-bottom: 15px;
     }
+  }
+}
+
+/deep/ .host-drawer {
+  padding: 10px 15px;
+  font-size: 13px;
+
+  .drawer-footer {
+    padding-top: 20px;
   }
 }
 </style>
