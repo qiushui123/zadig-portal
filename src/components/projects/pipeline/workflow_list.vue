@@ -45,7 +45,7 @@
             </router-link>
           </div>
         </div>
-        <div v-loading="loading"
+        <div v-loading="workflowListLoading"
              class="pipeline-loading"
              element-loading-text="加载中..."
              element-loading-spinner="iconfont iconfont-loading icongongzuoliucheng">
@@ -97,7 +97,6 @@ export default {
     return {
       itemComponent: virtualListItem,
       showStartProductBuild: false,
-      loading: false,
       showFavorite: false,
       workflowToRun: {},
       remain: 10,
@@ -115,7 +114,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getOnboardingTemplates'
+      'getOnboardingTemplates', 'workflowListLoading'
     ]),
     projectName () {
       return this.$route.params.project_name
@@ -195,10 +194,7 @@ export default {
   },
   methods: {
     fetchWorkflows () {
-      this.loading = true
-      this.$store.dispatch('refreshWorkflowList').then(() => {
-        this.loading = false
-      })
+      this.$store.dispatch('getWorkflowList')
     },
     deleteWorkflow (name) {
       this.$prompt('输入工作流名称确认', '删除工作流 ' + name, {
