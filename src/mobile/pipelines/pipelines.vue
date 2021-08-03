@@ -121,7 +121,7 @@ export default {
     },
     fetchWorkflows () {
       this.loading = true
-      this.$store.dispatch('refreshWorkflowList').then(() => {
+      this.$store.dispatch('getWorkflowList').then(() => {
         this.loading = false
       })
     },

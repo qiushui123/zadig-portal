@@ -270,7 +270,7 @@ export default {
   },
   mounted () {
     this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
-    this.$store.dispatch('refreshWorkflowList')
+    this.$store.dispatch('getWorkflowList')
     this.getProjects()
     bus.$emit('show-sidebar', true)
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })
