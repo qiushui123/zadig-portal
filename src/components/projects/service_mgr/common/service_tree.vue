@@ -655,7 +655,6 @@ export default {
             this.$emit('onRefreshSharedService')
             this.$emit('update:showNext', true)
             this.getServiceGroup()
-            this.importLoading = false
             this.dialogImportFileVisible = false
             this.$message({
               message: '服务导入成功',
@@ -666,6 +665,8 @@ export default {
               this.setServiceSelected(firstServiceName)
               this.$router.replace({ query: { service_name: firstServiceName, rightbar: 'help' } })
             }
+          }).finally(() => {
+            this.importLoading = false
           })
         } else {
           return false
