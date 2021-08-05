@@ -40,7 +40,7 @@
         <span class="tips">- 其它配置可以点击
           <el-link style="font-size: 13px;"
                    type="primary"
-                   :href="`https://docs.koderover.com/zadig/settings/codehost/`"
+                   :href="`https://docs.koderover.com/zadig/settings/codehost/gitlab/`"
                    :underline="false"
                    target="_blank">帮助</el-link> 查看配置样例
         </span>
