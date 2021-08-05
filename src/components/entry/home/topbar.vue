@@ -85,7 +85,7 @@
             <li role="separator"
                 class="divider"></li>
             <li>
-              <a href="https://docs.koderover.com/zadig/settings/codehost/"
+              <a href="https://docs.koderover.com/zadig/settings/codehost/gitlab/"
                  target="_blank">
                 <i class="icon el-icon-link"></i>
                 <span>系统设置</span>
