@@ -61,10 +61,7 @@
                 <span><i class="iconfont iconfuwu"></i></span> 检测到的服务组件
                 <el-tooltip effect="dark"
                             placement="top">
-                  <div slot="content">构建镜像标签生成规则 ：<br />选择 Tag 进行构建 ： 构建时间戳 -
-                    Tag<br />只选择分支进行构建：构建时间戳
-                    - 任务 ID - 分支名称<br />选择分支和 PR 进行构建：构建时间戳 - 任务 ID - 分支名称 - PR ID<br />只选择 PR
-                    进行构建：构建时间戳 - 任务 ID - PR ID</div>
+                  <div slot="content">可被更新的服务容器名称</div>
                   <span><i class="el-icon-question"></i></span>
                 </el-tooltip>
               </h4>
