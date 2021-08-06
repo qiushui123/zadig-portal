@@ -286,7 +286,7 @@
                            icon="el-icon-close"
                            @click="() => deleteSharedService(node, data)">
                 </el-button>
-                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
+                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab' || data.source === 'ilyshin'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
                            type="text"
                            size="mini"
                            icon="el-icon-refresh"

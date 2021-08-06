@@ -390,7 +390,7 @@ export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, pa
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
   if (type === 'github') {
     return http.get(`/api/aslan/code/workspace/github/${codehostId}/${encodeRepoName}/${branchName}?path=${path}`)
-  } else if (type === 'gitlab') {
+  } else if (type === 'gitlab' || type === 'ilyshin') {
     return http.get(`/api/aslan/code/workspace/gitlab/${codehostId}/${encodeRepoName}/${branchName}?path=${path}&repoOwner=${repoOwner}`)
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)

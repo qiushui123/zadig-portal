@@ -143,7 +143,7 @@ export default {
         .then(async () => {
           const payload = this.host
           payload.private_key = window.btoa(payload.private_key)
-          const res = await createHostAPI(payload).catch(() => { })
+          const res = await createHostAPI(payload)
           if (res) {
             this.$refs.host.resetFields()
             this.$message({
@@ -162,7 +162,7 @@ export default {
           const payload = this.host
           payload.private_key = window.btoa(payload.private_key)
           delete payload.origin_private_key
-          const res = await updateHostAPI(id, payload).catch(() => { })
+          const res = await updateHostAPI(id, payload)
           if (res) {
             this.$refs.host.resetFields()
             this.$message({
