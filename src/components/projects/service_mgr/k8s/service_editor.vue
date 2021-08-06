@@ -20,6 +20,9 @@
                     </el-tooltip>
                   </el-checkbox>
                 </div>
+                <div class="yaml-desc" v-show="!service.yaml">
+                  请输入 Kubernetes YAML 配置
+                </div>
                 <codemirror style="width: 100%; height: 100%;"
                             ref="myCm"
                             :value="service.yaml"
