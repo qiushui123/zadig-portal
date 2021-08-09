@@ -2,13 +2,6 @@
   <div
        class="pipeline-workflow__column pipeline-workflow__column_left pipeline-workflow__column--w100p">
     <div class="white-box-with-shadow">
-      <div v-if="showNoContent.show"
-           class="no-content">
-        <img src="@assets/icons/illustration/editor_nodata.svg"
-             alt="">
-        <p>{{showNoContent.msg}}</p>
-      </div>
-      <template v-else>
         <div class="white-box-with-shadow__content">
           <div class="row cf-pipeline-yml-build__wrapper">
             <div class="cf-pipeline-yml-build__editor cf-pipeline-yml-build__editor_inline">
@@ -26,6 +19,9 @@
                       <i class="el-icon-question"></i>
                     </el-tooltip>
                   </el-checkbox>
+                </div>
+                <div class="yaml-desc" v-show="!service.yaml">
+                  请输入 Kubernetes YAML 配置
                 </div>
                 <codemirror style="width: 100%; height: 100%;"
                             ref="myCm"
@@ -69,7 +65,6 @@
                     plain>保存</button>
           </div>
         </div>
-      </template>
     </div>
   </div>
 </template>
@@ -95,11 +90,6 @@ export default {
     serviceInTree: {
       type: Object,
       required: true
-    },
-    serviceCount: {
-      type: Number,
-      required: false,
-      default: 0
     }
   },
   data () {
@@ -115,10 +105,6 @@ export default {
       errors: [],
       info: { message: '' },
       service: {
-      },
-      showNoContent: {
-        show: false,
-        msg: ''
       },
       stagedYaml: {}
     }
@@ -240,58 +226,46 @@ export default {
     }
   },
   watch: {
-    serviceCount: {
-      handler (val, old_val) {
-        if (val === 0) {
-          this.showNoContent = {
-            show: true,
-            msg: '暂无服务,创建服务请在左侧栏点击「添加服务」按钮'
-          }
-        } else if (val > 0 && this.showNoContent.msg === '暂无服务,创建服务请在左侧栏点击「添加服务」按钮') {
-          this.showNoContent.show = false
-        }
-      },
-      immediate: true
-    },
     serviceInTree: {
       handler (val, old_val) {
-        if (this.serviceCount > 0) {
-          if (val.visibility === 'public' && val.product_name !== this.projectName) {
-            this.info = {
-              message: '信息：其它项目的共享服务，不支持在本项目中编辑，编辑器为只读模式'
-            }
-          } else if (val.product_name === this.projectName && val.source && val.source !== 'spock') {
-            this.info = {
-              message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
-            }
+        if (val.visibility === 'public' && val.product_name !== this.projectName) {
+          this.info = {
+            message: '信息：其它项目的共享服务，不支持在本项目中编辑，编辑器为只读模式'
+          }
+        } else if (val.product_name === this.projectName && val.source && val.source !== 'spock') {
+          this.info = {
+            message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
+          }
+        } else {
+          this.info = {
+            message: ''
+          }
+        }
+        if (val.status === 'added') {
+          this.getService(val)
+          if (val.source === 'gitlab' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
+            this.cmOptions.readOnly = true
           } else {
-            this.info = {
-              message: ''
-            }
-          }
-          if (val.status === 'added') {
-            this.getService(val)
-            if (val.source === 'gitlab' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
-              this.cmOptions.readOnly = true
-            } else {
-              this.cmOptions.readOnly = false
-            }
-          } else if (val.status === 'named') {
-            this.service = {
-              yaml: '',
-              service_name: val.service_name,
-              status: 'named'
-            }
             this.cmOptions.readOnly = false
-            if (this.stagedYaml[val.service_name]) {
-              this.service.yaml = this.stagedYaml[val.service_name]
-            }
-            this.editorFocus()
           }
+        } else if (val.status === 'named') {
+          this.service = {
+            yaml: '',
+            service_name: val.service_name,
+            status: 'named'
+          }
+          this.cmOptions.readOnly = false
+          if (this.stagedYaml[val.service_name]) {
+            this.service.yaml = this.stagedYaml[val.service_name]
+          }
+          this.$refs.myCm && this.editorFocus()
         }
       },
       immediate: true
     }
+  },
+  mounted () {
+    this.editorFocus()
   },
   components: {
     codemirror
