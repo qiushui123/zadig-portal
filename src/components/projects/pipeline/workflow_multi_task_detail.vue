@@ -314,6 +314,12 @@
                   </span>
                 </template>
               </div>
+              <div v-if="scope.row.buildv2SubTask.service_type==='pm'">
+                <span>
+                  <i class="iconfont iconwuliji"></i>
+                  物理机
+                </span>
+              </div>
             </template>
           </el-table-column>
         </el-table>
