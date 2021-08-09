@@ -69,6 +69,15 @@
     <footer>
       <div class="copyright">
         筑栈（上海）信息技术有限公司 KodeRover ©{{moment().format('YYYY')}}
+        <el-tooltip>
+          <div slot="content">
+            <span v-if="processEnv.VERSION">Version: {{processEnv.VERSION}}</span><br>
+            <span v-if="processEnv.BUILD_TIME">Build Time: {{moment.unix(processEnv.BUILD_TIME).format('YYYYMMDDHHmm')}}</span><br>
+            <span v-if="processEnv.TAG">Tag: {{processEnv.TAG}}</span>
+          </div>
+          <span v-if="processEnv && processEnv.BUILD_TIME"
+                class="el-icon-info"></span>
+        </el-tooltip>
       </div>
     </footer>
   </div>
@@ -162,6 +171,9 @@ export default {
     ...mapGetters([
       'signupStatus'
     ]),
+    processEnv () {
+      return process.env
+    },
     showCopywriting () {
       return this.copywriting.common
     }
