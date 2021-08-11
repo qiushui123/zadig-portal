@@ -101,7 +101,7 @@ export default {
         secret_key: '',
         reg_provider: '',
         region: '',
-        is_default: false
+        is_default: true
       },
       providerMap: {
         native: {

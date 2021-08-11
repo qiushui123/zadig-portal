@@ -192,7 +192,7 @@
       </el-alert>
       <div class="sync-container">
         <el-button :plain="true"
-                   @click="dialogRegistryCreateFormVisible=true"
+                   @click="addRegistryBtn"
                    size="small"
                    type="success">新建</el-button>
       </div>
@@ -310,6 +310,14 @@ export default {
     }
   },
   methods: {
+    addRegistryBtn () {
+      if (this.allRegistry.length === 0) {
+        this.registry.is_default = true
+      } else {
+        this.registry.is_default = false
+      }
+      this.dialogRegistryCreateFormVisible = true
+    },
     getProviderMap (name, type) {
       if (this.providerMap[name] && type) {
         return this.providerMap[name][type]
