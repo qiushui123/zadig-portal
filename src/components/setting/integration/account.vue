@@ -43,7 +43,7 @@
           <el-form-item label="DN"
                         prop="dn">
             <el-input v-model="userAccountEdit.dn"
-                      placeholder="DN"
+                      placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
                       autofocus
                       auto-complete="off"></el-input>
           </el-form-item>
@@ -122,13 +122,13 @@
                :rules="userAccountRules"
                status-icon
                ref="userAccountForm">
-        <el-form-item label="账号系统"
+        <el-form-item label="目录类型"
                       prop="type">
           <el-select v-model="userAccountAdd.type"
                      @change="clearValidate('userAccountForm')">
-            <el-option label="AD"
+            <el-option label="Microsoft Active Directory"
                        value="ad"></el-option>
-            <el-option label="LDAP"
+            <el-option label="OpenLDAP"
                        value="ldap"></el-option>
             <el-option label="SSO"
                        value="sso"></el-option>
@@ -153,7 +153,7 @@
           <el-form-item label="用户名"
                         prop="username">
             <el-input v-model="userAccountAdd.username"
-                      placeholder="用户名"
+                      placeholder="登录到 LDAP 的用户。示例：cn=user,dc=domain,dc=name"
                       autofocus
                       auto-complete="off"></el-input>
           </el-form-item>
@@ -164,10 +164,10 @@
                       autofocus
                       auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="DN"
+          <el-form-item label="基础 DN"
                         prop="dn">
             <el-input v-model="userAccountAdd.dn"
-                      placeholder="DN"
+                      placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
                       autofocus
                       auto-complete="off"></el-input>
           </el-form-item>
@@ -253,7 +253,7 @@
       <el-table v-if="accounts.length>0"
                 :data="accounts"
                 style="width: 100%;">
-        <el-table-column label="账号系统">
+        <el-table-column label="目录类型">
           <template slot-scope="scope">
             {{scope.row.type}}
           </template>
@@ -268,7 +268,7 @@
             {{scope.row.port}}
           </template>
         </el-table-column>
-        <el-table-column label="DN">
+        <el-table-column label="基础 DN">
           <template slot-scope="scope">
             {{scope.row.dn}}
           </template>
