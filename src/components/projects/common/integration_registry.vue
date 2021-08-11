@@ -41,6 +41,10 @@
                        label="腾讯云 TCR">
               <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
             </el-option>
+            <el-option value="harbor"
+                       label="Harbor">
+              <i class="iconfont iconHarbor"></i> <span>Harbor</span>
+            </el-option>
             <el-option value="native"
                        label="其它">
               <i class="iconfont iconqita"></i> <span>其它</span>
@@ -58,9 +62,12 @@
           <el-input clearable
                     v-model="registry.reg_addr"></el-input>
         </el-form-item>
-        <el-form-item label="Namespace"
-                      prop="namespace">
-          <el-input v-model="registry.namespace"></el-input>
+        <el-form-item prop="namespace">
+          <template slot="label">
+            {{ registry.reg_provider ? providerMap[registry.reg_provider].namespace : 'Namespace' }}
+          </template>
+          <el-input clearable
+                    v-model="registry.namespace"></el-input>
         </el-form-item>
         <el-form-item :label="registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'"
                       :rules="{ required: true, message: `请输入 ${registry.reg_provider === 'swr'?'Access Key':'Docker 用户名'}`, trigger: 'blur' }"
@@ -101,24 +108,33 @@ export default {
         secret_key: '',
         reg_provider: '',
         region: '',
-        is_default: false
+        is_default: true
       },
       providerMap: {
         native: {
           icon: 'iconfont logo iconqita',
-          name: '其它'
+          name: '其它',
+          namespace: 'Namespace'
         },
         swr: {
           icon: 'iconfont logo iconhuawei',
-          name: '华为云 SWR'
+          name: '华为云 SWR',
+          namespace: '组织名称'
         },
         acr: {
           icon: 'iconfont logo iconaliyun ',
-          name: '阿里云 ACR'
+          name: '阿里云 ACR',
+          namespace: '命名空间'
         },
         tcr: {
           icon: 'iconfont logo icontengxunyun',
-          name: '腾讯云 TCR'
+          name: '腾讯云 TCR',
+          namespace: '命名空间'
+        },
+        harbor: {
+          icon: 'iconfont logo iconHarbor',
+          name: 'Harbor',
+          namespace: '项目'
         }
       },
       rules: {

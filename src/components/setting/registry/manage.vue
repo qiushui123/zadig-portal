@@ -37,6 +37,10 @@
                        label="腾讯云 TCR">
               <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
             </el-option>
+            <el-option value="harbor"
+                       label="Harbor">
+              <i class="iconfont iconHarbor"></i> <span>Harbor</span>
+            </el-option>
             <el-option value="native"
                        label="其它">
               <i class="iconfont iconqita"></i> <span>其它</span>
@@ -56,8 +60,10 @@
                     clearable
                     v-model="registry.reg_addr"></el-input>
         </el-form-item>
-        <el-form-item label="Namespace"
-                      prop="namespace">
+        <el-form-item prop="namespace">
+          <template slot="label">
+            {{ registry.reg_provider ? providerMap[registry.reg_provider].namespace : 'Namespace' }}
+          </template>
           <el-input size="small"
                     clearable
                     v-model="registry.namespace"></el-input>
@@ -124,6 +130,10 @@
                        label="腾讯云 TCR">
               <i class="iconfont icontengxunyun"></i> <span>腾讯云 TCR</span>
             </el-option>
+            <el-option value="harbor"
+                       label="Harbor">
+              <i class="iconfont iconHarbor"></i> <span>Harbor</span>
+            </el-option>
             <el-option value="native"
                        label="其它">
               <i class="iconfont iconqita"></i> <span>其它</span>
@@ -143,8 +153,10 @@
                     clearable
                     v-model="swapRegistry.reg_addr"></el-input>
         </el-form-item>
-        <el-form-item label="Namespace"
-                      prop="namespace">
+        <el-form-item prop="namespace">
+          <template slot="label">
+            {{ swapRegistry.reg_provider ? providerMap[swapRegistry.reg_provider].namespace : 'Namespace' }}
+          </template>
           <el-input size="small"
                     clearable
                     v-model="swapRegistry.namespace"></el-input>
@@ -192,7 +204,7 @@
       </el-alert>
       <div class="sync-container">
         <el-button :plain="true"
-                   @click="dialogRegistryCreateFormVisible=true"
+                   @click="addRegistryBtn"
                    size="small"
                    type="success">新建</el-button>
       </div>
@@ -274,19 +286,28 @@ export default {
       providerMap: {
         native: {
           icon: 'iconfont logo iconqita',
-          name: '其它'
+          name: '其它',
+          namespace: 'Namespace'
         },
         swr: {
           icon: 'iconfont logo iconhuawei',
-          name: '华为云 SWR'
+          name: '华为云 SWR',
+          namespace: '组织名称'
         },
         acr: {
           icon: 'iconfont logo iconaliyun ',
-          name: '阿里云 ACR'
+          name: '阿里云 ACR',
+          namespace: '命名空间'
         },
         tcr: {
           icon: 'iconfont logo icontengxunyun',
-          name: '腾讯云 TCR'
+          name: '腾讯云 TCR',
+          namespace: '命名空间'
+        },
+        harbor: {
+          icon: 'iconfont logo iconHarbor',
+          name: 'Harbor',
+          namespace: '项目'
         }
       },
       dialogRegistryCreateFormVisible: false,
@@ -310,6 +331,14 @@ export default {
     }
   },
   methods: {
+    addRegistryBtn () {
+      if (this.allRegistry.length === 0) {
+        this.registry.is_default = true
+      } else {
+        this.registry.is_default = false
+      }
+      this.dialogRegistryCreateFormVisible = true
+    },
     getProviderMap (name, type) {
       if (this.providerMap[name] && type) {
         return this.providerMap[name][type]

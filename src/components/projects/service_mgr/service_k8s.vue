@@ -56,7 +56,6 @@
                      :class="{'pm':service.type==='pm'}">
                   <serviceEditorK8s ref="serviceEditor"
                                     :serviceInTree="service"
-                                    :serviceCount="serviceCount"
                                     :showNext.sync="showNext"
                                     @onParseKind="getYamlKind"
                                     @onRefreshService="getServices"
@@ -283,9 +282,6 @@ export default {
     },
     projectName () {
       return this.$route.params.project_name
-    },
-    serviceCount () {
-      return this.services.length
     },
     serviceName () {
       return this.$route.query.service_name

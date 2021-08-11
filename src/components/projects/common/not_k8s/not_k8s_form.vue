@@ -1397,7 +1397,7 @@ export default {
           clean_workspace: false,
           res_req: 'low',
           build_os: 'xenial',
-          image_id: '',
+          image_id: this.systems[0].id,
           image_from: '',
           installs: [],
           envs: [],
