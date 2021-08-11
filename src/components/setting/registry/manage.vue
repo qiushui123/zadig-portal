@@ -192,7 +192,7 @@
       </el-alert>
       <div class="sync-container">
         <el-button :plain="true"
-                   @click="createImage"
+                   @click="addRegistryBtn"
                    size="small"
                    type="success">新建</el-button>
       </div>
@@ -310,7 +310,7 @@ export default {
     }
   },
   methods: {
-    createImage () {
+    addRegistryBtn () {
       if (this.allRegistry.length === 0) {
         this.registry.is_default = true
       } else {
