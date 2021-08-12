@@ -87,6 +87,14 @@
 
 <script>
 import { createHostAPI, updateHostAPI } from '@api'
+const shellKeywords = ['alias', 'bg', 'bind', 'break', 'builtin', 'caller', 'case', 'cd',
+  'command', 'compgen', 'complete', 'continue', 'declare', 'dirs',
+  'disown', 'echo', 'enable', 'eval', 'exec', 'exit', 'export', 'false',
+  'fc', 'fg', 'for', 'function', 'getopts', 'hash', 'help', 'history', 'if',
+  'then', 'elif', 'else', 'jobs', 'kill', 'let', 'local', 'logout', 'popd', 'printf',
+  'pushd', 'pwd', 'read', 'readonly', 'return', 'select', 'set', 'shift',
+  'shopt', 'source', 'suspend', 'test', 'time', 'times', 'trap', 'true',
+  'type', 'typeset', 'ulimit', 'umask', 'unalias', 'unset', 'until', 'wait', 'while']
 export default {
   props: {
     host: {
@@ -104,13 +112,24 @@ export default {
     }
   },
   data () {
+    const validateKey = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入主机名称'))
+      } else if (shellKeywords.includes(value)) {
+        callback(new Error('主机名称不支持 bash 关键字'))
+      } else if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+        callback(new Error('主机名称仅支持英文字母、数字、下划线且首个字符不以数字开头'))
+      } else {
+        callback()
+      }
+    }
     return {
       rules: {
         name: [{
           type: 'string',
           required: true,
-          message: '请输入主机名称',
-          trigger: 'change'
+          trigger: 'change',
+          validator: validateKey
         }],
         provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }],
         label: [{
