@@ -50,6 +50,7 @@
                          clearable
                          size="small"
                          placeholder="代码库拥有者"
+                         :loading="codeInfo[repo_index].loading.owner"
                          filterable>
                 <el-option v-for="(repo_owner,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repo_owners'] : []"
                            :key="index"
@@ -72,6 +73,7 @@
                          clearable
                          size="small"
                          placeholder="请选择代码库"
+                         :loading="codeInfo[repo_index].loading.repo"
                          filterable>
                 <el-option v-for="(repo,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repos'] : []"
                            :key="index"
@@ -90,6 +92,7 @@
                          size="small"
                          filterable
                          allow-create
+                         :loading="codeInfo[repo_index].loading.branch"
                          clearable>
                 <el-option v-for="(branch,branch_index) in codeInfo[repo_index] ? codeInfo[repo_index]['branches'] : []"
                            :key="branch_index"
@@ -218,7 +221,12 @@ export default {
       allCodeHosts: [],
       codeInfo: {},
       showAdvancedSetting: {},
-      validateName: 'repoSelect'
+      validateName: 'repoSelect',
+      loading: {
+        owner: false,
+        repo: false,
+        branch: false
+      }
     }
   },
   props: {
@@ -278,6 +286,9 @@ export default {
     }
   },
   methods: {
+    setLoadingState (index, loading, isLoading) {
+      this.codeInfo[index].loading[loading] = isLoading
+    },
     validateForm () {
       return new Promise((resolve, reject) => {
         this.$refs.buildRepo.validate((valid) => {
@@ -310,7 +321,8 @@ export default {
         this.$set(this.codeInfo, index + 1, {
           repo_owners: [],
           repos: [],
-          branches: []
+          branches: [],
+          loading: this.$utils.cloneObj(this.loading)
         })
       }).catch(err => {
         console.log(err)
@@ -330,7 +342,8 @@ export default {
       this.$set(this.codeInfo, 0, {
         repo_owners: [],
         repos: [],
-        branches: []
+        branches: [],
+        loading: this.$utils.cloneObj(this.loading)
       })
       if (this.allCodeHosts && this.allCodeHosts.length === 1) {
         const codeHostId = this.allCodeHosts[0].id
@@ -362,9 +375,15 @@ export default {
       const type = item ? item.kind : 'group'
       const project_uuid = item.project_uuid ? item.project_uuid : ''
       if (repo_owner) {
+        if (!key) {
+          this.codeInfo[index].repos = []
+          this.codeInfo[index].branches = []
+        }
+        this.setLoadingState(index, 'repo', true)
         getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key, project_uuid).then((res) => {
           this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
           this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
+          this.setLoadingState(index, 'repo', false)
         })
       }
       this.$set(this.config.repos[index], 'project_uuid', project_uuid)
@@ -376,8 +395,11 @@ export default {
       const repoId = repoItem.repo_id ? repoItem.repo_id : ''
       const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
       if (repo_owner && repo_name) {
+        this.codeInfo[index].branches = []
+        this.setLoadingState(index, 'branch', true)
         getBranchInfoByIdAPI(id, repo_owner, repo_name, repoUUID).then((res) => {
           this.$set(this.codeInfo[index], 'branches', res || [])
+          this.setLoadingState(index, 'branch', false)
         })
       }
       this.$set(this.config.repos[index], 'repo_uuid', repoUUID)
@@ -385,9 +407,16 @@ export default {
       this.config.repos[index].branch = ''
     },
     getRepoOwnerById (index, id, key = '') {
+      if (!key) {
+        this.codeInfo[index].repo_owners = []
+        this.codeInfo[index].repos = []
+        this.codeInfo[index].branches = []
+      }
+      this.setLoadingState(index, 'owner', true)
       getRepoOwnerByIdAPI(id, key).then((res) => {
         this.$set(this.codeInfo[index], 'repo_owners', orderBy(res, ['name']))
         this.$set(this.codeInfo[index], 'origin_repo_owners', orderBy(res, ['name']))
+        this.setLoadingState(index, 'owner', false)
       })
       if (this.allCodeHosts && this.allCodeHosts.length > 1) {
         this.config.repos[index].repo_owner = ''
@@ -404,7 +433,8 @@ export default {
         this.$set(this.codeInfo, index, {
           repo_owners: [],
           repos: [],
-          branches: []
+          branches: [],
+          loading: this.$utils.cloneObj(this.loading)
         })
         if (codehostId) {
           getRepoOwnerByIdAPI(codehostId).then((res) => {
