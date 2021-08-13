@@ -48,6 +48,7 @@
             <el-input v-model="userAccountEdit.dn"
                       placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="userFilter"
