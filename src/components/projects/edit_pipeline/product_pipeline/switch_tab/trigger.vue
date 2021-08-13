@@ -9,9 +9,13 @@
                custom-class="add-trigger-dialog"
                center>
       <el-form :model="webhookSwap"
+               ref="triggerForm"
                label-position="left"
                label-width="80px">
-        <el-form-item label="名称">
+        <el-form-item label="名称"
+                      prop="name"
+                      class="bottom-22"
+                      :rules="nameRules">
           <el-input size="small"
                     autofocus
                     ref="webhookNamedRef"
@@ -211,7 +215,7 @@
         <el-button size="small"
                    round
                    type="primary"
-                   @click="webhookAddMode?addWebhook():saveWebhook()">确定</el-button>
+                   @click="validateForm(webhookAddMode?'addWebhook':'saveWebhook')">确定</el-button>
       </div>
     </el-dialog>
     <!--end of edit webhook dialog -->
@@ -348,6 +352,13 @@ import { listProductAPI, getBranchInfoByIdAPI, singleTestAPI, getAllBranchInfoAP
 import { uniqBy, get } from 'lodash'
 export default {
   data () {
+    const validateName = (rule, value, callback) => {
+      if (!/^[a-zA-Z0-9]([a-zA-Z0-9_\-\.]*[a-zA-Z0-9])?$/.test(value)) {
+        callback(new Error("触发器名称仅支持数字字符、'-'、'_'、'.' 且开始结束只能是数字字符"))
+      } else {
+        callback()
+      }
+    }
     return {
       testInfos: [],
       gotScheduleRepo: false,
@@ -370,7 +381,10 @@ export default {
       webhookEditMode: false,
       webhookAddMode: false,
       showEnvUpdatePolicy: false,
-      firstShowPolicy: false
+      firstShowPolicy: false,
+      nameRules: [
+        { type: 'string', trigger: 'change', validator: validateName }
+      ]
     }
   },
   props: {
@@ -400,6 +414,13 @@ export default {
     }
   },
   methods: {
+    validateForm (fn) {
+      this.$refs.triggerForm.validate(valid => {
+        if (valid) {
+          this[fn]()
+        }
+      })
+    },
     getTestReposForQuery (testInfos) {
       const testRepos = testInfos.length > 0 ? this.$utils.flattenArray(testInfos.map(t => t.builds)) : []
       let testReposForQuery = {}
@@ -759,6 +780,10 @@ export default {
   .el-form {
     .el-form-item {
       margin-bottom: 8px;
+
+      &.bottom-22 {
+        margin-bottom: 22px;
+      }
     }
 
     .env-open-button {

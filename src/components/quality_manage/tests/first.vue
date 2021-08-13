@@ -2,7 +2,7 @@
   <div v-loading="loading"
        element-loading-text="加载中..."
        element-loading-spinner="iconfont iconfont-loading icontest"
-       class="version-container-list">
+       class="test-container-list">
     <div v-if="loading || noProjects"
          class="no-show">
       <img src="@assets/icons/illustration/test_manage.svg"
@@ -71,7 +71,7 @@ export default {
 </script>
 
 <style lang="less">
-.version-container-list {
+.test-container-list {
   position: relative;
   flex: 1;
   overflow: auto;

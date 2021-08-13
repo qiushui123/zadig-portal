@@ -402,19 +402,7 @@
 <script>
 import gitfileTree from '@/components/common/gitfile_tree.vue'
 import { deleteServiceTemplateAPI, autoUpgradeEnvAPI, getSingleProjectAPI, updateEnvTemplateAPI, getCodeSourceAPI, getRepoOwnerByIdAPI, getRepoNameByIdAPI, getBranchInfoByIdAPI, loadRepoServiceAPI, validPreloadService, getCodeSourceByAdminAPI } from '@api'
-import { differenceBy } from 'lodash'
 import { mapGetters } from 'vuex'
-const validateServiceName = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入服务名称'))
-  } else {
-    if (!/^[a-z0-9-]+$/.test(value)) {
-      callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
-    } else {
-      callback()
-    }
-  }
-}
 export default {
   props: {
     services: {
@@ -500,7 +488,7 @@ export default {
           {
             type: 'string',
             required: true,
-            validator: validateServiceName,
+            validator: this.validateServiceName,
             trigger: ['blur', 'change']
           }
         ]
@@ -510,6 +498,19 @@ export default {
   },
 
   methods: {
+    validateServiceName (rule, value, callback) {
+      if (value === '') {
+        callback(new Error('请输入服务名称'))
+      } else if (this.filteredServices.map(ser => ser.service_name).includes(value)) {
+        callback(new Error('服务名称与现有名称重复'))
+      } else {
+        if (!/^[a-z0-9-]+$/.test(value)) {
+          callback(new Error('名称只支持小写字母和数字，特殊字符只支持中划线'))
+        } else {
+          callback()
+        }
+      }
+    },
     setHovered (name) {
       this.$nextTick(() => {
         this.$set(this.showHover, name, true)
@@ -534,6 +535,10 @@ export default {
       })
       services.push([data.service_name])
       payload.services = services
+      payload.shared_services = (payload.shared_services || []).concat({
+        name: data.service_name,
+        owner: data.product_name
+      })
       updateEnvTemplateAPI(projectName, payload).then((res) => {
         this.$message.success('添加共享服务成功')
         this.getServiceGroup()
@@ -568,6 +573,7 @@ export default {
           };
         })
         payload.services = services
+        payload.shared_services = payload.shared_services.filter(share => { return share.name !== data.service_name })
         updateEnvTemplateAPI(projectName, payload).then((res) => {
           this.getServiceGroup()
           this.$emit('onRefreshSharedService')
@@ -1068,7 +1074,7 @@ export default {
       })
     },
     filteredSharedServices () {
-      const services = this.$utils.filterObjectArrayByKey('service_name', this.searchService, differenceBy(this.sharedServices, this.services, 'service_name'))
+      const services = this.$utils.filterObjectArrayByKey('service_name', this.searchService, this.sharedServices)
       return [
         {
           label: '共享服务列表',
