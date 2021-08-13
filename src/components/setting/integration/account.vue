@@ -16,6 +16,7 @@
             <el-input v-model="userAccountEdit.address"
                       placeholder="主机名"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="端口"
@@ -31,6 +32,7 @@
             <el-input v-model="userAccountEdit.username"
                       placeholder="用户名"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码"
@@ -38,6 +40,7 @@
             <el-input v-model="userAccountEdit.password"
                       placeholder="密码"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="DN"
@@ -140,6 +143,7 @@
             <el-input v-model="userAccountAdd.address"
                       placeholder="主机名"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="端口"
@@ -162,6 +166,7 @@
             <el-input v-model="userAccountAdd.password"
                       placeholder="密码"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="基础 DN"
@@ -169,6 +174,7 @@
             <el-input v-model="userAccountAdd.dn"
                       placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
                       autofocus
+                      clearable
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="userFilter"
