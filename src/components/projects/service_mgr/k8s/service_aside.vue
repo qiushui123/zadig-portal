@@ -45,8 +45,7 @@
               <el-button type="primary"
                          size="small"
                          @click="saveBuildConfig"
-                         class="save-btn"
-                         plain>保存构建
+                         :disabled="projectName !== projectNameOfService">保存构建
               </el-button>
             </div>
         </div>
@@ -89,7 +88,7 @@
                 <el-table-column label="构建信息/操作">
                   <template slot-scope="scope">
                     <router-link v-if="scope.row.build_name"
-                                 :to="`${buildBaseUrl}?rightbar=build&service_name=${scope.row.name}&build_name=${scope.row.build_name}`">
+                                 :to="`${buildBaseUrl}?rightbar=build&service_name=${scope.row.name}&build_name=${scope.row.build_name}&service_project_name=${projectNameOfService}`">
                       <el-button size="small"
                                  type="text">{{scope.row.build_name}}</el-button>
                     </router-link>
@@ -338,26 +337,28 @@ export default {
       const projectName = this.projectName
       getSingleProjectAPI(projectName).then((res) => {
         this.projectForm = res
+        this.customEnvs = res.vars
         if (res.team_id === 0) {
           this.projectForm.team_id = null
         }
       })
     },
     getServiceTemplateWithConfig () {
-      if (this.service && this.service.type === 'k8s' && this.service.status === 'added' && this.service.product_name === this.projectName) {
+      if (this.service && this.service.type === 'k8s' && this.service.status === 'added') {
         this.changeRoute('var')
-        serviceTemplateWithConfigAPI(this.service.service_name, this.projectName).then(res => {
+        serviceTemplateWithConfigAPI(this.service.service_name, this.projectNameOfService).then(res => {
           this.serviceModules = res.service_module
           this.sysEnvs = res.system_variable
-          this.customEnvs = res.custom_variable
         })
       }
     },
     changeRoute (step) {
+      this.$route.query.service_project_name && (delete this.$route.query.service_project_name)
+      this.$route.query.build_name && (delete this.$route.query.build_name)
       this.$router.replace({
         query: Object.assign(
           {},
-          qs.parse(window.location.search, { ignoreQueryPrefix: true }),
+          this.$route.query,
           {
             rightbar: step
           })
@@ -508,6 +509,9 @@ export default {
   computed: {
     projectName () {
       return this.$route.params.project_name
+    },
+    projectNameOfService () {
+      return this.service.product_name
     },
     serviceType () {
       return 'k8s'
@@ -722,18 +726,6 @@ export default {
       .btn-container {
         padding: 0 10px 10px 10px;
         box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.05);
-
-        .save-btn {
-          padding: 10px 17px;
-          color: #fff;
-          font-weight: bold;
-          font-size: 13px;
-          text-decoration: none;
-          background-color: #1989fa;
-          border: 1px solid #1989fa;
-          cursor: pointer;
-          transition: background-color 300ms, color 300ms, border 300ms;
-        }
       }
     }
 

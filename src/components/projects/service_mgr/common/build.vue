@@ -1026,7 +1026,7 @@ export default {
       return this.$store.state.login.userinfo.organization.id
     },
     projectName () {
-      return this.$route.params.project_name
+      return this.$route.query.service_project_name || this.$route.params.project_name
     },
     isEdit () {
       return (!!(this.$route.query.build_name))
