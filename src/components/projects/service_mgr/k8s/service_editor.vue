@@ -239,19 +239,16 @@ export default {
           this.info = {
             message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
           }
-          if (val.status === 'added') {
-            this.getService(val)
-            if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
-              this.cmOptions.readOnly = true
-            } else {
-              this.cmOptions.readOnly = false
-            }
-          } else if (val.status === 'named') {
-            this.service = {
-              yaml: '',
-              service_name: val.service_name,
-              status: 'named'
-            }
+        } else {
+          this.info = {
+            message: ''
+          }
+        }
+        if (val.status === 'added') {
+          this.getService(val)
+          if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
+            this.cmOptions.readOnly = true
+          } else {
             this.cmOptions.readOnly = false
           }
         } else if (val.status === 'named') {
