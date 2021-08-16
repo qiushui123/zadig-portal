@@ -713,8 +713,6 @@ export default {
   }
 
   .tab-container {
-    margin-top: 15px;
-
     .sync-container {
       padding-top: 15px;
       padding-bottom: 15px;

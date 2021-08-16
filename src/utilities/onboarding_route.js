@@ -27,10 +27,12 @@ export function whetherOnboarding (projectTemplate) {
   const status = projectTemplate.onboarding_status
   const projectName = projectTemplate.product_name
   if (productFeature.deploy_type === 'k8s') {
-    return getRoute(status - 1, 'basic', projectName)
+    if (productFeature.basic_facility === 'cloud_host') {
+      return getRoute(status - 1, 'not_k8s', projectName)
+    } else {
+      return getRoute(status - 1, 'basic', projectName)
+    }
   } else if (productFeature.deploy_type === 'helm') {
     return getRoute(status - 1, 'helm', projectName)
-  } else if (productFeature.basic_facility === 'cloud_host') {
-    return getRoute(status - 1, 'not_k8s', projectName)
   }
 }
