@@ -360,14 +360,12 @@ export default {
     getRepoNameById (index, id, repo_owner, key = '') {
       const item = (this.codeInfo[index].repo_owners.find(item => { return item.path === repo_owner }))
       const type = item ? item.kind : 'group'
-      const project_uuid = item.project_uuid ? item.project_uuid : ''
       if (repo_owner) {
-        getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key, project_uuid).then((res) => {
+        getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key).then((res) => {
           this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
           this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
         })
       }
-      this.$set(this.config.repos[index], 'project_uuid', project_uuid)
       this.config.repos[index].repo_name = ''
       this.config.repos[index].branch = ''
     },
@@ -412,8 +410,7 @@ export default {
             this.$set(this.codeInfo[index], 'origin_repo_owners', orderBy(res, ['name']))
             const item = this.codeInfo[index].repo_owners.find(item => { return item.path === repoOwner })
             const type = item ? item.kind : 'group'
-            const project_uuid = item.project_uuid ? item.project_uuid : ''
-            getRepoNameByIdAPI(codehostId, type, encodeURI(repoOwner), '', project_uuid).then((res) => {
+            getRepoNameByIdAPI(codehostId, type, encodeURI(repoOwner), '', '').then((res) => {
               this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
               this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
             })
