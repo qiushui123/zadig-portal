@@ -473,13 +473,7 @@ export default {
           })
         })
         current_version_info.distributeInfo.forEach(distribute => {
-          if (distribute.distributeType !== 'file') {
-            this.imagesAndConfigs.push({
-              serviceName: distribute.serviceName,
-              registryName: distribute.registryName,
-              yamlContents: distribute.yamlContents
-            })
-          } else if (distribute.distributeType === 'file') {
+          if (distribute.distributeType === 'file') {
             this.packages.push({
               serviceName: distribute.serviceName,
               packageFile: distribute.packageFile
