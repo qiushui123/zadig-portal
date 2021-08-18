@@ -124,31 +124,6 @@
                 </tr>
                 <tr>
                   <td>
-                    <span>密钥</span>
-                  </td>
-                  <td v-if="secret">
-                    <span class="token">
-                      <el-input size="small"
-                                placeholder=""
-                                readonly
-                                type="text"
-                                v-model="secret">
-                        <el-button v-clipboard:copy="secret"
-                                   v-clipboard:success="copySuccess"
-                                   v-clipboard:error="copyError"
-                                   slot="append"
-                                   icon="el-icon-document-copy">复制</el-button>
-                      </el-input>
-
-                    </span>
-                  </td>
-                  <td v-else>
-                    <el-button @click="getToken()"
-                               type="text">点击获取</el-button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
                     <span>
                       通知设置
                     </span>
@@ -226,7 +201,6 @@ export default {
         confirmPassword: ''
       },
       jwtToken: null,
-      secret: null,
       loading: true,
       modifiedPwdDialogVisible: false,
       sysNoti: {},
@@ -253,12 +227,6 @@ export default {
     getJwtToken () {
       getJwtTokenAPI().then((res) => {
         this.jwtToken = res.token
-      })
-    },
-    getSecret () {
-      const id = 1
-      organizationInfoAPI(id).then((res) => {
-        this.secret = res.orgToken
       })
     },
     copySuccess (event) {
@@ -368,7 +336,6 @@ export default {
     this.getUserInfo()
     this.getJwtToken()
     this.getSubscribe()
-    this.getSecret()
   },
   components: {
     supportDoc
