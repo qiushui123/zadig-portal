@@ -38,87 +38,6 @@ import workflow_multi_testcase from '../components/projects/test/report/workflow
 // build
 import project_build_config from '../components/projects/build/config.vue'
 import project_build_config_detail from '../components/projects/build/config_detail.vue'
-
-// workflow product
-import configure_pipeline_view from '../components/projects/edit_pipeline/view.vue'
-import product_pipeline from '../components/projects/edit_pipeline/product_pipeline/pipeline.vue'
-
-/* env
-   outside */
-import env_home from '../components/projects/env/outer_env/home.vue'
-import env_detail from '../components/projects/env/outer_env/env_detail.vue'
-
-// inside
-import project_env_home from '../components/projects/env/inner_env/home.vue'
-import project_env_detail from '../components/projects/env/inner_env/env_detail.vue'
-import project_env_create from '../components/projects/env/inner_env/create_env_detail.vue'
-import project_env_service_detail from '../components/projects/env/inner_env/service_detail.vue'
-import project_env_pm_service_detail from '../components/projects/env/inner_env/pm_service_detail.vue'
-import project_env_service_config from '../components/projects/env/inner_env/service_config.vue'
-
-// test
-import project_test_function from '../components/projects/test/function/function.vue'
-import project_test_function_summary from '../components/projects/test/function/function_summary.vue'
-import project_test_function_detail from '../components/projects/test/function/function_detail.vue'
-import project_test_function_task_detail from '../components/projects/test/function/function_task_detail.vue'
-import project_test_case from '../components/projects/test/report/test_case.vue'
-
-// test mgr
-import test_home_first from '../components/quality_manage/tests/first.vue'
-import test_function from '../components/quality_manage/tests/function/function.vue'
-import test_function_detail from '../components/quality_manage/tests/function/function_detail.vue'
-import test_function_summary from '../components/quality_manage/tests/function/function_summary.vue'
-import test_function_task_detail from '../components/quality_manage/tests/function/function_task_detail.vue'
-import test_case from '../components/quality_manage/tests/test_case.vue'
-
-// delivery center
-import delivery_home from '../components/projects/delivery/home.vue'
-import delivery_version from '../components/projects/delivery/version/index.vue'
-import delivery_version_detail from '../components/projects/delivery/version/detail.vue'
-import delivery_artifacts from '../components/projects/delivery/artifacts/index.vue'
-import delivery_artifacts_detail from '../components/projects/delivery/artifacts/detail.vue'
-
-/**    onboarding    */
-// k8s
-import onboarding_projects_info_basic from '../components/projects/guide/k8s/info_basic.vue'
-import onboarding_projects_service from '../components/projects/guide/service.vue'
-import onboarding_projects_runtime from '../components/projects/guide/runtime.vue'
-import onboarding_projects_delivery from '../components/projects/guide/k8s/delivery.vue'
-
-// helm
-import onboarding_projects_info_helm from '../components/projects/guide/helm/info_basic.vue'
-import onboarding_projects_runtime_helm from '../components/projects/guide/helm/runtime.vue'
-import onboarding_projects_delivery_helm from '../components/projects/guide/helm/delivery.vue'
-
-// not k8s
-import onboarding_projects_not_k8s_info from '../components/projects/guide/not_k8s/not_k8s_info.vue'
-import onboarding_projects_not_k8s_config from '../components/projects/guide/not_k8s/not_k8s_config.vue'
-import onboarding_projects_not_k8s_deploy from '../components/projects/guide/not_k8s/not_k8s_deploy.vue'
-import onboarding_projects_not_k8s_delivery from '../components/projects/guide/not_k8s/not_k8s_delivery.vue'
-
-/** ---------------- */
-
-/**   enterprise    */
-
-import enterprise_mgr_home from '../components/enterprise_mgr/home.vue'
-import enterprise_mgr_users_manage from '../components/enterprise_mgr/users/manage.vue'
-
-/** ---------------- */
-
-/**   system setting      */
-import setting_home from '../components/setting/home.vue'
-
-import setting_integration_manage_home from '../components/setting/integration/home.vue'
-import setting_apps_manage from '../components/setting/apps/manage.vue'
-import setting_imgs_manage from '../components/setting/imgs/manage.vue'
-import setting_registry_manage from '../components/setting/registry/manage.vue'
-import setting_storage_manage from '../components/setting/storage/manage.vue'
-import setting_cluster_manage from '../components/setting/cluster/manage.vue'
-import setting_host_manage from '../components/setting/host/manage.vue'
-import setting_config_manage_home from '../components/setting/config/home.vue'
-import setting_config_manage_quota from '../components/setting/config/quota.vue'
-import setting_config_manage_proxy from '../components/setting/config/proxy.vue'
-import setting_config_manage_cache from '../components/setting/config/cache.vue'
 /** ---------------- */
 
 /**     profile      */
@@ -126,18 +45,98 @@ import setting_config_manage_cache from '../components/setting/config/cache.vue'
 import profile_home from '../components/profile/home.vue'
 import profile_manage from '../components/profile/manage.vue'
 
+// workflow product
+const configure_pipeline_view = () => import(/* webpackChunkName: "edit-pipeline" */ '../components/projects/edit_pipeline/view.vue')
+const product_pipeline = () => import(/* webpackChunkName: "edit-pipeline" */ '../components/projects/edit_pipeline/product_pipeline/pipeline.vue')
+
+/* env
+   outside */
+const env_home = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/outer_env/home.vue')
+const env_detail = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/outer_env/env_detail.vue')
+
+// inside
+const project_env_home = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/home.vue')
+const project_env_detail = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/env_detail.vue')
+const project_env_create = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/create_env_detail.vue')
+const project_env_service_detail = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/service_detail.vue')
+const project_env_pm_service_detail = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/pm_service_detail.vue')
+const project_env_service_config = () => import(/* webpackChunkName: "project-env" */ '../components/projects/env/inner_env/service_config.vue')
+
+// test
+const project_test_function = () => import(/* webpackChunkName: "project-test" */ '../components/projects/test/function/function.vue')
+const project_test_function_summary = () => import(/* webpackChunkName: "project-test" */ '../components/projects/test/function/function_summary.vue')
+const project_test_function_detail = () => import(/* webpackChunkName: "project-test" */ '../components/projects/test/function/function_detail.vue')
+const project_test_function_task_detail = () => import(/* webpackChunkName: "project-test" */ '../components/projects/test/function/function_task_detail.vue')
+const project_test_case = () => import(/* webpackChunkName: "project-test" */ '../components/projects/test/report/test_case.vue')
+
+// test mgr
+const test_home_first = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/first.vue')
+const test_function = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/function/function.vue')
+const test_function_detail = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/function/function_detail.vue')
+const test_function_summary = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/function/function_summary.vue')
+const test_function_task_detail = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/function/function_task_detail.vue')
+const test_case = () => import(/* webpackChunkName: "quality-manage" */ '../components/quality_manage/tests/test_case.vue')
+
+// delivery center
+const delivery_home = () => import(/* webpackChunkName: "project-delivery" */ '../components/projects/delivery/home.vue')
+const delivery_version = () => import(/* webpackChunkName: "project-delivery" */ '../components/projects/delivery/version/index.vue')
+const delivery_version_detail = () => import(/* webpackChunkName: "project-delivery" */ '../components/projects/delivery/version/detail.vue')
+const delivery_artifacts = () => import(/* webpackChunkName: "project-delivery" */ '../components/projects/delivery/artifacts/index.vue')
+const delivery_artifacts_detail = () => import(/* webpackChunkName: "project-delivery" */ '../components/projects/delivery/artifacts/detail.vue')
+
+/**    onboarding    */
+// k8s
+const onboarding_projects_info_basic = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/k8s/info_basic.vue')
+const onboarding_projects_service = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/service.vue')
+const onboarding_projects_runtime = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/runtime.vue')
+const onboarding_projects_delivery = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/k8s/delivery.vue')
+
+// helm
+const onboarding_projects_info_helm = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/helm/info_basic.vue')
+const onboarding_projects_runtime_helm = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/helm/runtime.vue')
+const onboarding_projects_delivery_helm = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/helm/delivery.vue')
+
+// not k8s
+const onboarding_projects_not_k8s_info = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/not_k8s/not_k8s_info.vue')
+const onboarding_projects_not_k8s_config = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/not_k8s/not_k8s_config.vue')
+const onboarding_projects_not_k8s_deploy = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/not_k8s/not_k8s_deploy.vue')
+const onboarding_projects_not_k8s_delivery = () => import(/* webpackChunkName: "onboarding" */ '../components/projects/guide/not_k8s/not_k8s_delivery.vue')
+
+/** ---------------- */
+
+/**   enterprise    */
+const enterprise_mgr_home = () => import(/* webpackChunkName: "enterprise-mgr" */ '../components/enterprise_mgr/home.vue')
+const enterprise_mgr_users_manage = () => import(/* webpackChunkName: "enterprise-mgr" */ '../components/enterprise_mgr/users/manage.vue')
+
+/** ---------------- */
+
+/**   system setting      */
+const setting_home = () => import(/* webpackChunkName: "setting" */ '../components/setting/home.vue')
+
+const setting_integration_manage_home = () => import(/* webpackChunkName: "setting" */ '../components/setting/integration/home.vue')
+const setting_apps_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/apps/manage.vue')
+const setting_imgs_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/imgs/manage.vue')
+const setting_registry_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/registry/manage.vue')
+const setting_storage_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/storage/manage.vue')
+const setting_cluster_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/cluster/manage.vue')
+const setting_host_manage = () => import(/* webpackChunkName: "setting" */ '../components/setting/host/manage.vue')
+const setting_config_manage_home = () => import(/* webpackChunkName: "setting" */ '../components/setting/config/home.vue')
+const setting_config_manage_quota = () => import(/* webpackChunkName: "setting" */ '../components/setting/config/quota.vue')
+const setting_config_manage_proxy = () => import(/* webpackChunkName: "setting" */ '../components/setting/config/proxy.vue')
+const setting_config_manage_cache = () => import(/* webpackChunkName: "setting" */ '../components/setting/config/cache.vue')
+
 /** ---------------- */
 
 // mobile
-import mobile from '../mobile/index.vue'
-import mobile_status from '../mobile/pipelines/status.vue'
-import mobile_envs from '../mobile/envs/envs.vue'
-import mobile_env_detail from '../mobile/envs/env_detail'
-import mobile_env_service_detail from '../mobile/envs/service_detail'
-import mobile_pipelines from '../mobile/pipelines/pipelines.vue'
-import mobile_pipelines_detail from '../mobile/pipelines/detail.vue'
-import mobile_pipelines_multi_task from '../mobile/pipelines/multi_task.vue'
-import mobile_profile from '../mobile/profile.vue'
+const mobile = () => import(/* webpackChunkName: "mobile" */ '../mobile/index.vue')
+const mobile_status = () => import(/* webpackChunkName: "mobile" */ '../mobile/pipelines/status.vue')
+const mobile_envs = () => import(/* webpackChunkName: "mobile" */ '../mobile/envs/envs.vue')
+const mobile_env_detail = () => import(/* webpackChunkName: "mobile" */ '../mobile/envs/env_detail')
+const mobile_env_service_detail = () => import(/* webpackChunkName: "mobile" */ '../mobile/envs/service_detail')
+const mobile_pipelines = () => import(/* webpackChunkName: "mobile" */ '../mobile/pipelines/pipelines.vue')
+const mobile_pipelines_detail = () => import(/* webpackChunkName: "mobile" */ '../mobile/pipelines/detail.vue')
+const mobile_pipelines_multi_task = () => import(/* webpackChunkName: "mobile" */ '../mobile/pipelines/multi_task.vue')
+const mobile_profile = () => import(/* webpackChunkName: "mobile" */ '../mobile/profile.vue')
 
 Vue.use(VueRouter)
 const routes = [
