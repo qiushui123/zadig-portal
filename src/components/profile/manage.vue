@@ -150,7 +150,7 @@
 <script>
 import bus from '@utils/event_bus'
 import supportDoc from './common/support_doc.vue'
-import { getCurrentUserInfoAPI, updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI, organizationInfoAPI } from '@api'
+import { getCurrentUserInfoAPI, updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
 export default {
   data () {
     const validateNewPass = (rule, value, callback) => {

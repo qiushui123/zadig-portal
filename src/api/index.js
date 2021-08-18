@@ -603,10 +603,6 @@ export function createOrganizationInfoAPI (payload) {
   return http.post('/api/directory/organization', payload)
 }
 
-export function organizationInfoAPI (organization_id) {
-  return http.get(`/api/directory/organization/${organization_id}`)
-}
-
 export function usersAPI (organization_id, team_id = '', page_size = 0, page_index = 0, keyword = '') {
   return http.get(`/api/directory/userss/search?orgId=${organization_id}&teamId=${team_id}&per_page=${page_size}&page=${page_index}&keyword=${keyword}`)
 }
