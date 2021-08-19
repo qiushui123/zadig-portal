@@ -139,7 +139,7 @@
                 </ul>
                 <ul v-if="$utils.roleCheck().superAdmin"
                     class="profile-list profile-list__with-icon user-settings">
-                  <router-link to="/v1/enterprise">
+                  <router-link to="/v1/users/account/manage">
                     <li class="profile-list__item">
                       <i class="iconfont icongeren"></i>
                       <span class="profile-list__text">用户管理</span>

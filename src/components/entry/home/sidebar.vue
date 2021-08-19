@@ -133,7 +133,7 @@ export default {
             {
               name: '用户管理',
               icon: 'iconfont icongeren',
-              url: 'enterprise/users/manage'
+              url: 'users/account/manage'
             }]
         }
       ],
@@ -284,7 +284,7 @@ export default {
     ]),
     navList () {
       const path = this.$route.path
-      if (path.includes('/v1/enterprise')) {
+      if (path.includes('/v1/users')) {
         return this.enterpriseMenu
       } else if (path.includes('/v1/system')) {
         return this.systemMenu
@@ -294,7 +294,7 @@ export default {
     },
     showBackPath () {
       const path = this.$route.path
-      if (path.includes('/v1/enterprise')) {
+      if (path.includes('/v1/users')) {
         this.backTitle = '用户管理'
         return true
       } else if (path.includes('/v1/system')) {

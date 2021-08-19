@@ -98,10 +98,8 @@ import onboarding_projects_not_k8s_delivery from '../components/projects/guide/n
 
 /** ---------------- */
 
-/**   enterprise    */
-
-import enterprise_mgr_home from '../components/enterprise_mgr/home.vue'
-import enterprise_mgr_users_manage from '../components/enterprise_mgr/users/manage.vue'
+/**   users    */
+import users_mgr_users_manage from '../components/users_mgr/users/manage.vue'
 
 /** ---------------- */
 
@@ -691,7 +689,7 @@ const routes = [
     ]
   },
   {
-    path: '/v1/enterprise',
+    path: '/v1/users',
     component: onboarding_home,
     meta: {
       requiresAuth: true,
@@ -701,16 +699,11 @@ const routes = [
     children: [
       {
         path: '',
-        component: enterprise_mgr_home,
-        meta: {
-          requiresAuth: true,
-          requiresSuperAdmin: true,
-          title: '用户管理'
-        }
+        redirect: 'account/manage'
       },
       {
-        path: 'users/manage',
-        component: enterprise_mgr_users_manage,
+        path: 'account/manage',
+        component: users_mgr_users_manage,
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
