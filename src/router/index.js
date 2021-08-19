@@ -125,6 +125,14 @@ const routes = [
         }
       },
       {
+        path: 'projects/create/:project_name/helm/service',
+        component: () => import(/* webpackChunkName: "onboarding-helm" */ '@/components/projects/guide/service_helm_guide'),
+        meta: {
+          requiresAuth: true,
+          title: '新建项目'
+        }
+      },
+      {
         path: 'projects/create/:project_name/helm/runtime',
         component: () => import(/* webpackChunkName: "onboarding-helm" */ '@/components/projects/guide/runtime.vue'),
         meta: {
