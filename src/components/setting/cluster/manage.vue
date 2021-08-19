@@ -98,8 +98,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="showNamespace"
-                        label="命名空间"
+          <el-form-item label="命名空间"
                         prop="namespace">
             <el-input size="small"
                       v-model="cluster.namespace"
@@ -173,8 +172,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="showNamespace"
-                        label="命名空间"
+          <el-form-item label="命名空间"
                         prop="namespace">
             <el-input size="small"
                       v-model="swapCluster.namespace"
