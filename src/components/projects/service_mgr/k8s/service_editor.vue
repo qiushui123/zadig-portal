@@ -6,7 +6,8 @@
           <div class="row cf-pipeline-yml-build__wrapper">
             <div class="cf-pipeline-yml-build__editor cf-pipeline-yml-build__editor_inline">
               <div v-if="serviceType === 'k8s'"
-                   class="cf-pipeline-yml-build__editor-wrapper">
+                   class="cf-pipeline-yml-build__editor-wrapper"
+                   @keydown.meta.83.prevent="updateServiceByKeyword">
                 <div class="shared-service-checkbox">
                   <el-checkbox v-model="service.visibility"
                                true-label="public"
@@ -58,10 +59,8 @@
           <div class="controls__right">
             <el-button type="primary"
                        size="small"
-                       class="save-btn"
-                       :disabled="disabledSave"
-                       @click="updateService"
-                       plain>保存</el-button>
+                       :disabled="disabledSave || !yamlChange"
+                       @click="updateService">保存</el-button>
           </div>
         </div>
     </div>
@@ -84,13 +83,14 @@ import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
-import { validateYamlAPI, updateServicePermissionAPI, serviceTemplateAPI } from '@api'
+import { validateYamlAPI, updateServicePermissionAPI, serviceTemplateAPI, saveServiceTemplateAPI } from '@api'
 export default {
   props: {
     serviceInTree: {
       type: Object,
       required: true
-    }
+    },
+    yamlChange: Boolean
   },
   data () {
     return {
@@ -107,10 +107,15 @@ export default {
       info: { message: '' },
       service: {
       },
-      stagedYaml: {}
+      stagedYaml: {},
+      initYaml: ''
     }
   },
   methods: {
+    keepInitYaml (newYaml) {
+      this.initYaml = newYaml
+      this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
+    },
     getService (val) {
       const serviceName = val ? val.service_name : this.serviceName
       const projectName = val.product_name
@@ -119,6 +124,7 @@ export default {
       if (val && serviceType) {
         serviceTemplateAPI(serviceName, serviceType, projectName).then(res => {
           this.service = res
+          this.keepInitYaml(res.yaml)
           if (this.$route.query.kind) {
             this.jumpToWord(`kind: ${this.$route.query.kind}`)
           }
@@ -140,6 +146,13 @@ export default {
         })
       }
     },
+    updateServiceByKeyword () {
+      const cantSave = this.hideSave || this.disabledSave || !this.yamlChange
+      if (cantSave) {
+        return
+      }
+      this.updateService()
+    },
     updateService () {
       const projectName = this.projectName
       const serviceName = this.service.service_name
@@ -153,11 +166,19 @@ export default {
         yaml: yaml,
         source: 'spock'
       }
-      this.$emit('onUpdateService', payload)
+      saveServiceTemplateAPI(payload).then((res) => {
+        this.$message({
+          type: 'success',
+          message: `服务 ${payload.service_name} 保存成功`
+        })
+        this.keepInitYaml(payload.yaml)
+        this.$emit('onUpdateService', { service_name: serviceName, service_status: this.service.status, res })
+      })
     },
     onCmCodeChange: debounce(function (newCode) {
       this.errors = []
       this.service.yaml = newCode
+      this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
       if (this.service.yaml) {
         this.validateYaml(newCode)
         if (this.service.status === 'named') {
@@ -217,7 +238,7 @@ export default {
       return this.serviceInTree.service_name
     },
     disabledSave () {
-      return (this.errors.length > 0)
+      return this.errors.length > 0
     },
     hideSave () {
       if (this.service.source === 'gitlab' || this.service.source === 'github' || this.service.source === 'gerrit' || (this.service.visibility === 'public' && this.service.product_name !== this.projectName)) {
@@ -257,6 +278,8 @@ export default {
             service_name: val.service_name,
             status: 'named'
           }
+          this.initYaml = '-#-'
+          this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
           this.cmOptions.readOnly = false
           if (this.stagedYaml[val.service_name]) {
             this.service.yaml = this.stagedYaml[val.service_name]
