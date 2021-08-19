@@ -117,6 +117,8 @@ import setting_config_manage_home from '../components/setting/config/home.vue'
 import setting_config_manage_quota from '../components/setting/config/quota.vue'
 import setting_config_manage_proxy from '../components/setting/config/proxy.vue'
 import setting_config_manage_cache from '../components/setting/config/cache.vue'
+import setting_announcement_manage from '../components/setting/announcement/manage.vue'
+import setting_auditlog_manage from '../components/setting/auditlog/manage.vue'
 /** ---------------- */
 
 /**     profile      */
@@ -853,6 +855,24 @@ const routes = [
             }
           }
         ]
+      },
+      {
+        path: 'announcement',
+        component: setting_announcement_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '公告设置'
+        }
+      },
+      {
+        path: 'auditlog',
+        component: setting_auditlog_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '操作日志'
+        }
       }
     ]
   },

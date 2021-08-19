@@ -189,6 +189,19 @@ export default {
             icon: 'iconfont iconfuwupeizhi',
             url: 'system/config'
           }]
+        },
+        {
+          category_name: '公告与审计',
+          items: [{
+            name: '公告管理',
+            icon: 'iconfont icongonggao',
+            url: 'system/announcement'
+          },
+          {
+            name: '操作日志',
+            icon: 'iconfont iconiconlog',
+            url: 'system/auditlog'
+          }]
         }
       ],
       defaultMenu: [
