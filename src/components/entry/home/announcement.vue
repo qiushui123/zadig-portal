@@ -31,8 +31,7 @@ export default {
       this.visible = false
       this.$emit('close')
     }
-  },
-  created () {}
+  }
 }
 </script>
 <style lang="less" >

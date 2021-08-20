@@ -805,6 +805,9 @@ export function deleteAppAPI (data) {
 export function getAuditLogAPI (payload) {
   return http.get(`/api/aslan/system/operation`, { params: payload })
 }
+export function getAnnouncementsAPI () {
+  return http.get(`/api/aslan/system/announcement`)
+}
 export function createAnnouncementAPI (payload) {
   return http.post(`/api/aslan/system/announcement`, payload)
 }
