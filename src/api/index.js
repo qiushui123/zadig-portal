@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
-const specialAPIs = ['/api/directory/userss/search', 'api/aslan/system/operation', '/api/aslan/delivery/artifacts']
+const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
 const reqExps = /api\/aslan\/environment\/environments\/[a-z-0-9]+\/groups$/
 const analyticsReq = 'https://api.koderover.com/api/operation/upload'
