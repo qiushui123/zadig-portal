@@ -162,16 +162,16 @@ export default {
   methods: {
     getAuditLogBySearch () {
       this.currentPageList = 1
-      this.getAuditLog('', this.pageSize, this.currentPageList)
+      this.getAuditLog('', this.logPageSize, this.currentPageList)
     },
-    getAuditLog (type, pageSize, pageList) {
+    getAuditLog (type, logPageSize, pageList) {
       this.loading = true
       const payload = {
         username: this.searchType === 'username' ? this.keyword : '',
         product_name: this.searchType === 'product_name' ? this.keyword : '',
         status: this.searchType === 'status' ? Number(this.keyword) : 0,
         function: this.searchType === 'function' ? this.keyword : '',
-        per_page: pageSize,
+        per_page: logPageSize,
         page: pageList
       }
       getAuditLogAPI(payload).then((res) => {
