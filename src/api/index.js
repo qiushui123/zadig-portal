@@ -803,16 +803,16 @@ export function deleteAppAPI (data) {
   return http.put('/api/aslan/system/install/delete', data)
 }
 export function getAuditLogAPI (payload) {
-  return http.get(`/api/aslanx/enterprise/operation`, { params: payload })
+  return http.get(`/api/aslan/system/operation`, { params: payload })
 }
 export function createAnnouncementAPI (payload) {
-  return http.post(`/api/aslanx/enterprise/announcement`, payload)
+  return http.post(`/api/aslan/system/announcement`, payload)
 }
 export function updateAnnouncementAPI (payload) {
-  return http.put(`/api/aslanx/enterprise/announcement/update`, payload)
+  return http.put(`/api/aslan/system/announcement/update`, payload)
 }
 export function getAnnouncementListAPI () {
-  return http.get(`/api/aslanx/enterprise/announcement/all`)
+  return http.get(`/api/aslan/system/announcement/all`)
 }
 
 // Custom image
