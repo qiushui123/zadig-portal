@@ -57,8 +57,7 @@
               </router-link>
               <router-link to="/setting/cluster"
                            active-class="activeTab">
-                <li v-if="showClusterManage"
-                    class="sidebar-item"
+                <li class="sidebar-item"
                     :class="{ sidebarCollapseItem: !showSidebar}">
                   <span class="view-name"><i class="iconfont iconjiqun"></i>
                     {{showSidebar?'集群管理':'集群'}}</span>
@@ -89,29 +88,10 @@
 </template>
 
 <script type="text/javascript">
-import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
       showSidebar: true
-    }
-  },
-  methods: {},
-  computed: {
-    ...mapGetters([
-      'signupStatus'
-    ]),
-    showClusterManage: {
-      get: function () {
-        if (this.signupStatus && this.signupStatus.features && this.signupStatus.features.length > 0) {
-          if (this.signupStatus.features.includes('cluster_manager')) {
-            return true
-          } else {
-            return false
-          }
-        }
-        return false
-      }
     }
   }
 }
