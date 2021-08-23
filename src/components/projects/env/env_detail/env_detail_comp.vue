@@ -822,27 +822,18 @@ export default {
         if (this.page === 1 && flag !== 'search') {
           await this.getProductEnvInfo(projectName, envName)
         }
-        if (this.envSource === 'external' || this.envSource === 'helm') {
-          const res = await productServicesAPI(projectName, envName, this.envSource)
-          serviceGroup = res.services
-          this.ingressList = res.ingresses
-          this.serviceLoading = false
-          if (serviceGroup && serviceGroup.length) {
-            const { containerServiceList, pmServiceList } = this.handleProductEnvServiceData(serviceGroup)
-            this.containerServiceList = _.orderBy(containerServiceList, 'service_name')
-            this.pmServiceList = _.orderBy(pmServiceList, 'service_name')
-            this.envTotal = this.containerServiceList.length + this.pmServiceList.length
-            this.scrollFinish = true
-          }
-          return
-        }
         this.scrollGetFlag = false
         if (this.page === 1) {
           this.addListener()
         }
         const res = await productServicesAPI(projectName, envName, this.envSource, this.serviceSearch, this.perPage, this.page)
         this.envTotal = res.headers['x-total'] ? parseInt(res.headers['x-total']) : 0
-        serviceGroup = res.data
+        if (this.envSource === 'external' || this.envSource === 'helm') {
+          serviceGroup = res.data.services
+          this.ingressList = res.data.ingresses
+        } else {
+          serviceGroup = res.data
+        }
         this.page++
         this.serviceLoading = false
         if (serviceGroup && serviceGroup.length) {
