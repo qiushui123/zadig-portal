@@ -817,6 +817,9 @@ export function updateAnnouncementAPI (payload) {
 export function getAnnouncementListAPI () {
   return http.get(`/api/aslan/system/announcement/all`)
 }
+export function deleteAnnouncementAPI (id) {
+  return http.delete(`/api/aslan/system/announcement/${id}`)
+}
 
 // Custom image
 export function addImgAPI (payload) {
@@ -1129,7 +1132,7 @@ export function getNotificationAPI () {
   return http.get('/api/aslan/system/notification')
 }
 
-export function deleteAnnouncementAPI (payload) {
+export function deleteNotificationAPI (payload) {
   return http.post('/api/aslan/system/notification/delete', payload)
 }
 

@@ -246,10 +246,7 @@ export default {
           }
         })
       } else if (operate === 'delete') {
-        const payload = {
-          ids: [current_announcement.id]
-        }
-        deleteAnnouncementAPI(payload).then(
+        deleteAnnouncementAPI(current_announcement.id).then(
           response => {
             this.$message({
               message: '公告已删除',
