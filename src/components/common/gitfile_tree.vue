@@ -49,8 +49,7 @@ import { getRepoFilesAPI, getCodehubRepoFileServiceAPI, getRepoFileServiceAPI } 
 export default {
   props: {
     codehostId: {
-      type: Number,
-      default: 0,
+      default: '',
       required: true
     },
     repoName: {

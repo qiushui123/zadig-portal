@@ -41,12 +41,14 @@
                            :sharedServices="sharedServices"
                            :basePath="`/v1/projects/detail/${projectName}/services`"
                            :showNext.sync="showNext"
+                           :yamlChange="yamlChange"
                            ref="serviceTree"
                            @onAddCodeSource="addCodeSource"
                            @onJumpToKind="jumpToKind"
                            @onRefreshService="getServices"
                            @onRefreshSharedService="getSharedServices"
-                           @onSelectServiceChange="onSelectServiceChange"></serviceTree>
+                           @onSelectServiceChange="onSelectServiceChange"
+                           @updateYaml="updateYaml"></serviceTree>
             </div>
             <template v-if="service.service_name  &&  services.length >0">
               <template v-if="service.type==='k8s'">
@@ -57,6 +59,7 @@
                   <serviceEditorK8s ref="serviceEditor"
                                     :serviceInTree="service"
                                     :showNext.sync="showNext"
+                                    :yamlChange.sync="yamlChange"
                                     @onParseKind="getYamlKind"
                                     @onRefreshService="getServices"
                                     @onRefreshSharedService="getSharedServices"
@@ -111,7 +114,7 @@ import serviceTree from './common/service_tree.vue'
 import addCode from './common/add_code.vue'
 import { mapGetters } from 'vuex'
 import { sortBy } from 'lodash'
-import { getServiceTemplatesAPI, getServicesTemplateWithSharedAPI, saveServiceTemplateAPI, serviceTemplateWithConfigAPI, autoUpgradeEnvAPI } from '@api'
+import { getServiceTemplatesAPI, getServicesTemplateWithSharedAPI, serviceTemplateWithConfigAPI, autoUpgradeEnvAPI } from '@api'
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 export default {
   props: {
@@ -128,6 +131,7 @@ export default {
       checkedEnvList: [],
       currentServiceYamlKinds: {},
       showNext: false,
+      yamlChange: false,
       updateEnvDialogVisible: false,
       addCodeDrawer: false
     }
@@ -179,29 +183,28 @@ export default {
         this.systemEnvs = res.system_variable ? res.system_variable : []
       })
     },
-    onUpdateService (payload) {
-      saveServiceTemplateAPI(payload).then((res) => {
-        this.showNext = true
-        this.$message({
-          type: 'success',
-          message: '服务保存成功'
-        })
-        this.$router.replace({
-          query: Object.assign(
-            {},
-            {},
-            {
-              service_name: payload.service_name,
-              rightbar: 'var'
-            })
-        })
+    onUpdateService ({ service_name, service_status, res }) {
+      this.showNext = true
+      this.$router.replace({
+        query: Object.assign(
+          {},
+          {},
+          {
+            service_name: service_name,
+            rightbar: 'var'
+          })
+      })
+      if (service_status === 'named') {
         this.getServices()
         this.$refs.serviceTree.getServiceGroup()
         this.getSharedServices()
-        this.detectedEnvs = res.custom_variable ? res.custom_variable : []
-        this.detectedServices = res.service_module ? res.service_module : []
-        this.systemEnvs = res.system_variable ? res.system_variable : []
-      })
+      }
+      this.detectedEnvs = res.custom_variable ? res.custom_variable : []
+      this.detectedServices = res.service_module ? res.service_module : []
+      this.systemEnvs = res.system_variable ? res.system_variable : []
+    },
+    updateYaml () {
+      this.$refs.serviceEditor.updateService()
     },
     getYamlKind (payload) {
       this.currentServiceYamlKinds = payload

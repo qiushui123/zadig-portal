@@ -261,7 +261,6 @@
   </div>
 </template>
 <script>
-import qs from 'qs'
 import bus from '@utils/event_bus'
 import { serviceTemplateWithConfigAPI, getSingleProjectAPI, updateEnvTemplateAPI, getRegistryWhenBuildAPI, getCodeSourceByAdminAPI } from '@api'
 import build from '../common/build.vue'
