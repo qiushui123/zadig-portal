@@ -130,7 +130,7 @@
 </template>
 <script>
 import { wordTranslate, colorTranslate } from '@utils/word_translate'
-import { getNotificationAPI, deleteAnnouncementAPI, markNotiReadAPI } from '@api'
+import { getNotificationAPI, deleteNotificationAPI, markNotiReadAPI } from '@api'
 export default {
   props: {},
   data: function () {
@@ -157,7 +157,7 @@ export default {
         const payload = {
           ids: [notify_obj.id]
         }
-        deleteAnnouncementAPI(payload).then((res) => {
+        deleteNotificationAPI(payload).then((res) => {
           this.getNotifications()
         })
       } else if (operation === 'mark_as_read') {
