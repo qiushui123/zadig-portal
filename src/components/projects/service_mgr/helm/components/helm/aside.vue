@@ -11,6 +11,11 @@
             <span class="step-name">镜像更新</span>
           </div>
           <div class="tabs__item"
+               :class="{'selected': $route.query.rightbar === 'values'}"
+               @click="changeRoute('values')">
+            <span class="step-name">变量</span>
+          </div>
+          <div class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'help'}"
                @click="changeRoute('help')">
             <span class="step-name">帮助</span>
@@ -77,7 +82,10 @@
                    ></build>
           </div> -->
         </div>
-        <div v-if="$route.query.rightbar === 'help'"
+        <div v-else-if="$route.query.rightbar === 'values'">
+          <values></values>
+        </div>
+        <div v-else-if="$route.query.rightbar === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">帮助</div>
@@ -95,6 +103,7 @@ import qs from 'qs'
 import bus from '@utils/event_bus'
 import { mapState } from 'vuex'
 import help from './help.vue'
+import values from './values.vue'
 import aceEditor from 'vue2-ace-bind'
 import 'brace/mode/yaml'
 import 'brace/theme/xcode'
@@ -181,7 +190,8 @@ export default {
   },
   components: {
     help,
-    editor: aceEditor
+    editor: aceEditor,
+    values
   }
 }
 </script>
