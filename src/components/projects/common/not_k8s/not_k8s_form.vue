@@ -80,7 +80,7 @@
         <el-row :gutter="30">
           <el-col :span="10">
             <el-form-item prop="pre_build.image_id"
-                          label="操作系统">
+                          label="构建系统">
               <el-select size="small"
                          style="width: 200px;"
                          v-model="buildConfig.pre_build.image_id"
