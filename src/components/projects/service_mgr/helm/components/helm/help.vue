@@ -11,7 +11,7 @@
           1
         </div>
         <p class="pipelines-aside-help__step-list-item-text">
-           初始化 Helm，支持两种方式：平台生成和仓库导入
+          导入服务，支持三种方式：从 Git 仓库导入/ Chart 仓库导入/引用模板库
         </p>
       </li>
       <li class="pipelines-aside-help__step-list-item">
@@ -19,7 +19,20 @@
           2
         </div>
         <p class="pipelines-aside-help__step-list-item-text">
-          编写 Helm 配置
+          配置可更新镜像 <br>
+          系统可自动从 values.yaml 中解析以下格式的镜像信息
+        <ul style="padding-left: 5px;">
+          <li>
+            格式一：<br>
+            image:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;repository： 镜像仓库/项目名/镜像名<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;tag：标签名<br>
+          </li>
+          <li>
+            格式二：<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;any_key：镜像仓库/项目名/镜像名:标签名
+          </li>
+        </ul>
         </p>
       </li>
       <li class="pipelines-aside-help__step-list-item">
@@ -27,19 +40,15 @@
           3
         </div>
         <p class="pipelines-aside-help__step-list-item-text">
-           配置可更新镜像
-        <ul>
-          <li>
-            系统可自动从 values.yaml 中解析以下格式的镜像信息 <br>
-- 格式一：<br>
- image:<br>
- &nbsp;&nbsp;&nbsp;&nbsp;repository： 镜像仓库/项目名/镜像名<br>
- &nbsp;&nbsp;&nbsp;&nbsp;tag：标签名<br>
- - 格式二：<br>
-key：镜像仓库/项目名/镜像名 : 标签名<br>
-通过对镜像配置构建脚本，实现版本升级（代码构建->构建镜像->镜像部署）
-          </li>
-        </ul>
+          通过对镜像配置构建脚本，实现版本升级（代码构建 -> 构建镜像 -> 镜像部署）
+        </p>
+      </li>
+      <li class="pipelines-aside-help__step-list-item">
+        <div class="pipelines-aside-help__step-list-item-counter">
+          4
+        </div>
+        <p class="pipelines-aside-help__step-list-item-text">
+          配置变量，定义不同环境中使用的 values.yaml
         </p>
       </li>
     </ul>
