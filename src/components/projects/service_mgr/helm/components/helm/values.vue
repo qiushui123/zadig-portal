@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import ImportValues from '@/components/projects/common/import_values.vue'
+import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
 export default {
   data () {

@@ -19,8 +19,8 @@
 
 <script>
 import { cloneDeep } from 'lodash'
-import Codemirror from './codemirror.vue'
-import KeyValue from './import_values/key_value.vue'
+import Codemirror from '../codemirror.vue'
+import KeyValue from './key_value.vue'
 export default {
   data () {
     return {
