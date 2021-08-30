@@ -65,16 +65,12 @@ export default {
 
 <style lang="less" scoped>
 .values-outer {
-  padding: 0 5px 5px;
-
   /deep/ .el-divider--horizontal {
     margin: 14px 0;
   }
 
   .yaml-container {
     padding: 10px;
-    // border: 1px solid #eee;
-    // border-radius: 4px;
 
     h4 {
       margin: 7px 0;
@@ -88,7 +84,6 @@ export default {
     }
 
     .desc {
-      padding: 0 10px;
       color: #a1a3a7;
       font-size: 14px;
     }

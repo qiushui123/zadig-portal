@@ -1,29 +1,63 @@
 <template>
   <div class="key-value-outer">
     <h5>指定需要覆盖的键值对</h5>
-    <el-table :data="keyValues">
-      <el-table-column header-align="center" align="center" prop="key" label="键">
-        <template slot-scope="{ row }">
-          <el-input v-model="row.key" placeholder="键" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column header-align="center" align="center" prop="value" label="值">
-        <template slot-scope="{ row }">
-          <el-input v-model="row.value" placeholder="值" size="small"></el-input>
-        </template>
-      </el-table-column>
-      <el-table-column header-align="center" align="center" label="操作" width="50px">
-        <template slot-scope="{ $index }">
-          <el-button type="text" @click="deleteKeyValue($index)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <el-form ref="form" :model="keyValueForm" :rules="rules">
+      <el-table :data="keyValues">
+        <el-table-column header-align="center" align="left" prop="key" label="键">
+          <template slot-scope="{ row }">
+            <el-form-item v-if="row.add" prop="key">
+              <el-input v-model="keyValueForm.key" placeholder="键" size="small"></el-input>
+            </el-form-item>
+            <span v-else>{{row.key}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column header-align="center" align="left" prop="value" label="值">
+          <template slot-scope="{ row }">
+            <el-form-item v-if="row.add" prop="value">
+              <el-input v-model="keyValueForm.value" placeholder="值" size="small"></el-input>
+            </el-form-item>
+            <span v-else>{{row.value}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column header-align="center" align="left" label="操作" width="50px">
+          <template slot-scope="{ $index }">
+            <el-form-item>
+              <el-button type="text" @click="deleteKeyValue($index)">删除</el-button>
+            </el-form-item>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-form>
     <el-button type="text" @click="addKeyValue" icon="el-icon-plus">添加需要覆盖的键值对</el-button>
   </div>
 </template>
 
 <script>
+import { cloneDeep } from 'lodash'
 export default {
+  data () {
+    const validateKey = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入 key 值'))
+      } else if (this.keyValues.map(value => value.key).includes(value)) {
+        callback(new Error('key 值重复'))
+      } else {
+        callback()
+      }
+    }
+
+    this.rules = {
+      key: [{ validator: validateKey, trigger: 'blur' }],
+      value: [{ required: true, message: '请输入 key 值', trigger: 'blur' }]
+    }
+
+    return {
+      keyValueForm: {
+        key: '',
+        value: ''
+      }
+    }
+  },
   props: {
     keyValues: {
       default: () => [],
@@ -32,12 +66,24 @@ export default {
   },
   methods: {
     deleteKeyValue (index) {
+      this.keyValues[index].add && this.$refs.form.resetFields()
       this.keyValues.splice(index, 1)
     },
+    validate () {
+      return this.$refs.form.validate().then(() => {
+        const len = this.keyValues.length
+        if (len > 0 && this.keyValues[len - 1].add) this.keyValues[len - 1] = cloneDeep(this.keyValueForm)
+        Promise.resolve()
+      })
+    },
     addKeyValue () {
-      this.keyValues.push({
-        key: '',
-        value: ''
+      this.validate().then(() => {
+        this.$refs.form.resetFields()
+        this.keyValues.push({
+          key: '',
+          value: '',
+          add: true
+        })
       })
     }
   }
@@ -57,6 +103,14 @@ export default {
     th {
       padding: 6px 0;
       text-align: left;
+    }
+
+    td {
+      padding: 12px 0 0;
+    }
+
+    .el-form-item {
+      margin-bottom: 18px;
     }
   }
 }

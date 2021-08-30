@@ -49,6 +49,9 @@ export default {
   },
   created () {
     this.options = options
+  },
+  mounted () {
+    this.$refs.cmEditor.codemirror.focus()
   }
 }
 </script>
@@ -56,6 +59,7 @@ export default {
 <style lang="less" scoped>
 .codemirror {
   height: 100%;
+  margin: -5px;
 
   /deep/.CodeMirror {
     height: 100%;

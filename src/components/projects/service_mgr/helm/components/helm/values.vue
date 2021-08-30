@@ -28,8 +28,9 @@ export default {
     }
   },
   methods: {
-    handleClick (tab) {
-      console.log(tab)
+    handleClick ({ label }) {
+      // 请求相应环境下的 values.yaml 和 键值对
+      console.log('请求相应环境下的 values.yaml 和 键值对: ', label)
     },
     closeValueEdit () {
       this.showValueEdit = false
