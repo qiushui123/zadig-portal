@@ -76,10 +76,10 @@
             </el-col>
           </el-row>
           <el-row :gutter="10">
-            <el-col :span="3">
+            <el-col :span="3" v-if="!pmServiceList.length">
               <div class="grid-content">命名空间:</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="8" v-if="!pmServiceList.length">
               <div class="grid-content">{{ envText }}</div>
             </el-col>
             <el-col :span="3">
