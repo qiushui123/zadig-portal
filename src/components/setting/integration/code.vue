@@ -234,7 +234,7 @@
                ref="codeForm">
         <el-form-item label="代码源"
                       prop="type">
-          <el-select v-model="codeAdd.type">
+          <el-select v-model="codeAdd.type" filterable allow-create>
             <el-option label="GitLab"
                        value="gitlab"></el-option>
             <el-option label="GitHub"
@@ -243,16 +243,14 @@
                        value="codehub"></el-option>
             <el-option label="Gerrit"
                        value="gerrit"></el-option>
-            <el-option label="ilyshin"
-                       value="ilyshin"></el-option>
           </el-select>
         </el-form-item>
         <template v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin' || codeAdd.type ==='github'">
           <el-form-item v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'"
-                        label="GitLab 服务 URL"
+                        :label="codeAdd.type==='gitlab'?'GitLab 服务 URL':'服务 URL'"
                         prop="address">
             <el-input v-model="codeAdd.address"
-                      placeholder="GitLab 服务 URL"
+                      :placeholder="codeAdd.type==='gitlab'?'GitLab 服务 URL':'服务 URL'"
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item :label="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
