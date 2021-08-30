@@ -965,8 +965,8 @@ export default {
         })
       }
       if (this.buildAdd && !this.isEdit && this.buildServiceName) {
-        this.$set(this.buildConfig, 'name', 'build-' + this.buildServiceName)
-        this.$set(this.jenkinsBuild, 'name', 'build-' + this.buildServiceName)
+        this.$set(this.buildConfig, 'name', this.projectName + '-build-' + this.buildServiceName)
+        this.$set(this.jenkinsBuild, 'name', this.projectName + '-build-' + this.buildServiceName)
       }
       getAllAppsAPI().then((response) => {
         const apps = this.$utils.sortVersion(response, 'name', 'asc')
