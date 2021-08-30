@@ -1,7 +1,10 @@
 <template>
   <div class="values-outer">
     <div class="yaml-container">
-      <h4>{{ fileName }}</h4>
+      <h4>
+        <span>{{ fileName }}</span>
+        <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="hiddenValueEdit"></i>
+      </h4>
       <el-divider></el-divider>
       <div class="desc">
         <p>请输入 values.yaml 配置</p>
@@ -36,11 +39,18 @@ export default {
     showKeyValue: {
       default: false,
       type: Boolean
+    },
+    showDelete: {
+      default: false,
+      type: Boolean
     }
   },
   methods: {
     handleInput (code) {
       this.yamlValue = code
+    },
+    hiddenValueEdit () {
+      this.$emit('closeValueEdit')
     }
   },
   components: {
@@ -55,7 +65,7 @@ export default {
 
 <style lang="less" scoped>
 .values-outer {
-  padding: 5px;
+  padding: 0 5px 5px;
 
   /deep/ .el-divider--horizontal {
     margin: 14px 0;
@@ -63,10 +73,18 @@ export default {
 
   .yaml-container {
     padding: 10px;
-    background: #eee;
+    // border: 1px solid #eee;
+    // border-radius: 4px;
 
     h4 {
-      margin: 10px 0;
+      margin: 7px 0;
+      color: #4d4c4c;
+      font-size: 14px;
+
+      .icon-delete {
+        float: right;
+        cursor: pointer;
+      }
     }
 
     .desc {

@@ -1,6 +1,6 @@
 <template>
   <div class="key-value-outer">
-    <h4>指定需要覆盖的键值对</h4>
+    <h5>指定需要覆盖的键值对</h5>
     <el-table :data="keyValues">
       <el-table-column header-align="center" align="center" prop="key" label="键">
         <template slot-scope="{ row }">
@@ -47,6 +47,11 @@ export default {
 <style lang="less" scoped>
 .key-value-outer {
   padding: 10px 0;
+
+  h5 {
+    margin: 14px 0;
+    font-size: 14px;
+  }
 
   /deep/ .el-table {
     th {

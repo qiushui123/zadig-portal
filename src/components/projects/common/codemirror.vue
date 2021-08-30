@@ -1,10 +1,13 @@
 <template>
   <div @keydown.meta.83.prevent="handleSave">
-    <codemirror :value="value" class="codemirror" :options="options" @input="handleInput"></codemirror>
+    <Resize :resize="resize" :height="'300px'">
+      <codemirror ref="cmEditor" :value="value" class="codemirror" :options="options" @input="handleInput"></codemirror>
+    </Resize>
   </div>
 </template>
 
 <script>
+import Resize from '@/components/common/resize'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/yaml/yaml'
@@ -25,6 +28,11 @@ export default {
     value: {
       default: '',
       type: String
+    },
+    resize: {
+      // can resize, default none
+      default: 'none',
+      type: String
     }
   },
   methods: {
@@ -36,7 +44,8 @@ export default {
     }
   },
   components: {
-    codemirror
+    codemirror,
+    Resize
   },
   created () {
     this.options = options
@@ -46,7 +55,10 @@ export default {
 
 <style lang="less" scoped>
 .codemirror {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
+  height: 100%;
+
+  /deep/.CodeMirror {
+    height: 100%;
+  }
 }
 </style>
