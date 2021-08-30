@@ -19,7 +19,7 @@
            class="divider item"></div>
       <div v-for="(repo,repo_index) in config.repos"
            :key="repo_index">
-        <el-row>
+        <el-row class="repo-select">
           <el-col :span="showAdvanced || showTrigger ?4:5">
             <el-form-item :label="repo_index === 0 ? (shortDescription?'平台':'托管平台') : ''"
                           :prop="'repos.' + repo_index + '.codehost_id'"
@@ -50,6 +50,7 @@
                          clearable
                          size="small"
                          placeholder="代码库拥有者"
+                         :loading="codeInfo[repo_index].loading.owner"
                          filterable>
                 <el-option v-for="(repo_owner,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repo_owners'] : []"
                            :key="index"
@@ -72,6 +73,7 @@
                          clearable
                          size="small"
                          placeholder="请选择代码库"
+                         :loading="codeInfo[repo_index].loading.repo"
                          filterable>
                 <el-option v-for="(repo,index) in codeInfo[repo_index] ? codeInfo[repo_index]['repos'] : []"
                            :key="index"
@@ -90,6 +92,7 @@
                          size="small"
                          filterable
                          allow-create
+                         :loading="codeInfo[repo_index].loading.branch"
                          clearable>
                 <el-option v-for="(branch,branch_index) in codeInfo[repo_index] ? codeInfo[repo_index]['branches'] : []"
                            :key="branch_index"
@@ -159,21 +162,21 @@
         </el-row>
         <el-row v-if="showAdvancedSetting[repo_index]"
                 style="padding: 4px; background-color: rgb(240, 242, 245);">
-          <el-col :span="5">
+          <el-col :span="6">
             <el-form-item label="Remote name">
               <el-input v-model="repo.remote_name"
                         size="small"
                         placeholder="请输入"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="5">
             <el-form-item label="克隆目录名">
               <el-input v-model="repo.checkout_path"
                         size="small"
                         placeholder="请输入"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="3"
+          <el-col :span="4"
                   style="margin-left: 4px;">
             <el-form-item label="子模块">
               <el-switch v-model="repo.submodules"></el-switch>
@@ -185,7 +188,7 @@
             </el-form-item>
           </el-col>
           <el-col v-if="!hidePrimary"
-                  :span="3">
+                  :span="4">
             <el-form-item>
               <slot name="label">
                 <label class="el-form-item__label">主库
@@ -218,7 +221,12 @@ export default {
       allCodeHosts: [],
       codeInfo: {},
       showAdvancedSetting: {},
-      validateName: 'repoSelect'
+      validateName: 'repoSelect',
+      loading: {
+        owner: false,
+        repo: false,
+        branch: false
+      }
     }
   },
   props: {
@@ -278,6 +286,9 @@ export default {
     }
   },
   methods: {
+    setLoadingState (index, loading, isLoading) {
+      this.codeInfo[index].loading[loading] = isLoading
+    },
     validateForm () {
       return new Promise((resolve, reject) => {
         this.$refs.buildRepo.validate((valid) => {
@@ -310,7 +321,8 @@ export default {
         this.$set(this.codeInfo, index + 1, {
           repo_owners: [],
           repos: [],
-          branches: []
+          branches: [],
+          loading: this.$utils.cloneObj(this.loading)
         })
       }).catch(err => {
         console.log(err)
@@ -330,7 +342,8 @@ export default {
       this.$set(this.codeInfo, 0, {
         repo_owners: [],
         repos: [],
-        branches: []
+        branches: [],
+        loading: this.$utils.cloneObj(this.loading)
       })
       if (this.allCodeHosts && this.allCodeHosts.length === 1) {
         const codeHostId = this.allCodeHosts[0].id
@@ -361,9 +374,15 @@ export default {
       const item = (this.codeInfo[index].repo_owners.find(item => { return item.path === repo_owner }))
       const type = item ? item.kind : 'group'
       if (repo_owner) {
+        if (!key) {
+          this.codeInfo[index].repos = []
+          this.codeInfo[index].branches = []
+        }
+        this.setLoadingState(index, 'repo', true)
         getRepoNameByIdAPI(id, type, encodeURI(repo_owner), key).then((res) => {
           this.$set(this.codeInfo[index], 'repos', orderBy(res, ['name']))
           this.$set(this.codeInfo[index], 'origin_repos', orderBy(res, ['name']))
+          this.setLoadingState(index, 'repo', false)
         })
       }
       this.config.repos[index].repo_name = ''
@@ -374,8 +393,11 @@ export default {
       const repoId = repoItem.repo_id ? repoItem.repo_id : ''
       const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
       if (repo_owner && repo_name) {
+        this.codeInfo[index].branches = []
+        this.setLoadingState(index, 'branch', true)
         getBranchInfoByIdAPI(id, repo_owner, repo_name, repoUUID).then((res) => {
           this.$set(this.codeInfo[index], 'branches', res || [])
+          this.setLoadingState(index, 'branch', false)
         })
       }
       this.$set(this.config.repos[index], 'repo_uuid', repoUUID)
@@ -383,9 +405,16 @@ export default {
       this.config.repos[index].branch = ''
     },
     getRepoOwnerById (index, id, key = '') {
+      if (!key) {
+        this.codeInfo[index].repo_owners = []
+        this.codeInfo[index].repos = []
+        this.codeInfo[index].branches = []
+      }
+      this.setLoadingState(index, 'owner', true)
       getRepoOwnerByIdAPI(id, key).then((res) => {
         this.$set(this.codeInfo[index], 'repo_owners', orderBy(res, ['name']))
         this.$set(this.codeInfo[index], 'origin_repo_owners', orderBy(res, ['name']))
+        this.setLoadingState(index, 'owner', false)
       })
       if (this.allCodeHosts && this.allCodeHosts.length > 1) {
         this.config.repos[index].repo_owner = ''
@@ -402,7 +431,8 @@ export default {
         this.$set(this.codeInfo, index, {
           repo_owners: [],
           repos: [],
-          branches: []
+          branches: [],
+          loading: this.$utils.cloneObj(this.loading)
         })
         if (codehostId) {
           getRepoOwnerByIdAPI(codehostId).then((res) => {
@@ -496,6 +526,18 @@ export default {
 
   &.item {
     width: 30%;
+  }
+}
+
+/deep/ .el-row.repo-select {
+  .el-form-item__label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .app-operation {
+    white-space: nowrap;
   }
 }
 </style>

@@ -98,10 +98,8 @@ import onboarding_projects_not_k8s_delivery from '../components/projects/guide/n
 
 /** ---------------- */
 
-/**   enterprise    */
-
-import enterprise_mgr_home from '../components/enterprise_mgr/home.vue'
-import enterprise_mgr_users_manage from '../components/enterprise_mgr/users/manage.vue'
+/**   users    */
+import users_mgr_users_manage from '../components/users_mgr/users/manage.vue'
 
 /** ---------------- */
 
@@ -119,6 +117,8 @@ import setting_config_manage_home from '../components/setting/config/home.vue'
 import setting_config_manage_quota from '../components/setting/config/quota.vue'
 import setting_config_manage_proxy from '../components/setting/config/proxy.vue'
 import setting_config_manage_cache from '../components/setting/config/cache.vue'
+import setting_announcement_manage from '../components/setting/announcement/manage.vue'
+import setting_auditlog_manage from '../components/setting/auditlog/manage.vue'
 /** ---------------- */
 
 /**     profile      */
@@ -691,7 +691,7 @@ const routes = [
     ]
   },
   {
-    path: '/v1/enterprise',
+    path: '/v1/users',
     component: onboarding_home,
     meta: {
       requiresAuth: true,
@@ -701,16 +701,11 @@ const routes = [
     children: [
       {
         path: '',
-        component: enterprise_mgr_home,
-        meta: {
-          requiresAuth: true,
-          requiresSuperAdmin: true,
-          title: '用户管理'
-        }
+        redirect: 'account/manage'
       },
       {
-        path: 'users/manage',
-        component: enterprise_mgr_users_manage,
+        path: 'account/manage',
+        component: users_mgr_users_manage,
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
@@ -860,6 +855,24 @@ const routes = [
             }
           }
         ]
+      },
+      {
+        path: 'announcement',
+        component: setting_announcement_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '公告设置'
+        }
+      },
+      {
+        path: 'auditlog',
+        component: setting_auditlog_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '操作日志'
+        }
       }
     ]
   },

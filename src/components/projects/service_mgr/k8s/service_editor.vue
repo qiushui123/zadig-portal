@@ -2,18 +2,12 @@
   <div
        class="pipeline-workflow__column pipeline-workflow__column_left pipeline-workflow__column--w100p">
     <div class="white-box-with-shadow">
-      <div v-if="showNoContent.show"
-           class="no-content">
-        <img src="@assets/icons/illustration/editor_nodata.svg"
-             alt="">
-        <p>{{showNoContent.msg}}</p>
-      </div>
-      <template v-else>
         <div class="white-box-with-shadow__content">
           <div class="row cf-pipeline-yml-build__wrapper">
             <div class="cf-pipeline-yml-build__editor cf-pipeline-yml-build__editor_inline">
               <div v-if="serviceType === 'k8s'"
-                   class="cf-pipeline-yml-build__editor-wrapper">
+                   class="cf-pipeline-yml-build__editor-wrapper"
+                   @keydown.meta.83.prevent="updateServiceByKeyword">
                 <div class="shared-service-checkbox">
                   <el-checkbox v-model="service.visibility"
                                true-label="public"
@@ -26,6 +20,9 @@
                       <i class="el-icon-question"></i>
                     </el-tooltip>
                   </el-checkbox>
+                </div>
+                <div class="yaml-desc" v-show="!service.yaml">
+                  请输入 Kubernetes YAML 配置
                 </div>
                 <codemirror style="width: 100%; height: 100%;"
                             ref="myCm"
@@ -62,13 +59,10 @@
           <div class="controls__right">
             <el-button type="primary"
                        size="small"
-                       class="save-btn"
-                       :disabled="disabledSave"
-                       @click="updateService"
-                       plain>保存</el-button>
+                       :disabled="disabledSave || !yamlChange"
+                       @click="updateService">保存</el-button>
           </div>
         </div>
-      </template>
     </div>
   </div>
 </template>
@@ -89,18 +83,14 @@ import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
-import { validateYamlAPI, updateServicePermissionAPI, serviceTemplateAPI } from '@api'
+import { validateYamlAPI, updateServicePermissionAPI, serviceTemplateAPI, saveServiceTemplateAPI } from '@api'
 export default {
   props: {
     serviceInTree: {
       type: Object,
       required: true
     },
-    serviceCount: {
-      type: Number,
-      required: false,
-      default: 0
-    }
+    yamlChange: Boolean
   },
   data () {
     return {
@@ -117,14 +107,15 @@ export default {
       info: { message: '' },
       service: {
       },
-      showNoContent: {
-        show: false,
-        msg: ''
-      },
-      stagedYaml: {}
+      stagedYaml: {},
+      initYaml: ''
     }
   },
   methods: {
+    keepInitYaml (newYaml) {
+      this.initYaml = newYaml
+      this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
+    },
     getService (val) {
       const serviceName = val ? val.service_name : this.serviceName
       const projectName = val.product_name
@@ -133,6 +124,7 @@ export default {
       if (val && serviceType) {
         serviceTemplateAPI(serviceName, serviceType, projectName).then(res => {
           this.service = res
+          this.keepInitYaml(res.yaml)
           if (this.$route.query.kind) {
             this.jumpToWord(`kind: ${this.$route.query.kind}`)
           }
@@ -154,6 +146,13 @@ export default {
         })
       }
     },
+    updateServiceByKeyword () {
+      const cantSave = this.hideSave || this.disabledSave || !this.yamlChange
+      if (cantSave) {
+        return
+      }
+      this.updateService()
+    },
     updateService () {
       const projectName = this.projectName
       const serviceName = this.service.service_name
@@ -167,11 +166,19 @@ export default {
         yaml: yaml,
         source: 'spock'
       }
-      this.$emit('onUpdateService', payload)
+      saveServiceTemplateAPI(payload).then((res) => {
+        this.$message({
+          type: 'success',
+          message: `服务 ${payload.service_name} 保存成功`
+        })
+        this.keepInitYaml(payload.yaml)
+        this.$emit('onUpdateService', { service_name: serviceName, service_status: this.service.status, res })
+      })
     },
     onCmCodeChange: debounce(function (newCode) {
       this.errors = []
       this.service.yaml = newCode
+      this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
       if (this.service.yaml) {
         this.validateYaml(newCode)
         if (this.service.status === 'named') {
@@ -231,7 +238,7 @@ export default {
       return this.serviceInTree.service_name
     },
     disabledSave () {
-      return (this.errors.length > 0)
+      return this.errors.length > 0
     },
     hideSave () {
       if (this.service.source === 'gitlab' || this.service.source === 'github' || this.service.source === 'ilyshin' || this.service.source === 'gerrit' || (this.service.visibility === 'public' && this.service.product_name !== this.projectName)) {
@@ -242,59 +249,49 @@ export default {
     }
   },
   watch: {
-    serviceCount: {
-      handler (val, old_val) {
-        if (val === 0) {
-          this.showNoContent = {
-            show: true,
-            msg: '暂无服务,创建服务请在左侧栏点击「添加服务」按钮'
-          }
-        } else if (val > 0 && this.showNoContent.msg === '暂无服务,创建服务请在左侧栏点击「添加服务」按钮') {
-          this.showNoContent.show = false
-        }
-      },
-      immediate: true
-    },
 
     serviceInTree: {
       handler (val, old_val) {
-        if (this.serviceCount > 0) {
-          if (val.visibility === 'public' && val.product_name !== this.projectName) {
-            this.info = {
-              message: '信息：其它项目的共享服务，不支持在本项目中编辑，编辑器为只读模式'
-            }
-          } else if (val.product_name === this.projectName && val.source && val.source !== 'spock') {
-            this.info = {
-              message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
-            }
+        if (val.visibility === 'public' && val.product_name !== this.projectName) {
+          this.info = {
+            message: '信息：其它项目的共享服务，不支持在本项目中编辑，编辑器为只读模式'
+          }
+        } else if (val.product_name === this.projectName && val.source && val.source !== 'spock') {
+          this.info = {
+            message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
+          }
+        } else {
+          this.info = {
+            message: ''
+          }
+        }
+        if (val.status === 'added') {
+          this.getService(val)
+          if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
+            this.cmOptions.readOnly = true
           } else {
-            this.info = {
-              message: ''
-            }
-          }
-          if (val.status === 'added') {
-            this.getService(val)
-            if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
-              this.cmOptions.readOnly = true
-            } else {
-              this.cmOptions.readOnly = false
-            }
-          } else if (val.status === 'named') {
-            this.service = {
-              yaml: '',
-              service_name: val.service_name,
-              status: 'named'
-            }
             this.cmOptions.readOnly = false
-            if (this.stagedYaml[val.service_name]) {
-              this.service.yaml = this.stagedYaml[val.service_name]
-            }
-            this.editorFocus()
           }
+        } else if (val.status === 'named') {
+          this.service = {
+            yaml: '',
+            service_name: val.service_name,
+            status: 'named'
+          }
+          this.initYaml = '-#-'
+          this.$emit('update:yamlChange', this.initYaml !== this.service.yaml)
+          this.cmOptions.readOnly = false
+          if (this.stagedYaml[val.service_name]) {
+            this.service.yaml = this.stagedYaml[val.service_name]
+          }
+          this.$refs.myCm && this.editorFocus()
         }
       },
       immediate: true
     }
+  },
+  mounted () {
+    this.editorFocus()
   },
   components: {
     codemirror

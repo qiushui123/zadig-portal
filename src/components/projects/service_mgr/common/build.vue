@@ -201,6 +201,7 @@
                       </span>
                     </el-option>
                   </el-select>
+                  <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -1026,7 +1027,7 @@ export default {
       return this.$store.state.login.userinfo.organization.id
     },
     projectName () {
-      return this.$route.params.project_name
+      return this.$route.query.service_project_name || this.$route.params.project_name
     },
     isEdit () {
       return (!!(this.$route.query.build_name))

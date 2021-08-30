@@ -180,8 +180,8 @@
           <span class="item-title">构建环境</span>
           <div class="divider item"></div>
           <el-row :gutter="20">
-            <el-col :span="6">
-              <el-form-item label="操作系统">
+            <el-col :span="8">
+              <el-form-item label="构建系统">
                 <el-select size="small"
                            v-model="buildConfig.pre_build.image_id"
                            placeholder="请选择">
@@ -199,6 +199,7 @@
                     </span>
                   </el-option>
                 </el-select>
+                <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -583,14 +584,10 @@
                          class="btn-primary"
                          type="primary">取消</el-button>
             </router-link>
-            <el-button v-if="!isCreate"
-                       class="btn-primary"
-                       @click="saveBuildConfig"
-                       type="primary">保存</el-button>
-            <el-button v-else
-                       class="btn-primary"
-                       @click="createBuildConfig"
-                       type="primary">保存</el-button>
+            <el-button class="btn-primary"
+                         @click="isCreate ? createBuildConfig() : saveBuildConfig()"
+                         :loading="saveLoading"
+                         type="primary">保存</el-button>
           </div>
         </el-col>
       </el-row>
@@ -730,7 +727,8 @@ export default {
         ]
       },
       systems: [],
-      validObj: new ValidateSubmit()
+      validObj: new ValidateSubmit(),
+      saveLoading: false
     }
   },
   methods: {
@@ -884,7 +882,9 @@ export default {
       payload.product_name = this.projectName
       this.$refs[formName].validate(valid => {
         if (valid) {
+          this.saveLoading = true
           createBuildConfigAPI(payload).then(() => {
+            this.saveLoading = false
             this.$router.push(`/v1/projects/detail/${this.projectName}/builds`)
             this.$message({
               type: 'success',
@@ -927,9 +927,11 @@ export default {
           return
         }
       }
+      this.saveLoading = true
       payload.source = this.source
       payload.productName = this.projectName
       updateBuildConfigAPI(payload).then((response) => {
+        this.saveLoading = false
         this.$router.push(`/v1/projects/detail/${this.projectName}/builds`)
         this.$message({
           message: '保存成功',

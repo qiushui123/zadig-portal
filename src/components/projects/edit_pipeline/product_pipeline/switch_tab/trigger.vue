@@ -9,9 +9,13 @@
                custom-class="add-trigger-dialog"
                center>
       <el-form :model="webhookSwap"
+               ref="triggerForm"
                label-position="left"
                label-width="80px">
-        <el-form-item label="名称">
+        <el-form-item label="名称"
+                      prop="name"
+                      class="bottom-22"
+                      :rules="nameRules">
           <el-input size="small"
                     autofocus
                     ref="webhookNamedRef"
@@ -101,17 +105,17 @@
                 动态选择空闲环境更新
               </el-radio>
             </el-tooltip>
-            <el-tooltip v-if="showPrEnv && webhookSwap.repo.source==='gitlab'"
+            <el-tooltip v-if="webhookSwap.repo.source==='gitlab'"
                         content="基于基准环境版本生成一套临时测试环境做 PR 级验证"
                         placement="right">
               <el-radio label="base"
-                        :disabled="!(webhookSwap.namespace.length===1 && showPrEnv && webhookSwap.repo.source==='gitlab')">
+                        :disabled="!(webhookSwap.namespace.length===1 && webhookSwap.repo.source==='gitlab')">
                 设置指定环境为基准环境
               </el-radio>
             </el-tooltip>
           </el-radio-group>
         </div>
-        <el-form-item v-if="webhookSwap.env_update_policy === 'base' && showPrEnv && webhookSwap.repo.source==='gitlab' && showEnvUpdatePolicy"
+        <el-form-item v-if="webhookSwap.env_update_policy === 'base' && webhookSwap.repo.source==='gitlab' && showEnvUpdatePolicy"
                       label="销毁策略">
           <el-select style="width: 100%;"
                      v-model="webhookSwap.env_recycle_policy"
@@ -211,7 +215,7 @@
         <el-button size="small"
                    round
                    type="primary"
-                   @click="webhookAddMode?addWebhook():saveWebhook()">确定</el-button>
+                   @click="validateForm(webhookAddMode?'addWebhook':'saveWebhook')">确定</el-button>
       </div>
     </el-dialog>
     <!--end of edit webhook dialog -->
@@ -343,11 +347,17 @@
 <script type="text/javascript">
 import bus from '@utils/event_bus'
 import workflowArgs from '../container/workflow_args.vue'
-import { mapGetters } from 'vuex'
 import { listProductAPI, getBranchInfoByIdAPI, singleTestAPI, getAllBranchInfoAPI } from '@api'
 import { uniqBy, get } from 'lodash'
 export default {
   data () {
+    const validateName = (rule, value, callback) => {
+      if (!/^[a-zA-Z0-9]([a-zA-Z0-9_\-\.]*[a-zA-Z0-9])?$/.test(value)) {
+        callback(new Error("触发器名称仅支持数字字符、'-'、'_'、'.' 且开始结束只能是数字字符"))
+      } else {
+        callback()
+      }
+    }
     return {
       testInfos: [],
       gotScheduleRepo: false,
@@ -370,7 +380,10 @@ export default {
       webhookEditMode: false,
       webhookAddMode: false,
       showEnvUpdatePolicy: false,
-      firstShowPolicy: false
+      firstShowPolicy: false,
+      nameRules: [
+        { type: 'string', trigger: 'change', validator: validateName }
+      ]
     }
   },
   props: {
@@ -400,6 +413,13 @@ export default {
     }
   },
   methods: {
+    validateForm (fn) {
+      this.$refs.triggerForm.validate(valid => {
+        if (valid) {
+          this[fn]()
+        }
+      })
+    },
     getTestReposForQuery (testInfos) {
       const testRepos = testInfos.length > 0 ? this.$utils.flattenArray(testInfos.map(t => t.builds)) : []
       let testReposForQuery = {}
@@ -670,20 +690,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['signupStatus']),
-    showPrEnv: {
-      get: function () {
-        if (this.signupStatus && this.signupStatus.features && this.signupStatus.features.length > 0) {
-          if (this.signupStatus.features.includes('pr_create_env')) {
-            return true
-          } else {
-            return false
-          }
-        } else {
-          return false
-        }
-      }
-    },
     showWebhookDialog: {
       get: function () {
         return this.webhookAddMode ? this.webhookAddMode : this.webhookEditMode
@@ -759,6 +765,10 @@ export default {
   .el-form {
     .el-form-item {
       margin-bottom: 8px;
+
+      &.bottom-22 {
+        margin-bottom: 22px;
+      }
     }
 
     .env-open-button {

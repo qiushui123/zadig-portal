@@ -80,7 +80,7 @@
         <el-row :gutter="30">
           <el-col :span="10">
             <el-form-item prop="pre_build.image_id"
-                          label="操作系统">
+                          label="构建系统">
               <el-select size="small"
                          style="width: 200px;"
                          v-model="buildConfig.pre_build.image_id"
@@ -99,6 +99,7 @@
                   </span>
                 </el-option>
               </el-select>
+              <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
             </el-form-item>
           </el-col>
           <el-col :span="10">
@@ -1397,7 +1398,7 @@ export default {
           clean_workspace: false,
           res_req: 'low',
           build_os: 'xenial',
-          image_id: '',
+          image_id: this.systems[0].id,
           image_from: '',
           installs: [],
           envs: [],

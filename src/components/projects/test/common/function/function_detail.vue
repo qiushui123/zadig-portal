@@ -4,7 +4,8 @@
              :model="test"
              ref="test-form"
              :rules="rules"
-             label-width="120px">
+             label-width="120px"
+             label-position="left">
       <el-form-item prop="name"
                     label="测试名称"
                     class="fixed-width">
@@ -29,7 +30,7 @@
       <el-row :gutter="20">
         <el-col :span="9">
           <el-form-item prop="pre_test.image_id"
-                        label="操作系统">
+                        label="构建系统">
             <el-select size="small"
                        v-model="test.pre_test.image_id"
                        placeholder="请选择">
@@ -264,7 +265,7 @@
                            type="text">添加</el-button> -->
         </slot>
       </label>
-      <el-form-item label-width="150px"
+      <el-form-item label-width="160px"
                     label="Junit 测试报告目录"
                     prop="test_result_path"
                     class="fixed-width">
@@ -275,7 +276,7 @@
           <template slot="prepend">$WORKSPACE/</template>
         </el-input>
       </el-form-item>
-      <el-form-item label-width="150px"
+      <el-form-item label-width="160px"
                     class="fixed-width">
         <template slot="label">
           <span>Html 测试报告文件</span>
@@ -292,7 +293,7 @@
           <template slot="prepend">$WORKSPACE/</template>
         </el-input>
       </el-form-item>
-      <el-form-item label-width="150px"
+      <el-form-item label-width="160px"
                     class="fixed-width">
         <template slot="label">
           <span>测试文件导出路径</span>
@@ -781,7 +782,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .function-test-detail {
   position: relative;
   flex: 1;
@@ -804,7 +805,7 @@ export default {
     }
 
     .fixed-width {
-      .el-input__inner {
+      /deep/ .el-input__inner {
         width: 300px;
       }
     }
@@ -833,6 +834,7 @@ export default {
 
   .title {
     padding-top: 6px;
+    color: #000;
     font-size: 15px;
     line-height: 40px;
   }
@@ -857,9 +859,8 @@ export default {
     /* padding: 5px 8px; */
     .title {
       display: inline-block;
-      padding-top: 6px;
-      color: #606266;
-      font-size: 14px;
+      font-size: 15px;
+      line-height: 40px;
     }
 
     .item-title {
@@ -906,7 +907,7 @@ export default {
   }
 
   .el-select.appended {
-    .el-input__inner {
+    /deep/ .el-input__inner {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }

@@ -36,10 +36,12 @@
     <div class="input" v-if="showAddInput">
         <el-input v-model="serviceName"  oninput="value=value.replace(/[^a-zA-Z0-9-_]/g,'')" size="small" @blur="blur" @change="change" ref="input"></el-input>
     </div>
+    <UpdateEnv ref="updateEnv"/>
   </div>
 </template>
 <script>
 import { deleteServiceTemplateAPI, getServiceTemplatesAPI } from '@api'
+import UpdateEnv from '../../service_mgr/not_k8s/updateEnv'
 
 function compare (a, b) {
   if (a.service_name < b.service_name) {
@@ -53,6 +55,9 @@ function compare (a, b) {
 
 export default {
   name: 'service_list',
+  components: {
+    UpdateEnv
+  },
   props: {
     editService: Function,
     addService: Function,
@@ -134,6 +139,7 @@ export default {
           this.projectName,
           obj.visibility
         ).then(() => {
+          this.$refs.updateEnv.openDialog()
           this.$message({
             type: 'success',
             message: '删除成功'
