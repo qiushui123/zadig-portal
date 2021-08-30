@@ -1251,8 +1251,8 @@ export default {
     async loadPage () {
       const projectName = this.projectName
       const orgId = this.currentOrganizationId
-      this.$set(this.buildConfig, 'name', 'build-' + this.name)
-      this.$set(this.jenkinsBuild, 'name', 'build-' + this.name)
+      this.$set(this.buildConfig, 'name', this.projectName + '-build-' + this.name)
+      this.$set(this.jenkinsBuild, 'name', this.projectName + '-build-' + this.name)
       if (this.isExp) {
         getBuildConfigDetailAPI(
           'voting-result-build',
