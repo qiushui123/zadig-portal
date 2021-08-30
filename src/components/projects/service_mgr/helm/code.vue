@@ -1,15 +1,7 @@
 <template>
   <div class="content">
-    <div
-      class="modalContent"
-      :style="`z-index: ${zindex}`"
-      @click="changeModalStatus(null, false, null, true)"
-    >
-      <div
-        class="modal"
-        v-show="modalvalue"
-        :style="`left:${position.left}px;top: ${position.top}px`"
-      >
+    <div class="modalContent" :style="`z-index: ${zindex}`" @click="changeModalStatus(null, false, null, true)">
+      <div class="modal" v-show="modalvalue" :style="`left:${position.left}px;top: ${position.top}px`">
         <!-- <div
           class="item"
           v-if="!(currentData && !currentData.type ==='folder')"
@@ -27,20 +19,15 @@
         <div class="item" v-if="currentData" @click="updateFileName">
           重命名
         </div>
-        <div class="item" v-if="currentData" @click="deleteFile">删除</div> -->
+        <div class="item" v-if="currentData" @click="deleteFile">删除</div>-->
         <div class="item" v-if="currentData.type && (actionList[currentData.type].includes('deleteServer'))" @click="deleteServer">删除服务</div>
-     </div>
+      </div>
     </div>
 
     <multipane class="custom-resizer" layout="vertical">
       <div class="left">
         <div class="title">
-            <el-button  @click="openRepoModal()"
-                size="mini"
-                icon="el-icon-plus"
-                plain
-                circle>
-            </el-button>
+          <el-button @click="openRepoModal()" size="mini" icon="el-icon-plus" plain circle></el-button>
         </div>
         <Folder
           class="folder"
@@ -57,7 +44,7 @@
           :openRepoModal="openRepoModal"
         />
         <div class="bottom">
-           <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button>
+          <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button>
           <el-button size="small" type="primary" :disabled="!updateEnv" @click="update">更新环境</el-button>
         </div>
       </div>
@@ -74,8 +61,15 @@
           />
         </div>
         <div class="code" v-if="page.expandFileList.length">
-          <component v-if="currentCode.type==='components'" :changeExpandFileList="changeExpandFileList" :currentCode="currentCode" v-bind="currentCode" v-bind:is="currentCode.componentsName"></component>
-          <CodeMirror v-if="currentCode.type==='file'"
+          <component
+            v-if="currentCode.type==='components'"
+            :changeExpandFileList="changeExpandFileList"
+            :currentCode="currentCode"
+            v-bind="currentCode"
+            v-bind:is="currentCode.componentsName"
+          ></component>
+          <CodeMirror
+            v-if="currentCode.type==='file'"
             :saveFile="saveFile"
             :changeCodeTxtCache="changeCodeTxtCache"
             :currentCode="currentCode"
@@ -85,17 +79,20 @@
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
       <div :style="{ flexGrow: 1 }" class="right">
-        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" /> <!-- 右侧aside -->
+        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" />
+        <!-- 右侧aside -->
       </div>
-      </multipane>
-     <UpdateHelmEnv v-model="updateHelmEnvDialogVisible"/>
-    <el-dialog
-      title="请选择导入源"
-      :visible.sync="dialogVisible"
-      center
-      @close="closeSelectRepo"
-    >
-      <Repo ref="repo" @triggleAction="changeExpandFileList('clear');clearCommitCache()" :currentService="currentService" @canUpdateEnv="updateEnv = true" v-model="dialogVisible" /> <!-- 代码库弹窗 -->
+    </multipane>
+    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" />
+    <el-dialog title="请选择导入源" :visible.sync="dialogVisible" center @close="closeSelectRepo">
+      <Repo
+        ref="repo"
+        @triggleAction="changeExpandFileList('clear');clearCommitCache()"
+        :currentService="currentService"
+        @canUpdateEnv="updateEnv = true"
+        v-model="dialogVisible"
+      />
+      <!-- 代码库弹窗 -->
     </el-dialog>
   </div>
 </template>
@@ -490,7 +487,7 @@ export default {
     background-color: #fff;
     border: 1px solid #dbdbdb;
     border-radius: 5px;
-    content: "";
+    content: '';
   }
 
   .resizer2 {
@@ -510,7 +507,7 @@ export default {
     background-color: #fff;
     border: 1px solid #dbdbdb;
     border-radius: 5px;
-    content: "";
+    content: '';
   }
 
   .center {
@@ -528,7 +525,7 @@ export default {
 
     .code {
       box-sizing: border-box;
-      height: calc(~"100% - 40px");
+      height: calc(~'100% - 40px');
       margin-top: 40px;
       overflow-y: scroll;
       background-color: #fff;
