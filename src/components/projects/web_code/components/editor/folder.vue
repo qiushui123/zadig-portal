@@ -26,7 +26,7 @@ export default {
     saveNewFile: Function,
     saveNewFolder: Function,
     changeExpandFileList: Function,
-    laodData: Function,
+    loadData: Function,
     nodeData: Array,
     expandKey: Array,
     deleteServer: Function,
@@ -139,7 +139,7 @@ export default {
           this.changeExpandFileList('add', data)
         }
       } else if (data.children && data.children.length === 0) {
-        this.laodData(data)
+        this.loadData(data)
       }
     },
     save (data) {
