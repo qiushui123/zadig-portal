@@ -7,8 +7,8 @@
       </h4>
       <el-divider></el-divider>
       <div class="desc">
-        <p>请输入 values.yaml 配置</p>
-        <codemirror :value="yamlValue" @codemirrorInput="handleInput"></codemirror>
+        <div>请输入 values.yaml 配置</div>
+        <codemirror class="mirror" :height="height" :value="yamlValue" @codemirrorInput="handleInput"></codemirror>
       </div>
     </div>
 
@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import { cloneDeep } from 'lodash'
 import Codemirror from '../codemirror.vue'
 import KeyValue from './key_value.vue'
 export default {
@@ -35,7 +34,7 @@ export default {
       default: 'values 文件',
       type: String
     },
-    yaml: Object,
+    yaml: String,
     showKeyValue: {
       default: false,
       type: Boolean
@@ -43,11 +42,16 @@ export default {
     showDelete: {
       default: false,
       type: Boolean
+    },
+    height: {
+      default: '300px',
+      type: String
     }
   },
   methods: {
     handleInput (code) {
       this.yamlValue = code
+      this.$emit('update:yaml', code)
     },
     hiddenValueEdit () {
       this.$emit('closeValueEdit')
@@ -58,7 +62,7 @@ export default {
     KeyValue
   },
   created () {
-    if (this.yaml) this.valuesYaml = cloneDeep(this.yaml)
+    if (this.yaml) this.valuesYaml = this.yaml
   }
 }
 </script>
@@ -66,15 +70,16 @@ export default {
 <style lang="less" scoped>
 .values-outer {
   /deep/ .el-divider--horizontal {
-    margin: 14px 0;
+    margin: 12px 0;
   }
 
   .yaml-container {
     padding: 10px;
+    line-height: 1;
 
     h4 {
       margin: 7px 0;
-      color: #4d4c4c;
+      color: #606266;
       font-size: 14px;
 
       .icon-delete {
@@ -86,6 +91,10 @@ export default {
     .desc {
       color: #a1a3a7;
       font-size: 14px;
+
+      .mirror {
+        margin-top: 12px;
+      }
     }
   }
 }

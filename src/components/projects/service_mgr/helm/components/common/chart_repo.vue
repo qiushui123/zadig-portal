@@ -47,7 +47,6 @@ export default {
   name: 'ChartRepo',
   data () {
     return {
-      tabName: 'private',
       chartData: {
         repoAttr: 'private',
         source: '',

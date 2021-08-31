@@ -1,6 +1,6 @@
 <template>
   <div @keydown.meta.83.prevent="handleSave">
-    <Resize :resize="resize" :height="'300px'">
+    <Resize :resize="resize" :height="height">
       <codemirror ref="cmEditor" :value="value" class="codemirror" :options="options" @input="handleInput"></codemirror>
     </Resize>
   </div>
@@ -32,6 +32,10 @@ export default {
     resize: {
       // can resize, default none
       default: 'none',
+      type: String
+    },
+    height: {
+      default: '300px',
       type: String
     }
   },
