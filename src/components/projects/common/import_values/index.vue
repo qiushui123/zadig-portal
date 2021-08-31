@@ -8,7 +8,7 @@
       <el-divider></el-divider>
       <div class="desc">
         <div>请输入 values.yaml 配置</div>
-        <codemirror class="mirror" :height="height" :value="yamlValue" @codemirrorInput="handleInput"></codemirror>
+        <codemirror class="mirror" :resize="resize" :height="height" :value="yamlValue" @input="handleInput"></codemirror>
       </div>
     </div>
 
@@ -23,10 +23,6 @@ import KeyValue from './key_value.vue'
 export default {
   data () {
     return {
-      valuesYaml: {
-        origin: 'repo'
-      },
-      yamlValue: ''
     }
   },
   props: {
@@ -46,6 +42,20 @@ export default {
     height: {
       default: '300px',
       type: String
+    },
+    resize: {
+      default: 'none',
+      type: String
+    }
+  },
+  computed: {
+    yamlValue: {
+      get () {
+        return this.yaml || ''
+      },
+      set (val) {
+        return val
+      }
     }
   },
   methods: {
@@ -60,9 +70,6 @@ export default {
   components: {
     Codemirror,
     KeyValue
-  },
-  created () {
-    if (this.yaml) this.valuesYaml = this.yaml
   }
 }
 </script>

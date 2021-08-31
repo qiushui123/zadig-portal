@@ -1,40 +1,30 @@
 <template>
-  <el-dialog title="更新环境变量"
-             :visible.sync="updateHelmEnvVarDialogVisible"
-             width="80%">
-    <div v-loading="getHelmEnvVarLoading"
-         class="kv-container">
-      <el-collapse v-model="activeHelmServiceNames">
-        <el-collapse-item v-for="(item, index) in helmServiceYamls"
-                          :key="index"
-                          :title="item.service_name"
-                          :name="index">
-          <editor v-model="item.values_yaml"
-                  :options="yamlEditorOption"
-                  lang="yaml"
-                  theme="xcode"
-                  width="100%"
-                  height="300"></editor>
-        </el-collapse-item>
-      </el-collapse>
+  <el-dialog title="更新环境变量" :visible.sync="updateHelmEnvVarDialogVisible" width="80%">
+    <div v-loading="getHelmEnvVarLoading" class="kv-container">
+      <div class="helm-content">
+        <el-tabs tab-position="left" type="border-card" v-model="checkedChart">
+          <el-tab-pane :label="key" :name="key" v-for="(item, key) in helmServiceYamls" :key="key"></el-tab-pane>
+        </el-tabs>
+        <div class="values">
+          <div class="title">Chart Version: {{helmServiceYamls[checkedChart].chart_version}}</div>
+          <ImportValues :yaml.sync="helmServiceYamls[checkedChart].values_yaml" showKeyValue :resize="'vertical'"></ImportValues>
+        </div>
+      </div>
     </div>
-    <span slot="footer"
-          class="dialog-footer">
-      <el-button size="small"
-                 type="primary"
-                 :loading="updataHelmEnvVarLoading"
-                 @click="updateHelmEnvVar">更新</el-button>
-      <el-button size="small"
-                 @click="cancelUpdateHelmEnvVar">取 消</el-button>
+    <span slot="footer" class="dialog-footer">
+      <el-button size="small" type="primary" :loading="updataHelmEnvVarLoading" @click="updateHelmEnvVar">更新</el-button>
+      <el-button size="small" @click="cancelUpdateHelmEnvVar">取 消</el-button>
     </span>
   </el-dialog>
 </template>
 <script>
+import ImportValues from '@/components/projects/common/import_values/index.vue'
 import { getHelmEnvVarAPI, updateHelmEnvVarAPI } from '@/api'
 import editor from 'vue2-ace-bind'
 import 'brace/mode/yaml'
 import 'brace/theme/xcode'
 import 'brace/ext/searchbox'
+import { keyBy } from 'lodash'
 export default {
   name: 'updateHelmVarDialog',
   props: {
@@ -44,22 +34,16 @@ export default {
     envName: String
   },
   components: {
-    editor
+    editor,
+    ImportValues
   },
   data () {
     return {
       updateHelmEnvVarDialogVisible: false,
-      helmServiceYamls: [],
+      helmServiceYamls: { placeholder: { chart_version: '', values_yaml: '' } },
       updataHelmEnvVarLoading: false,
-      activeHelmServiceNames: [],
-      yamlEditorOption: {
-        enableEmmet: true,
-        showLineNumbers: false,
-        showGutter: false,
-        showPrintMargin: false,
-        tabSize: 2
-      },
-      getHelmEnvVarLoading: true
+      getHelmEnvVarLoading: true,
+      checkedChart: 'placeholder'
     }
   },
   methods: {
@@ -72,24 +56,24 @@ export default {
       const envName = this.envName
       const res = await getHelmEnvVarAPI(projectName, envName).catch((error) => {
         console.log(error)
-        this.getHelmEnvVarLoading = false
       })
-      this.getHelmEnvVarLoading = false
       if (res) {
-        this.helmServiceYamls = res
+        this.getHelmEnvVarLoading = false
+        this.helmServiceYamls = keyBy(res, 'service_name')
+        this.checkedChart = res[0].service_name
       }
     },
     updateHelmEnvVar () {
       const projectName = this.productInfo.product_name
       const envName = this.productInfo.env_name
       const payload = {
-        chart_infos: this.$utils.cloneObj(this.helmServiceYamls)
+        chart_infos: this.$utils.cloneObj(Object.values(this.helmServiceYamls))
       }
       this.updataHelmEnvVarLoading = true
       updateHelmEnvVarAPI(projectName, envName, payload).then(response => {
         this.updataHelmEnvVarLoading = false
         this.updateHelmEnvVarDialogVisible = false
-        this.helmServiceYamls = []
+        this.initData()
         this.fetchAllData()
         this.$message({
           message: '更新环境变量成功，请等待服务升级',
@@ -101,7 +85,13 @@ export default {
     },
     cancelUpdateHelmEnvVar () {
       this.updateHelmEnvVarDialogVisible = false
-      this.helmServiceYamls = []
+      this.initData()
+    },
+    initData () {
+      this.$nextTick(() => {
+        this.checkedChart = 'placeholder'
+        this.helmServiceYamls = { placeholder: { chart_version: '', values_yaml: '' } }
+      })
     }
   },
   watch: {
@@ -113,3 +103,46 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+/deep/.el-dialog {
+  .el-dialog__body {
+    padding: 0 10px 20px;
+  }
+}
+
+.helm-content {
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 20px;
+
+  /deep/.el-tabs {
+    flex-shrink: 0;
+
+    .el-tabs__header {
+      margin-right: 0;
+    }
+
+    .el-tabs__content {
+      padding: 0;
+    }
+  }
+
+  .values {
+    box-sizing: border-box;
+    width: calc(~'100% - 250px');
+    padding: 20px;
+    border: 1px solid #dcdfe6;
+    border-left-width: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+
+    .title {
+      line-height: 40px;
+    }
+  }
+}
+</style>

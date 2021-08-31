@@ -30,8 +30,7 @@ export default {
       type: String
     },
     resize: {
-      // can resize, default none
-      default: 'none',
+      default: 'vertical',
       type: String
     },
     height: {
@@ -41,7 +40,7 @@ export default {
   },
   methods: {
     handleInput: debounce(function (code) {
-      this.$emit('codemirrorInput', code)
+      this.$emit('input', code)
     }, 200),
     handleSave (event) {
       this.$emit('saveValue', { event, value: this.value })
