@@ -45,6 +45,10 @@
                        label="Harbor">
               <i class="iconfont iconHarbor"></i> <span>Harbor</span>
             </el-option>
+            <el-option value="dockerhub"
+                       label="DockerHub">
+              <i class="iconfont icondocker"></i> <span>DockerHub</span>
+            </el-option>
             <el-option value="native"
                        label="其它">
               <i class="iconfont iconqita"></i> <span>其它</span>
@@ -135,6 +139,11 @@ export default {
           icon: 'iconfont logo iconHarbor',
           name: 'Harbor',
           namespace: '项目'
+        },
+        dockerhub: {
+          icon: 'iconfont logo icondocker',
+          name: 'DockerHub',
+          namespace: 'Namespace'
         }
       },
       rules: {
@@ -158,6 +167,17 @@ export default {
   computed: {
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
+    }
+  },
+  watch: {
+    'registry.reg_provider': {
+      deep: true,
+      immediate: false,
+      handler: function (val, oldVal) {
+        if (val === 'dockerhub') {
+          this.registry.reg_addr = 'https://registry.hub.docker.com'
+        }
+      }
     }
   },
   methods: {
