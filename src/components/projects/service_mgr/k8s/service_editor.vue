@@ -241,7 +241,7 @@ export default {
       return this.errors.length > 0
     },
     hideSave () {
-      if (this.service.source === 'gitlab' || this.service.source === 'github' || this.service.source === 'gerrit' || (this.service.visibility === 'public' && this.service.product_name !== this.projectName)) {
+      if (this.service.source === 'gitlab' || this.service.source === 'github' || this.service.source === 'ilyshin' || this.service.source === 'gerrit' || (this.service.visibility === 'public' && this.service.product_name !== this.projectName)) {
         return true
       } else {
         return false
@@ -267,7 +267,7 @@ export default {
         }
         if (val.status === 'added') {
           this.getService(val)
-          if (val.source === 'gitlab' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
+          if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
             this.cmOptions.readOnly = true
           } else {
             this.cmOptions.readOnly = false
