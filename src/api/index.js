@@ -388,10 +388,8 @@ export function getBuildConfigDetailAPI (name, version, projectName = '') {
 
 export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, path, type, remoteName = 'origin') {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  if (type === 'github') {
-    return http.get(`/api/aslan/code/workspace/github/${codehostId}/${encodeRepoName}/${branchName}?path=${path}`)
-  } else if (type === 'gitlab' || type === 'ilyshin') {
-    return http.get(`/api/aslan/code/workspace/gitlab/${codehostId}/${encodeRepoName}/${branchName}?path=${path}&repoOwner=${repoOwner}`)
+  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm') {
+    return http.get(`/api/aslan/code/workspace/tree?repo=${encodeRepoName}&path=${path}&branch=${branchName}&owner=${repoOwner}&codehost_id=${codehostId}`)
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)
   } else if (type === 'codehub') {
