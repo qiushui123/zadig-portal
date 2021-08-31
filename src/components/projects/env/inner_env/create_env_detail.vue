@@ -99,7 +99,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="集群："
+          <el-form-item v-if="$utils.isEmpty(pmServiceMap)" label="集群："
                         prop="cluster_id">
             <el-select class="select"
                        filterable
