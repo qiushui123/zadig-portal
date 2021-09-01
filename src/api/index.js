@@ -277,10 +277,6 @@ export function getServiceTemplatesAPI (projectName = '') {
   return http.get(`/api/aslan/service/services?productName=${projectName}`)
 }
 
-export function getServiceTemplatesStatAPI () {
-  return http.get('/api/aslan/service/services?requestFrom=stat')
-}
-
 export function serviceTemplateWithConfigAPI (name, projectName) {
   return http.get(`/api/aslan/service/services/${name}?productName=${projectName}`)
 }
