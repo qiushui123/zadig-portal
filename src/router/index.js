@@ -213,6 +213,13 @@ const routes = [
         }
       },
       {
+        path: 'chart',
+        component: () => import('@/components/projects/chart_temp/index.vue'),
+        meta: {
+          title: '模板库'
+        }
+      },
+      {
         path: 'projects/create',
         component: onboarding_projects_create,
         meta: {

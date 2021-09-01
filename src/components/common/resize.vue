@@ -1,5 +1,10 @@
 <template>
-  <div class="resize" :class="{none: resize === 'none'}" ref="resize" :style="{width: containerWidth, height: height, resize: resize}">
+  <div
+    class="resize"
+    :class="{none: resize === 'none', border: border}"
+    ref="resize"
+    :style="{width: containerWidth, height: height, resize: resize}"
+  >
     <slot></slot>
   </div>
 </template>
@@ -26,6 +31,10 @@ export default {
     resize: {
       type: String,
       default: 'vertical'
+    },
+    border: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
@@ -72,8 +81,11 @@ export default {
   min-height: 100px;
   padding: 6px;
   overflow: hidden;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+
+  &.border {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
 
   &:not(.none)::after {
     position: absolute;

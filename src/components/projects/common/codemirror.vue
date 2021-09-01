@@ -1,13 +1,10 @@
 <template>
-  <div @keydown.meta.83.prevent="handleSave">
-    <Resize :resize="resize" :height="height">
-      <codemirror ref="cmEditor" :value="value" class="codemirror" :options="options" @input="handleInput"></codemirror>
-    </Resize>
+  <div class="codemirror-container" @keydown.meta.83.prevent="handleSave">
+    <codemirror class="codemirror" ref="cmEditor" :value="value" :options="options" @input="handleInput"></codemirror>
   </div>
 </template>
 
 <script>
-import Resize from '@/components/common/resize'
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/yaml/yaml'
@@ -29,14 +26,7 @@ export default {
       default: '',
       type: String
     },
-    resize: {
-      default: 'vertical',
-      type: String
-    },
-    height: {
-      default: '300px',
-      type: String
-    }
+    cmOption: { type: Object, default: () => { return {} } }
   },
   methods: {
     handleInput: debounce(function (code) {
@@ -47,11 +37,10 @@ export default {
     }
   },
   components: {
-    codemirror,
-    Resize
+    codemirror
   },
   created () {
-    this.options = options
+    this.options = Object.assign({}, options, this.cmOption)
   },
   mounted () {
     this.$refs.cmEditor.codemirror.focus()
@@ -60,12 +49,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.codemirror {
+.codemirror-container {
   height: 100%;
-  margin: -5px;
 
-  /deep/.CodeMirror {
+  .codemirror {
     height: 100%;
+    margin: -5px;
+
+    /deep/.CodeMirror {
+      height: 100%;
+      font-size: 14px;
+    }
+
+    /deep/.cm-s-neo .CodeMirror-linenumber {
+      color: rgb(0, 108, 134);
+    }
+
+    /deep/.CodeMirror-sizer {
+      padding: 0 10px;
+    }
   }
 }
 </style>

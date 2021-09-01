@@ -8,7 +8,9 @@
       <el-divider></el-divider>
       <div class="desc">
         <div>请输入 values.yaml 配置</div>
-        <codemirror class="mirror" :resize="resize" :height="height" :value="yamlValue" @input="handleInput"></codemirror>
+        <Resize class="mirror" :resize="resize" :height="height">
+          <codemirror :value="yamlValue" @input="handleInput"></codemirror>
+        </Resize>
       </div>
     </div>
 
@@ -18,6 +20,7 @@
 </template>
 
 <script>
+import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
 import KeyValue from './key_value.vue'
 export default {
@@ -69,7 +72,8 @@ export default {
   },
   components: {
     Codemirror,
-    KeyValue
+    KeyValue,
+    Resize
   }
 }
 </script>

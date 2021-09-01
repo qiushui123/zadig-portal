@@ -10,7 +10,7 @@
         <div class="desc">暂无自定义的 values 文件</div>
         <el-button type="text" @click="showValueEdit = true" icon="el-icon-plus">添加 values 文件</el-button>
       </div>
-      <import-values v-show="showValueEdit" :showDelete="true" @closeValueEdit="closeValueEdit"></import-values>
+      <import-values v-if="showValueEdit" :showDelete="true" @closeValueEdit="closeValueEdit" :yaml.sync="yaml"></import-values>
       <key-value></key-value>
     </div>
   </div>
@@ -24,7 +24,8 @@ export default {
     return {
       activeName: 'dev',
       tabs: ['dev', 'qa'],
-      showValueEdit: false
+      showValueEdit: false,
+      yaml: ''
     }
   },
   methods: {
