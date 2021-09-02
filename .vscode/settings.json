@@ -4,7 +4,7 @@
     "vue": "html",
     "vetur.validation.template": true
   },
-  "vetur.format.defaultFormatter.html": "prettyhtml", // prettyhtml   js-beautify-html
+  "vetur.format.defaultFormatter.html": "prettyhtml",
   "vetur.format.defaultFormatterOptions": {
     "js-beautify-html": {
       "wrap_line_length": "100",
@@ -28,8 +28,7 @@
   },
   "vetur.validation.template": true,
   "prettier.printWidth": 180,
-  // "prettier.disableLanguages": [],
-  "prettier.semi": false, // false
+  "prettier.semi": false,
   "prettier.singleQuote": true,
   "gitlens.advanced.messages": {
     "suppressCommitHasNoPreviousCommitWarning": false,
@@ -38,17 +37,12 @@
     "suppressGitVersionWarning": false,
     "suppressLineUncommittedWarning": false,
     "suppressNoRepositoryWarning": false
-    // "suppressResultsExplorerNotice": false,
-    // "suppressShowKeyBindingsNotice": true
   },
   "breadcrumbs.enabled": true,
-  "vetur.format.defaultFormatter.js": "prettier", // vscode-typescript  prettier
-  // "gitlens.views.lineHistory.enabled": true,
-  // "debug.console.fontSize": 14,
-  // 让函数名和后面的括号之间加个空格
-  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+  "vetur.format.defaultFormatter.js": "prettier-eslint",
+  // 指定 *.js 文件的格式化工具为vscode自带，以符合ESLint规范
   "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features" // esbenp.prettier-vscode  vscode.typescript-language-features(先用着，为了空格化函数)
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
@@ -58,7 +52,7 @@
   },
   "workbench.settings.enableNaturalLanguageSearch": false,
   "[vue]": {
-    "editor.defaultFormatter": "octref.vetur" // octref.vetur   esbenp.prettier-vscode
+    "editor.defaultFormatter": "octref.vetur"
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -78,7 +72,7 @@
   "git.alwaysSignOff": true,
   "eslint.validate": ["vue", "html", "javascript", "typescript", "javascriptreact", "typescriptreact"],
   // 保存时代码自动格式化
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true
@@ -96,8 +90,4 @@
   // 指定wxml的格式化
   "minapp-vscode.wxmlFormatter": "prettyHtml",
   "minapp-vscode.disableAutoConfig": true
-  // "gitlens.gitCommands.skipConfirmations": [
-  //   "fetch:command",
-  //   "stash-push:command"
-  // ],
 }
