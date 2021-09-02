@@ -14,17 +14,9 @@
         <template slot-scope="scope">
           <el-button
             size="small"
-            v-if="scope.row.build_name"
-            @click="editBuild(scope.row.name, scope.row.build_name)"
             type="text"
-            >{{ scope.row.build_name }}</el-button
-          >
-          <el-button
-            size="small"
-            v-else
-            type="text"
-            @click="addBuild(scope.row.name)"
-            >添加构建</el-button
+            @click="openBuild(scope.row)"
+            >{{scope.row.build_name ? scope.row.build_name: '添加构建' }}</el-button
           >
         </template>
       </el-table-column>
@@ -35,7 +27,8 @@
 export default {
   name: 'serviceModule',
   props: {
-    serviceModules: Array
+    serviceModules: Array,
+    openBuild: Function
   }
 }
 </script>

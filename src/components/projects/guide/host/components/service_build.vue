@@ -1,25 +1,35 @@
 <template>
   <div>
     <div class="left">
-      <el-tree ref="tree" node-key="id" class="tree" :data="nodeData"></el-tree>
+      <el-tree ref="tree" node-key="id" class="tree" @node-click="handlerNodeClick" :data="nodeData"></el-tree>
     </div>
     <div class="right">
-      <ServiceModule  :serviceModules="serviceModules" />
+      <ServiceModule :openBuild="openBuild" v-show="!build.showModal"  :serviceModules="serviceModules" />
+      <Build  v-show="build.showModal" :name="build.name" :isEdit="build.isEdit" :buildName="build.buildName" />
     </div>
   </div>
 </template>
 <script>
 import { getServiceTemplatesAPI, serviceTemplateWithConfigAPI } from '@/api'
 import ServiceModule from '@/components/projects/common/serviceModules'
+import Build from '@/components/projects/common/hosting/build'
+
 export default {
   name: 'serviceBuild',
   components: {
-    ServiceModule
+    ServiceModule,
+    Build
   },
   data () {
     return {
       nodeData: [],
-      serviceModules: []
+      serviceModules: [],
+      build: {
+        name: null,
+        isEdit: false,
+        buildName: null,
+        showModal: false
+      }
     }
   },
   computed: {
@@ -29,6 +39,38 @@ export default {
     }
   },
   methods: {
+    openBuild (data) {
+      if (data.build_name) {
+        this.build.name = data.name
+        this.build.buildName = data.build_name
+        this.build.isEdit = true
+      } else {
+        this.build.name = data.name
+        this.build.buildName = null
+        this.build.isEdit = false
+      }
+      this.build.showModal = true
+    },
+    handlerNodeClick (data) {
+      if (!data.children) {
+        this.openBuild(data)
+      } else {
+        this.getServiceModules(data)
+        this.build.showModal = false
+      }
+    },
+    async getServiceModules (data) {
+      const { service_module } = await serviceTemplateWithConfigAPI(
+        data.label,
+        this.projectName
+      )
+      data.children = service_module.map((item) => ({
+        label: item.name,
+        name: item.name,
+        build_name: item.build_name
+      }))
+      this.serviceModules = service_module
+    },
     async getServices () {
       const { data } = await getServiceTemplatesAPI(this.projectName)
       this.nodeData = data.map((item) => ({
@@ -36,14 +78,7 @@ export default {
         children: []
       }))
       if (data.length) {
-        const { service_module } = await serviceTemplateWithConfigAPI(
-          data[0].service_name,
-          this.projectName
-        )
-        this.nodeData[0].children = service_module.map((item) => ({
-          label: item.name
-        }))
-        this.serviceModules = service_module
+        this.getServiceModules(this.nodeData[0])
       }
     }
   },
@@ -73,6 +108,7 @@ export default {
   .right {
     width: calc(~'100% - 340px');
     height: 100%;
+    overflow: scroll;
     background-color: #fff;
   }
 }
