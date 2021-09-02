@@ -96,6 +96,11 @@ import onboarding_projects_not_k8s_config from '../components/projects/guide/not
 import onboarding_projects_not_k8s_deploy from '../components/projects/guide/not_k8s/not_k8s_deploy.vue'
 import onboarding_projects_not_k8s_delivery from '../components/projects/guide/not_k8s/not_k8s_delivery.vue'
 
+// host
+import onboarding_host_config from '../components/projects/guide/host/host_config.vue'
+// import onboarding_host_service_build from '../components/projects/guide/host/service_build.vue'
+// import onboarding_host_run_workflow from '../components/projects/guide/host/run_workflow.vue'
+
 /** ---------------- */
 
 /**   users    */
@@ -223,6 +228,14 @@ const routes = [
       {
         path: 'projects/create/:project_name/basic/info',
         component: onboarding_projects_info_basic,
+        meta: {
+          requiresAuth: true,
+          title: '新建项目'
+        }
+      },
+      {
+        path: 'projects/create/:project_name/host/config',
+        component: onboarding_host_config,
         meta: {
           requiresAuth: true,
           title: '新建项目'

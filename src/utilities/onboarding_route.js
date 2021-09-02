@@ -17,6 +17,9 @@ function getRoute (status, type, projectName) {
       `/v1/projects/create/${projectName}/helm/service?rightbar=help`,
       `/v1/projects/create/${projectName}/helm/runtime`,
       `/v1/projects/create/${projectName}/helm/delivery`
+    ],
+    host: [
+      `/v1/projects/create/${projectName}/host/config`
     ]
   }
   return routes[type][status]
@@ -26,6 +29,9 @@ export function whetherOnboarding (projectTemplate) {
   const productFeature = projectTemplate.product_feature
   const status = projectTemplate.onboarding_status
   const projectName = projectTemplate.product_name
+  if (productFeature.create_env_type === 'hosting') {
+    return getRoute(status - 1, 'host', projectName)
+  }
   if (productFeature.deploy_type === 'k8s') {
     if (productFeature.basic_facility === 'cloud_host') {
       return getRoute(status - 1, 'not_k8s', projectName)
