@@ -8,14 +8,14 @@
         <div class="top">
           <el-button icon="el-icon-plus" circle size="mini" @click="chartDialogVisible = !chartDialogVisible"></el-button>
         </div>
-        <Folder></Folder>
+        <Folder :fileData="fileData" @clickFile="handleFileClick" @deleteChart="deleteChart" @refreshChart="refreshChart"></Folder>
       </div>
       <multipane-resizer></multipane-resizer>
-      <div class="pane center" :style="{width: '500px'}">
+      <div class="pane center" :style="{minWidth: '200px', width: '500px'}">
         <div class="top">
-          <PageNav></PageNav>
+          <PageNav :displayedFile="displayedFile" :currentTab="currentTab" @updateFile="updateFile"></PageNav>
         </div>
-        <Codemirror v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
+        <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: false }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
       <ModuleUse class="pane right" :style="{flexGrow: 1, width: '100px'}"></ModuleUse>
@@ -35,7 +35,110 @@ export default {
   data () {
     return {
       yaml: '',
-      chartDialogVisible: false
+      chartDialogVisible: false,
+      currentTab: '',
+      fileData: [
+        {
+          path: '.helmignore',
+          name: '.helmignore',
+          size: 349,
+          is_dir: false
+        },
+        {
+          path: 'Chart.yaml',
+          name: 'Chart.yaml',
+          size: 1138,
+          is_dir: false,
+          is_chart: false
+        },
+        {
+          path: 'templates',
+          name: 'templates',
+          size: 4096,
+          is_dir: true,
+          is_chart: true,
+          children: [
+            {
+              path: 'templates/NOTES.txt',
+              name: 'NOTES.txt',
+              size: 141,
+              is_dir: false
+            },
+            {
+              path: 'templates/_helpers.tpl',
+              name: '_helpers.tpl',
+              size: 1852,
+              is_dir: false
+            },
+            {
+              path: 'templates/deployment.yaml',
+              name: 'deployment.yaml',
+              size: 780,
+              is_dir: false
+            },
+            {
+              path: 'templates/service.yaml',
+              name: 'service.yaml',
+              size: 365,
+              is_dir: false
+            }
+          ]
+        },
+        {
+          path: 'values.yaml',
+          name: 'values.yaml',
+          size: 426,
+          is_dir: false
+        },
+        {
+          path: 'values.yamlxxxxxxxx',
+          name: 'values.yamlxxxxxxxxxx',
+          size: 426,
+          is_dir: false
+        }
+      ],
+      displayedFile: []
+    }
+  },
+  methods: {
+    handleFileClick (data) {
+      console.log('这里要判断一下，需要请求chart内容')
+      if (!data.is_dir) {
+        this.currentTab = data.path
+        const filter = this.displayedFile.filter(
+          file => file.path === data.path
+        )
+        if (filter.length === 0) {
+          this.displayedFile.push(data)
+          console.log('点击文件，请求文件内容：', data)
+        }
+      }
+    },
+    updateFile ({ data, index }) {
+      this.currentTab = data ? data.path : ''
+      console.log('切换文件内容：', data)
+    },
+    deleteChart (data) {
+      this.$confirm(`确定要删除 ${data.name} 这个服务吗？`, '确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除 '
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消'
+          })
+        })
+    },
+    refreshChart (data) {
+      console.log('show dialog:', data)
     }
   },
   components: {
@@ -92,12 +195,9 @@ export default {
       }
 
       &.center {
+        background-color: #f5f7fa;
         border-right: 1px solid #ebedef;
         border-left: 1px solid #ebedef;
-
-        .top {
-          background-color: #f5f7fa;
-        }
 
         .mirror {
           height: calc(~'100% - 60px');
