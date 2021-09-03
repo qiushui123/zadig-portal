@@ -150,8 +150,7 @@ export default {
     Folder,
     ImportChart,
     PageNav
-  },
-  created () {}
+  }
 }
 </script>
 

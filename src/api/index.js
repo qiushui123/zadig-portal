@@ -1186,3 +1186,28 @@ export function retrievePassword (payload) {
 export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
+
+// module repo
+export function getChartTemplatesAPI () {
+  return http.get(`/api/aslan/template/charts`)
+}
+
+export function getChartTemplateByNameAPI (name) {
+  return http.get(`/api/aslan/template/charts/${name}`)
+}
+
+export function getTemplateFileContentAPI (name, fileName, filePath) {
+  return http.get(`/api/aslan/template/charts/${name}/files?fileName=${fileName}&filePath=${filePath}`)
+}
+
+export function createChartTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/charts`, payload)
+}
+
+export function updateChartTemplateAPI (name) {
+  return http.put(`/api/aslan/template/charts/${name}`)
+}
+
+export function deleteChartTemplateAPI (name) {
+  return http.delete(`/api/aslan/template/charts/${name}`)
+}
