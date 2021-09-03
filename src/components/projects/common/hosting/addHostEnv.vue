@@ -135,7 +135,7 @@ export default {
 <style lang='less' scoped>
   .form-content {
     padding-left: 100px;
-    background-color: #ffffff;
+    background-color: #fff;
 
     .form {
       width: 500px;

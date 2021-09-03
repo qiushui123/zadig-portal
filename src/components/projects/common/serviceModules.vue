@@ -7,7 +7,7 @@
         <span><i class="el-icon-question"></i></span>
       </el-tooltip>
     </div>
-    <el-table :data="serviceModules" stripe style="width: 100%">
+    <el-table :data="serviceModules" stripe style="width: 100%;">
       <el-table-column prop="name" label="服务组件"> </el-table-column>
       <el-table-column prop="image" label="当前镜像版本"> </el-table-column>
       <el-table-column label="构建信息/操作">

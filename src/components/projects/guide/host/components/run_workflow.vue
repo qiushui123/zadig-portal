@@ -1,9 +1,9 @@
 <template>
   <div class="account-integrations cf-block__list">
-    <el-table v-loading="loading" :data="mapWorkflows" style="width: 100%">
+    <el-table v-loading="loading" :data="mapWorkflows" style="width: 100%;">
       <el-table-column label="工作流名称">
         <template slot-scope="scope">
-          <span style="margin-left: 10px">{{ scope.row.name }}</span>
+          <span style="margin-left: 10px;">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column width="200px" label="环境信息">
@@ -30,7 +30,7 @@
               :key="host_index"
             >
               <a
-                style="color: #1989fa"
+                style="color: #1989fa;"
                 :href="`http://${item.host}`"
                 target="_blank"
                 >{{ item.host }}</a

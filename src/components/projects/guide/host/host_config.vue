@@ -101,6 +101,7 @@ export default {
     background-color: #fff;
     border-top: 1px solid #ccc;
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.05);
+
     & > * {
       margin-right: 10px;
     }
