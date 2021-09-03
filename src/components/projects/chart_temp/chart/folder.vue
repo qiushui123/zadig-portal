@@ -54,6 +54,8 @@ export default {
   font-size: 13px;
 
   /deep/ .el-tree {
+    background-color: transparent;
+
     .el-tree-node__content {
       .icon {
         color: #1989fa;

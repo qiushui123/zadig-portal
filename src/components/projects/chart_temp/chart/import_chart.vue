@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import GitRepo from '../service_mgr/helm/components/common/git_repo.vue'
+import GitRepo from '../../service_mgr/helm/components/common/git_repo.vue'
 const controlParam = {
   hiddenCreateButton: true,
   hiddenRepoSelect: true,

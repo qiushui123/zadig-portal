@@ -214,10 +214,19 @@ const routes = [
       },
       {
         path: 'chart',
-        component: () => import('@/components/projects/chart_temp/index.vue'),
+        component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/index.vue'),
         meta: {
           title: '模板库'
-        }
+        },
+        children: [
+          {
+            path: '',
+            redirect: 'charts'
+          },
+          {
+            path: 'charts',
+            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/chart/index.vue')
+          }]
       },
       {
         path: 'projects/create',
