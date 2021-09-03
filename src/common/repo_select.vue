@@ -287,7 +287,9 @@ export default {
   },
   methods: {
     setLoadingState (index, loading, isLoading) {
-      this.codeInfo[index].loading[loading] = isLoading
+      if (this.codeInfo[index]) {
+        this.codeInfo[index].loading[loading] = isLoading
+      }
     },
     validateForm () {
       return new Promise((resolve, reject) => {
@@ -408,9 +410,11 @@ export default {
     },
     getRepoOwnerById (index, id, key = '') {
       if (!key) {
-        this.codeInfo[index].repo_owners = []
-        this.codeInfo[index].repos = []
-        this.codeInfo[index].branches = []
+        if (this.codeInfo[index]) {
+          this.codeInfo[index].repo_owners = []
+          this.codeInfo[index].repos = []
+          this.codeInfo[index].branches = []
+        }
       }
       this.setLoadingState(index, 'owner', true)
       getRepoOwnerByIdAPI(id, key).then((res) => {
