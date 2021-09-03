@@ -51,7 +51,7 @@ import env_detail from '../components/projects/env/outer_env/env_detail.vue'
 // inside
 import project_env_home from '../components/projects/env/inner_env/home.vue'
 import project_env_detail from '../components/projects/env/inner_env/env_detail.vue'
-import project_env_create from '../components/projects/env/inner_env/create_env_detail.vue'
+import project_env_create from '../components/projects/env/createEnv.vue'
 import project_env_service_detail from '../components/projects/env/inner_env/service_detail.vue'
 import project_env_pm_service_detail from '../components/projects/env/inner_env/pm_service_detail.vue'
 import project_env_service_config from '../components/projects/env/inner_env/service_config.vue'
