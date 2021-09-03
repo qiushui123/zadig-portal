@@ -1,8 +1,8 @@
 <template>
   <div class="import-chart-container">
-    <el-form ref="form" :model="tempData" label-width="140px" :rules="rules">
+    <el-form ref="gitForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="模板名称" prop="name">
-        <el-input v-model="tempData.name" placeholder="请输入服务名称" size="small"></el-input>
+        <el-input v-model="tempData.name" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item label-width="0">
         <GitRepo
@@ -17,7 +17,13 @@
         ></GitRepo>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="createChartTemplate" :disabled="!tempData.name && disabled" size="small">加载</el-button>
+        <el-button
+          type="primary"
+          @click="createChartTemplate"
+          :disabled="!tempData.name || disabled"
+          size="small"
+          :loading="loading"
+        >{{isUpdate? '更新':'加载'}}</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -25,6 +31,8 @@
 
 <script>
 import GitRepo from '../../service_mgr/helm/components/common/git_repo.vue'
+import { createChartTemplateAPI, updateChartTemplateAPI } from '@api'
+
 const controlParam = {
   hiddenCreateButton: true,
   hiddenRepoSelect: true,
@@ -37,23 +45,74 @@ export default {
         name: ''
       },
       disabled: true,
+      loading: false,
       rules: {
         name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }]
-      }
+      },
+      currentService: null,
+      isUpdate: false
     }
   },
   props: {
     value: Boolean,
-    currentService: Object
+    chartCurrentService: Object
   },
   methods: {
     selectedPath (emitParams) {
       emitParams.path = emitParams.path[0]
       this.tempData = Object.assign({}, this.tempData, emitParams)
       this.disabled = false
+      console.log('this.tempData: ', this.tempData)
     },
-    createChartTemplate () {
-      console.log('加载')
+    async createChartTemplate () {
+      this.loading = true
+      let res
+      if (this.isUpdate) {
+        res = await updateChartTemplateAPI(
+          this.tempData.name,
+          this.tempData
+        ).catch(err => {
+          console.log(err)
+        })
+      } else {
+        res = await createChartTemplateAPI(this.tempData).catch(err => {
+          console.log(err)
+        })
+      }
+
+      if (res) {
+        this.loading = false
+        this.resetField()
+        this.$message.success(
+          `${this.isUpdate ? '更新' : '导入'}模板 ${this.tempData.name} 成功`
+        )
+        this.$emit('input', false)
+        this.$emit('importChart')
+      }
+    },
+    resetField () {
+      this.tempData.name = ''
+      this.$refs.gitRepo.closeSelectRepo()
+      this.$nextTick(() => {
+        this.$refs.gitForm.clearValidate()
+        this.$refs.gitRepo.$refs.sourceForm.clearValidate()
+      })
+    }
+  },
+  watch: {
+    value: {
+      handler (val) {
+        if (val && this.chartCurrentService) {
+          this.tempData.name = this.chartCurrentService.name
+          this.isUpdate = true
+        }
+        if (!val) {
+          this.resetField()
+          this.isUpdate = false
+        }
+        this.currentService = this.chartCurrentService
+      },
+      immediate: true
     }
   },
   components: {

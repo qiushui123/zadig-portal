@@ -1204,8 +1204,8 @@ export function createChartTemplateAPI (payload) {
   return http.post(`/api/aslan/template/charts`, payload)
 }
 
-export function updateChartTemplateAPI (name) {
-  return http.put(`/api/aslan/template/charts/${name}`)
+export function updateChartTemplateAPI (name, payload) {
+  return http.put(`/api/aslan/template/charts/${name}`, payload)
 }
 
 export function deleteChartTemplateAPI (name) {

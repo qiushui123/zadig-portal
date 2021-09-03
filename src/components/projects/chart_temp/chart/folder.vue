@@ -52,9 +52,12 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除 '
+          deleteChartTemplateAPI(data.name).then(() => {
+            this.$message({
+              type: 'success',
+              message: '删除 '
+            })
+            this.$emit('deleteChart', data)
           })
         })
         .catch(() => {
@@ -63,7 +66,6 @@ export default {
             message: '取消'
           })
         })
-      this.$emit('deleteChart', data)
     },
     updateChart (data) {
       this.$emit('refreshChart', data)

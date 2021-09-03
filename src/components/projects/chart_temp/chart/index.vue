@@ -1,21 +1,27 @@
 <template>
   <div class="chart-template-container">
     <el-dialog title="请选择导入源" :visible.sync="chartDialogVisible" :close-on-click-modal="false">
-      <ImportChart v-model="chartDialogVisible" :currentService="currentService"></ImportChart>
+      <ImportChart v-model="chartDialogVisible" :chartCurrentService="currentService" @importChart="getChartTemplates"></ImportChart>
     </el-dialog>
     <multipane>
       <div class="pane left" :style="{minWidth: '200px', width: '230px', maxWidth: '400px'}">
         <div class="top">
           <el-button icon="el-icon-plus" circle size="mini" @click="chartDialogVisible = !chartDialogVisible"></el-button>
         </div>
-        <Folder :fileData="fileData" @clickFile="handleFileClick" @deleteChart="deleteChart" @refreshChart="refreshChart"></Folder>
+        <Folder
+          v-if="fileData.length"
+          :fileData="fileData"
+          @clickFile="handleFileClick"
+          @deleteChart="getChartTemplates"
+          @refreshChart="refreshChart($event)"
+        ></Folder>
       </div>
       <multipane-resizer></multipane-resizer>
       <div class="pane center" :style="{minWidth: '200px', width: '500px'}">
         <div class="top">
           <PageNav :displayedFile="displayedFile" :currentTab="currentTab" @updateFile="showFile"></PageNav>
         </div>
-        <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: false }" class="mirror"></Codemirror>
+        <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
       <ModuleUse class="pane right" :style="{flexGrow: 1, width: '100px'}"></ModuleUse>
@@ -35,7 +41,7 @@ import {
   getChartTemplateByNameAPI,
   getTemplateFileContentAPI
 } from '@api'
-import { keyBy } from 'lodash'
+import { keyBy, cloneDeep } from 'lodash'
 
 function tree ({ chartName, files }) {
   const result = []
@@ -99,22 +105,26 @@ export default {
       }
       this.yaml = this.yamlSet[`${data.chartName}/${data.path}`]
     },
-    deleteChart (data) {
-      console.log('deleteChart:', data)
-    },
     refreshChart (data) {
-      console.log('show dialog:', data)
+      this.chartDialogVisible = true
+      this.currentService = {
+        name: data.name,
+        codehost_id: data.codehostID,
+        branch_name: data.branch,
+        repo_name: data.repo,
+        repo_owner: data.owner,
+        load_path: data.path
+      }
     },
     getChartTemplates () {
       return getChartTemplatesAPI().then(res => {
         const list = res.map(re => {
-          return {
-            name: re.name,
+          return Object.assign(re, {
             is_chart: true,
             is_dir: true,
             fullPath: re.name,
             children: []
-          }
+          })
         })
         this.fileData = list
         return res
@@ -141,6 +151,13 @@ export default {
       })
       if (res) {
         this.$set(this.yamlSet, `${charName}/${fileName}`, res)
+      }
+    }
+  },
+  watch: {
+    chartDialogVisible (val) {
+      if (!val) {
+        this.currentService = null
       }
     }
   },
