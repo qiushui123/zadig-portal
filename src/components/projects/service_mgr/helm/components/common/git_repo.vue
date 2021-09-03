@@ -1,6 +1,6 @@
 <template>
   <div class="git-repo-container">
-    <div class="repo-attr">
+    <div v-if="!controlParam.hiddenRepoSelect" class="repo-attr">
       <span>仓库属性</span>
       <el-radio v-model="gitName" label="private">私有库</el-radio>
       <el-radio v-model="gitName" label="public">公开库</el-radio>
@@ -115,7 +115,7 @@
           <el-button @click="openFileTree" :disabled="!showSelectFileBtn" type="primary" plain size="mini" round>选择文件目录</el-button>
         </el-form-item>
       </template>
-      <el-form-item>
+      <el-form-item v-if="!controlParam.hiddenCreateButton">
         <el-button size="small" plain :loading="loading" :disabled="selectPath.length === 0" @click="submit">加载</el-button>
       </el-form-item>
     </el-form>
@@ -145,6 +145,7 @@
         :type="gitName"
         :url="source.url"
         :changeSelectPath="changeSelectPath"
+        :justSelectOne="controlParam.justSelectOneFile"
       />
     </el-dialog>
   </div>
@@ -164,7 +165,17 @@ export default {
   name: 'GitRepo',
   props: {
     value: Boolean,
-    currentService: Object
+    currentService: Object,
+    controlParam: {
+      type: Object,
+      default: () => {
+        return {
+          hiddenCreateButton: false,
+          hiddenRepoSelect: false,
+          justSelectOneFile: false
+        }
+      }
+    }
   },
   components: {
     Gitfile
@@ -224,7 +235,7 @@ export default {
       this.$refs.sourceForm.resetFields()
     },
     async queryCodeSource () {
-      const res = await getCodeSourceAPI().catch((error) => console.log(error))
+      const res = await getCodeSourceAPI().catch(error => console.log(error))
       if (res) {
         this.allCodeHosts = res
       }
@@ -233,7 +244,7 @@ export default {
       this.source.repoOwner = ''
       this.source.repoName = ''
       this.source.branchName = ''
-      const res = await getRepoOwnerByIdAPI(id, key).catch((error) =>
+      const res = await getRepoOwnerByIdAPI(id, key).catch(error =>
         console.log(error)
       )
       if (res) {
@@ -243,7 +254,7 @@ export default {
     async searchProject (query) {
       this.searchProjectLoading = true
       const repoOwner = this.source.repoOwner
-      const item = this.codeInfo.repoOwners.find((item) => {
+      const item = this.codeInfo.repoOwners.find(item => {
         return item.path === repoOwner
       })
       const type = item ? item.kind : 'group'
@@ -253,7 +264,7 @@ export default {
         type,
         encodeURI(repoOwner),
         query
-      ).catch((error) => console.log(error))
+      ).catch(error => console.log(error))
       if (res) {
         this.codeInfo.repos = res
       }
@@ -262,25 +273,25 @@ export default {
     getRepoNameById (id, repoOwner, key = '') {
       this.source.repoName = ''
       this.source.branchName = ''
-      const item = this.codeInfo.repoOwners.find((item) => {
+      const item = this.codeInfo.repoOwners.find(item => {
         return item.path === repoOwner
       })
       const type = item ? item.kind : 'group'
       this.$refs.sourceForm.clearValidate()
-      getRepoNameByIdAPI(id, type, encodeURI(repoOwner), key).then((res) => {
+      getRepoNameByIdAPI(id, type, encodeURI(repoOwner), key).then(res => {
         this.$set(this.codeInfo, 'repos', res)
       })
     },
     getBranchInfoById (id, repoOwner, repoName) {
       this.source.branchName = ''
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(id, repoOwner, repoName).then((res) => {
+        getBranchInfoByIdAPI(id, repoOwner, repoName).then(res => {
           this.$set(this.codeInfo, 'branches', res)
         })
       }
     },
     openFileTree () {
-      this.$refs.sourceForm.validate().then((res) => {
+      this.$refs.sourceForm.validate().then(res => {
         this.workSpaceModalVisible = true
       })
     },
@@ -295,6 +306,14 @@ export default {
     changeSelectPath (path) {
       this.selectPath = path
       this.workSpaceModalVisible = false
+      const emitParams = {
+        path: this.selectPath,
+        codeHostID: this.source.codehostId,
+        owner: this.source.repoOwner,
+        repo: this.source.repoName,
+        branch: this.source.branchName
+      }
+      this.$emit('selectPath', emitParams)
     },
     async addService () {
       const projectName = this.$route.params.project_name
@@ -316,7 +335,7 @@ export default {
           file_paths: this.selectPath
         }
       }
-      const res = await addHelmChartAPI(projectName, payload).catch((error) =>
+      const res = await addHelmChartAPI(projectName, payload).catch(error =>
         console.log(error)
       )
       if (res) {
@@ -326,11 +345,11 @@ export default {
     },
     async submit () {
       const path = ''
-      this.$refs.sourceForm.validate().then((res) => {
+      this.$refs.sourceForm.validate().then(res => {
         this.loading = true
         if (this.currentService) {
           if (this.gitName === 'public') {
-            getPublicRepoFilesAPI(path, this.source.url).then((res) => {
+            getPublicRepoFilesAPI(path, this.source.url).then(res => {
               this.addService()
             })
           } else {
@@ -341,7 +360,7 @@ export default {
               this.source.branchName,
               path,
               'gerrit'
-            ).then((res) => {
+            ).then(res => {
               this.addService()
             })
           }

@@ -1,7 +1,7 @@
 <template>
   <div class="chart-template-container">
     <el-dialog title="请选择导入源" :visible.sync="chartDialogVisible" :close-on-click-modal="false">
-      <ImportChart></ImportChart>
+      <ImportChart v-model="chartDialogVisible" :currentService="currentService"></ImportChart>
     </el-dialog>
     <multipane>
       <div class="pane left" :style="{minWidth: '200px', width: '230px', maxWidth: '400px'}">
@@ -37,6 +37,7 @@ export default {
       yaml: '',
       chartDialogVisible: false,
       currentTab: '',
+      currentService: null,
       fileData: [
         {
           path: '.helmignore',
