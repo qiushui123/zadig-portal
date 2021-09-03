@@ -21,7 +21,7 @@ export default {
         const res = await this.$refs.addHostEnv.submit()
         if (res) {
           this.$router.push(
-            `/v1/projects/detail/${this.$route.params.project_name}/envs/detail`
+            `/v1/projects/detail/${this.$route.params.project_name}/envs/detail?envName=${this.$refs.addHostEnv.form.env_name}`
           )
         }
       }
