@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path');
-const backEndAddr = 'http://koderover-develop.app.8slan.com/';
+const backEndAddr = 'http://dyliu.ko.coderover.cn/';
 
 module.exports = {
   dev: {

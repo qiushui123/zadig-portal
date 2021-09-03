@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
-const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts']
+const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts', '/api/aslan/environment/kube/workloads']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
 const reqExps = /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/groups/
 const analyticsReq = 'https://api.koderover.com/api/operation/upload'
@@ -1187,4 +1187,14 @@ export function retrievePassword (payload) {
 }
 export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
+}
+
+// 托管环境
+
+export function queryWorkloads (clusterId, namespace, page) {
+  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=20&page=${page}`)
+}
+
+export function postWorkloads (payload) {
+  return http.post(`api/aslan/service/services/workloads`, payload)
 }

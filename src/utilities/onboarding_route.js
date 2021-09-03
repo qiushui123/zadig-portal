@@ -19,7 +19,7 @@ function getRoute (status, type, projectName) {
       `/v1/projects/create/${projectName}/helm/delivery`
     ],
     host: [
-      `/v1/projects/create/${projectName}/host/config`
+      `/v1/projects/create/${projectName}/host/config?step=${status + 1}`
     ]
   }
   return routes[type][status]
@@ -30,7 +30,7 @@ export function whetherOnboarding (projectTemplate) {
   const status = projectTemplate.onboarding_status
   const projectName = projectTemplate.product_name
   if (productFeature.create_env_type === 'hosting') {
-    return getRoute(status - 1, 'host', projectName)
+    return getRoute(0, 'host', projectName)
   }
   if (productFeature.deploy_type === 'k8s') {
     if (productFeature.basic_facility === 'cloud_host') {

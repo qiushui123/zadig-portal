@@ -80,8 +80,8 @@
                     </el-col>
                     <el-col :span="10">
                       <el-radio-group size="mini" v-model="projectForm.product_feature.create_env_type">
-                        <el-radio border label="integrate">新建集成环境</el-radio>
-                        <el-radio border label="hosting">托管现有环境</el-radio>
+                        <el-radio border label="system">新建集成环境</el-radio>
+                        <el-radio border label="external">托管现有环境</el-radio>
                       </el-radio-group>
                     </el-col>
                   </el-row>
@@ -182,7 +182,7 @@ export default {
         product_feature: {
           basic_facility: 'kubernetes',
           deploy_type: 'k8s',
-          create_env_type: 'integrate'
+          create_env_type: 'system'
         }
       },
       rules: {
@@ -241,8 +241,8 @@ export default {
         })
         this.$store.dispatch('refreshProjectTemplates')
         if (payload.product_feature.basic_facility === 'kubernetes') {
-          if (payload.product_feature.create_env_type === 'hosting') {
-            this.$router.push(`/v1/projects/create/${payload.product_name}/host/config`)
+          if (payload.product_feature.create_env_type === 'external') {
+            this.$router.push(`/v1/projects/create/${payload.product_name}/host/config?step=1`)
             return
           }
           if (payload.product_feature.deploy_type === 'k8s') {

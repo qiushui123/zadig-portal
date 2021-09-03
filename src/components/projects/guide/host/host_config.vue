@@ -1,18 +1,18 @@
 <template>
   <div class="container">
     <div>
-    <Step :activeStep="0" />
-    <component class="content" :is="currentComponent" />
+    <Step :activeStep="currentStep" />
+    <component ref="component" class="content" :is="componentsList[currentStep]" />
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
-        <router-link :to="`/v1/projects/create/${projectName}/basic/service?rightbar=help`">
-          <button type="primary"
+        <button type="primary"
                   class="save-btn"
+                  @click="nextStep"
                   plain>下一步</button>
-        </router-link>
         <button type="primary"
                 class="save-btn"
+                v-if="currentStep === 0"
                 @click="jumpOnboarding">
           <i v-if="jumpLoading"
              class="el-icon-loading"></i>
@@ -37,12 +37,30 @@ export default {
   },
   data () {
     return {
-      currentComponent: ServiceBuild
+      componentsList: [HostEnvConfig, ServiceBuild],
+      jumpLoading: false
+    }
+  },
+  methods: {
+    jumpOnboarding () {
+      this.jumpLoading = true
+      this.saveOnboardingStatus(this.projectName, 0).then((res) => {
+        this.$router.push(`/v1/projects/detail/${this.projectName}`)
+      }).catch(() => {
+        this.jumpLoading = false
+      })
+    },
+    nextStep () {
+      this.$refs.component.nextStep(this.currentStep + 2)
+      // this.$router.push(`/v1/projects/create/${this.projectName}/host/config?step=${this.currentStep + 2}`)
     }
   },
   computed: {
     projectName () {
       return this.$route.params.project_name
+    },
+    currentStep () {
+      return this.$route.query.step - 1
     }
   },
   created () {
