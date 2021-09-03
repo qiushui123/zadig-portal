@@ -1344,8 +1344,7 @@ export default {
       return this.$store.state.login.userinfo.organization.id
     },
     projectName () {
-      return 'micorservice-demo'
-      // return this.$route.params.project_name
+      return this.$route.params.project_name
     },
     serviceName () {
       return this.$route.query.service_name

@@ -1192,9 +1192,9 @@ export function changePassword (payload) {
 // 托管环境
 
 export function queryWorkloads (clusterId, namespace, page) {
-  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=20&page=${page}`)
+  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=100&page=${page}`)
 }
 
 export function postWorkloads (payload) {
-  return http.post(`api/aslan/service/services/workloads`, payload)
+  return http.post(`/api/aslan/service/services/workloads`, payload)
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="step-container">
+  <div class="step-container1">
     <div class="step-detail">
       <div class="guide-title">
         <h4>
@@ -19,9 +19,9 @@
       </el-steps>
     </div>
     <div class="title-container">
-      <span class="first">第一步</span>
+      <span class="first">{{stepMap[activeStep].title}}</span>
       <span class="second"
-        >托管现有环境，后续托管其他测试环境，可以在集成环境模块操作</span
+        >{{stepMap[activeStep].description}}</span
       >
     </div>
   </div>
@@ -30,7 +30,16 @@
 export default {
   data () {
     return {
-
+      stepMap: [{
+        title: '第一步',
+        description: '托管现有环境，后续托管其他测试环境，可以在集成环境模块操作'
+      }, {
+        title: '第二步',
+        description: '为服务配置构建脚步，后续可在集成环境做修改'
+      }, {
+        title: '第三步',
+        description: '运行工作流触发服务的自动化交付'
+      }]
     }
   },
   props: {
@@ -42,7 +51,7 @@ export default {
 }
 </script>
 <style lang="less">
-.step-container {
+.step-container1 {
   height: 200px;
   padding-top: 20px;
   padding-left: 20px;

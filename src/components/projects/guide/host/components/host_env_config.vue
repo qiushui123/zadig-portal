@@ -12,7 +12,7 @@
         <el-form-item prop="env_name"  label="环境名称">
           <el-input v-model="form.env_name" placeholder="请输入环境名称"></el-input>
         </el-form-item>
-        <el-form-item prop="cluster_id" label="集群">
+        <el-form-item label="集群">
           <el-select filterable v-model="form.cluster_id" placeholder="请选择集群"  @change="changeCluster">
              <el-option label="本地集群" value=""></el-option>
              <el-option v-for="cluster in allCluster"
@@ -22,7 +22,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="namespace" label="命名空间">
+        <el-form-item label="命名空间">
           <el-select filterable v-model="form.namespace" placeholder="命名空间" @change="changeNamespace">
              <el-option v-for="(ns,index) in hostingNamespace"
                          :key="index"
@@ -40,14 +40,6 @@
         :data="serviceList"
         class="transfer"
       >
-      <div slot="left-footer">
-          <el-pagination
-            layout="prev, pager, next"
-            @current-change="changePage"
-            :page-size="20"
-            :total="total">
-          </el-pagination>
-      </div>
       </el-transfer>
     </div>
 </template>
@@ -65,14 +57,16 @@ export default {
         namespace: null
       },
       rules: {
-        env_name: [{ required: true, message: '请输入环境名称', trigger: 'blur' }],
-        cluster_id: [{ required: true, message: '请选择集群', trigger: 'blur' }],
-        namespace: [{ required: true, message: '请选择命名空间', trigger: 'blur' }]
+        env_name: [{ required: true, message: '请输入环境名称', trigger: 'blur' }]
       },
       serviceList: [],
-      total: 0,
       selectService: []
 
+    }
+  },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
     }
   },
   methods: {
@@ -86,16 +80,14 @@ export default {
     },
     async getWorkloads (page) {
       const res = await queryWorkloads(this.form.cluster_id, this.form.namespace, page)
-      this.total = res.headers['x-total'] ? parseInt(res.headers['x-total']) : 0
       this.serviceList = res.data.services.map((item, index) => {
         return {
           label: item.service_name,
-          key: index
+          key: index,
+          name: item.service_name,
+          type: item.workLoadType
         }
       })
-    },
-    changePage (page) {
-      this.getWorkloads(page)
     },
     async getCluster () {
       const res = await getClusterListAPI()
@@ -113,20 +105,37 @@ export default {
     nextStep (step) {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.submit(step)
+          if (this.selectService.length) {
+            this.submit(step)
+          } else {
+            this.$message.error('请选择服务')
+          }
         } else {
           return false
         }
       })
     },
-    submit (step) {
-      // this.$router.push(`/v1/projects/create/${this.projectName}/host/config?step=${step}`)
-
+    async submit (step) {
+      const workloads = this.serviceList.filter(item => {
+        return this.selectService.includes(item.key)
+      })
+      const params = {
+        env_name: this.form.env_name,
+        cluster_id: this.form.cluster_id,
+        namespace: this.form.namespace,
+        workloads: workloads,
+        product_name: this.projectName
+      }
+      const res = await postWorkloads(params)
+      if (res) {
+        this.$router.push(`/v1/projects/create/${this.projectName}/host/config?step=${step}`)
+      }
     }
   },
   created () {
     this.getCluster()
-  }
+  },
+  onboardingStatus: 1
 }
 </script>
 <style lang='less' scoped>

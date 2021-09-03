@@ -34,8 +34,7 @@ export default {
   },
   computed: {
     projectName () {
-      //   return this.$route.params.project_name
-      return 'micorservice-demo'
+      return this.$route.params.project_name
     }
   },
   methods: {
@@ -84,7 +83,8 @@ export default {
   },
   mounted () {
     this.getServices()
-  }
+  },
+  onboardingStatus: 2
 }
 </script>
 <style lang="less" scoped>

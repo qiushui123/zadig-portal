@@ -4,12 +4,12 @@
     <Step :activeStep="currentStep" />
     <component ref="component" class="content" :is="componentsList[currentStep]" />
     </div>
-    <div class="controls__wrap">
+    <div class="controls__wrap_host">
       <div class="controls__right">
         <button type="primary"
                   class="save-btn"
                   @click="nextStep"
-                  plain>下一步</button>
+                  plain>{{currentStep===2 ? '完成' : '下一步'}}</button>
         <button type="primary"
                 class="save-btn"
                 v-if="currentStep === 0"
@@ -29,6 +29,7 @@ import bus from '@utils/event_bus'
 import Step from './components/step.vue'
 import HostEnvConfig from './components/host_env_config.vue'
 import ServiceBuild from './components/service_build.vue'
+import RunWorkflow from './components/run_workflow.vue'
 
 export default {
   name: 'hostConfig',
@@ -37,7 +38,7 @@ export default {
   },
   data () {
     return {
-      componentsList: [HostEnvConfig, ServiceBuild],
+      componentsList: [HostEnvConfig, ServiceBuild, RunWorkflow],
       jumpLoading: false
     }
   },
@@ -51,8 +52,13 @@ export default {
       })
     },
     nextStep () {
-      this.$refs.component.nextStep(this.currentStep + 2)
-      // this.$router.push(`/v1/projects/create/${this.projectName}/host/config?step=${this.currentStep + 2}`)
+      if (this.currentStep === 0) {
+        this.$refs.component.nextStep(this.currentStep + 2)
+      } else if (this.currentStep === 1) {
+        this.$router.push(`/v1/projects/create/${this.projectName}/host/config?step=${this.currentStep + 2}`)
+      } else {
+        this.$router.push(`/v1/projects/detail/${this.projectName}`)
+      }
     }
   },
   computed: {
@@ -82,7 +88,7 @@ export default {
     overflow: scroll;
   }
 
-  .controls__wrap {
+  .controls__wrap_host {
     position: fixed;
     bottom: 0;
     z-index: 2;
