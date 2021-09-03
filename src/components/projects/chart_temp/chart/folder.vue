@@ -1,6 +1,12 @@
 <template>
   <div class="folder-container">
-    <el-tree :data="fileData" :props="defaultProps" @node-click="handleNodeClick">
+    <el-tree
+      :data="fileData"
+      :props="defaultProps"
+      @node-click="handleNodeClick"
+      :default-expanded-keys="[fileData && fileData[0].fullPath]"
+      node-key="fullPath"
+    >
       <span slot-scope="{data}">
         <i class="icon el-icon-document" v-if="!data.is_dir"></i>
         <i class="icon el-icon-folder" v-else></i>
@@ -15,6 +21,8 @@
 </template>
 
 <script>
+import { deleteChartTemplateAPI } from '@api'
+
 export default {
   data () {
     return {
@@ -38,6 +46,23 @@ export default {
       this.$emit('clickFile', data)
     },
     deleteChart (data) {
+      this.$confirm(`确定要删除 ${data.name} 这个服务吗？`, '确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '删除 '
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消'
+          })
+        })
       this.$emit('deleteChart', data)
     },
     updateChart (data) {
