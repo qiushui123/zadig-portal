@@ -1076,8 +1076,8 @@ export function getProductInfo (productName, envName = '') {
   return http.get(`/api/aslan/environment/environments/${productName}?envName=${envName}`)
 }
 
-export function getServiceInfo (productName, serviceName, envName = '', envType = '') {
-  return http.get(`/api/aslan/environment/environments/${productName}/services/${serviceName}?envName=${envName}&envType=${envType}`)
+export function getServiceInfo (productName, serviceName, envName = '', envType = '', workLoadType) {
+  return http.get(`/api/aslan/environment/environments/${productName}/services/${serviceName}?envName=${envName}&envType=${envType}&workLoadType=${workLoadType}`)
 }
 
 export function autoUpgradeEnvAPI (projectName, payload, force = '') {
