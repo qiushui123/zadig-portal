@@ -10,7 +10,7 @@
         <div class="desc">暂无自定义的 values 文件</div>
         <el-button type="text" @click="showValueEdit = true" icon="el-icon-plus">添加 values 文件</el-button>
       </div>
-      <import-values v-if="showValueEdit" :showDelete="true" @closeValueEdit="closeValueEdit" :yaml.sync="yaml"></import-values>
+      <import-values v-if="showValueEdit" :showDelete="true" @closeValueEdit="closeValueEdit" :yaml.sync="yaml" :resize="'vertical'"></import-values>
       <key-value></key-value>
     </div>
   </div>
@@ -50,7 +50,8 @@ export default {
 
   h5 {
     margin: 14px 0;
-    font-size: 14px;
+    color: #909399;
+    font-size: 15px;
   }
 
   .desc {

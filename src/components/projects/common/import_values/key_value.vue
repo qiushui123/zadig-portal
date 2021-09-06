@@ -72,7 +72,7 @@ export default {
     validate () {
       return this.$refs.form.validate().then(() => {
         const len = this.keyValues.length
-        if (len > 0 && this.keyValues[len - 1].add) this.keyValues[len - 1] = cloneDeep(this.keyValueForm)
+        if (len > 0 && this.keyValues[len - 1].add) { this.keyValues[len - 1] = cloneDeep(this.keyValueForm) }
         Promise.resolve()
       })
     },
@@ -96,7 +96,8 @@ export default {
 
   h5 {
     margin: 14px 0;
-    font-size: 14px;
+    color: #909399;
+    font-size: 15px;
   }
 
   /deep/ .el-table {

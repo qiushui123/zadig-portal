@@ -10,7 +10,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label-width="0">
-        <ImportValues :height="'250px'" :yaml.sync="tempData.valueYaml"></ImportValues>
+        <ImportValues :height="'250px'" :yaml.sync="tempData.valueYaml" :resize="'vertical'"></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
@@ -35,7 +35,6 @@ export default {
         moduleName: '',
         valueYaml: ''
       }
-
     }
   },
   props: {

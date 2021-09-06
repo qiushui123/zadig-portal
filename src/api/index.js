@@ -1211,3 +1211,7 @@ export function updateChartTemplateAPI (name, payload) {
 export function deleteChartTemplateAPI (name) {
   return http.delete(`/api/aslan/template/charts/${name}`)
 }
+
+export function createTemplateServiceAPI (productName, payload) {
+  return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
+}
