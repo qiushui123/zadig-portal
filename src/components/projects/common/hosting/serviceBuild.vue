@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="left">
-      <el-tree ref="tree" node-key="label" class="tree" @node-click="handlerNodeClick" :current-node-key="currentKey" :data="nodeData">
+      <el-tree ref="treeRef" node-key="name" class="tree" :highlight-current="true" @node-click="handlerNodeClick" :data="nodeData">
       <span
         class="custom-tree-node"
         slot-scope="{ data }"
@@ -34,15 +34,14 @@ export default {
   },
   data () {
     return {
-      nodeData: [],
+      nodeData: [{ label: 'zadig-mimo', name: 'zadig-mimo', key: 0, children: [{ label: 'poetry1', name: 'poetry1', key: 2 }] }, { key: 1, label: 'poetry', name: 'poetry', children: [{ label: 'poetry2', name: 'poetry2', key: 3 }] }],
       serviceModules: [],
       build: {
         name: null,
         isEdit: false,
         buildName: null,
         showModal: false
-      },
-      currentKey: 'cron'
+      }
     }
   },
   computed: {
@@ -90,6 +89,8 @@ export default {
         children: [],
         name: item.service_name
       }))
+
+      console.log(this.nodeData)
       if (data.length) {
         await this.getServiceModules(this.nodeData[0])
       }
@@ -103,8 +104,11 @@ export default {
   async mounted () {
     await this.getServices()
     if (this.serviceName) {
+      const data = this.nodeData.find(item => item.name === this.serviceName)
+      await this.getServiceModules(data)
       this.$nextTick(() => {
-        this.$refs.tree.setCurrentKey(this.serviceName)
+        this.currentKey = this.serviceName
+        this.$refs.treeRef.setCurrentKey(this.currentKey)
       })
     }
   }
@@ -115,7 +119,7 @@ export default {
   display: flex;
 
   .left {
-    width: 290px;
+    width: 260px;
     height: 100%;
     border-right: 1px solid #ebedef;
 

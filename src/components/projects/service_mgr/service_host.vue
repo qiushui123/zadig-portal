@@ -1,9 +1,9 @@
 <template>
   <div class="tab">
-    <el-tabs type="card" v-model="envName">
-      <el-tab-pane v-for="item in envNameList" :key="item.env_name" :label="item.env_name" :name="item.env_name"></el-tab-pane>
+    <el-tabs type="card" :value="envName" @tab-click="tabChange">
+      <el-tab-pane v-for="item in envNameList"  :key="item.env_name" :label="item.env_name" :name="item.env_name"></el-tab-pane>
     </el-tabs>
-    <ServiceBuild :envName="envName" :serviceName="serviceName" class="serviceBuild"/>
+    <ServiceBuild v-if="envName" :envName="envName" :serviceName="serviceName" class="serviceBuild"/>
   </div>
 </template>
 <script>
@@ -17,7 +17,7 @@ export default {
   },
   data () {
     return {
-      envName: null,
+      envName: '',
       serviceName: null
     }
   },
@@ -32,14 +32,19 @@ export default {
       'productList', 'signupStatus'
     ])
   },
+  methods: {
+    tabChange (tab) {
+      this.envName = tab.name
+    }
+  },
   async created () {
+    this.serviceName = this.$route.query.serviceName
     await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
     if (this.$route.query.envName) {
       this.envName = this.$route.query.envName
     } else {
       this.envName = this.envNameList[0].env_name
     }
-    this.serviceName = this.$route.query.serviceName
   }
 }
 </script>
