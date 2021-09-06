@@ -33,13 +33,13 @@ export default {
     ])
   },
   async created () {
+    await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
     if (this.$route.query.envName) {
       this.envName = this.$route.query.envName
     } else {
       this.envName = this.envNameList[0].env_name
     }
     this.serviceName = this.$route.query.serviceName
-    await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
   }
 }
 </script>
