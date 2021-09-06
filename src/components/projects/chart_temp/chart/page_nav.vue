@@ -82,6 +82,7 @@ export default {
       display: inline-block;
       width: 90px;
       overflow: hidden;
+      white-space: nowrap;
       text-overflow: ellipsis;
       cursor: pointer;
       user-select: none;

@@ -266,7 +266,7 @@ export default {
         border-left: 1px solid #ebedef;
 
         .mirror {
-          height: calc(~'100% - 60px');
+          height: calc(~'100% - 50px');
           padding: 5px;
         }
       }
