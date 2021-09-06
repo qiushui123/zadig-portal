@@ -20,14 +20,8 @@ export default {
       type: Object,
       default: () => {
         return {
-          version: 'v1',
-          used: [
-            {
-              project_name: 'xx',
-              service_name: 'yy',
-              version: 'zz'
-            }
-          ]
+          version: '',
+          used: []
         }
       }
     }
