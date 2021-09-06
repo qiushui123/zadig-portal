@@ -2,9 +2,9 @@
   <div class="page-nav-container">
     <div
       class="tab"
-      :class="{'is-current': file.path === currentTab}"
+      :class="{'is-current': file.fullPath === currentTab}"
       v-for="(file, index) in displayedFile"
-      :key="file.path"
+      :key="file.fullPath"
       @click="clickTab(file, index)"
     >
       <span class="desc">{{ file.name }}</span>
@@ -39,7 +39,7 @@ export default {
     },
     closeFile (data, index) {
       this.displayedFile.splice(index, 1)
-      if (data.path !== this.currentTab) return
+      if (data.fullPath !== this.currentTab) return
 
       data = null
       index = -1

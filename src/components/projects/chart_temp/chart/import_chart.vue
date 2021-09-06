@@ -62,11 +62,11 @@ export default {
       emitParams.path = emitParams.path[0]
       this.tempData = Object.assign({}, this.tempData, emitParams)
       this.disabled = false
-      console.log('this.tempData: ', this.tempData)
     },
     async createChartTemplate () {
       this.loading = true
       let res
+      const name = this.tempData.name
       if (this.isUpdate) {
         res = await updateChartTemplateAPI(
           this.tempData.name,
@@ -87,7 +87,11 @@ export default {
           `${this.isUpdate ? '更新' : '导入'}模板 ${this.tempData.name} 成功`
         )
         this.$emit('input', false)
-        this.$emit('importChart')
+        this.$emit('importChart', {
+          create: !this.isUpdate,
+          update: this.isUpdate,
+          name: name
+        })
       }
     },
     resetField () {
@@ -109,6 +113,8 @@ export default {
         if (!val) {
           this.resetField()
           this.isUpdate = false
+          this.disabled = true
+          this.loading = false
         }
         this.currentService = this.chartCurrentService
       },

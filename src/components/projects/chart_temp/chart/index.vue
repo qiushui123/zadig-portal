@@ -1,7 +1,7 @@
 <template>
   <div class="chart-template-container">
     <el-dialog title="请选择导入源" :visible.sync="chartDialogVisible" :close-on-click-modal="false">
-      <ImportChart v-model="chartDialogVisible" :chartCurrentService="currentService" @importChart="getChartTemplates"></ImportChart>
+      <ImportChart v-model="chartDialogVisible" :chartCurrentService="currentService" @importChart="chartTemplateUpdate($event)"></ImportChart>
     </el-dialog>
     <multipane>
       <div class="pane left" :style="{minWidth: '200px', width: '230px', maxWidth: '400px'}">
@@ -11,8 +11,9 @@
         <Folder
           v-if="fileData.length"
           :fileData="fileData"
+          :expandedKeys="expandedKeys"
           @clickFile="handleFileClick"
-          @deleteChart="getChartTemplates"
+          @deleteChart="chartTemplateUpdate($event)"
           @refreshChart="refreshChart($event)"
         ></Folder>
       </div>
@@ -41,7 +42,7 @@ import {
   getChartTemplateByNameAPI,
   getTemplateFileContentAPI
 } from '@api'
-import { keyBy, cloneDeep } from 'lodash'
+import { keyBy } from 'lodash'
 
 function tree ({ chartName, files }) {
   const result = []
@@ -75,7 +76,8 @@ export default {
       currentService: null,
       fileData: [],
       displayedFile: [],
-      yamlSet: {}
+      yamlSet: {},
+      expandedKeys: []
     }
   },
   computed: {
@@ -95,15 +97,22 @@ export default {
       }
     },
     async showFile ({ data, index }) {
-      this.currentTab = data ? data.path : ''
-      const filter = this.displayedFile.filter(file => file.path === data.path)
+      if (!data) {
+        this.currentTab = ''
+        return
+      }
+
+      this.currentTab = data.fullPath
+      const filter = this.displayedFile.filter(
+        file => file.fullPath === data.fullPath
+      )
       if (filter.length === 0) {
         this.displayedFile.push(data)
       }
-      if (!this.yamlSet[`${data.chartName}/${data.path}`]) {
+      if (!this.yamlSet[data.fullPath]) {
         await this.getTemplateFileContent(data.chartName, data.path)
       }
-      this.yaml = this.yamlSet[`${data.chartName}/${data.path}`]
+      this.yaml = this.yamlSet[data.fullPath]
     },
     refreshChart (data) {
       this.chartDialogVisible = true
@@ -116,6 +125,31 @@ export default {
         load_path: data.path
       }
     },
+    chartTemplateUpdate ({ deleteFlag, update, create, name }) {
+      if (deleteFlag) {
+        const id = this.fileData.findIndex(file => file.name === name)
+        this.fileData.splice(id, 1)
+        return
+      }
+      this.getChartTemplates().then(res => {
+        if (update) {
+          const id = this.fileData.findIndex(file => {
+            return file.name === name
+          })
+          const file = res.find(file => {
+            return file.name === name
+          })
+          this.fileData.splice(id, 1, file)
+        }
+        if (create) {
+          const file = res.find(file => file.name === name)
+          this.fileData.push(file)
+        }
+        this.getChartTemplateByName(name).then(() => {
+          this.showFile({ data: this.fileDataObj[name].children[0] })
+        })
+      })
+    },
     getChartTemplates () {
       return getChartTemplatesAPI().then(res => {
         const list = res.map(re => {
@@ -126,8 +160,7 @@ export default {
             children: []
           })
         })
-        this.fileData = list
-        return res
+        return list
       })
     },
     getChartTemplateByName (name) {
@@ -139,6 +172,7 @@ export default {
           chartName: name,
           files: res.files
         })
+        this.expandedKeys = [name]
       })
     },
     async getTemplateFileContent (charName, fileName, filePath = '') {
@@ -163,6 +197,7 @@ export default {
   },
   created () {
     this.getChartTemplates().then(res => {
+      this.fileData = res
       if (res.length) {
         const name = res[0].name
         this.getChartTemplateByName(name).then(() => {

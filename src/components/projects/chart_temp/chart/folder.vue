@@ -1,12 +1,6 @@
 <template>
   <div class="folder-container">
-    <el-tree
-      :data="fileData"
-      :props="defaultProps"
-      @node-click="handleNodeClick"
-      :default-expanded-keys="[fileData && fileData[0].fullPath]"
-      node-key="fullPath"
-    >
+    <el-tree :data="fileData" :props="defaultProps" @node-click="handleNodeClick" :default-expanded-keys="expandedKeys" node-key="fullPath">
       <span slot-scope="{data}">
         <i class="icon el-icon-document" v-if="!data.is_dir"></i>
         <i class="icon el-icon-folder" v-else></i>
@@ -39,6 +33,13 @@ export default {
       default: () => {
         return []
       }
+    },
+    expandedKeys: {
+      require: true,
+      type: Array,
+      default: () => {
+        return []
+      }
     }
   },
   methods: {
@@ -57,7 +58,7 @@ export default {
               type: 'success',
               message: '删除 '
             })
-            this.$emit('deleteChart', data)
+            this.$emit('deleteChart', { deleteFlag: true, name: data.name })
           })
         })
         .catch(() => {
