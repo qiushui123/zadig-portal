@@ -10,7 +10,14 @@
         </el-select>
       </el-form-item>
       <el-form-item label-width="0">
-        <ImportValues :height="'250px'" :yaml.sync="tempData.valueYaml" :resize="'vertical'"></ImportValues>
+        <ImportValues
+          ref="importValues"
+          :height="'250px'"
+          :yaml.sync="tempData.valueYaml"
+          :resize="'vertical'"
+          :valuesPaths="valuesPaths"
+          @updateRepoInfo="updatedRepo = $event"
+        ></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
@@ -29,6 +36,22 @@ const rules = {
   moduleName: [{ required: true, message: '请选择模板', trigger: 'blur' }]
 }
 
+const createTemplateForm = {
+  source: 'chartTemplate',
+  name: '',
+  createFrom: {
+    templateName: '',
+    valuesYAML: '',
+
+    valuesPaths: [],
+    codehostID: null,
+    owner: '',
+    repo: '',
+    branch: ''
+  }
+
+}
+
 export default {
   name: 'TemplateRepo',
   data () {
@@ -38,7 +61,12 @@ export default {
         serviceName: '',
         moduleName: '',
         valueYaml: ''
-      }
+      },
+      valuesPaths: [{
+        path: '',
+        yaml: ''
+      }],
+      updatedRepo: null
     }
   },
   props: {
@@ -56,6 +84,18 @@ export default {
     }
   },
   methods: {
+    closeSelectRepo () {
+      this.tempData = {
+        serviceName: '',
+        moduleName: '',
+        valueYaml: ''
+      }
+      this.valuesPaths = [{
+        path: '',
+        yaml: ''
+      }]
+      this.updatedRepo = null
+    },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
         this.tempCharts = res
@@ -63,19 +103,40 @@ export default {
       })
     },
     async importTempRepo () {
-      const valid = await this.$refs.tempForm.validate().catch(err => {
+      const valid1 = await this.$refs.importValues.validate().catch(err =>
+        console.log(err)
+      )
+      const valid2 = await this.$refs.tempForm.validate().catch(err => {
         console.log(err)
       })
-      if (!valid) {
+      if (!valid1 || !valid2) {
         return
       }
 
       const projectName = this.$route.params.project_name
-      const payload = {
+      let payload = {
         source: 'chartTemplate',
-        name: this.tempData.serviceName,
-        templateName: this.tempData.moduleName,
-        valuesYAML: this.tempData.valueYaml
+        name: this.tempData.serviceName
+
+      }
+      if (!this.updatedRepo) {
+        payload = Object.assign(payload, {
+          createFrom: {
+            templateName: this.tempData.moduleName,
+            valuesYAML: this.tempData.valueYaml
+          }
+        })
+      } else {
+        payload = Object.assign(payload, {
+          createFrom: {
+            codehostID: this.updatedRepo.codehostID,
+            owner: this.updatedRepo.owner,
+            repo: this.updatedRepo.repo,
+            branch: this.updatedRepo.branch,
+            valuesPaths: this.valuesPaths.map(path => path.path),
+            templateName: this.tempData.moduleName
+          }
+        })
       }
       const res = await createTemplateServiceAPI(projectName, payload).catch(
         err => {
@@ -83,8 +144,12 @@ export default {
         }
       )
       if (res) {
-        thihs.$message.success(`导入模板 ${payload.templateName} 成功`)
+        this.$message.success(`导入模板 ${payload.name} 成功`)
         this.dialogVisible = false
+        this.$store.dispatch('queryService', {
+          projectName: this.$route.params.project_name
+        })
+        this.$emit('canUpdateEnv')
       }
     }
   },

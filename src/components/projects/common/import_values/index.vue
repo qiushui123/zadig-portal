@@ -7,10 +7,20 @@
       </h4>
       <el-divider></el-divider>
       <div class="desc">
-        <div>请输入 values.yaml 配置</div>
-        <Resize class="mirror" :resize="resize" :height="height">
-          <codemirror :value="yamlValue" @input="handleInput"></codemirror>
-        </Resize>
+        <template>
+          <div class="title">文件来源</div>
+          <el-select v-model="tempSelect" size="small">
+            <el-option label="Git 仓库" value="gitRepo"></el-option>
+            <el-option label="手动输入" value="manualInput"></el-option>
+          </el-select>
+        </template>
+        <template>
+          <div class="title">仓库信息</div>
+          <Resize v-if="tempSelect === 'manualInput'" class="mirror" :resize="resize" :height="height">
+            <codemirror :value="yamlValue" @input="handleInput"></codemirror>
+          </Resize>
+          <ValueRepo v-else ref="valueRepo" :currentService="currentService" :valuesPaths="valuesPaths" @selectedRepoChange="selectedRepoChange($event)"></ValueRepo>
+        </template>
       </div>
     </div>
 
@@ -23,9 +33,13 @@
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
 import KeyValue from './key_value.vue'
+import ValueRepo from './value_repo.vue'
+
 export default {
   data () {
     return {
+      currentService: null,
+      tempSelect: 'gitRepo' // manualInput
     }
   },
   props: {
@@ -49,7 +63,8 @@ export default {
     resize: {
       default: 'none',
       type: String
-    }
+    },
+    valuesPaths: Array
   },
   computed: {
     yamlValue: {
@@ -68,12 +83,30 @@ export default {
     },
     hiddenValueEdit () {
       this.$emit('closeValueEdit')
+    },
+    selectedRepoChange (data) {
+      this.currentService = {
+        codehostID: data.codehostId,
+        branch: data.branchName,
+        repo: data.repoName,
+        owner: data.repoOwner
+      }
+      this.$emit('updateRepoInfo', this.currentService)
+    },
+    validate () {
+      if (this.tempSelect === 'gitRepo') {
+        const valueRepo = this.$refs.valueRepo
+        return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
+      } else {
+        return Promise.resolve('true')
+      }
     }
   },
   components: {
     Codemirror,
     KeyValue,
-    Resize
+    Resize,
+    ValueRepo
   }
 }
 </script>
@@ -87,6 +120,10 @@ export default {
   .yaml-container {
     padding: 10px;
     line-height: 1;
+
+    .title {
+      padding: 10px 0;
+    }
 
     h4 {
       margin: 7px 0;
@@ -102,10 +139,6 @@ export default {
     .desc {
       color: #a1a3a7;
       font-size: 14px;
-
-      .mirror {
-        margin-top: 12px;
-      }
     }
   }
 }
