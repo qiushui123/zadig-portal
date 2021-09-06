@@ -39,6 +39,8 @@
         :titles="['服务列表', '已选服务']"
         :data="serviceList"
         class="transfer"
+        :render-content="renderFunc"
+        :filterable="true"
       >
       </el-transfer>
     </div>
@@ -48,6 +50,7 @@ import { getClusterListAPI, productHostingNamespaceAPI, queryWorkloads, postWork
 export default {
   name: 'host_env_config',
   data () {
+    // let self = this
     return {
       allCluster: [],
       hostingNamespace: [],
@@ -60,8 +63,14 @@ export default {
         env_name: [{ required: true, message: '请输入环境名称', trigger: 'blur' }]
       },
       serviceList: [],
-      selectService: []
-
+      selectService: [],
+      renderFunc (h, option) {
+        if (option.env_name) {
+          return <span>{ option.label }   使用环境({option.env_name})</span>
+        } else {
+          return <span>{ option.label }</span>
+        }
+      }
     }
   },
   computed: {
@@ -86,7 +95,9 @@ export default {
           key: index,
           disabled: !!item.env_name,
           name: item.service_name,
-          type: item.workLoadType
+          type: item.workLoadType,
+          product_name: item.product_name,
+          env_name: item.env_name
         }
       })
     },

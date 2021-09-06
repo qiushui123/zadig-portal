@@ -273,8 +273,8 @@ export function templatesAPI () {
   return http.get('/api/aslan/project/templates/info')
 }
 
-export function getServiceTemplatesAPI (projectName = '') {
-  return http.get(`/api/aslan/service/services?productName=${projectName}`)
+export function getServiceTemplatesAPI (projectName = '', envName = '') {
+  return http.get(`/api/aslan/service/services?productName=${projectName}&envName=${envName}`)
 }
 
 export function getServiceTemplatesStatAPI () {
@@ -1192,7 +1192,7 @@ export function changePassword (payload) {
 // 托管环境
 
 export function queryWorkloads (clusterId, namespace, page) {
-  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=100&page=${page}`)
+  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1000&page=${page}`)
 }
 
 export function postWorkloads (payload) {

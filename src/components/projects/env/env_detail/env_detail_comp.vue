@@ -247,7 +247,7 @@
              element-loading-text="正在获取服务信息"
              element-loading-spinner="el-icon-loading"
              class="service-container">
-          <el-input v-if="envSource !== 'external' && envSource !== 'helm'"
+          <el-input v-if="envSource !== 'helm'"
                     size="mini"
                     class="search-input"
                     clearable
@@ -399,7 +399,7 @@
                          class="el-icon-refresh"></i>
                   </el-tooltip>
                 </span>
-                <span v-if="(envSource===''||envSource ==='spock')"
+                <span v-if="(envSource===''||envSource ==='spock'||envSource ==='external')"
                       class="operation">
                   <el-tooltip effect="dark"
                               content="查看服务配置"
@@ -1190,6 +1190,9 @@ export default {
       }
     },
     setServiceConfigRoute (scope) {
+      if (this.envSource === 'external') {
+        return `/v1/projects/detail/${scope.row.product_name}/services?envName=${this.envName}&serviceName=${scope.row.service_name}`
+      }
       if (typeof this.envName === 'undefined') {
         return `${this.envBasePath}/${scope.row.service_name}/config?projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}`
       } else {

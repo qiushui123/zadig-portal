@@ -85,7 +85,7 @@
                       </el-radio-group>
                     </el-col>
                   </el-row>
-                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'" :gutter="5">
+                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'&&projectForm.product_feature.create_env_type==='system'" :gutter="5">
                     <el-col :span="4">
                       <span>
                         部署方式
