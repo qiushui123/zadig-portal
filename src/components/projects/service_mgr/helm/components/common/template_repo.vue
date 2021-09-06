@@ -1,12 +1,12 @@
 <template>
   <div class="template-repo-container">
-    <el-form ref="form" :model="tempData" label-width="80px" :rules="rules">
+    <el-form ref="tempForm" :model="tempData" label-width="80px" :rules="rules">
       <el-form-item label="服务名称" prop="serviceName">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
         <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small">
-          <el-option label="label" value="value"></el-option>
+          <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label-width="0">
@@ -22,14 +22,18 @@
 
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
+import { createTemplateServiceAPI, getChartTemplatesAPI } from '@api'
+
 const rules = {
   serviceName: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
   moduleName: [{ required: true, message: '请选择模板', trigger: 'blur' }]
 }
+
 export default {
   name: 'TemplateRepo',
   data () {
     return {
+      tempCharts: [],
       tempData: {
         serviceName: '',
         moduleName: '',
@@ -52,12 +56,36 @@ export default {
     }
   },
   methods: {
-    closeSelectRepo () {
-      console.log('close template')
+    getTemplateCharts () {
+      return getChartTemplatesAPI().then(res => {
+        this.tempCharts = res
+        return res
+      })
     },
-    importTempRepo () {
-      // this.dialogVisible = false
-      console.log('importTempRepo', this.tempData)
+    async importTempRepo () {
+      const valid = await this.$refs.tempForm.validate().catch(err => {
+        console.log(err)
+      })
+      if (!valid) {
+        return
+      }
+
+      const projectName = this.$route.params.project_name
+      const payload = {
+        source: 'chartTemplate',
+        name: this.tempData.serviceName,
+        templateName: this.tempData.moduleName,
+        valuesYAML: this.tempData.valueYaml
+      }
+      const res = await createTemplateServiceAPI(projectName, payload).catch(
+        err => {
+          console.log(err)
+        }
+      )
+      if (res) {
+        thihs.$message.success(`导入模板 ${payload.templateName} 成功`)
+        this.dialogVisible = false
+      }
     }
   },
   components: {
@@ -65,6 +93,7 @@ export default {
   },
   created () {
     this.rules = rules
+    this.getTemplateCharts()
   }
 }
 </script>
