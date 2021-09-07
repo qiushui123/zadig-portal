@@ -68,10 +68,12 @@ export default {
         if (option.env_name) {
           const content = `使用项目：${option.product_name}；使用环境：${option.env_name}`
           return <el-tooltip content={content} placement="top">
-            <span>{ option.label }-{option.images[0]}</span>
+            <span>{ option.label }</span>
           </el-tooltip>
         } else {
-          return <span>{ option.label }-{option.images[0]}</span>
+          return <el-tooltip content={option.images[0]} placement="top">
+            <span>{ option.label }</span>
+          </el-tooltip>
         }
       }
     }
