@@ -61,7 +61,7 @@ export default {
         valueYaml: ''
       },
       gitInfo: null,
-      selected: 'gitRepo' // gitRepo or manualInput
+      selected: 'gitRepo'
     }
   },
   props: {

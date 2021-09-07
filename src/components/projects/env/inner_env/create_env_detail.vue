@@ -236,7 +236,12 @@
               </el-tabs>
               <div class="values">
                 <div class="title">Chart Version: {{helmCharts[checkedChart].chart_version}}</div>
-                <ImportValues :yaml.sync="helmCharts[checkedChart].values_yaml" showKeyValue :resize="'vertical'"></ImportValues>
+                <ImportValues
+                  :yaml.sync="helmCharts[checkedChart].values_yaml"
+                  :resize="{height: '300px', direction: 'vertical'}"
+                  :selected.sync="selected"
+                ></ImportValues>
+                <KeyValue></KeyValue>
               </div>
             </div>
           </el-card>
@@ -276,7 +281,14 @@
 
 <script>
 import {
-  imagesAPI, productHostingNamespaceAPI, initProductAPI, getVersionListAPI, getClusterListAPI, createProductAPI, getSingleProjectAPI, getHostListAPI
+  imagesAPI,
+  productHostingNamespaceAPI,
+  initProductAPI,
+  getVersionListAPI,
+  getClusterListAPI,
+  createProductAPI,
+  getSingleProjectAPI,
+  getHostListAPI
 } from '@api'
 import bus from '@utils/event_bus'
 import { mapGetters } from 'vuex'
@@ -287,6 +299,7 @@ import 'brace/mode/yaml'
 import 'brace/theme/xcode'
 import 'brace/ext/searchbox'
 import ImportValues from '@/components/projects/common/import_values/index.vue'
+import KeyValue from '@/components/projects/common/import_values/key_value.vue'
 
 const validateKey = (rule, value, callback) => {
   if (typeof value === 'undefined' || value === '') {
@@ -364,7 +377,12 @@ export default {
           { required: true, trigger: 'change', validator: validateEnvName }
         ],
         roleIds: [
-          { type: 'array', required: true, message: '请选择项目角色', trigger: 'change' }
+          {
+            type: 'array',
+            required: true,
+            message: '请选择项目角色',
+            trigger: 'change'
+          }
         ]
       },
       addKeyData: [
@@ -392,7 +410,8 @@ export default {
           }
         ]
       },
-      checkedChart: ''
+      checkedChart: '',
+      selected: 'manualInput'
     }
   },
 
@@ -402,7 +421,9 @@ export default {
       return this.$route.params.project_name
     },
     deployType () {
-      return this.projectInfo.product_feature ? this.projectInfo.product_feature.deploy_type : 'k8s'
+      return this.projectInfo.product_feature
+        ? this.projectInfo.product_feature.deploy_type
+        : 'k8s'
     },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
@@ -414,7 +435,12 @@ export default {
       return this.projectConfig.source === 'versionBack'
     },
     showEmptyServiceModal () {
-      return this.$utils.isEmpty(this.containerMap) && this.$utils.isEmpty(this.pmServiceMap) && this.$utils.isEmpty(this.helmServiceMap) && (this.projectConfig.source !== 'external')
+      return (
+        this.$utils.isEmpty(this.containerMap) &&
+        this.$utils.isEmpty(this.pmServiceMap) &&
+        this.$utils.isEmpty(this.helmServiceMap) &&
+        this.projectConfig.source !== 'external'
+      )
     }
   },
   methods: {
@@ -426,7 +452,7 @@ export default {
         })
       } else if (this.rollbackMode) {
         this.allCluster = res.filter(element => {
-          return (element.status === 'normal' && !element.production)
+          return element.status === 'normal' && !element.production
         })
       }
     },
@@ -472,7 +498,11 @@ export default {
           }
         }
       }
-      if (template.source === '' || template.source === 'spock' || template.source === 'helm') {
+      if (
+        template.source === '' ||
+        template.source === 'spock' ||
+        template.source === 'helm'
+      ) {
         this.projectConfig.source = 'system'
       }
       if (source === 'versionBack') {
@@ -485,7 +515,7 @@ export default {
     getVersionList () {
       const orgId = this.currentOrganizationId
       const projectName = this.projectName
-      getVersionListAPI(orgId, '', projectName).then((res) => {
+      getVersionListAPI(orgId, '', projectName).then(res => {
         this.currentProductDeliveryVersions = res
       })
     },
@@ -497,9 +527,13 @@ export default {
       this.projectConfig.vars = template.vars
       this.helmCharts = keyBy(template.chart_infos, 'service_name')
       this.checkedChart = template.chart_infos[0].service_name
-      if (template.source === '' || template.source === 'spock' || template.source === 'helm') {
+      if (
+        template.source === '' ||
+        template.source === 'spock' ||
+        template.source === 'helm'
+      ) {
         this.projectConfig.source = 'system'
-      };
+      }
       for (const group of template.services) {
         group.sort((a, b) => {
           if (a.service_name !== b.service_name) {
@@ -519,7 +553,8 @@ export default {
       for (const group of template.services) {
         for (const ser of group) {
           if (ser.type === 'k8s') {
-            containerMap[ser.service_name] = containerMap[ser.service_name] || {}
+            containerMap[ser.service_name] =
+              containerMap[ser.service_name] || {}
             containerMap[ser.service_name][ser.type] = ser
             ser.picked = true
             const containers = ser.containers
@@ -534,10 +569,12 @@ export default {
               }
             }
           } else if (ser.type === 'pm') {
-            pmServiceMap[ser.service_name] = pmServiceMap[ser.service_name] || {}
+            pmServiceMap[ser.service_name] =
+              pmServiceMap[ser.service_name] || {}
             pmServiceMap[ser.service_name][ser.type] = ser
           } else if (ser.type === 'helm') {
-            helmServiceMap[ser.service_name] = helmServiceMap[ser.service_name] || {}
+            helmServiceMap[ser.service_name] =
+              helmServiceMap[ser.service_name] || {}
             helmServiceMap[ser.service_name][ser.type] = ser
           }
         }
@@ -546,7 +583,7 @@ export default {
       this.containerMap = containerMap
       this.pmServiceMap = pmServiceMap
       this.helmServiceMap = helmServiceMap
-      imagesAPI(uniq(containerNames)).then((images) => {
+      imagesAPI(uniq(containerNames)).then(images => {
         if (images) {
           for (const image of images) {
             image.full = `${image.host}/${image.owner}/${image.name}:${image.tag}`
@@ -590,7 +627,8 @@ export default {
                 if (con.name === container) {
                   service.containers[index_con] = {
                     name: con.name,
-                    image: container_img_selected[service.service_name][con.name]
+                    image:
+                      container_img_selected[service.service_name][con.name]
                   }
                 }
               })
@@ -603,7 +641,9 @@ export default {
       if (this.addKeyData[0].key !== '') {
         this.$refs.addKeyForm.validate(valid => {
           if (valid) {
-            this.projectConfig.vars.push(this.$utils.cloneObj(this.addKeyData[0]))
+            this.projectConfig.vars.push(
+              this.$utils.cloneObj(this.addKeyData[0])
+            )
             this.addKeyData[0].key = ''
             this.addKeyData[0].value = ''
             this.$refs.addKeyForm.resetFields()
@@ -620,14 +660,16 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          this.projectConfig.vars.splice(index, 1)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
         })
+          .then(() => {
+            this.projectConfig.vars.splice(index, 1)
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
       } else {
         this.projectConfig.vars.splice(index, 1)
       }
@@ -649,7 +691,7 @@ export default {
     changeCluster (clusterId) {
       const source = this.projectConfig.source
       if (source === 'external') {
-        productHostingNamespaceAPI(clusterId).then((res) => {
+        productHostingNamespaceAPI(clusterId).then(res => {
           this.hostingNamespace = res
         })
       }
@@ -665,13 +707,13 @@ export default {
       }
       this.selection = ''
       if (source === 'external') {
-        productHostingNamespaceAPI(clusterId).then((res) => {
+        productHostingNamespaceAPI(clusterId).then(res => {
           this.hostingNamespace = res
         })
       }
     },
     loadHosting () {
-      this.$refs['create-env-ref'].validate((valid) => {
+      this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
           const payload = this.$utils.cloneObj(this.projectConfig)
           payload.services = []
@@ -679,24 +721,29 @@ export default {
           payload.source = 'external'
           const envType = 'test'
           this.startDeployLoading = true
-          createProductAPI(payload, envType).then((res) => {
-            const envName = payload.env_name
-            this.startDeployLoading = false
-            this.$message({
-              message: '创建环境成功',
-              type: 'success'
-            })
-            this.$router.push(`/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`)
-          }, () => {
-            this.startDeployLoading = false
-          })
+          createProductAPI(payload, envType).then(
+            res => {
+              const envName = payload.env_name
+              this.startDeployLoading = false
+              this.$message({
+                message: '创建环境成功',
+                type: 'success'
+              })
+              this.$router.push(
+                `/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`
+              )
+            },
+            () => {
+              this.startDeployLoading = false
+            }
+          )
         }
       })
     },
     deployEnv () {
       const picked2D = []
       const picked1D = []
-      this.$refs['create-env-ref'].validate((valid) => {
+      this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
           // 同名至少要选一个
           for (const name in this.containerMap) {
@@ -731,7 +778,12 @@ export default {
                   }
                 }
               } else if (ser.type === 'pm') {
-                ser.env_configs = [{ env_name: this.projectConfig.env_name, host_ids: ser.host_ids }]
+                ser.env_configs = [
+                  {
+                    env_name: this.projectConfig.env_name,
+                    host_ids: ser.host_ids
+                  }
+                ]
                 delete ser.host_ids
               }
             }
@@ -741,24 +793,29 @@ export default {
           payload.source = 'spock'
           const envType = 'test'
           this.startDeployLoading = true
-          createProductAPI(payload, envType).then((res) => {
-            const envName = payload.env_name
-            this.startDeployLoading = false
-            this.$message({
-              message: '创建环境成功',
-              type: 'success'
-            })
-            this.$router.push(`/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`)
-          }, () => {
-            this.startDeployLoading = false
-          })
+          createProductAPI(payload, envType).then(
+            res => {
+              const envName = payload.env_name
+              this.startDeployLoading = false
+              this.$message({
+                message: '创建环境成功',
+                type: 'success'
+              })
+              this.$router.push(
+                `/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`
+              )
+            },
+            () => {
+              this.startDeployLoading = false
+            }
+          )
         } else {
           console.log('not-valid')
         }
       })
     },
     deployHelmEnv () {
-      this.$refs['create-env-ref'].validate((valid) => {
+      this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
           for (const key in this.helmCharts) {
             const chart = this.helmCharts[key]
@@ -772,17 +829,22 @@ export default {
           const envType = 'test'
           payload.source = 'helm'
           this.startDeployLoading = true
-          createProductAPI(payload, envType).then((res) => {
-            const envName = payload.env_name
-            this.startDeployLoading = false
-            this.$message({
-              message: '创建环境成功',
-              type: 'success'
-            })
-            this.$router.push(`/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`)
-          }, () => {
-            this.startDeployLoading = false
-          })
+          createProductAPI(payload, envType).then(
+            res => {
+              const envName = payload.env_name
+              this.startDeployLoading = false
+              this.$message({
+                message: '创建环境成功',
+                type: 'success'
+              })
+              this.$router.push(
+                `/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`
+              )
+            },
+            () => {
+              this.startDeployLoading = false
+            }
+          )
         }
       })
     },
@@ -797,7 +859,8 @@ export default {
     quickSelection (select) {
       for (const group of this.projectConfig.services) {
         for (const ser of group) {
-          ser.picked = (ser.type === 'k8s' && (select === 'latest' || select === 'default'))
+          ser.picked =
+            ser.type === 'k8s' && (select === 'latest' || select === 'default')
           const containers = ser.containers
           if (containers) {
             for (const con of ser.containers) {
@@ -818,19 +881,31 @@ export default {
     }
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '', breadcrumb: [{ title: '项目', url: `/v1/projects/detail/${this.projectName}` }, { title: `${this.projectName}`, url: `/v1/projects/detail/${this.projectName}` }, { title: '集成环境', url: '' }, { title: '创建', url: '' }] })
+    bus.$emit('set-topbar-title', {
+      title: '',
+      breadcrumb: [
+        { title: '项目', url: `/v1/projects/detail/${this.projectName}` },
+        {
+          title: `${this.projectName}`,
+          url: `/v1/projects/detail/${this.projectName}`
+        },
+        { title: '集成环境', url: '' },
+        { title: '创建', url: '' }
+      ]
+    })
     this.getVersionList()
     this.projectConfig.product_name = this.projectName
     this.getTemplateAndImg()
     this.checkProjectFeature()
     this.getCluster()
-    getHostListAPI().then((res) => {
+    getHostListAPI().then(res => {
       this.allHost = res
     })
   },
   components: {
     editor: aceEditor,
-    ImportValues
+    ImportValues,
+    KeyValue
   }
 }
 </script>

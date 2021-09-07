@@ -7,7 +7,12 @@
         </el-tabs>
         <div class="values">
           <div class="title">Chart Version: {{helmServiceYamls[checkedChart].chart_version}}</div>
-          <ImportValues :yaml.sync="helmServiceYamls[checkedChart].values_yaml" showKeyValue :resize="'vertical'"></ImportValues>
+          <ImportValues
+            :yaml.sync="helmServiceYamls[checkedChart].values_yaml"
+            :resize="{height: '300px', direction: 'vertical'}"
+            :selected.sync="selected"
+          ></ImportValues>
+          <KeyValue></KeyValue>
         </div>
       </div>
     </div>
@@ -19,6 +24,7 @@
 </template>
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
+import KeyValue from '@/components/projects/common/import_values/key_value.vue'
 import { getHelmEnvVarAPI, updateHelmEnvVarAPI } from '@/api'
 import editor from 'vue2-ace-bind'
 import 'brace/mode/yaml'
@@ -35,7 +41,8 @@ export default {
   },
   components: {
     editor,
-    ImportValues
+    ImportValues,
+    KeyValue
   },
   data () {
     return {
@@ -43,7 +50,8 @@ export default {
       helmServiceYamls: { placeholder: { chart_version: '', values_yaml: '' } },
       updataHelmEnvVarLoading: false,
       getHelmEnvVarLoading: true,
-      checkedChart: 'placeholder'
+      checkedChart: 'placeholder',
+      selected: 'manualInput'
     }
   },
   methods: {
@@ -54,7 +62,7 @@ export default {
       this.getHelmEnvVarLoading = true
       const projectName = this.projectName
       const envName = this.envName
-      const res = await getHelmEnvVarAPI(projectName, envName).catch((error) => {
+      const res = await getHelmEnvVarAPI(projectName, envName).catch(error => {
         console.log(error)
       })
       if (res) {
@@ -70,18 +78,20 @@ export default {
         chart_infos: this.$utils.cloneObj(Object.values(this.helmServiceYamls))
       }
       this.updataHelmEnvVarLoading = true
-      updateHelmEnvVarAPI(projectName, envName, payload).then(response => {
-        this.updataHelmEnvVarLoading = false
-        this.updateHelmEnvVarDialogVisible = false
-        this.initData()
-        this.fetchAllData()
-        this.$message({
-          message: '更新环境变量成功，请等待服务升级',
-          type: 'success'
+      updateHelmEnvVarAPI(projectName, envName, payload)
+        .then(response => {
+          this.updataHelmEnvVarLoading = false
+          this.updateHelmEnvVarDialogVisible = false
+          this.initData()
+          this.fetchAllData()
+          this.$message({
+            message: '更新环境变量成功，请等待服务升级',
+            type: 'success'
+          })
         })
-      }).catch(() => {
-        this.updataHelmEnvVarLoading = false
-      })
+        .catch(() => {
+          this.updataHelmEnvVarLoading = false
+        })
     },
     cancelUpdateHelmEnvVar () {
       this.updateHelmEnvVarDialogVisible = false
@@ -90,7 +100,9 @@ export default {
     initData () {
       this.$nextTick(() => {
         this.checkedChart = 'placeholder'
-        this.helmServiceYamls = { placeholder: { chart_version: '', values_yaml: '' } }
+        this.helmServiceYamls = {
+          placeholder: { chart_version: '', values_yaml: '' }
+        }
       })
     }
   },

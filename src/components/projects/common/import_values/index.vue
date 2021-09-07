@@ -57,7 +57,7 @@ export default {
         }
       }
     },
-    selected: String
+    selected: String // gitRepo or manualInput
   },
   computed: {
     yamlValue: {
@@ -101,7 +101,9 @@ export default {
     },
     resetValueRepoInfo () {
       this.$nextTick(() => {
-        if (this.tempSelect === 'gitRepo') { this.$refs.valueRepo.resetSource(this.valueRepoInfo) }
+        if (this.tempSelect === 'gitRepo') {
+          this.$refs.valueRepo.resetSource(this.valueRepoInfo)
+        }
       })
     }
   },
@@ -140,6 +142,12 @@ export default {
   .desc {
     color: #a1a3a7;
     font-size: 14px;
+
+    /deep/.el-input {
+      .el-input__inner {
+        width: 100%;
+      }
+    }
   }
 
   /deep/.el-select {
