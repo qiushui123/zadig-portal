@@ -18,11 +18,7 @@
         <Resize v-if="tempSelect === 'manualInput'" class="mirror" :resize="resize.direction" :height="resize.height">
           <codemirror v-model="yamlValue"></codemirror>
         </Resize>
-        <ValueRepo
-          v-else
-          ref="valueRepo"
-          :valueRepoInfo.sync="valueRepoInfo"
-        ></ValueRepo>
+        <ValueRepo v-else ref="valueRepo" :valueRepoInfo.sync="valueRepoInfo"></ValueRepo>
       </template>
     </div>
   </div>
@@ -43,9 +39,7 @@ const valueInfo = {
 
 export default {
   data () {
-    return {
-      tempSelect: 'gitRepo' // manualInput
-    }
+    return {}
   },
   props: {
     yaml: String,
@@ -62,7 +56,8 @@ export default {
           direction: 'none'
         }
       }
-    }
+    },
+    selected: String
   },
   computed: {
     yamlValue: {
@@ -84,20 +79,29 @@ export default {
         this.$emit('update:gitInfo', val)
         return val
       }
+    },
+    tempSelect: {
+      get () {
+        return this.selected
+      },
+      set (val) {
+        this.$emit('update:selected', val)
+        return val
+      }
     }
   },
   methods: {
     validate () {
       if (this.tempSelect === 'gitRepo') {
         const valueRepo = this.$refs.valueRepo
-        return Promise.all([Promise.resolve('gitRepo'), valueRepo.validate(), valueRepo.validateRoute()])
+        return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
       } else {
-        return Promise.all([Promise.resolve('manualInput')])
+        return Promise.all([Promise.resolve(true)])
       }
     },
     resetValueRepoInfo () {
       this.$nextTick(() => {
-        this.$refs.valueRepo.resetSource(this.valueRepoInfo)
+        if (this.tempSelect === 'gitRepo') { this.$refs.valueRepo.resetSource(this.valueRepoInfo) }
       })
     }
   },

@@ -15,6 +15,7 @@
           :yaml.sync="tempData.valueYaml"
           :resize="{direction: 'vertical', height: '250px'}"
           :gitInfo.sync="gitInfo"
+          :selected.sync="selected"
         ></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
@@ -59,7 +60,8 @@ export default {
         moduleName: '',
         valueYaml: ''
       },
-      gitInfo: null
+      gitInfo: null,
+      selected: 'gitRepo' // gitRepo or manualInput
     }
   },
   props: {
@@ -92,9 +94,9 @@ export default {
       })
     },
     async importTempRepo () {
-      const valid1 = await this.$refs.importValues.validate().catch(err =>
-        console.log(err)
-      )
+      const valid1 = await this.$refs.importValues
+        .validate()
+        .catch(err => console.log(err))
       const valid2 = await this.$refs.tempForm.validate().catch(err => {
         console.log(err)
       })
@@ -106,16 +108,15 @@ export default {
       let payload = {
         source: 'chartTemplate',
         name: this.tempData.serviceName
-
       }
-      if (valid1[0] === 'manualInput') {
+      if (this.selected === 'manualInput') {
         payload = Object.assign(payload, {
           createFrom: {
             templateName: this.tempData.moduleName,
             valuesYAML: this.tempData.valueYaml
           }
         })
-      } else if (valid1[0] === 'gitRepo') {
+      } else if (this.selected === 'gitRepo') {
         payload = Object.assign(payload, {
           createFrom: {
             codehostID: this.gitInfo.codehostID,
