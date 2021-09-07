@@ -23,7 +23,6 @@
       <el-tab-pane label="模板库" name="template">
         <TemplateRepo
           @canUpdateEnv="$emit('canUpdateEnv')"
-          :currentService="currentService"
           @input="$emit('input', $event)"
           :value="value"
           ref="templateRepo"

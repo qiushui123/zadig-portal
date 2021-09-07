@@ -12,11 +12,10 @@
       <el-form-item label-width="0">
         <ImportValues
           ref="importValues"
-          :height="'250px'"
           :yaml.sync="tempData.valueYaml"
-          :resize="'vertical'"
-          :valuesPaths="valuesPaths"
-          @updateRepoInfo="updatedRepo = $event"
+          :resize="{direction: 'vertical', height: '250px'}"
+          :gitInfo.sync="gitInfo"
+          :value="value"
         ></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
@@ -49,7 +48,6 @@ const createTemplateForm = {
     repo: '',
     branch: ''
   }
-
 }
 
 export default {
@@ -62,16 +60,11 @@ export default {
         moduleName: '',
         valueYaml: ''
       },
-      valuesPaths: [{
-        path: '',
-        yaml: ''
-      }],
-      updatedRepo: null
+      gitInfo: null
     }
   },
   props: {
-    value: Boolean,
-    currentService: Object
+    value: Boolean
   },
   computed: {
     dialogVisible: {
@@ -90,11 +83,7 @@ export default {
         moduleName: '',
         valueYaml: ''
       }
-      this.valuesPaths = [{
-        path: '',
-        yaml: ''
-      }]
-      this.updatedRepo = null
+      this.gitInfo = null
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
@@ -119,21 +108,21 @@ export default {
         name: this.tempData.serviceName
 
       }
-      if (!this.updatedRepo) {
+      if (valid1[0] === 'manualInput') {
         payload = Object.assign(payload, {
           createFrom: {
             templateName: this.tempData.moduleName,
             valuesYAML: this.tempData.valueYaml
           }
         })
-      } else {
+      } else if (valid1[0] === 'gitRepo') {
         payload = Object.assign(payload, {
           createFrom: {
-            codehostID: this.updatedRepo.codehostID,
-            owner: this.updatedRepo.owner,
-            repo: this.updatedRepo.repo,
-            branch: this.updatedRepo.branch,
-            valuesPaths: this.valuesPaths.map(path => path.path),
+            codehostID: this.gitInfo.codehostID,
+            owner: this.gitInfo.owner,
+            repo: this.gitInfo.repo,
+            branch: this.gitInfo.branch,
+            valuesPaths: this.gitInfo.valuesPaths.map(path => path.path),
             templateName: this.tempData.moduleName
           }
         })

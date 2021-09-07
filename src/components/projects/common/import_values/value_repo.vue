@@ -1,13 +1,13 @@
 <template>
   <div class="value-repo-container">
     <el-form :model="source" :rules="sourceRules" ref="repoForm">
-      <el-form-item prop="codehostId">
+      <el-form-item prop="codehostID">
         <el-select
-          v-model="source.codehostId"
+          v-model="source.codehostID"
           size="small"
           style="width: 100%;"
           placeholder="请选择托管平台"
-          @change="queryRepoOwnerById(source.codehostId)"
+          @change="queryRepoOwnerById(source.codehostID)"
           filterable
         >
           <el-option
@@ -25,12 +25,12 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="repoOwner">
+      <el-form-item prop="owner">
         <el-select
-          v-model="source.repoOwner"
+          v-model="source.owner"
           size="small"
           style="width: 100%;"
-          @change="getRepoNameById(source.codehostId, source.repoOwner)"
+          @change="getRepoNameById(source.codehostID, source.owner)"
           placeholder="请选择代码库拥有者"
           filterable
         >
@@ -38,16 +38,16 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item prop="repoName">
+      <el-form-item prop="repo">
         <el-select
           @change="
                   getBranchInfoById(
-                    source.codehostId,
-                    source.repoOwner,
-                    source.repoName
+                    source.codehostID,
+                    source.owner,
+                    source.repo
                   )
                 "
-          v-model.trim="source.repoName"
+          v-model.trim="source.repo"
           remote
           :remote-method="searchProject"
           style="width: 100%;"
@@ -60,16 +60,15 @@
           <el-option v-for="(repo, index) in codeInfo['repos']" :key="index" :label="repo.name" :value="repo.name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="branchName">
+      <el-form-item prop="branch">
         <el-select
-          v-model.trim="source.branchName"
+          v-model.trim="source.branch"
           placeholder="请选择"
           style="width: 100%;"
           size="small"
           filterable
           allow-create
           clearable
-          @change="selectedRepoChange"
         >
           <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
         </el-select>
@@ -77,10 +76,10 @@
     </el-form>
     <div class="file-route">
       <div class="title">文件路径</div>
-      <div v-for="(path, index) in valuesPaths" :key="index">
+      <div v-for="(path, index) in source.valuesPaths" :key="index">
         <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
         <el-button type="text" @click="review(index)">预览</el-button>
-        <el-button v-show="valuesPaths.length > 1" type="text" @click="deletePath(index)">移除</el-button>
+        <el-button v-show="source.valuesPaths.length > 1" type="text" @click="deletePath(index)">移除</el-button>
       </div>
       <el-button icon="el-icon-plus" type="text" size="small" @click="addPath">添加 values 文件</el-button>
       <el-alert v-show="showTip" title="请先添加 value 文件" type="warning" :closable="false"></el-alert>
@@ -89,11 +88,11 @@
 </template>
 <script>
 import RepoMixin from '../mixin/import_repo'
+import { cloneDeep } from 'lodash'
 
 export default {
   props: {
-    currentService: Object,
-    valuesPaths: Array
+    valueRepoInfo: Object
   },
   mixins: [RepoMixin],
   data () {
@@ -101,27 +100,35 @@ export default {
       showTip: false
     }
   },
+  watch: {
+    source: {
+      handler (newV) {
+        this.$emit('update:valueRepoInfo', cloneDeep(newV))
+      },
+      deep: true
+    }
+  },
   methods: {
     review (index) {
-      console.log('review values.yaml: ', this.valuesPaths[index].yaml)
+      console.log('review values.yaml: ', this.source.valuesPaths[index].yaml)
     },
     deletePath (index) {
-      if (this.valuesPaths.length < 2) return
-      this.valuesPaths.splice(index, 1)
+      if (this.source.valuesPaths.length < 2) return
+      this.source.valuesPaths.splice(index, 1)
     },
     addPath () {
-      if (!this.valuesPaths[this.valuesPaths.length - 1].path) {
+      if (!this.source.valuesPaths[this.source.valuesPaths.length - 1].path) {
         this.showTip = true
         return
       }
       this.showTip = false
-      this.valuesPaths.push({
+      this.source.valuesPaths.push({
         path: '',
         yaml: ''
       })
     },
     validateRoute () {
-      const path = this.valuesPaths.find(path => path.path === '')
+      const path = this.source.valuesPaths.find(path => path.path === '')
       if (path) {
         this.showTip = true
         return Promise.reject()
@@ -131,19 +138,8 @@ export default {
       }
     }
   },
-  watch: {
-    value: {
-      handler (value) {
-        const currentService = this.currentService
-        if (value && currentService) {
-          this.source.codehostId = currentService.codehostID
-          this.source.branchName = currentService.branch
-          this.source.repoName = currentService.repo
-          this.source.repoOwner = currentService.owner
-        }
-      },
-      immediate: true
-    }
+  created () {
+    this.source = cloneDeep(this.valueRepoInfo)
   }
 }
 </script>

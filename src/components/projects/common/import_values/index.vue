@@ -1,70 +1,69 @@
 <template>
   <div class="values-outer">
-    <div class="yaml-container">
-      <h4>
-        <span>{{ fileName }}</span>
-        <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="hiddenValueEdit"></i>
-      </h4>
-      <el-divider></el-divider>
-      <div class="desc">
-        <template>
-          <div class="title">文件来源</div>
-          <el-select v-model="tempSelect" size="small">
-            <el-option label="Git 仓库" value="gitRepo"></el-option>
-            <el-option label="手动输入" value="manualInput"></el-option>
-          </el-select>
-        </template>
-        <template>
-          <div class="title">仓库信息</div>
-          <Resize v-if="tempSelect === 'manualInput'" class="mirror" :resize="resize" :height="height">
-            <codemirror :value="yamlValue" @input="handleInput"></codemirror>
-          </Resize>
-          <ValueRepo v-else ref="valueRepo" :currentService="currentService" :valuesPaths="valuesPaths" @selectedRepoChange="selectedRepoChange($event)"></ValueRepo>
-        </template>
-      </div>
+    <h4>
+      <span>values 文件</span>
+      <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="$emit('closeValueEdit')"></i>
+    </h4>
+    <el-divider></el-divider>
+    <div class="desc">
+      <template>
+        <div class="title">文件来源</div>
+        <el-select v-model="tempSelect" size="small">
+          <el-option label="Git 仓库" value="gitRepo"></el-option>
+          <el-option label="手动输入" value="manualInput"></el-option>
+        </el-select>
+      </template>
+      <template>
+        <div class="title">仓库信息</div>
+        <Resize v-if="tempSelect === 'manualInput'" class="mirror" :resize="resize.direction" :height="resize.height">
+          <codemirror v-model="yamlValue"></codemirror>
+        </Resize>
+        <ValueRepo
+          v-else
+          ref="valueRepo"
+          :valueRepoInfo.sync="valueRepoInfo"
+        ></ValueRepo>
+      </template>
     </div>
-
-    <!-- 底部的添加键值对 -->
-    <key-value v-if="showKeyValue"></key-value>
   </div>
 </template>
 
 <script>
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
-import KeyValue from './key_value.vue'
 import ValueRepo from './value_repo.vue'
+
+const valueInfo = {
+  codehostID: null,
+  owner: '',
+  repo: '',
+  branch: '',
+  valuesPaths: [{ path: '', yaml: '' }]
+}
 
 export default {
   data () {
     return {
-      currentService: null,
       tempSelect: 'gitRepo' // manualInput
     }
   },
   props: {
-    fileName: {
-      default: 'values 文件',
-      type: String
-    },
+    value: Boolean,
     yaml: String,
-    showKeyValue: {
-      default: false,
-      type: Boolean
-    },
+    gitInfo: Object,
     showDelete: {
       default: false,
       type: Boolean
     },
-    height: {
-      default: '300px',
-      type: String
-    },
     resize: {
-      default: 'none',
-      type: String
-    },
-    valuesPaths: Array
+      type: Object,
+      default: () => {
+        return {
+          height: '300px',
+          direction: 'none'
+        }
+      }
+    }
   },
   computed: {
     yamlValue: {
@@ -72,39 +71,41 @@ export default {
         return this.yaml || ''
       },
       set (val) {
+        this.$emit('update:yaml', val)
+        return val
+      }
+    },
+    valueRepoInfo: {
+      get () {
+        console.log('index:', this.gitInfo)
+        return Object.assign({}, valueInfo, this.gitInfo)
+      },
+      set (val) {
+        console.log('set index:', this.gitInfo)
+        this.$emit('update:gitInfo', val)
         return val
       }
     }
   },
-  methods: {
-    handleInput (code) {
-      this.yamlValue = code
-      this.$emit('update:yaml', code)
-    },
-    hiddenValueEdit () {
-      this.$emit('closeValueEdit')
-    },
-    selectedRepoChange (data) {
-      this.currentService = {
-        codehostID: data.codehostId,
-        branch: data.branchName,
-        repo: data.repoName,
-        owner: data.repoOwner
+  watch: {
+    value (newV) {
+      if (!newV) {
+        this.$refs.valueRepo && this.$refs.valueRepo.resetSource(this.valueRepoInfo)
       }
-      this.$emit('updateRepoInfo', this.currentService)
-    },
+    }
+  },
+  methods: {
     validate () {
       if (this.tempSelect === 'gitRepo') {
         const valueRepo = this.$refs.valueRepo
-        return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
+        return Promise.all([Promise.resolve('gitRepo'), valueRepo.validate(), valueRepo.validateRoute()])
       } else {
-        return Promise.resolve('true')
+        return Promise.all([Promise.resolve('manualInput')])
       }
     }
   },
   components: {
     Codemirror,
-    KeyValue,
     Resize,
     ValueRepo
   }
@@ -117,29 +118,31 @@ export default {
     margin: 12px 0;
   }
 
-  .yaml-container {
-    padding: 10px;
-    line-height: 1;
+  padding: 10px;
+  line-height: 1;
 
-    .title {
-      padding: 10px 0;
+  .title {
+    padding: 10px 0;
+  }
+
+  h4 {
+    margin: 7px 0;
+    color: #606266;
+    font-size: 14px;
+
+    .icon-delete {
+      float: right;
+      cursor: pointer;
     }
+  }
 
-    h4 {
-      margin: 7px 0;
-      color: #606266;
-      font-size: 14px;
+  .desc {
+    color: #a1a3a7;
+    font-size: 14px;
+  }
 
-      .icon-delete {
-        float: right;
-        cursor: pointer;
-      }
-    }
-
-    .desc {
-      color: #a1a3a7;
-      font-size: 14px;
-    }
+  /deep/.el-select {
+    width: 100%;
   }
 }
 </style>
