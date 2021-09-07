@@ -43,6 +43,7 @@ import {
   getTemplateFileContentAPI
 } from '@api'
 import { keyBy } from 'lodash'
+import bus from '@utils/event_bus'
 
 function tree ({ chartName, files }) {
   const result = []
@@ -196,6 +197,7 @@ export default {
     }
   },
   created () {
+    bus.$emit('set-topbar-title', { title: 'Chart 模板库', breadcrumb: [] })
     this.getChartTemplates().then(res => {
       this.fileData = res
       if (res.length) {

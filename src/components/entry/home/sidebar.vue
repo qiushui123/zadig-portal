@@ -204,7 +204,7 @@ export default {
           },
           {
             name: '模板库',
-            icon: 'iconfont iconjiaofu',
+            icon: 'iconfont iconicon-repertory',
             url: 'chart'
           }]
         },

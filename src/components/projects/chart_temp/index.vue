@@ -8,6 +8,7 @@
 import bus from '@utils/event_bus'
 export default {
   created () {
+    bus.$emit('set-topbar-title', { title: '模板库', breadcrumb: [] })
     bus.$emit('set-sub-sidebar-title', {
       title: '模板库',
       routerList: [
