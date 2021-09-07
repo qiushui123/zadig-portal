@@ -42,7 +42,7 @@ export default {
     await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
     if (this.$route.query.envName) {
       this.envName = this.$route.query.envName
-    } else {
+    } else if (this.envNameList.length) {
       this.envName = this.envNameList[0].env_name
     }
   }
