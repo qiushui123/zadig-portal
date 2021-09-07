@@ -683,14 +683,14 @@
           </div>
         </div>
       </div>
-        <el-button
+        <!-- <el-button
             type="primary"
             size="small"
             @click="updateBuildConfig"
             class="save-btn"
             plain
             >保存构建
-        </el-button>
+        </el-button> -->
       <el-dialog
         title="参数化构建"
         :visible.sync="paramsBuildDialogVisible"
@@ -837,7 +837,8 @@ export default {
   props: {
     name: String,
     buildName: String,
-    isEdit: Boolean
+    isEdit: Boolean,
+    handlerSubmit: Function
   },
   data () {
     return {
@@ -1132,24 +1133,25 @@ export default {
         1
       )
     },
-    updateBuildConfig () {
+    async updateBuildConfig () {
       if (this.source === 'zadig') {
-        this.$refs.repoSelect.validateForm().then(res => {
+        const validate = await this.$refs.repoSelect.validateForm()
+        if (validate) {
           if (this.isEdit) {
-            this.saveBuildConfig()
+            return await this.saveBuildConfig()
           } else {
-            this.createBuildConfig()
+            return await this.createBuildConfig()
           }
-        })
+        }
       } else {
         if (this.isEdit) {
-          this.saveBuildConfig()
+          return await this.saveBuildConfig()
         } else {
-          this.createBuildConfig()
+          return await this.createBuildConfig()
         }
       }
     },
-    createBuildConfig () {
+    async createBuildConfig () {
       let payload = null
       let formName = null
       if (this.source === 'zadig') {
@@ -1180,20 +1182,19 @@ export default {
       }
       payload.product_name = this.projectName
       payload.source = this.source
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          createBuildConfigAPI(payload).then(() => {
-            this.$message({
-              type: 'success',
-              message: '新建构建成功'
-            })
+      const valid = await this.$refs[formName].validate()
+      if (valid) {
+        const res = await createBuildConfigAPI(payload)
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: '新建构建成功'
           })
-        } else {
-          return false
         }
-      })
+        return res
+      }
     },
-    saveBuildConfig () {
+    async saveBuildConfig () {
       let payload = null
       if (this.source === 'zadig') {
         payload = this.$utils.cloneObj(this.buildConfig)
@@ -1213,12 +1214,14 @@ export default {
       }
       payload.source = this.source
       payload.productName = this.projectName
-      updateBuildConfigAPI(payload).then((response) => {
+      const res = await updateBuildConfigAPI(payload)
+      if (res) {
         this.$message({
           message: '保存构建成功',
           type: 'success'
         })
-      })
+      }
+      return res
     },
     async getJenkinsJob () {
       const res = await queryJenkinsJob().catch(error => console.log(error))
@@ -1524,14 +1527,6 @@ export default {
       margin-right: 25px;
       color: #8d9199;
     }
-  }
-
-  .save-btn {
-    position: absolute;
-    bottom: 80px;
-    z-index: 9999;
-    color: #fff;
-    background-color: #409eff;
   }
 }
 </style>

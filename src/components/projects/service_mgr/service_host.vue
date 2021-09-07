@@ -53,7 +53,7 @@ export default {
   margin: 40px 10px;
 
   .serviceBuild {
-    height: calc(~'100vh - 200px');
+    height: calc(~'100vh - 220px');
   }
 }
 </style>
