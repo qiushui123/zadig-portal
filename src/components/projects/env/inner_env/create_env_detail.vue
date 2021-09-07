@@ -43,7 +43,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="集群：" prop="cluster_id">
+        <el-form-item v-if="$utils.isEmpty(pmServiceMap)" label="集群：" prop="cluster_id">
           <el-select class="select" filterable @change="changeCluster" v-model="projectConfig.cluster_id" size="small" placeholder="请选择集群">
             <el-option label="本地集群" value></el-option>
             <el-option

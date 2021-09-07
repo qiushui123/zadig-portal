@@ -157,8 +157,6 @@ import {
   getRepoOwnerByIdAPI,
   getBranchInfoByIdAPI,
   addHelmChartAPI,
-  getRepoFilesAPI,
-  getPublicRepoFilesAPI,
   createTemplateServiceAPI
 } from '@api'
 import Gitfile from './gitfile_tree'
@@ -342,9 +340,10 @@ export default {
             paths: this.selectPath
           }
         }
-        res = await createTemplateServiceAPI(projectName, payload).catch(error =>
-          console.log(error)
-        )
+        res = await createTemplateServiceAPI(
+          projectName,
+          payload
+        ).catch(error => console.log(error))
       }
       if (res) {
         this.closeFileTree()
@@ -352,29 +351,9 @@ export default {
       this.loading = false
     },
     async submit () {
-      const path = ''
       this.$refs.sourceForm.validate().then(res => {
         this.loading = true
-        if (this.currentService) {
-          if (this.gitName === 'public') {
-            getPublicRepoFilesAPI(path, this.source.url).then(res => {
-              this.addService()
-            })
-          } else {
-            getRepoFilesAPI(
-              this.source.codehostId,
-              this.source.repoOwner,
-              this.source.repoName,
-              this.source.branchName,
-              path,
-              'gerrit'
-            ).then(res => {
-              this.addService()
-            })
-          }
-        } else {
-          this.addService()
-        }
+        this.addService()
       })
     }
   },

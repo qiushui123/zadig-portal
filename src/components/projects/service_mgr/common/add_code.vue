@@ -63,26 +63,28 @@
                      value="codehub"></el-option>
           <el-option label="Gerrit"
                      value="gerrit"></el-option>
+          <el-option label="ilyshin"
+                     value="ilyshin"></el-option>
         </el-select>
       </el-form-item>
-      <template v-if="codeAdd.type==='gitlab'||codeAdd.type==='github'">
-        <el-form-item v-if="codeAdd.type==='gitlab'"
+      <template v-if="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'||codeAdd.type==='github'">
+        <el-form-item v-if="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'"
                       label="GitLab 服务 URL"
                       prop="address">
           <el-input v-model="codeAdd.address"
                     placeholder="GitLab 服务 URL"
                     auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item :label="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
+        <el-form-item :label="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
                       prop="applicationId">
           <el-input v-model="codeAdd.applicationId"
-                    :placeholder="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
+                    :placeholder="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
                     auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item :label="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
+        <el-form-item :label="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
                       prop="clientSecret">
           <el-input v-model="codeAdd.clientSecret"
-                    :placeholder="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
+                    :placeholder="codeAdd.type==='gitlab' || codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
                     auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item v-if="codeAdd.type==='github'"
@@ -273,7 +275,7 @@ export default {
               message: '代码源添加成功',
               type: 'success'
             })
-            if (payload.type === 'gitlab' || payload.type === 'github') {
+            if (payload.type === 'gitlab' || payload.type === 'ilyshin' || payload.type === 'github') {
               this.goToCodeHostAuth(code_source_id, redirect_url, provider)
             }
             this.handleCodeCancel()

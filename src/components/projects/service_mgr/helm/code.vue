@@ -33,7 +33,7 @@
           class="folder"
           ref="folder"
           :changeModalStatus="changeModalStatus"
-          :laodData="laodData"
+          :loadData="loadData"
           :saveFileName="saveFileName"
           :saveNewFile="saveNewFile"
           :saveNewFolder="saveNewFolder"
@@ -168,14 +168,13 @@ export default {
     closeSelectRepo () {
       this.$refs.repo.closeSelectRepo()
     },
-    laodData (data) {
+    loadData (data) {
+      console.log(typeof data.parent)
       let path = ''
-      if (data.parent) {
-        if (data.parent === '/') {
-          path = data.parent + data.label
-        } else {
-          path = data.parent + '/' + data.label
-        }
+      if (typeof data.parent !== 'undefined') {
+        path = data.parent + '/' + data.label
+      } else {
+        path = ''
       }
       this.expandKey = []
       const params = {
@@ -376,7 +375,8 @@ export default {
         // }
         // this.changeExpandFileList('add', item)
       } else {
-        this.$refs.folder.addExpandFileList(this.nodeData[0].children[0])
+        const data = this.nodeData[0].children.filter(node => node.label === 'values.yaml')[0] || this.nodeData[0].children[0]
+        this.$refs.folder.addExpandFileList(data)
       }
     }
   },

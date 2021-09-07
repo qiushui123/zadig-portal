@@ -201,6 +201,7 @@
                       </span>
                     </el-option>
                   </el-select>
+                  <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -964,8 +965,8 @@ export default {
         })
       }
       if (this.buildAdd && !this.isEdit && this.buildServiceName) {
-        this.$set(this.buildConfig, 'name', 'build-' + this.buildServiceName)
-        this.$set(this.jenkinsBuild, 'name', 'build-' + this.buildServiceName)
+        this.$set(this.buildConfig, 'name', this.projectName + '-build-' + this.buildServiceName)
+        this.$set(this.jenkinsBuild, 'name', this.projectName + '-build-' + this.buildServiceName)
       }
       getAllAppsAPI().then((response) => {
         const apps = this.$utils.sortVersion(response, 'name', 'asc')

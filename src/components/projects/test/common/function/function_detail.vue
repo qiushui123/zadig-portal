@@ -30,7 +30,7 @@
       <el-row :gutter="20">
         <el-col :span="9">
           <el-form-item prop="pre_test.image_id"
-                        label="操作系统">
+                        label="构建系统">
             <el-select size="small"
                        v-model="test.pre_test.image_id"
                        placeholder="请选择">
