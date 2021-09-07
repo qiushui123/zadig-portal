@@ -156,7 +156,6 @@ import {
   getRepoNameByIdAPI,
   getRepoOwnerByIdAPI,
   getBranchInfoByIdAPI,
-  addHelmChartAPI,
   createTemplateServiceAPI
 } from '@api'
 import Gitfile from './gitfile_tree'
@@ -317,18 +316,14 @@ export default {
     async addService () {
       const projectName = this.$route.params.project_name
       let payload = {}
-      let repoName = null
-      let res
       if (this.gitName === 'public') {
-        repoName = this.source.url.match(/https:\/\/github.com\/.*\/(\S*)/)[1]
         payload = {
-          src_path: this.source.url,
-          repo_name: repoName,
-          file_paths: this.selectPath
+          source: 'repo',
+          createFrom: {
+            repoLink: this.source.url,
+            paths: this.selectPath
+          }
         }
-        res = await addHelmChartAPI(projectName, payload).catch(error =>
-          console.log(error)
-        )
       } else {
         payload = {
           source: 'repo',
@@ -340,11 +335,11 @@ export default {
             paths: this.selectPath
           }
         }
-        res = await createTemplateServiceAPI(
-          projectName,
-          payload
-        ).catch(error => console.log(error))
       }
+      const res = await createTemplateServiceAPI(
+        projectName,
+        payload
+      ).catch(error => console.log(error))
       if (res) {
         this.closeFileTree()
       }

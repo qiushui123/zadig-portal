@@ -317,10 +317,6 @@ export function getHelmChartProjectAPI (projectName = '') {
   return http.get(`/api/aslan/service/harbor/project`)
 }
 
-export function addHelmChartAPI (projectName = '', payload) {
-  return http.post(`/api/aslan/service/helm/${projectName}`, payload)
-}
-
 export function updateHelmChartAPI (projectName = '', payload) {
   return http.put(`/api/aslan/service/helm/${projectName}`, payload)
 }
