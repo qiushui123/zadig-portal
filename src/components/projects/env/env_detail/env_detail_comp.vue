@@ -201,7 +201,7 @@
         </div>
       </el-card>
       <!--end of basic info-->
-      <el-card v-if="envSource==='external'||envSource==='helm' && ingressList.length > 0"
+      <el-card v-if="(envSource==='external'||envSource==='helm') && ingressList.length > 0"
                class="box-card-stack"
                :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
         <div slot="header"
@@ -247,7 +247,20 @@
              element-loading-text="正在获取服务信息"
              element-loading-spinner="el-icon-loading"
              class="service-container">
-          <el-input v-if="envSource !== 'helm'"
+          <el-input v-if="envSource !== 'helm' && envSource !== 'external'"
+                    size="mini"
+                    class="search-input"
+                    clearable
+                    v-model="serviceSearch"
+                    placeholder="搜索服务"
+                    @keyup.enter.native="searchServicesByKeyword"
+                    @clear="searchServicesByKeyword">
+            <template slot="append">
+              <el-button class="el-icon-search"
+                         @click="searchServicesByKeyword"></el-button>
+            </template>
+          </el-input>
+                    <el-input v-if="envSource === 'external'"
                     size="mini"
                     class="search-input"
                     clearable
