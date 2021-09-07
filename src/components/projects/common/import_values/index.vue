@@ -48,7 +48,6 @@ export default {
     }
   },
   props: {
-    value: Boolean,
     yaml: String,
     gitInfo: Object,
     showDelete: {
@@ -87,13 +86,6 @@ export default {
       }
     }
   },
-  watch: {
-    value (newV) {
-      if (!newV) {
-        this.$refs.valueRepo && this.$refs.valueRepo.resetSource(this.valueRepoInfo)
-      }
-    }
-  },
   methods: {
     validate () {
       if (this.tempSelect === 'gitRepo') {
@@ -102,6 +94,11 @@ export default {
       } else {
         return Promise.all([Promise.resolve('manualInput')])
       }
+    },
+    resetValueRepoInfo () {
+      this.$nextTick(() => {
+        this.$refs.valueRepo.resetSource(this.valueRepoInfo)
+      })
     }
   },
   components: {

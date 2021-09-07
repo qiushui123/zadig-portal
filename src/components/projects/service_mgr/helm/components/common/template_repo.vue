@@ -15,7 +15,6 @@
           :yaml.sync="tempData.valueYaml"
           :resize="{direction: 'vertical', height: '250px'}"
           :gitInfo.sync="gitInfo"
-          :value="value"
         ></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
@@ -35,20 +34,20 @@ const rules = {
   moduleName: [{ required: true, message: '请选择模板', trigger: 'blur' }]
 }
 
-const createTemplateForm = {
-  source: 'chartTemplate',
-  name: '',
-  createFrom: {
-    templateName: '',
-    valuesYAML: '',
+// const createTemplateForm = {
+//   source: 'chartTemplate',
+//   name: '',
+//   createFrom: {
+//     templateName: '',
+//     valuesYAML: '',
 
-    valuesPaths: [],
-    codehostID: null,
-    owner: '',
-    repo: '',
-    branch: ''
-  }
-}
+//     valuesPaths: [],
+//     codehostID: null,
+//     owner: '',
+//     repo: '',
+//     branch: ''
+//   }
+// }
 
 export default {
   name: 'TemplateRepo',
@@ -84,6 +83,7 @@ export default {
         valueYaml: ''
       }
       this.gitInfo = null
+      this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
