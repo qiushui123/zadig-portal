@@ -66,9 +66,12 @@ export default {
       selectService: [],
       renderFunc (h, option) {
         if (option.env_name) {
-          return <span>{ option.label }   使用环境({option.env_name})</span>
+          const content = `使用项目：${option.product_name}；使用环境：${option.env_name}`
+          return <el-tooltip content={content} placement="top">
+            <span>{ option.label }-{option.images[0]}</span>
+          </el-tooltip>
         } else {
-          return <span>{ option.label }</span>
+          return <span>{ option.label }-{option.images[0]}</span>
         }
       }
     }
@@ -97,7 +100,8 @@ export default {
           name: item.service_name,
           type: item.workLoadType,
           product_name: item.product_name,
-          env_name: item.env_name
+          env_name: item.env_name,
+          images: item.images
         }
       })
     },
