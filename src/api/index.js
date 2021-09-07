@@ -378,19 +378,30 @@ export function getBuildConfigDetailAPI (name, version, projectName = '') {
   return http.get(`/api/aslan/build/build/${name}/${version}?productName=${projectName}`)
 }
 
-export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, path, type, remoteName = 'origin') {
+export function getRepoFilesAPI ({ codehostId = '', repoOwner = '', repoName = '', branchName = '', path = '', type = '', repoLink = '', remoteName = 'origin' }) {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm') {
-    return http.get(`/api/aslan/code/workspace/tree?repo=${encodeRepoName}&path=${path}&branch=${branchName}&owner=${repoOwner}&codehost_id=${codehostId}`)
+  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm' || type === 'githubPublic') {
+    let params = {}
+    if (type === 'githubPublic') {
+      params = {
+        path,
+        repoLink
+      }
+    } else {
+      params = {
+        repo: encodeRepoName,
+        path,
+        branch: branchName,
+        owner: repoOwner,
+        codehost_id: codehostId
+      }
+    }
+    return http.get(`/api/aslan/code/workspace/tree`, { params })
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)
   } else if (type === 'codehub') {
     return http.get(`/api/aslan/code/workspace/codehub/${codehostId}/${encodeRepoName}/${branchName}?&path=${path}`)
   }
-}
-
-export function getPublicRepoFilesAPI (path, url) {
-  return http.get(`/api/aslan/code/workspace/publicRepo?dir=${path}&url=${url}`)
 }
 
 export function getRepoFileServiceAPI (codehostId, repoOwner, repoName, branchName, path, isDir, remoteName = '') {

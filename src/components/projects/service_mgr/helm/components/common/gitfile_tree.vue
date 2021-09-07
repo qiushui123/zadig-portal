@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { getRepoFilesAPI, getPublicRepoFilesAPI } from '@api'
+import { getRepoFilesAPI } from '@api'
 export default {
   props: {
     codehostId: {
@@ -113,42 +113,41 @@ export default {
       const repoName = this.repoName
       const branchName = this.branchName
       const url = this.url
-      const type = 'helm'
       let path = ''
+      let params = {}
       path = node.data ? node.data.full_path : ''
       this.selectPath = ''
       this.loading = true
       if (this.type === 'private') {
-        getRepoFilesAPI(codehostId, repoOwner, repoName, branchName, path, type)
-          .then(res => {
-            res.forEach(element => {
-              if (element.is_dir) {
-                element.leaf = false
-              } else {
-                element.leaf = true
-              }
-            })
-            return resolve(res)
-          })
-          .finally(() => {
-            this.loading = false
-          })
+        params = {
+          codehostId,
+          repoOwner,
+          repoName,
+          branchName,
+          path,
+          type: 'helm'
+        }
       } else if (this.type === 'public') {
-        getPublicRepoFilesAPI(path, url)
-          .then(res => {
-            res.forEach(element => {
-              if (element.is_dir) {
-                element.leaf = false
-              } else {
-                element.leaf = true
-              }
-            })
-            return resolve(res)
-          })
-          .finally(() => {
-            this.loading = false
-          })
+        params = {
+          repoLink: url,
+          path,
+          type: 'githubPublic'
+        }
       }
+      getRepoFilesAPI(params)
+        .then(res => {
+          res.forEach(element => {
+            if (element.is_dir) {
+              element.leaf = false
+            } else {
+              element.leaf = true
+            }
+          })
+          return resolve(res)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     async selectFile () {
       const checkList = []
