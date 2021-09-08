@@ -318,7 +318,7 @@ export default {
       let payload = {}
       if (this.gitName === 'public') {
         payload = {
-          source: 'repo',
+          source: 'publicRepo',
           createFrom: {
             repoLink: this.source.url,
             paths: this.selectPath
