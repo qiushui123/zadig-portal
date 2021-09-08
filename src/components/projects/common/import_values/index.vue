@@ -8,17 +8,23 @@
     <div class="desc">
       <template>
         <div class="title">文件来源</div>
-        <el-select v-model="tempSelect" size="small">
+        <el-select v-model="importRepoInfoUse.yamlSource" size="small">
           <el-option label="Git 仓库" value="gitRepo"></el-option>
-          <el-option label="手动输入" value="manualInput"></el-option>
+          <el-option label="手动输入" value="freeEdit"></el-option>
+          <el-option label="使用默认" value="default"></el-option>
         </el-select>
       </template>
-      <template>
+      <template v-if="importRepoInfoUse.yamlSource !== 'default'">
         <div class="title">仓库信息</div>
-        <Resize v-if="tempSelect === 'manualInput'" class="mirror" :resize="resize.direction" :height="resize.height">
-          <codemirror v-model="yamlValue"></codemirror>
+        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="resize.direction" :height="resize.height">
+          <codemirror v-model="this.importRepoInfoUse.valuesYaml"></codemirror>
         </Resize>
-        <ValueRepo v-else ref="valueRepo" :valueRepoInfo.sync="valueRepoInfo"></ValueRepo>
+        <ValueRepo
+          v-if="importRepoInfoUse.yamlSource === 'gitRepo'"
+          ref="valueRepo"
+          :valueRepoInfo="importRepoInfoUse.gitRepoConfigs"
+          @update:valueRepoInfo="importRepoInfoUse.gitRepoConfigs = $event"
+        ></ValueRepo>
       </template>
     </div>
   </div>
@@ -30,11 +36,15 @@ import Codemirror from '../codemirror.vue'
 import ValueRepo from './value_repo.vue'
 
 const valueInfo = {
-  codehostID: null,
-  owner: '',
-  repo: '',
-  branch: '',
-  valuesPaths: [{ path: '', yaml: '' }]
+  yamlSource: '', // gitRepo or freeEdit or default
+  valuesYaml: '',
+  gitRepoConfigs: {
+    codehostID: null,
+    owner: '',
+    repo: '',
+    branch: '',
+    valuesPaths: [{ path: '', yaml: '' }]
+  }
 }
 
 export default {
@@ -42,8 +52,6 @@ export default {
     return {}
   },
   props: {
-    yaml: String,
-    gitInfo: Object,
     showDelete: {
       default: false,
       type: Boolean
@@ -57,42 +65,27 @@ export default {
         }
       }
     },
-    selected: String // gitRepo or manualInput
+    importRepoInfo: Object
   },
   computed: {
-    yamlValue: {
+    importRepoInfoUse: {
       get () {
-        return this.yaml || ''
+        let gitRepoConfigs = {}
+        if (!this.importRepoInfo.gitRepoConfigs) {
+          gitRepoConfigs = { gitRepoConfigs: valueInfo.gitRepoConfigs }
+        }
+        console.log('importRepoInfoUse index:', this.importRepoInfo)
+        return Object.assign(this.importRepoInfo, gitRepoConfigs)
       },
       set (val) {
-        this.$emit('update:yaml', val)
-        return val
-      }
-    },
-    valueRepoInfo: {
-      get () {
-        console.log('index:', this.gitInfo)
-        return Object.assign({}, valueInfo, this.gitInfo)
-      },
-      set (val) {
-        console.log('set index:', this.gitInfo)
-        this.$emit('update:gitInfo', val)
-        return val
-      }
-    },
-    tempSelect: {
-      get () {
-        return this.selected
-      },
-      set (val) {
-        this.$emit('update:selected', val)
+        this.$emit('update:importRepoInfo', val)
         return val
       }
     }
   },
   methods: {
     validate () {
-      if (this.tempSelect === 'gitRepo') {
+      if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
         const valueRepo = this.$refs.valueRepo
         return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
       } else {
@@ -101,8 +94,10 @@ export default {
     },
     resetValueRepoInfo () {
       this.$nextTick(() => {
-        if (this.tempSelect === 'gitRepo') {
-          this.$refs.valueRepo.resetSource(this.valueRepoInfo)
+        if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
+          this.$refs.valueRepo.resetSource(
+            this.importRepoInfoUse.gitRepoConfigs
+          )
         }
       })
     }

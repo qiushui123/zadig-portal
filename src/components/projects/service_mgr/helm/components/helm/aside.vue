@@ -82,9 +82,7 @@
                    ></build>
           </div> -->
         </div>
-        <div v-else-if="$route.query.rightbar === 'values'">
-          <values></values>
-        </div>
+        <values v-else-if="$route.query.rightbar === 'values'"></values>
         <div v-else-if="$route.query.rightbar === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">

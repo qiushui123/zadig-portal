@@ -12,10 +12,8 @@
       <el-form-item label-width="0">
         <ImportValues
           ref="importValues"
-          :yaml.sync="tempData.valueYaml"
           :resize="{direction: 'vertical', height: '250px'}"
-          :gitInfo.sync="gitInfo"
-          :selected.sync="selected"
+          :importRepoInfo.sync="importRepoInfo"
         ></ImportValues>
       </el-form-item>
       <el-form-item style="text-align: right;">
@@ -40,6 +38,7 @@ const rules = {
 //   name: '',
 //   createFrom: {
 //     templateName: '',
+
 //     valuesYAML: '',
 
 //     valuesPaths: [],
@@ -57,11 +56,13 @@ export default {
       tempCharts: [],
       tempData: {
         serviceName: '',
-        moduleName: '',
-        valueYaml: ''
+        moduleName: ''
       },
-      gitInfo: null,
-      selected: 'gitRepo'
+      importRepoInfo: {
+        yamlSource: 'gitRepo',
+        valuesYaml: '',
+        gitRepoConfigs: null
+      }
     }
   },
   props: {
@@ -81,15 +82,18 @@ export default {
     closeSelectRepo () {
       this.tempData = {
         serviceName: '',
-        moduleName: '',
-        valueYaml: ''
+        moduleName: ''
       }
-      this.gitInfo = null
+      this.importRepoInfo = {
+        yamlSource: 'gitRepo',
+        valuesYaml: '',
+        gitRepoConfigs: null
+      }
       this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
-        this.tempCharts = res
+        this.tempCharts = [{ name: 'x' }]// res
         return res
       })
     },
@@ -109,21 +113,27 @@ export default {
         source: 'chartTemplate',
         name: this.tempData.serviceName
       }
-      if (this.selected === 'manualInput') {
+      if (this.importRepoInfo.yamlSource === 'freeEdit') {
         payload = Object.assign(payload, {
           createFrom: {
             templateName: this.tempData.moduleName,
-            valuesYAML: this.tempData.valueYaml
+            valuesYAML: this.importRepoInfo.valuesYaml
           }
         })
-      } else if (this.selected === 'gitRepo') {
+      } else if (this.importRepoInfo.yamlSource === 'gitRepo') {
         payload = Object.assign(payload, {
           createFrom: {
-            codehostID: this.gitInfo.codehostID,
-            owner: this.gitInfo.owner,
-            repo: this.gitInfo.repo,
-            branch: this.gitInfo.branch,
-            valuesPaths: this.gitInfo.valuesPaths.map(path => path.path),
+            codehostID: this.importRepoInfo.gitRepoConfigs.codehostID,
+            owner: this.importRepoInfo.gitRepoConfigs.owner,
+            repo: this.importRepoInfo.gitRepoConfigs.repo,
+            branch: this.importRepoInfo.gitRepoConfigs.branch,
+            valuesPaths: this.importRepoInfo.gitRepoConfigs.valuesPaths.map(path => path.path),
+            templateName: this.tempData.moduleName
+          }
+        })
+      } else {
+        payload = Object.assign(payload, {
+          createFrom: {
             templateName: this.tempData.moduleName
           }
         })

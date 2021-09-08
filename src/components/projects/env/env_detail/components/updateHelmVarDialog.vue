@@ -51,7 +51,7 @@ export default {
       updataHelmEnvVarLoading: false,
       getHelmEnvVarLoading: true,
       checkedChart: 'placeholder',
-      selected: 'manualInput'
+      selected: 'freeEdit'
     }
   },
   methods: {

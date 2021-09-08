@@ -72,7 +72,7 @@
   "git.alwaysSignOff": true,
   "eslint.validate": ["vue", "html", "javascript", "typescript", "javascriptreact", "typescriptreact"],
   // 保存时代码自动格式化
-  "editor.formatOnSave": true,
+  // "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true
