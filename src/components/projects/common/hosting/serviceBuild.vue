@@ -93,7 +93,8 @@ export default {
     async saveBuild () {
       const res = await this.$refs.build.updateBuildConfig()
       if (res) {
-        this.getServiceModules({ label: this.build.serviceName })
+        await this.getServices()
+        await this.getServiceModules({ label: this.build.serviceName })
         this.build.showModal = false
       }
     },
@@ -134,7 +135,7 @@ export default {
       }))
       this.serviceModules = service_module
     },
-    async getServices () {
+    async getServices (init) {
       const { data } = await getServiceTemplatesAPI(
         this.projectName,
         this.envName
@@ -145,20 +146,18 @@ export default {
         name: item.service_name,
         id: 'serviceName' + item.service_name
       }))
-
-      console.log(this.nodeData)
-      if (data.length) {
+      if (data.length && init) {
         await this.getServiceModules(this.nodeData[0])
       }
     }
   },
   watch: {
     envName () {
-      this.getServices()
+      this.getServices('init')
     }
   },
   async mounted () {
-    await this.getServices()
+    await this.getServices('init')
     if (this.serviceName) {
       const data = this.nodeData.find((item) => item.name === this.serviceName)
       await this.getServiceModules(data)
