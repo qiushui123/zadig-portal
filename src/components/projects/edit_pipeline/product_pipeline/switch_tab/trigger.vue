@@ -105,7 +105,7 @@
                 动态选择空闲环境更新
               </el-radio>
             </el-tooltip>
-            <el-tooltip v-if="webhookSwap.repo.source==='gitlab'"
+            <el-tooltip v-if="isK8sEnv && webhookSwap.repo.source==='gitlab'"
                         content="基于基准环境版本生成一套临时测试环境做 PR 级验证"
                         placement="right">
               <el-radio label="base"
@@ -726,6 +726,9 @@ export default {
     },
     matchedProducts () {
       return this.products.filter(p => p.product_name === this.productTmlName)
+    },
+    isK8sEnv () {
+      return this.presets && this.presets[0] && this.presets[0].deploy && this.presets[0].deploy[0].type === 'k8s'
     }
   },
   watch: {

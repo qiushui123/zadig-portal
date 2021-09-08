@@ -55,7 +55,7 @@
              element-loading-spinner="el-icon-loading"
              class="text item">
           <el-row :gutter="10">
-            <template>
+            <template v-if="!pmServiceList.length">
               <el-col :span="3">
                 <div class="grid-content">所属集群:</div>
               </el-col>

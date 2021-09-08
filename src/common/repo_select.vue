@@ -287,7 +287,9 @@ export default {
   },
   methods: {
     setLoadingState (index, loading, isLoading) {
-      this.codeInfo[index].loading[loading] = isLoading
+      if (this.codeInfo[index]) {
+        this.codeInfo[index].loading[loading] = isLoading
+      }
     },
     validateForm () {
       return new Promise((resolve, reject) => {
@@ -312,11 +314,6 @@ export default {
       }
       this.showTrigger && (repoMeta.enableTrigger = false)
       this.validateForm().then(res => {
-        if (this.allCodeHosts && this.allCodeHosts.length === 1) {
-          const codeHostId = this.allCodeHosts[0].id
-          repoMeta.codehost_id = codeHostId
-          this.getRepoOwnerById(index + 1, codeHostId)
-        }
         this.config.repos.push(repoMeta)
         this.$set(this.codeInfo, index + 1, {
           repo_owners: [],
@@ -324,6 +321,11 @@ export default {
           branches: [],
           loading: this.$utils.cloneObj(this.loading)
         })
+        if (this.allCodeHosts && this.allCodeHosts.length === 1) {
+          const codeHostId = this.allCodeHosts[0].id
+          repoMeta.codehost_id = codeHostId
+          this.getRepoOwnerById(index + 1, codeHostId)
+        }
       }).catch(err => {
         console.log(err)
       })
@@ -408,9 +410,11 @@ export default {
     },
     getRepoOwnerById (index, id, key = '') {
       if (!key) {
-        this.codeInfo[index].repo_owners = []
-        this.codeInfo[index].repos = []
-        this.codeInfo[index].branches = []
+        if (this.codeInfo[index]) {
+          this.codeInfo[index].repo_owners = []
+          this.codeInfo[index].repos = []
+          this.codeInfo[index].branches = []
+        }
       }
       this.setLoadingState(index, 'owner', true)
       getRepoOwnerByIdAPI(id, key).then((res) => {
