@@ -93,8 +93,8 @@ export default {
     async saveBuild () {
       const res = await this.$refs.build.updateBuildConfig()
       if (res) {
-        await this.getServices()
-        await this.getServiceModules({ label: this.build.serviceName })
+        this.getServices()
+        this.getServiceModules({ label: this.build.serviceName })
         this.build.showModal = false
       }
     },
@@ -160,7 +160,7 @@ export default {
     await this.getServices('init')
     if (this.serviceName) {
       const data = this.nodeData.find((item) => item.name === this.serviceName)
-      await this.getServiceModules(data)
+      this.getServiceModules(data)
       this.$nextTick(() => {
         this.currentKey = this.serviceName
         this.$refs.treeRef.setCurrentKey('serviceName' + this.currentKey)
