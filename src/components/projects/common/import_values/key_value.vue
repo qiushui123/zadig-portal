@@ -73,12 +73,16 @@ export default {
       return this.$refs.form.validate().then(() => {
         const len = this.keyValues.length
         if (len > 0 && this.keyValues[len - 1].add) { this.keyValues[len - 1] = cloneDeep(this.keyValueForm) }
+        this.$refs.form.clearValidate()
+        this.keyValueForm = {
+          key: '',
+          value: ''
+        }
         Promise.resolve()
       })
     },
     addKeyValue () {
       this.validate().then(() => {
-        this.$refs.form.resetFields()
         this.keyValues.push({
           key: '',
           value: '',

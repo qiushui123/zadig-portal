@@ -61,7 +61,7 @@ export default {
       importRepoInfo: {
         yamlSource: 'gitRepo',
         valuesYaml: '',
-        gitRepoConfigs: null
+        gitRepoConfig: null
       }
     }
   },
@@ -87,7 +87,7 @@ export default {
       this.importRepoInfo = {
         yamlSource: 'gitRepo',
         valuesYaml: '',
-        gitRepoConfigs: null
+        gitRepoConfig: null
       }
       this.$refs.importValues.resetValueRepoInfo()
     },
@@ -123,11 +123,11 @@ export default {
       } else if (this.importRepoInfo.yamlSource === 'gitRepo') {
         payload = Object.assign(payload, {
           createFrom: {
-            codehostID: this.importRepoInfo.gitRepoConfigs.codehostID,
-            owner: this.importRepoInfo.gitRepoConfigs.owner,
-            repo: this.importRepoInfo.gitRepoConfigs.repo,
-            branch: this.importRepoInfo.gitRepoConfigs.branch,
-            valuesPaths: this.importRepoInfo.gitRepoConfigs.valuesPaths.map(path => path.path),
+            codehostID: this.importRepoInfo.gitRepoConfig.codehostID,
+            owner: this.importRepoInfo.gitRepoConfig.owner,
+            repo: this.importRepoInfo.gitRepoConfig.repo,
+            branch: this.importRepoInfo.gitRepoConfig.branch,
+            valuesPaths: this.importRepoInfo.gitRepoConfig.valuesPaths.map(path => path.path),
             templateName: this.tempData.moduleName
           }
         })

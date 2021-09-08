@@ -1,26 +1,27 @@
 <template>
   <div class="values-container">
     <h4>变量</h4>
-    <el-tabs v-model="activeName" @tab-click="handleClick">
+    <el-tabs v-model="activeEnv" @tab-click="handleSwitchTab">
       <el-tab-pane v-for="tab in tabs" :key="tab" :label="tab" :name="tab"></el-tab-pane>
     </el-tabs>
     <div class="content">
       <h5>覆盖默认 values 文件</h5>
-      <div v-show="!showValueEdit">
+      <div v-if="!showValueEdit">
         <div class="desc">暂无自定义的 values 文件</div>
         <el-button type="text" @click="showValueEdit = true" icon="el-icon-plus">添加 values 文件</el-button>
       </div>
-      <import-values
-        v-if="showValueEdit"
+      <ImportValues
+        v-else
+        ref="importValuesRef"
         :showDelete="true"
-        :importRepoInfo.sync="importRepoInfo"
-        :resize="'vertical'"
-        @closeValueEdit="closeValueEdit"
-      ></import-values>
-      <key-value></key-value>
+        :importRepoInfo.sync="valuesYaml[activeEnv].importRepoInfo"
+        :resize="{ direction: 'vertical' }"
+        @closeValueEdit="showValueEdit = false"
+      ></ImportValues>
+      <KeyValue ref="keyValueRef" :keyValues="valuesYaml[activeEnv].keyValues"></KeyValue>
     </div>
     <div class="bottom">
-      <el-button type="primary" size="small" @click="addChartValuesYamlByEnv">保存</el-button>
+      <el-button type="primary" size="small" @click="addChartValuesYamlByEnv" :disabled="!serviceName">保存</el-button>
     </div>
   </div>
 </template>
@@ -29,38 +30,93 @@
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
 import { addChartValuesYamlByEnvAPI } from '@api'
+import { cloneDeep } from 'lodash'
 export default {
   data () {
     const tabs = ['dev', 'qa']
     return {
-      activeName: tabs[0],
+      activeEnv: tabs[0],
       tabs: tabs,
       showValueEdit: false,
       valuesYaml: {
         dev: {},
         qa: {}
-      },
-      yaml: '',
-      importRepoInfo: {
-        yamlSource: 'gitRepo',
-        valuesYaml: '',
-        gitRepoConfigs: null
       }
     }
   },
-  methods: {
-    handleClick ({ label }) {
-      // 请求相应环境下的 values.yaml 和 键值对
-      console.log('请求相应环境下的 values.yaml 和 键值对: ', label)
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
     },
-    closeValueEdit () {
-      this.showValueEdit = false
+    serviceName () {
+      return this.$route.query.service_name
+    }
+  },
+  methods: {
+    handleSwitchTab ({ label }) {
+      this.showValueEdit =
+        this.valuesYaml[label].importRepoInfo.yamlSource !== 'default'
+    },
+    initValuesYaml () {
+      const importRepoInfo = {
+        yamlSource: 'default',
+        valuesYaml: '',
+        gitRepoConfig: null
+      }
+      const keyValues = []
+      for (const key in this.valuesYaml) {
+        this.valuesYaml[key] = {
+          importRepoInfo: cloneDeep(importRepoInfo),
+          keyValues: cloneDeep(keyValues),
+          updated: false
+        }
+      }
+    },
+    generatePayload () {
+      const valuesYaml = this.valuesYaml[this.activeEnv]
+      let payload = {
+        envName: this.activeEnv,
+        yamlSource: valuesYaml.importRepoInfo.yamlSource,
+        serviceName: this.serviceName,
+        overrideValues: valuesYaml.keyValues
+      }
+      if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
+        payload = Object.assign(payload, {
+          valuesYAML: valuesYaml.importRepoInfo.valuesYaml
+        })
+      } else if (valuesYaml.importRepoInfo.yamlSource === 'gitRepo') {
+        const gitRepoConfig = valuesYaml.importRepoInfo.gitRepoConfig
+        payload = Object.assign(payload, {
+          gitRepoConfig: {
+            codehostID: gitRepoConfig.codehostID,
+            branch: gitRepoConfig.branch,
+            owner: gitRepoConfig.owner,
+            repo: gitRepoConfig.repo,
+            valuesPaths: gitRepoConfig.valuesPaths.map(config => config.path)
+          }
+        })
+      }
+      return payload
     },
     addChartValuesYamlByEnv () {
-      addChartValuesYamlByEnvAPI().then(res => {
-        console.log()
-      })
+      const valid = []
+      if (this.$refs.importValuesRef) {
+        valid.push(this.$refs.importValuesRef.validate())
+      }
+      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      Promise.all(valid)
+        .then(res => {
+          addChartValuesYamlByEnvAPI(this.projectName, this.generatePayload()).then(res => {
+            this.$message.success(`保存成功`)
+          })
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
+  },
+  created () {
+    this.initValuesYaml()
   },
   components: {
     ImportValues,

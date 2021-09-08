@@ -10,7 +10,8 @@
                @click="changeRoute('var')">
             <span class="step-name">镜像更新</span>
           </div>
-          <div class="tabs__item"
+          <div v-if="isCreate"
+               class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'values'}"
                @click="changeRoute('values')">
             <span class="step-name">变量</span>
@@ -108,7 +109,11 @@ import 'brace/theme/xcode'
 import 'brace/ext/searchbox'
 export default {
   props: {
-    changeExpandFileList: Function
+    changeExpandFileList: Function,
+    isCreate: {
+      default: false,
+      type: Boolean
+    }
   },
   data () {
     return {

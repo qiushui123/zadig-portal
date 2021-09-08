@@ -79,7 +79,7 @@
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
       <div :style="{ flexGrow: 1 }" class="right">
-        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" />
+        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate"/>
         <!-- 右侧aside -->
       </div>
     </multipane>
@@ -128,6 +128,12 @@ const newFolderNode = {
 }
 export default {
   name: 'vscode',
+  props: {
+    isCreate: {
+      default: false,
+      type: Boolean
+    }
+  },
   components: {
     Folder,
     PageNav,

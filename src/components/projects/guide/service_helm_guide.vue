@@ -11,7 +11,7 @@
       </div>
     </div>
   <div class="content">
-    <Code ref="code" :service="serviceList" >
+    <Code ref="code" :service="serviceList" isCreate>
     </Code>
   </div>
       <div class="controls__wrap">

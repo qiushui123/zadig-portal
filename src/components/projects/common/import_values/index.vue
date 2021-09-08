@@ -2,7 +2,7 @@
   <div class="values-outer">
     <h4>
       <span>values 文件</span>
-      <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="$emit('closeValueEdit')"></i>
+      <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="closeValueEdit"></i>
     </h4>
     <el-divider></el-divider>
     <div class="desc">
@@ -16,14 +16,14 @@
       </template>
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
         <div class="title">仓库信息</div>
-        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="resize.direction" :height="resize.height">
-          <codemirror v-model="this.importRepoInfoUse.valuesYaml"></codemirror>
+        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
+          <codemirror v-model="importRepoInfoUse.valuesYaml"></codemirror>
         </Resize>
         <ValueRepo
           v-if="importRepoInfoUse.yamlSource === 'gitRepo'"
           ref="valueRepo"
-          :valueRepoInfo="importRepoInfoUse.gitRepoConfigs"
-          @update:valueRepoInfo="importRepoInfoUse.gitRepoConfigs = $event"
+          :valueRepoInfo="importRepoInfoUse.gitRepoConfig"
+          @update:valueRepoInfo="importRepoInfoUse.gitRepoConfig = $event"
         ></ValueRepo>
       </template>
     </div>
@@ -38,7 +38,7 @@ import ValueRepo from './value_repo.vue'
 const valueInfo = {
   yamlSource: '', // gitRepo or freeEdit or default
   valuesYaml: '',
-  gitRepoConfigs: {
+  gitRepoConfig: {
     codehostID: null,
     owner: '',
     repo: '',
@@ -68,14 +68,26 @@ export default {
     importRepoInfo: Object
   },
   computed: {
+    setResize () {
+      return Object.assign(
+        {
+          height: '300px',
+          direction: 'none'
+        },
+        this.resize
+      )
+    },
     importRepoInfoUse: {
       get () {
-        let gitRepoConfigs = {}
-        if (!this.importRepoInfo.gitRepoConfigs) {
-          gitRepoConfigs = { gitRepoConfigs: valueInfo.gitRepoConfigs }
+        let gitRepoConfig = {}
+        if (!this.importRepoInfo.gitRepoConfig) {
+          gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
+        }
+        if (this.importRepoInfo.yamlSource === 'default') {
+          gitRepoConfig = Object.assign(gitRepoConfig, { yamlSource: 'gitRepo' })
         }
         console.log('importRepoInfoUse index:', this.importRepoInfo)
-        return Object.assign(this.importRepoInfo, gitRepoConfigs)
+        return Object.assign(this.importRepoInfo, gitRepoConfig)
       },
       set (val) {
         this.$emit('update:importRepoInfo', val)
@@ -84,6 +96,10 @@ export default {
     }
   },
   methods: {
+    closeValueEdit () {
+      this.importRepoInfoUse.yamlSource = 'default'
+      this.$emit('closeValueEdit')
+    },
     validate () {
       if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
         const valueRepo = this.$refs.valueRepo
@@ -96,7 +112,7 @@ export default {
       this.$nextTick(() => {
         if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
           this.$refs.valueRepo.resetSource(
-            this.importRepoInfoUse.gitRepoConfigs
+            this.importRepoInfoUse.gitRepoConfig
           )
         }
       })
