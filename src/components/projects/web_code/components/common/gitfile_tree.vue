@@ -115,13 +115,9 @@ export default {
       const repoName = this.repoName
       const branchName = this.branchName
       const url = this.url
-      const type = 'gerrit'
+      const type = 'helm'
       let path = ''
-      if (node.data && node.data.parent === '/') {
-        path = node.data.parent + node.data.name
-      } else if (node.data) {
-        path = node.data.parent + '/' + node.data.name
-      }
+      path = node.data ? node.data.full_path : ''
       this.selectPath = ''
       this.loading = true
       if (this.type === 'private') {
@@ -160,11 +156,7 @@ export default {
       const checkList = []
       this.checkedData.forEach((item) => {
         if (item.is_dir) {
-          if (item.parent === '/') {
-            checkList.push(item.parent + item.name)
-          } else {
-            checkList.push(item.parent + '/' + item.name)
-          }
+          checkList.push(item.full_path)
         }
       })
       this.changeSelectPath(checkList)

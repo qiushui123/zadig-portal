@@ -3,7 +3,7 @@
     <transition name="el-fade-in-linear">
       <div v-if="showGuideText === true"
            class="page-title-container">
-        <h1>恭喜你成功创建新的项目 {{this.projectName}}</h1>
+        <h1>恭喜您成功创建新的项目 {{this.projectName}}</h1>
       </div>
     </transition>
 
@@ -13,7 +13,7 @@
       <div class="current-step-container">
         <div class="title-container">
           <span class="first">第一步</span>
-          <span class="second">对项目的流程做初步定义后，后续可在项目中进行调整。当您创建好服务后，我们会为你做如下的智能交付准备。Zadig
+          <span class="second">对项目的流程做初步定义后，后续可在项目中进行调整。当您创建好服务后，我们会为您做如下的智能交付准备。Zadig
             会自动生成以下资源：</span>
         </div>
         <div class="account-integrations cf-block__list">
@@ -27,7 +27,7 @@
                 </div>
                 <div class="integration-card__info">
                   <div class="integration-name cf-sub-title">2 套测试环境</div>
-                  <div class="integration-details">dev,qa
+                  <div class="integration-details">dev, qa
                   </div>
                 </div>
               </div>
@@ -54,7 +54,6 @@
                 </div>
               </div>
               <div class="account-box-item__controls">
-
               </div>
             </div>
           </div>

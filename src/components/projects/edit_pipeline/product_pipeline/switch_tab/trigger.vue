@@ -105,7 +105,7 @@
                 动态选择空闲环境更新
               </el-radio>
             </el-tooltip>
-            <el-tooltip v-if="webhookSwap.repo.source==='gitlab'"
+            <el-tooltip v-if="isK8sEnv && webhookSwap.repo.source==='gitlab'"
                         content="基于基准环境版本生成一套临时测试环境做 PR 级验证"
                         placement="right">
               <el-radio label="base"
@@ -178,7 +178,7 @@
           <el-checkbox v-model="webhookSwap.auto_cancel">
             <span>自动取消</span>
             <el-tooltip effect="dark"
-                        content="如果你希望只构建最新的提交，则使用这个选项会自动取消队列中的任务"
+                        content="如果您希望只构建最新的提交，则使用这个选项会自动取消队列中的任务"
                         placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
@@ -726,6 +726,9 @@ export default {
     },
     matchedProducts () {
       return this.products.filter(p => p.product_name === this.productTmlName)
+    },
+    isK8sEnv () {
+      return this.presets && this.presets[0] && this.presets[0].deploy && this.presets[0].deploy[0].type === 'k8s'
     }
   },
   watch: {

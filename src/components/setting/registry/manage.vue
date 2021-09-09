@@ -41,6 +41,10 @@
                        label="Harbor">
               <i class="iconfont iconHarbor"></i> <span>Harbor</span>
             </el-option>
+            <el-option value="dockerhub"
+                       label="DockerHub">
+              <i class="iconfont icondocker"></i> <span>DockerHub</span>
+            </el-option>
             <el-option value="native"
                        label="其它">
               <i class="iconfont iconqita"></i> <span>其它</span>
@@ -133,6 +137,10 @@
             <el-option value="harbor"
                        label="Harbor">
               <i class="iconfont iconHarbor"></i> <span>Harbor</span>
+            </el-option>
+            <el-option value="dockerhub"
+                       label="DockerHub">
+              <i class="iconfont icondocker"></i> <span>DockerHub</span>
             </el-option>
             <el-option value="native"
                        label="其它">
@@ -227,7 +235,7 @@
               </template>
             </el-table-column>
             <el-table-column width="220px"
-                             label="创建时间">
+                             label="修改时间">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
                 <span
@@ -308,6 +316,11 @@ export default {
           icon: 'iconfont logo iconHarbor',
           name: 'Harbor',
           namespace: '项目'
+        },
+        dockerhub: {
+          icon: 'iconfont logo icondocker',
+          name: 'DockerHub',
+          namespace: 'Namespace'
         }
       },
       dialogRegistryCreateFormVisible: false,
@@ -421,6 +434,17 @@ export default {
   computed: {
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
+    }
+  },
+  watch: {
+    'registry.reg_provider': {
+      deep: true,
+      immediate: false,
+      handler: function (val, oldVal) {
+        if (val === 'dockerhub') {
+          this.registry.reg_addr = 'https://registry.hub.docker.com'
+        }
+      }
     }
   },
   created () {

@@ -2,9 +2,9 @@ import axios from 'axios'
 import qs from 'qs'
 import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
-const specialAPIs = ['/api/directory/userss/search', '/api/aslan/delivery/artifacts']
+const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
-const reqExps = /api\/aslan\/environment\/environments\/[a-z-0-9]+\/groups$/
+const reqExps = /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/groups/
 const analyticsReq = 'https://api.koderover.com/api/operation/upload'
 const installationAnalysisReq = 'https://api.koderover.com/api/operation/admin/user'
 const http = axios.create()
@@ -249,7 +249,7 @@ export function envRevisionsAPI (projectName, envName) {
 
 export function productServicesAPI (projectName, envName, envSource, searchName = '', perPage = 20, page = 1) {
   if (envSource === 'helm' || envSource === 'external') {
-    return http.get(`/api/aslan/environment/environments/${projectName}/groups/${envSource}?envName=${envName}`)
+    return http.get(`/api/aslan/environment/environments/${projectName}/groups/${envSource}?envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
   } else {
     return http.get(`/api/aslan/environment/environments/${projectName}/groups?envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
   }
@@ -388,10 +388,8 @@ export function getBuildConfigDetailAPI (name, version, projectName = '') {
 
 export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, path, type, remoteName = 'origin') {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  if (type === 'github') {
-    return http.get(`/api/aslan/code/workspace/github/${codehostId}/${encodeRepoName}/${branchName}?path=${path}`)
-  } else if (type === 'gitlab' || type === 'ilyshin') {
-    return http.get(`/api/aslan/code/workspace/gitlab/${codehostId}/${encodeRepoName}/${branchName}?path=${path}&repoOwner=${repoOwner}`)
+  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm') {
+    return http.get(`/api/aslan/code/workspace/tree?repo=${encodeRepoName}&path=${path}&branch=${branchName}&owner=${repoOwner}&codehost_id=${codehostId}`)
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)
   } else if (type === 'codehub') {
@@ -603,10 +601,6 @@ export function createOrganizationInfoAPI (payload) {
   return http.post('/api/directory/organization', payload)
 }
 
-export function organizationInfoAPI (organization_id) {
-  return http.get(`/api/directory/organization/${organization_id}`)
-}
-
 export function usersAPI (organization_id, team_id = '', page_size = 0, page_index = 0, keyword = '') {
   return http.get(`/api/directory/userss/search?orgId=${organization_id}&teamId=${team_id}&per_page=${page_size}&page=${page_index}&keyword=${keyword}`)
 }
@@ -805,6 +799,24 @@ export function updateAppAPI (data) {
 }
 export function deleteAppAPI (data) {
   return http.put('/api/aslan/system/install/delete', data)
+}
+export function getAuditLogAPI (payload) {
+  return http.get(`/api/aslan/system/operation`, { params: payload })
+}
+export function getAnnouncementsAPI () {
+  return http.get(`/api/aslan/system/announcement`)
+}
+export function createAnnouncementAPI (payload) {
+  return http.post(`/api/aslan/system/announcement`, payload)
+}
+export function updateAnnouncementAPI (payload) {
+  return http.put(`/api/aslan/system/announcement/update`, payload)
+}
+export function getAnnouncementListAPI () {
+  return http.get(`/api/aslan/system/announcement/all`)
+}
+export function deleteAnnouncementAPI (id) {
+  return http.delete(`/api/aslan/system/announcement/${id}`)
 }
 
 // Custom image
@@ -1118,7 +1130,7 @@ export function getNotificationAPI () {
   return http.get('/api/aslan/system/notification')
 }
 
-export function deleteAnnouncementAPI (payload) {
+export function deleteNotificationAPI (payload) {
   return http.post('/api/aslan/system/notification/delete', payload)
 }
 

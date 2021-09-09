@@ -19,7 +19,7 @@
            class="divider item"></div>
       <div v-for="(repo,repo_index) in config.repos"
            :key="repo_index">
-        <el-row>
+        <el-row class="repo-select">
           <el-col :span="showAdvanced || showTrigger ?4:5">
             <el-form-item :label="repo_index === 0 ? (shortDescription?'平台':'托管平台') : ''"
                           :prop="'repos.' + repo_index + '.codehost_id'"
@@ -162,21 +162,21 @@
         </el-row>
         <el-row v-if="showAdvancedSetting[repo_index]"
                 style="padding: 4px; background-color: rgb(240, 242, 245);">
-          <el-col :span="5">
+          <el-col :span="6">
             <el-form-item label="Remote name">
               <el-input v-model="repo.remote_name"
                         size="small"
                         placeholder="请输入"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="5">
             <el-form-item label="克隆目录名">
               <el-input v-model="repo.checkout_path"
                         size="small"
                         placeholder="请输入"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="3"
+          <el-col :span="4"
                   style="margin-left: 4px;">
             <el-form-item label="子模块">
               <el-switch v-model="repo.submodules"></el-switch>
@@ -188,7 +188,7 @@
             </el-form-item>
           </el-col>
           <el-col v-if="!hidePrimary"
-                  :span="3">
+                  :span="4">
             <el-form-item>
               <slot name="label">
                 <label class="el-form-item__label">主库
@@ -287,7 +287,9 @@ export default {
   },
   methods: {
     setLoadingState (index, loading, isLoading) {
-      this.codeInfo[index].loading[loading] = isLoading
+      if (this.codeInfo[index]) {
+        this.codeInfo[index].loading[loading] = isLoading
+      }
     },
     validateForm () {
       return new Promise((resolve, reject) => {
@@ -312,11 +314,6 @@ export default {
       }
       this.showTrigger && (repoMeta.enableTrigger = false)
       this.validateForm().then(res => {
-        if (this.allCodeHosts && this.allCodeHosts.length === 1) {
-          const codeHostId = this.allCodeHosts[0].id
-          repoMeta.codehost_id = codeHostId
-          this.getRepoOwnerById(index + 1, codeHostId)
-        }
         this.config.repos.push(repoMeta)
         this.$set(this.codeInfo, index + 1, {
           repo_owners: [],
@@ -324,6 +321,11 @@ export default {
           branches: [],
           loading: this.$utils.cloneObj(this.loading)
         })
+        if (this.allCodeHosts && this.allCodeHosts.length === 1) {
+          const codeHostId = this.allCodeHosts[0].id
+          repoMeta.codehost_id = codeHostId
+          this.getRepoOwnerById(index + 1, codeHostId)
+        }
       }).catch(err => {
         console.log(err)
       })
@@ -386,7 +388,7 @@ export default {
           this.setLoadingState(index, 'repo', false)
         })
       }
-      this.$set(this.config.repos[index], 'project_uuid', project_uuid)
+      this.config.repos[index].project_uuid = project_uuid
       this.config.repos[index].repo_name = ''
       this.config.repos[index].branch = ''
     },
@@ -408,9 +410,11 @@ export default {
     },
     getRepoOwnerById (index, id, key = '') {
       if (!key) {
-        this.codeInfo[index].repo_owners = []
-        this.codeInfo[index].repos = []
-        this.codeInfo[index].branches = []
+        if (this.codeInfo[index]) {
+          this.codeInfo[index].repo_owners = []
+          this.codeInfo[index].repos = []
+          this.codeInfo[index].branches = []
+        }
       }
       this.setLoadingState(index, 'owner', true)
       getRepoOwnerByIdAPI(id, key).then((res) => {
@@ -529,6 +533,18 @@ export default {
 
   &.item {
     width: 30%;
+  }
+}
+
+/deep/ .el-row.repo-select {
+  .el-form-item__label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .app-operation {
+    white-space: nowrap;
   }
 }
 </style>

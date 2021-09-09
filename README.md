@@ -6,7 +6,7 @@
 [![Zadig CI](https://os.koderover.com/api/collie/api/badge?pipelineName=zadig-ci/zadig-ci&source=github&repoFullName=koderover/zadig&branch=main&eventType=push)](https://os.koderover.com/v1/projects/detail/zadig-ci/pipelines/freestyle/home/zadig-ci/608824fef341de000137317d?rightbar=step)
 [![LICENSE](https://img.shields.io/github/license/koderover/zadig-portal.svg)](https://github.com/koderover/zadig-portal/blob/main/LICENSE)
 [![Language](https://img.shields.io/badge/Language-Vue-blue.svg)](https://golang.org/)
-![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/koderover/zadig-portal?include_prereleases)
+![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/koderover/zadig?include_prereleases)
 [!["Join us on Slack"](https://img.shields.io/badge/join-us%20on%20slack-gray.svg?longCache=true&logo=slack&colorB=brightgreen)](https://join.slack.com/t/zadig-workspace/shared_invite/zt-qedvct1t-mQUf2eyTRkoVCc_RWKKgxw)
 
 ## Requirement

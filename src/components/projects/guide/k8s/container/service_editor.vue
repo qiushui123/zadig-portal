@@ -243,26 +243,9 @@ export default {
         }
         if (val.status === 'added') {
           this.getService(val)
-          if (val.source === 'gitlab' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
+          if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
             this.cmOptions.readOnly = true
           } else {
-            this.info = {
-              message: ''
-            }
-          }
-          if (val.status === 'added') {
-            this.getService(val)
-            if (val.source === 'gitlab' || val.source === 'ilyshin' || val.source === 'gerrit' || val.source === 'github' || (val.visibility === 'public' && val.product_name !== this.projectName)) {
-              this.cmOptions.readOnly = true
-            } else {
-              this.cmOptions.readOnly = false
-            }
-          } else if (val.status === 'named') {
-            this.service = {
-              yaml: '',
-              service_name: val.service_name,
-              status: 'named'
-            }
             this.cmOptions.readOnly = false
           }
         } else if (val.status === 'named') {
