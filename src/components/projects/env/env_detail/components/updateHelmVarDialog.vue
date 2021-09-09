@@ -111,6 +111,10 @@ export default {
 /deep/.el-dialog {
   .el-dialog__body {
     padding: 0 10px 20px;
+
+    .kv-container {
+      margin: 0 50px;
+    }
   }
 }
 </style>

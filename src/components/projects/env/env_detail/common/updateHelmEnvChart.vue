@@ -1,7 +1,15 @@
 <template>
   <div class="helm-chart-yaml-content">
     <el-tabs tab-position="left" type="border-card" v-model="checkedChart">
-      <el-tab-pane :label="name" :name="name" v-for="name in serviceNames" :key="name"></el-tab-pane>
+      <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.serviceName==='delete'">
+        <span slot="label">
+          <i
+            class="icon"
+            :class="{'el-icon-delete': name.serviceName==='delete', 'el-icon-refresh': name.serviceName==='update', 'el-icon-folder-add': name.serviceName==='create'}"
+          ></i>
+          <span class="desc">{{name.serviceName}}</span>
+        </span>
+      </el-tab-pane>
     </el-tabs>
     <div class="values" v-if="checkedChart">
       <div class="title">Chart Version: {{allChartNameInfo[checkedChart].chartVersion}}</div>
@@ -19,7 +27,7 @@ const chartInfo = {
   envName: '', // ?: String
   serviceName: '', // : String
   chartVersion: '', // : String
-  yamlSource: '', // : String
+  yamlSource: 'default', // : String
   overrideValues: [], // : Object{key,value}[]
   valuesYAML: '', // : String
   gitRepoConfig: null // : Object
@@ -37,6 +45,7 @@ export default {
       required: true
     },
     chartInfos: {
+      // TODO 这里不应该要 更新环境变量更改后 再删掉  其他不用这个
       // 结构与 this.allChartNameInfo 保持一致
       type: Object,
       required: false,
@@ -51,9 +60,12 @@ export default {
   },
   computed: {
     serviceNames () {
-      return this.chartNames
-        ? this.chartNames.map(chart => chart.serviceName)
-        : Object.keys(this.chartInfos)
+      return (
+        this.chartNames ||
+        Object.keys(this.allChartNameInfo).map(name => {
+          return { serviceName: name, type: 'common' }
+        })
+      )
     }
   },
   methods: {
@@ -70,16 +82,33 @@ export default {
           serviceName: chart.serviceName
         })
       })
+      this.checkedChart = Object.keys(this.allChartNameInfo)[0]
+    },
+    initAllChartNameInfoByChartInfos () {
+      for (const key in this.chartInfos) {
+        this.chartInfos[key] = {
+          ...cloneDeep(chartInfo),
+          ...this.chartInfos[key]
+        }
+      }
+      this.allChartNameInfo = this.chartInfos
+      this.checkedChart = Object.keys(this.allChartNameInfo)[0]
+    },
+    validate () {
+      const valid = []
+      if (this.$refs.importValuesRef) {
+        valid.push(this.$refs.importValuesRef.validate())
+      }
+      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      return Promise.all(valid)
     }
   },
   created () {
-    if (this.chartInfos) {
-      this.allChartNameInfo = this.chartInfos
-    } else {
-      this.initAllChartNameInfo()
-    }
-    this.checkedChart = Object.keys(this.allChartNameInfo)[0]
-    console.log('--:', this.allChartNameInfo, this.checkedChart)
+    this[
+      this.chartInfos
+        ? 'initAllChartNameInfoByChartInfos'
+        : 'initAllChartNameInfo'
+    ]()
   },
   components: {
     ImportValues,
@@ -91,7 +120,6 @@ export default {
 <style lang="less" scoped>
 .helm-chart-yaml-content {
   display: flex;
-  justify-content: center;
   box-sizing: border-box;
   width: 100%;
   margin-top: 20px;
@@ -101,6 +129,20 @@ export default {
 
     .el-tabs__header {
       margin-right: 0;
+
+      &.is-left {
+        .el-tabs__item {
+          width: 150px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+
+          .icon {
+            display: inline-block;
+            padding-right: 3px;
+          }
+        }
+      }
     }
 
     .el-tabs__content {
@@ -110,7 +152,7 @@ export default {
 
   .values {
     box-sizing: border-box;
-    width: calc(~'100% - 250px');
+    width: calc(~'100% - 160px');
     padding: 20px;
     border: 1px solid #dcdfe6;
     border-left-width: 0;

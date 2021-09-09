@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="是否更新对应环境？" :visible.sync="updateHelmEnvDialogVisible" width="40%">
+  <el-dialog title="是否更新对应环境？" :visible.sync="updateHelmEnvDialogVisible" width="60%">
     <div class="title">
       <el-alert title="勾选需要更新的环境，点击确定之后，该服务将自动在对应的环境中进行更新" :closable="false" type="warning"></el-alert>
     </div>
@@ -7,9 +7,7 @@
       <el-checkbox-group v-model="checkedEnvList">
         <el-checkbox v-for="(env, index) in envNameList" :key="index" :label="env.envName"></el-checkbox>
       </el-checkbox-group>
-      <div class="tip">
-        <el-switch v-model="readTip" active-text="确认更新 Chart 保存后，即将要更新的相对应环境的 values.yaml 文件和变量已更新！"></el-switch>
-      </div>
+      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envTabs="false" :chartNames="chartNames"></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" :disabled="!readTip || !checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
@@ -18,6 +16,7 @@
   </el-dialog>
 </template>
 <script>
+import ChartValues from '@/components/projects/env/env_detail/common/updateHelmEnvChart.vue'
 import {
   autoUpgradeHelmEnvAPI
 } from '@api'
@@ -26,7 +25,8 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'updateHelmEnv',
   props: {
-    value: Boolean
+    value: Boolean,
+    chartNames: Array
   },
   data () {
     return {
@@ -92,6 +92,9 @@ export default {
   },
   mounted () {
     this.getProducts()
+  },
+  components: {
+    ChartValues
   }
 }
 </script>

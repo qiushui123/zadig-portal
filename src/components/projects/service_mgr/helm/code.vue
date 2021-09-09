@@ -79,11 +79,11 @@
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
       <div :style="{ flexGrow: 1 }" class="right">
-        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate"/>
+        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate" />
         <!-- 右侧aside -->
       </div>
     </multipane>
-    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" />
+    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
     <el-dialog title="请选择导入源" :visible.sync="dialogVisible" center @close="closeSelectRepo">
       <Repo
         ref="repo"
@@ -167,7 +167,13 @@ export default {
       position: {
         left: 0,
         top: 0
-      }
+      },
+      chartNames: [
+        // { serviceName: 'common', type: 'common' },
+        // { serviceName: 'delete', type: 'delete' },
+        // { serviceName: 'update', type: 'update' },
+        // { serviceName: 'create', type: 'create' }
+      ]
     }
   },
   methods: {
@@ -217,7 +223,7 @@ export default {
         this.page.expandFileList = []
       } else {
         const resIndex = this.page.expandFileList.findIndex(
-          (i) => i.id === item.id
+          i => i.id === item.id
         )
         const length = this.page.expandFileList.length
         if (method === 'add') {
@@ -238,7 +244,7 @@ export default {
     deleteFile () {
       this.$refs.folder.remove(this.currentData)
       const resIndex = this.page.expandFileList.findIndex(
-        (i) => i.id === this.currentData.id
+        i => i.id === this.currentData.id
       )
       if (resIndex >= 0) {
         this.changeExpandFileList('del', null, resIndex)
@@ -252,12 +258,21 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
-        deleteServiceTemplateAPI(currentData.service_name, 'helm', this.projectName, 'private').then(res => {
-          if (res) {
-            this.updateEnv = true
-            this.$store.dispatch('queryService', { projectName: this.projectName })
-          }
-        }).catch(error => console.log(error))
+        deleteServiceTemplateAPI(
+          currentData.service_name,
+          'helm',
+          this.projectName,
+          'private'
+        )
+          .then(res => {
+            if (res) {
+              this.updateEnv = true
+              this.$store.dispatch('queryService', {
+                projectName: this.projectName
+              })
+            }
+          })
+          .catch(error => console.log(error))
       })
     },
     newFile (type) {
@@ -381,7 +396,10 @@ export default {
         // }
         // this.changeExpandFileList('add', item)
       } else {
-        const data = this.nodeData[0].children.filter(node => node.label === 'values.yaml')[0] || this.nodeData[0].children[0]
+        const data =
+          this.nodeData[0].children.filter(
+            node => node.label === 'values.yaml'
+          )[0] || this.nodeData[0].children[0]
         this.$refs.folder.addExpandFileList(data)
       }
     }
@@ -391,7 +409,7 @@ export default {
       return this.$route.params.project_name
     },
     ...mapState({
-      service: (state) => state.service_manage.serviceList
+      service: state => state.service_manage.serviceList
     })
   }
 }

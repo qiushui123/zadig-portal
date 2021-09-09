@@ -230,20 +230,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <div class="helm-content">
-              <el-tabs tab-position="left" type="border-card" v-model="checkedChart">
-                <el-tab-pane :label="key" :name="key" v-for="(value, key) in helmCharts" :key="key"></el-tab-pane>
-              </el-tabs>
-              <div class="values">
-                <div class="title">Chart Version: {{helmCharts[checkedChart].chart_version}}</div>
-                <ImportValues
-                  :yaml.sync="helmCharts[checkedChart].values_yaml"
-                  :resize="{height: '300px', direction: 'vertical'}"
-                  :selected.sync="selected"
-                ></ImportValues>
-                <KeyValue></KeyValue>
-              </div>
-            </div>
+            <ChartValues class="chart-value" ref="chartValuesRef" :envTabs="false" :chartInfos="chartInfos"></ChartValues>
           </el-card>
         </template>
       </div>
@@ -298,8 +285,7 @@ import aceEditor from 'vue2-ace-bind'
 import 'brace/mode/yaml'
 import 'brace/theme/xcode'
 import 'brace/ext/searchbox'
-import ImportValues from '@/components/projects/common/import_values/index.vue'
-import KeyValue from '@/components/projects/common/import_values/key_value.vue'
+import ChartValues from '../env_detail/common/updateHelmEnvChart.vue'
 
 const validateKey = (rule, value, callback) => {
   if (typeof value === 'undefined' || value === '') {
@@ -359,7 +345,6 @@ export default {
       pmServiceMap: {},
       helmServiceMap: {},
       chartVersionMap: {},
-      helmCharts: {},
       quickSelection: '',
       unSelectedImgContainers: [],
       serviceTypeMap: serviceTypeMap,
@@ -410,8 +395,7 @@ export default {
           }
         ]
       },
-      checkedChart: '',
-      selected: 'manualInput'
+      chartInfos: {}
     }
   },
 
@@ -525,8 +509,17 @@ export default {
       this.loading = false
       this.projectConfig.revision = template.revision
       this.projectConfig.vars = template.vars
-      this.helmCharts = keyBy(template.chart_infos, 'service_name')
-      this.checkedChart = template.chart_infos[0].service_name
+      // TODO test start
+      const handled = {}
+      template.chart_infos.forEach(chart => {
+        handled[chart.service_name] = {
+          serviceName: chart.service_name,
+          chartVersion: chart.chart_version,
+          valuesYAML: chart.values_yaml
+        }
+      })
+      this.chartInfos = handled
+      // TODO test end
       if (
         template.source === '' ||
         template.source === 'spock' ||
@@ -814,17 +807,25 @@ export default {
         }
       })
     },
-    deployHelmEnv () {
+    async deployHelmEnv () {
+      const res = await this.$refs.chartValuesRef.validate().catch(err => {
+        console.log(err)
+      })
+      if (!res) {
+        return
+      }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
-          for (const key in this.helmCharts) {
-            const chart = this.helmCharts[key]
-            if (!chart.chart_version) {
-              this.$message.warning(`${chart.service_name} 未选择版本`)
-              return
+          // TODO start
+          const chartInfo = Object.values(this.chartInfos).map(chart => {
+            return {
+              chart_version: chart.chartVersion,
+              service_name: chart.serviceName,
+              values_yaml: chart.valuesYAML
             }
-          }
-          this.projectConfig.chart_infos = Object.values(this.helmCharts)
+          })
+          // TODO end
+          this.projectConfig.chart_infos = chartInfo
           const payload = this.$utils.cloneObj(this.projectConfig)
           const envType = 'test'
           payload.source = 'helm'
@@ -904,8 +905,7 @@ export default {
   },
   components: {
     editor: aceEditor,
-    ImportValues,
-    KeyValue
+    ChartValues
   }
 }
 </script>
@@ -1032,38 +1032,10 @@ export default {
       }
     }
 
-    .helm-content {
-      display: flex;
-      box-sizing: border-box;
-      width: 100%;
-      margin-top: 20px;
-
-      .el-tabs {
-        flex-shrink: 0;
-
-        .el-tabs__header {
-          margin-right: 0;
-        }
-
-        .el-tabs__content {
-          padding: 0;
-        }
-      }
-
-      .values {
-        box-sizing: border-box;
-        width: calc(~'100% - 250px');
-        padding: 20px;
-        border: 1px solid #dcdfe6;
-        border-left-width: 0;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-
-        .title {
-          line-height: 40px;
-        }
-      }
+    .chart-value {
+      width: 80%;
+      min-width: 450px;
+      margin-left: 3%;
     }
   }
 

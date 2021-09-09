@@ -1,6 +1,7 @@
 <template>
   <div>
     <el-dialog title="更新环境" :visible.sync="updateHelmEnvDialogVisible" width="40%">
+      <ChartValues v-if="chartInfos" class="chart-value" ref="chartValuesRef" :envTabs="false" :chartInfos="chartInfos"></ChartValues>
       <el-table :data="envChartsDiff" v-loading="getHelmEnvChartDiffLoading" element-loading-text="正在获取版本信息" style="width: 100%;">
         <el-table-column label="Chart 名称">
           <template slot-scope="scope">
@@ -71,6 +72,7 @@
   </div>
 </template>
 <script>
+import ChartValues from '../common/updateHelmEnvChart.vue'
 import { getHelmEnvChartDiffAPI, updateHelmEnvAPI } from '@/api'
 const jsdiff = require('diff')
 export default {
@@ -88,7 +90,8 @@ export default {
       helmChartDiffTitle: '',
       helmChartDiffVisible: false,
       helmChartDiffResult: [],
-      updateImage: 'update'
+      updateImage: 'update',
+      chartInfos: null
     }
   },
   methods: {
@@ -142,6 +145,20 @@ export default {
         envName
       ).catch((error) => console.log(error))
       if (res) {
+        // TODO start
+        const handled = {}
+        res.forEach(re => {
+          handled[re.service_name] = {
+            serviceName: re.service_name,
+            chartVersion: re.latest_version,
+            valuesYAML: re.latest_values_yaml
+          }
+        })
+        this.chartInfos = handled
+        this.$nextTick(() => {
+          this.$refs.chartValuesRef.initAllChartNameInfoByChartInfos()
+        })
+        // TODO end
         this.envChartsDiff = res
       }
       this.getHelmEnvChartDiffLoading = false
@@ -153,6 +170,9 @@ export default {
         this.getHelmEnvChartDiff()
       }
     }
+  },
+  components: {
+    ChartValues
   }
 }
 </script>
