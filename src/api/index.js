@@ -4,7 +4,7 @@ import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
 const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts', '/api/aslan/environment/kube/workloads']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
-const reqExps = /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/groups/
+const reqExps = /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/workloads/
 const analyticsReq = 'https://api.koderover.com/api/operation/upload'
 const installationAnalysisReq = 'https://api.koderover.com/api/operation/admin/user'
 const http = axios.create()
