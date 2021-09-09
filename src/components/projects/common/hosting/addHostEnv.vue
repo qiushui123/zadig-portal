@@ -71,7 +71,7 @@ export default {
             <span>{ option.label }</span>
           </el-tooltip>
         } else {
-          return <el-tooltip content={option.images[0]} placement="top">
+          return <el-tooltip content={option.images && option.images[0]} placement="top">
             <span>{ option.label }</span>
           </el-tooltip>
         }
