@@ -89,7 +89,7 @@
         ref="repo"
         @triggleAction="changeExpandFileList('clear');clearCommitCache()"
         :currentService="currentService"
-        @canUpdateEnv="updateEnv = true"
+        @canUpdateEnv="canUpdateEnv($event)"
         v-model="dialogVisible"
       />
       <!-- 代码库弹窗 -->
@@ -177,6 +177,26 @@ export default {
     }
   },
   methods: {
+    handleChartNames (services) {
+      services.forEach(service => {
+        const serviceNames = this.chartNames.map(chart => chart.serviceName)
+        const index = serviceNames.indexOf(service.serviceName)
+        const type = service.type
+        if (type === 'delete') {
+          if (index !== -1) {
+            this.chartNames.splice(index, 1)
+          } else {
+            this.chartNames.push(service)
+          }
+        } else if (index === -1) {
+          this.chartNames.push(service)
+        }
+      })
+    },
+    canUpdateEnv (services) {
+      this.updateEnv = true
+      if (services) this.handleChartNames(services)
+    },
     closeSelectRepo () {
       this.$refs.repo.closeSelectRepo()
     },
@@ -258,6 +278,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
+        this.handleChartNames([{ serviceName: currentData.service_name, type: 'delete' }])
         deleteServiceTemplateAPI(
           currentData.service_name,
           'helm',

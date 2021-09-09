@@ -298,7 +298,15 @@ export default {
       this.$store.dispatch('queryService', {
         projectName: this.$route.params.project_name
       })
-      this.$emit('canUpdateEnv')
+      const services = this.selectPath.map(path => {
+        const names = path.split('/')
+        const name = names[names.length - 1]
+        return {
+          serviceName: name,
+          type: this.isUpdate ? 'update' : 'create'
+        }
+      })
+      this.$emit('canUpdateEnv', services)
       this.$emit('triggleAction')
     },
     changeSelectPath (path) {
@@ -385,6 +393,9 @@ export default {
           this.source.repoOwner = currentService.repo_owner
           this.source.url = currentService.src_path
           this.selectPath = [currentService.load_path]
+          this.isUpdate = true
+        } else {
+          this.isUpdate = false
         }
       },
       immediate: true

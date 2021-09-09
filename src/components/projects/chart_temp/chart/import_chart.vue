@@ -7,7 +7,7 @@
       <el-form-item label-width="0">
         <GitRepo
           @triggleAction="$emit('triggleAction')"
-          @canUpdateEnv="$emit('canUpdateEnv')"
+          @canUpdateEnv="$emit('canUpdateEnv', $event)"
           :currentService="currentService"
           @input="$emit('input', $event)"
           :controlParam="controlParam"

@@ -149,7 +149,7 @@ export default {
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit('canUpdateEnv')
+        this.$emit('canUpdateEnv', [{ serviceName: payload.name, type: 'create' }])
       }
     }
   },

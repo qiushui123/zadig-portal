@@ -5,13 +5,13 @@
         <span slot="label">
           <i
             class="icon"
-            :class="{'el-icon-delete': name.serviceName==='delete', 'el-icon-refresh': name.serviceName==='update', 'el-icon-folder-add': name.serviceName==='create'}"
+            :class="{'el-icon-delete': name.type==='delete', 'el-icon-refresh': name.type==='update', 'el-icon-folder-add': name.type==='create'}"
           ></i>
           <span class="desc">{{name.serviceName}}</span>
         </span>
       </el-tab-pane>
     </el-tabs>
-    <div class="values" v-if="checkedChart">
+    <div class="values" v-if="checkedChart && serviceNames.length">
       <div class="title">Chart Version: {{allChartNameInfo[checkedChart].chartVersion}}</div>
       <ImportValues ref="importValuesRef" :resize="{direction: 'vertical'}" :importRepoInfo="allChartNameInfo[checkedChart]"></ImportValues>
       <KeyValue ref="keyValueRef" :keyValues="allChartNameInfo[checkedChart].overrideValues"></KeyValue>
@@ -60,6 +60,7 @@ export default {
   },
   computed: {
     serviceNames () {
+      console.log('update')
       return (
         this.chartNames ||
         Object.keys(this.allChartNameInfo).map(name => {

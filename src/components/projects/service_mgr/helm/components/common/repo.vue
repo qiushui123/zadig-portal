@@ -4,7 +4,7 @@
       <el-tab-pane label="Git 仓库" name="git">
         <GitRepo
           @triggleAction="$emit('triggleAction')"
-          @canUpdateEnv="$emit('canUpdateEnv')"
+          @canUpdateEnv="$emit('canUpdateEnv', $event)"
           :currentService="currentService"
           @input="$emit('input', $event)"
           :value="value"
@@ -13,7 +13,7 @@
       </el-tab-pane>
       <el-tab-pane label="Chart 仓库" name="chart">
         <ChartRepo
-          @canUpdateEnv="$emit('canUpdateEnv')"
+          @canUpdateEnv="$emit('canUpdateEnv', $event)"
           :currentService="currentService"
           @input="$emit('input', $event)"
           :value="value"
@@ -22,7 +22,7 @@
       </el-tab-pane>
       <el-tab-pane label="模板库" name="template">
         <TemplateRepo
-          @canUpdateEnv="$emit('canUpdateEnv')"
+          @canUpdateEnv="$emit('canUpdateEnv', $event)"
           @input="$emit('input', $event)"
           :value="value"
           ref="templateRepo"

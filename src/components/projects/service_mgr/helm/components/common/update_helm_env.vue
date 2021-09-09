@@ -10,7 +10,7 @@
       <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envTabs="false" :chartNames="chartNames"></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
-      <el-button size="small" :disabled="!readTip || !checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
+      <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
       <el-button size="small" @click="skipUpdate">跳过</el-button>
     </span>
   </el-dialog>
@@ -30,8 +30,7 @@ export default {
   },
   data () {
     return {
-      checkedEnvList: [],
-      readTip: false
+      checkedEnvList: []
     }
   },
   methods: {
