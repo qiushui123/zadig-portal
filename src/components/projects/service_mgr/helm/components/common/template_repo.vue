@@ -60,7 +60,7 @@ export default {
       },
       importRepoInfo: {
         yamlSource: 'gitRepo',
-        valuesYaml: '',
+        valuesYAML: '',
         gitRepoConfig: null
       }
     }
@@ -86,7 +86,7 @@ export default {
       }
       this.importRepoInfo = {
         yamlSource: 'gitRepo',
-        valuesYaml: '',
+        valuesYAML: '',
         gitRepoConfig: null
       }
       this.$refs.importValues.resetValueRepoInfo()
@@ -117,7 +117,7 @@ export default {
         payload = Object.assign(payload, {
           createFrom: {
             templateName: this.tempData.moduleName,
-            valuesYAML: this.importRepoInfo.valuesYaml
+            valuesYAML: this.importRepoInfo.valuesYAML
           }
         })
       } else if (this.importRepoInfo.yamlSource === 'gitRepo') {

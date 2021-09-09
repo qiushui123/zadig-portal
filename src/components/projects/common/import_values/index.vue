@@ -17,7 +17,7 @@
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
         <div class="title">仓库信息</div>
         <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
-          <codemirror v-model="importRepoInfoUse.valuesYaml"></codemirror>
+          <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
         </Resize>
         <ValueRepo
           v-if="importRepoInfoUse.yamlSource === 'gitRepo'"
@@ -37,7 +37,7 @@ import ValueRepo from './value_repo.vue'
 
 const valueInfo = {
   yamlSource: '', // gitRepo or freeEdit or default
-  valuesYaml: '',
+  valuesYAML: '',
   gitRepoConfig: {
     codehostID: null,
     owner: '',

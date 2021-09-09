@@ -60,7 +60,7 @@ export default {
     initValuesYaml () {
       const importRepoInfo = {
         yamlSource: 'default',
-        valuesYaml: '',
+        valuesYAML: '',
         gitRepoConfig: null
       }
       const keyValues = []
@@ -82,7 +82,7 @@ export default {
       }
       if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
         payload = Object.assign(payload, {
-          valuesYAML: valuesYaml.importRepoInfo.valuesYaml
+          valuesYAML: valuesYaml.importRepoInfo.valuesYAML
         })
       } else if (valuesYaml.importRepoInfo.yamlSource === 'gitRepo') {
         const gitRepoConfig = valuesYaml.importRepoInfo.gitRepoConfig
