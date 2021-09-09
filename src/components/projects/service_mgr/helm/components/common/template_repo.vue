@@ -93,7 +93,7 @@ export default {
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
-        this.tempCharts = [{ name: 'x' }]// res
+        this.tempCharts = res
         return res
       })
     },
