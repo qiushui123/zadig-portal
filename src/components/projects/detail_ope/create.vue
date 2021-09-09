@@ -1,123 +1,146 @@
 <template>
   <div class="create-project">
-    <el-dialog :fullscreen="true" custom-class="create-project" :before-close="handleClose" :visible.sync="dialogVisible">
+    <el-dialog :fullscreen="true"
+               custom-class="create-project"
+               :before-close="handleClose"
+               :visible.sync="dialogVisible">
       <div class="project-contexts-modal">
-        <header class="project-contexts-modal__header"></header>
+        <header class="project-contexts-modal__header">
+        </header>
         <div class="project-contexts-modal__content">
           <h1 class="project-contexts-modal__content-title">{{isEdit?'修改项目信息':'开始新建项目'}}</h1>
           <div class="project-contexts-modal__content-container">
             <div class="project-settings__inputs-container">
-              <el-form
-                :model="projectForm"
-                :rules="rules"
-                label-position="top"
-                ref="projectForm"
-                label-width="100px"
-                class="demo-projectForm"
-              >
-                <el-form-item label="项目名称" prop="project_name">
-                  <el-input @keyup.native="()=>projectForm.project_name=projectForm.project_name.trim()" v-model="projectForm.project_name"></el-input>
+              <el-form :model="projectForm"
+                       :rules="rules"
+                       label-position="top"
+                       ref="projectForm"
+                       label-width="100px"
+                       class="demo-projectForm">
+                <el-form-item label="项目名称"
+                              prop="project_name">
+                  <el-input @keyup.native="()=>projectForm.project_name=projectForm.project_name.trim()"
+                            v-model="projectForm.project_name"></el-input>
                 </el-form-item>
 
-                <el-form-item label="项目主键" prop="product_name">
-                  <span slot="label">
-                    项目主键
-                    <el-tooltip effect="dark" content="项目主键是该项目资源的全局唯一标识符，用于该项目下所有资源的引用与更新，默认自动生成，同时支持手动指定，创建后不可更改" placement="top">
+                <el-form-item label="项目主键"
+                              prop="product_name">
+                  <span slot="label">项目主键
+                    <el-tooltip effect="dark"
+                                content="项目主键是该项目资源的全局唯一标识符，用于该项目下所有资源的引用与更新，默认自动生成，同时支持手动指定，创建后不可更改"
+                                placement="top">
                       <i class="el-icon-question"></i>
                     </el-tooltip>
-                    <el-button v-if="!isEdit&&!editProductName" @click="editProductName=true" type="text">编辑</el-button>
-                    <el-button v-if="!isEdit&&editProductName" @click="editProductName=false" type="text">完成</el-button>
+                    <el-button v-if="!isEdit&&!editProductName"
+                               @click="editProductName=true"
+                               type="text">编辑</el-button>
+                    <el-button v-if="!isEdit&&editProductName"
+                               @click="editProductName=false"
+                               type="text">完成</el-button>
                   </span>
-                  <el-input :disabled="!showProductName" v-model="projectForm.product_name"></el-input>
+                  <el-input :disabled="!showProductName"
+                            v-model="projectForm.product_name"></el-input>
                 </el-form-item>
 
-                <el-form-item v-if="isEdit" label="服务部署超时（分钟）" prop="timeout">
+                <el-form-item v-if="isEdit"
+                              label="服务部署超时（分钟）"
+                              prop="timeout">
                   <el-input v-model.number="projectForm.timeout"></el-input>
                 </el-form-item>
-                <el-form-item label="描述信息" prop="desc">
-                  <el-input type="textarea" :rows="2" placeholder="请输入描述信息" v-model="projectForm.desc"></el-input>
+                <el-form-item label="描述信息"
+                              prop="desc">
+                  <el-input type="textarea"
+                            :rows="2"
+                            placeholder="请输入描述信息"
+                            v-model="projectForm.desc">
+                  </el-input>
+
                 </el-form-item>
-                <el-form-item label="项目管理员" prop="user_ids" v-if="!isEdit">
-                  <el-select
-                    v-model="projectForm.user_ids"
-                    style="width: 100%;"
-                    filterable
-                    multiple
-                    remote
-                    :remote-method="remoteMethod"
-                    :loading="loading"
-                    placeholder="请输入用户名搜索用户"
-                  >
-                    <el-option v-for="(user,index) in users" :key="index" :label="user.name" :value="user.id"></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item v-if="!isEdit" label="项目特点" prop="desc">
+                <el-form-item v-if="!isEdit"
+                              label="项目特点"
+                              prop="desc">
                   <el-row :gutter="5">
-                    <el-col :span="4">
-                      <span>
-                        基础设施
-                        <el-tooltip placement="top">
-                          <div slot="content">
-                            Kubernetes：包括自建 K8s 和云厂商提供容器云服务
-                            <br />云主机/物理机：包括物理机和云厂商提供的云服务器
-                          </div>
-                          <i class="icon el-icon-question"></i>
-                        </el-tooltip>
-                      </span>
-                    </el-col>
-                    <el-col :span="10">
-                      <el-radio-group size="mini" v-model="projectForm.product_feature.basic_facility">
-                        <el-radio border label="kubernetes">Kubernetes</el-radio>
-                        <el-radio border label="cloud_host">云主机/物理机</el-radio>
-                      </el-radio-group>
-                    </el-col>
+                      <el-col :span="4">
+                        <span>基础设施
+                          <el-tooltip placement="top">
+                            <div slot="content">
+                              Kubernetes：包括自建 K8s 和云厂商提供容器云服务<br />
+                              云主机/物理机：包括物理机和云厂商提供的云服务器
+                            </div>
+                            <i class="icon el-icon-question"></i>
+                          </el-tooltip>
+                        </span>
+                      </el-col>
+                      <el-col :span="10">
+                        <el-radio-group size="mini"
+                                        v-model="projectForm.product_feature.basic_facility">
+                          <el-radio border
+                                    label="kubernetes">Kubernetes</el-radio>
+                          <el-radio border
+                                    label="cloud_host">云主机/物理机</el-radio>
+                        </el-radio-group>
+                      </el-col>
                   </el-row>
-                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'" :gutter="5">
+                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'"
+                          :gutter="5">
                     <el-col :span="4">
-                      <span>
-                        部署方式
+                      <span>部署方式
                         <el-tooltip placement="top">
                           <div slot="content">
-                            K8s YAML 部署：使用 K8s 原生的 YAML配置方式部署服务
-                            <br />Helm Chart 部署：使用 Helm 工具部署服务
+                            K8s YAML 部署：使用 K8s 原生的 YAML配置方式部署服务<br />
+                            Helm Chart 部署：使用 Helm 工具部署服务
                           </div>
                           <i class="icon el-icon-question"></i>
                         </el-tooltip>
                       </span>
                     </el-col>
                     <el-col :span="12">
-                      <el-radio-group size="mini" v-model="projectForm.product_feature.deploy_type">
-                        <el-radio border label="k8s">K8s YAML 部署</el-radio>
-                        <el-radio border label="helm">Helm Chart 部署</el-radio>
+                      <el-radio-group size="mini"
+                                      v-model="projectForm.product_feature.deploy_type">
+                        <el-radio border
+                                  label="k8s">K8s YAML 部署</el-radio>
+                        <el-radio border
+                                  label="helm">Helm Chart 部署</el-radio>
                       </el-radio-group>
                     </el-col>
                   </el-row>
                 </el-form-item>
-                <el-row v-if="isEdit" :gutter="5">
+                <el-row v-if="isEdit"
+                        :gutter="5">
                   <el-col :span="24">
-                    <el-form-item label="项目管理员" prop="user_ids">
-                      <el-select
-                        v-model="projectForm.user_ids"
-                        style="width: 100%;"
-                        filterable
-                        multiple
-                        remote
-                        :remote-method="remoteMethod"
-                        :loading="loading"
-                        placeholder="请输入用户名搜索用户"
-                      >
-                        <el-option v-for="(user,index) in users" :key="index" :label="user.name" :value="user.id"></el-option>
+                    <el-form-item label="项目管理员"
+                                  prop="user_ids">
+                      <el-select v-model="projectForm.user_ids"
+                                 style="width: 100%;"
+                                 filterable
+                                 multiple
+                                 remote
+                                 :remote-method="remoteMethod"
+                                 :loading="loading"
+                                 placeholder="请输入用户名搜索用户">
+                        <el-option v-for="(user,index) in users"
+                                   :key="index"
+                                   :label="user.name"
+                                   :value="user.id">
+                        </el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
                 </el-row>
+
               </el-form>
             </div>
+
           </div>
         </div>
         <footer class="project-contexts-modal__footer">
-          <el-button class="create-btn" type="primary" plain @click="submitForm('projectForm')">{{isEdit?'确认修改':'立即创建'}}</el-button>
+          <el-button class="create-btn"
+                     type="primary"
+                     plain
+                     @click="submitForm('projectForm')">{{isEdit?'确认修改':'立即创建'}}
+          </el-button>
         </footer>
+
       </div>
     </el-dialog>
   </div>
@@ -266,7 +289,7 @@ export default {
             this.updateSingleProject(this.projectForm.product_name, this.projectForm)
           } else {
             this.projectForm.timeout = 10
-            this.projectForm.user_ids.length === 0 && this.projectForm.user_ids.push(this.currentUserId)
+            this.projectForm.user_ids.push(this.currentUserId)
             if (this.projectForm.product_feature.basic_facility === 'cloud_host') {
               this.projectForm.product_feature.deploy_type = 'k8s'
             }
@@ -318,11 +341,9 @@ export default {
   },
   mounted () {
     this.$store.dispatch('getSignupStatus')
-    this.getUsers()
     if (this.isEdit) {
+      this.getUsers()
       this.getProject(this.projectName)
-    } else {
-      this.projectForm.user_ids.push(this.currentUserId)
     }
   }
 }
