@@ -375,7 +375,7 @@
                              label="服务入口">
               <template slot-scope="scope">
                 <template
-                          v-if="scope.row.ingress.host_info && scope.row.ingress.host_info.length>0">
+                          v-if="scope.row.ingress && scope.row.ingress.host_info && scope.row.ingress.host_info.length>0">
                   <el-tooltip v-for="(ingress,index) in scope.row.ingress.host_info"
                               :key="index"
                               effect="dark"
@@ -526,7 +526,7 @@
       </el-card>
       <UpdateHelmEnvDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateHelmEnvDialog"/>
       <UpdateHelmVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateHelmVarDialog" :projectName="projectName" :envName="envName"/>
-      <UpdateK8sVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog"/>
+      <UpdateK8sVarDialog  :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog"/>
       <PmServiceLog  ref="pmServiceLog"/>
       <RecycleDialog :getProductEnv="getProductEnv" :productInfo="productInfo" :initPageInfo="initPageInfo" :recycleDay="recycleDay" ref="recycleDialog" />
     </div>
