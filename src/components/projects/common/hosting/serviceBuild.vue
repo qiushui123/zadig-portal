@@ -196,7 +196,7 @@ export default {
     .bottom {
       position: absolute;
       bottom: 61px;
-      z-index: 9999;
+      z-index: 999;
       width: calc(~'100% - 340px');
       height: 50px;
       background-color: #fff;
