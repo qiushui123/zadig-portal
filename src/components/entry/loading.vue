@@ -1,27 +1,47 @@
 <template>
   <div class="loading-container">
     <div class="loading">
-      <span class="letter">L</span>
-      <span class="letter">o</span>
-      <span class="letter">a</span>
-      <span class="letter">d</span>
-      <span class="letter">i</span>
-      <span class="letter">n</span>
-      <span class="letter">g</span>
-    </div>
+      <atom-spinner :animation-duration="1000"
+                    :size="65"
+                    color="#ff2968" />
     <div class="desc">
-      服务准备中，耐心等一会哦 ~
+      服务启动中，请稍等片刻
     </div>
+    </div>
+        <footer>
+      <div class="copyright">
+        KodeRover © {{moment().format('YYYY')}}
+        <el-tooltip>
+          <div slot="content">
+            <span v-if="processEnv.VERSION">Version: {{processEnv.VERSION}}</span><br>
+            <span v-if="processEnv.BUILD_TIME">Build Time: {{moment.unix(processEnv.BUILD_TIME).format('YYYYMMDDHHmm')}}</span><br>
+            <span v-if="processEnv.TAG">Tag: {{processEnv.TAG}}</span>
+          </div>
+          <span v-if="processEnv && processEnv.BUILD_TIME"
+                class="el-icon-info"></span>
+        </el-tooltip>
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import { AtomSpinner } from 'epic-spinners'
+import moment from 'moment'
 export default {
+  data () {
+    return {
+      moment
+    }
+  },
   computed: {
     ...mapGetters([
       'signupStatus'
-    ])
+    ]),
+    processEnv () {
+      return process.env
+    }
   },
   methods: {
     checkInit () {
@@ -40,77 +60,53 @@ export default {
   },
   created () {
     this.checkInit()
+  },
+  components: {
+    AtomSpinner
   }
 }
 </script>
 
 <style lang="less" scoped>
-@keyframes bounce {
-  0% {
-    text-shadow: rgba(255, 255, 255, 0.4) 0 0 0.05em;
-    transform: translate3d(0, 0, 0);
-  }
-
-  100% {
-    text-shadow: rgba(255, 255, 255, 0.4) 0 1em 0.35em;
-    transform: translate3d(0, -0.5em, 0);
-  }
-}
 
 .loading-container {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   margin: 0;
   overflow-y: hidden;
-  color: #1989fa;
-  background: #2d303a;
+  background: #fff;
 
   .loading {
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 80%;
     white-space: nowrap;
 
-    .letter {
-      display: inline-block;
-      margin-top: 0.5em;
-      font-weight: 500;
-      font-size: 6rem;
-      letter-spacing: 1rem;
-      text-shadow: rgba(255, 255, 255, 0.4) 0 0 0.05em;
-      transform: translate3d(0, 0, 0);
-      animation: bounce 0.75s cubic-bezier(0.05, 0, 0.2, 1) infinite alternate;
-    }
-
-    .letter:nth-of-type(1) {
-      animation-delay: -0.083333333s;
-    }
-
-    .letter:nth-of-type(3) {
-      animation-delay: 0.0833333333s;
-    }
-
-    .letter:nth-of-type(4) {
-      animation-delay: 0.1666666667s;
-    }
-
-    .letter:nth-of-type(5) {
-      animation-delay: 0.25s;
-    }
-
-    .letter:nth-of-type(6) {
-      animation-delay: 0.3333333333s;
-    }
-
-    .letter:nth-of-type(7) {
-      animation-delay: 0.4166666667s;
+    .desc {
+      margin-left: 20px;
+      color: #2f3239;
+      font-weight: 300;
+      font-size: 18px;
+      text-align: center;
     }
   }
 
-  .desc {
+  footer {
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    margin-bottom: 20px;
     text-align: center;
+
+    .copyright {
+      color: #606266;
+      font-size: 13px;
+    }
   }
 }
 </style>
