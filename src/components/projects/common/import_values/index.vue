@@ -11,7 +11,7 @@
         <el-select v-model="importRepoInfoUse.yamlSource" size="small">
           <el-option label="Git 仓库" value="gitRepo"></el-option>
           <el-option label="手动输入" value="freeEdit"></el-option>
-          <el-option label="使用默认" value="default"></el-option>
+          <!-- <el-option label="使用默认" value="default"></el-option> -->
         </el-select>
       </template>
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
@@ -83,9 +83,9 @@ export default {
         if (!this.importRepoInfo.gitRepoConfig) {
           gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
         }
-        if (this.importRepoInfo.yamlSource === 'default') {
-          gitRepoConfig = Object.assign(gitRepoConfig, { yamlSource: 'gitRepo' })
-        }
+        // if (this.importRepoInfo.yamlSource === 'default') {
+        //   gitRepoConfig = Object.assign(gitRepoConfig, { yamlSource: 'gitRepo' })
+        // }
         console.log('importRepoInfoUse index:', this.importRepoInfo)
         return Object.assign(this.importRepoInfo, gitRepoConfig)
       },

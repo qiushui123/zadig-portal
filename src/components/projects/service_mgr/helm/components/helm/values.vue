@@ -1,14 +1,14 @@
 <template>
   <div class="values-container">
     <h4>变量</h4>
-    <el-tabs v-model="activeEnv" @tab-click="handleSwitchTab">
+    <el-tabs v-model="activeEnv">
       <el-tab-pane v-for="tab in tabs" :key="tab" :label="tab" :name="tab"></el-tab-pane>
     </el-tabs>
-    <div class="content">
+    <div class="content" :loading="valuesLoading">
       <h5>覆盖默认 values 文件</h5>
-      <div v-if="!showValueEdit">
+      <div v-if="valuesYaml[activeEnv].importRepoInfo.yamlSource === 'default'">
         <div class="desc">暂无自定义的 values 文件</div>
-        <el-button type="text" @click="showValueEdit = true" icon="el-icon-plus">添加 values 文件</el-button>
+        <el-button type="text" @click="valuesYaml[activeEnv].importRepoInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
       </div>
       <ImportValues
         v-else
@@ -16,7 +16,7 @@
         :showDelete="true"
         :importRepoInfo.sync="valuesYaml[activeEnv].importRepoInfo"
         :resize="{ direction: 'vertical' }"
-        @closeValueEdit="showValueEdit = false"
+        @closeValueEdit="valuesYaml[activeEnv].importRepoInfo.yamlSource = 'default'"
       ></ImportValues>
       <KeyValue ref="keyValueRef" :keyValues="valuesYaml[activeEnv].keyValues"></KeyValue>
     </div>
@@ -29,19 +29,22 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
-import { addChartValuesYamlByEnvAPI } from '@api'
+import { addChartValuesYamlByEnvAPI, getChartValuesYamlAPI } from '@api'
 import { cloneDeep } from 'lodash'
 export default {
+  props: {
+    valuesYamlDeposit: Object
+  },
   data () {
     const tabs = ['dev', 'qa']
     return {
       activeEnv: tabs[0],
       tabs: tabs,
-      showValueEdit: false,
       valuesYaml: {
         dev: {},
         qa: {}
-      }
+      },
+      valuesLoading: false
     }
   },
   computed: {
@@ -53,24 +56,57 @@ export default {
     }
   },
   methods: {
-    handleSwitchTab ({ label }) {
-      this.showValueEdit =
-        this.valuesYaml[label].importRepoInfo.yamlSource !== 'default'
+    getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
+      return getChartValuesYamlAPI(this.projectName, env, service)
+        .then(res => {
+          if (res.length) {
+            const re = res[0]
+            const valueYaml = {}
+            valueYaml.updated = false
+            valueYaml.keyValues = re.overrideValues
+
+            if (re.gitRepoConfig) {
+              re.gitRepoConfig.valuesPaths = re.gitRepoConfig.valuesPaths.map(
+                path => {
+                  return { path: path, yaml: '' }
+                }
+              )
+            }
+
+            valueYaml.importRepoInfo = {
+              yamlSource: re.yamlSource,
+              valuesYAML: re.valuesYAML || '',
+              gitRepoConfig: re.gitRepoConfig || null
+            }
+
+            this.valuesYaml[env] = valueYaml
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
-    initValuesYaml () {
+    async initValuesYaml (service = this.serviceName) {
+      this.valuesLoading = true
+
       const importRepoInfo = {
         yamlSource: 'default',
         valuesYAML: '',
         gitRepoConfig: null
       }
       const keyValues = []
+
       for (const key in this.valuesYaml) {
         this.valuesYaml[key] = {
           importRepoInfo: cloneDeep(importRepoInfo),
           keyValues: cloneDeep(keyValues),
           updated: false
         }
+        if (service) { await this.getChartValuesYaml({ env: key, service: service }) }
       }
+
+      this.valuesLoading = false
+      return Promise.resolve(this.valuesYaml)
     },
     generatePayload () {
       const valuesYaml = this.valuesYaml[this.activeEnv]
@@ -106,7 +142,10 @@ export default {
       if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       Promise.all(valid)
         .then(res => {
-          addChartValuesYamlByEnvAPI(this.projectName, this.generatePayload()).then(res => {
+          addChartValuesYamlByEnvAPI(
+            this.projectName,
+            this.generatePayload()
+          ).then(res => {
             this.$message.success(`保存成功`)
           })
         })
@@ -115,8 +154,23 @@ export default {
         })
     }
   },
-  created () {
-    this.initValuesYaml()
+  watch: {
+    serviceName: {
+      handler (newV, oldV) {
+        if (!newV) {
+          this.initValuesYaml(newV)
+          return
+        }
+        if (this.valuesYamlDeposit[newV]) {
+          this.valuesYaml = this.valuesYamlDeposit[newV]
+        } else {
+          this.initValuesYaml(newV).then(res => {
+            this.valuesYamlDeposit[newV] = res
+          })
+        }
+      },
+      immediate: true
+    }
   },
   components: {
     ImportValues,

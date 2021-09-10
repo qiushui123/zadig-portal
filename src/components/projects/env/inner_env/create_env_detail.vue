@@ -279,12 +279,8 @@ import {
 } from '@api'
 import bus from '@utils/event_bus'
 import { mapGetters } from 'vuex'
-import { uniq, cloneDeep, keyBy } from 'lodash'
+import { uniq, cloneDeep } from 'lodash'
 import { serviceTypeMap } from '@utils/word_translate'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/mode/yaml'
-import 'brace/theme/xcode'
-import 'brace/ext/searchbox'
 import ChartValues from '../env_detail/common/updateHelmEnvChart.vue'
 
 const validateKey = (rule, value, callback) => {
@@ -325,28 +321,17 @@ export default {
         roleIds: []
       },
       projectInfo: {},
-      yamlEditorOption: {
-        enableEmmet: true,
-        showLineNumbers: false,
-        showGutter: false,
-        showPrintMargin: false,
-        tabSize: 2
-      },
       hostingNamespace: [],
       allHost: [],
-      roles: [],
       allCluster: [],
       startDeployLoading: false,
       loading: false,
       addKeyInputVisable: false,
-      showHelmVarEdit: false,
       imageMap: {},
       containerMap: {},
       pmServiceMap: {},
       helmServiceMap: {},
-      chartVersionMap: {},
       quickSelection: '',
-      unSelectedImgContainers: [],
       serviceTypeMap: serviceTypeMap,
       rules: {
         cluster_id: [
@@ -598,18 +583,6 @@ export default {
         }
       }
       return map
-    },
-    checkImgSelected (container_img_selected) {
-      const containerNames = []
-      for (const service in container_img_selected) {
-        for (const containername in container_img_selected[service]) {
-          if (container_img_selected[service][containername] === '') {
-            containerNames.push(containername)
-          }
-        }
-      }
-      this.unSelectedImgContainers = containerNames
-      return containerNames
     },
     mapImgToprojectConfig (product_tpl, container_img_selected) {
       for (const service_con_img in container_img_selected) {
@@ -904,7 +877,6 @@ export default {
     })
   },
   components: {
-    editor: aceEditor,
     ChartValues
   }
 }

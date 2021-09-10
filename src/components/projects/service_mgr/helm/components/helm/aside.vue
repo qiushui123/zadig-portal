@@ -83,7 +83,7 @@
                    ></build>
           </div> -->
         </div>
-        <values v-else-if="$route.query.rightbar === 'values'"></values>
+        <values v-else-if="$route.query.rightbar === 'values'" :valuesYamlDeposit="valuesYamlDeposit"></values>
         <div v-else-if="$route.query.rightbar === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
@@ -136,7 +136,8 @@ export default {
       serviceName: null,
       name: null,
       buildName: null,
-      isEdit: false
+      isEdit: false,
+      valuesYamlDeposit: {}
     }
   },
   methods: {
