@@ -1189,7 +1189,7 @@ export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
 
-// 托管环境
+// exteranl
 
 export function queryWorkloads (clusterId, namespace, page) {
   return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)

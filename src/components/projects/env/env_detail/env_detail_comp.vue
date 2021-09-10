@@ -1089,7 +1089,6 @@ export default {
             if (this.envNameList.length > 0) {
               this.$router.push(`${this.envBasePath}?envName=${this.envNameList[this.envNameList.length - 1].envName}`)
             } else {
-              console.log('to1')
               this.$router.push(`/v1/projects/detail/${this.projectName}/envs/create`)
             }
           })
