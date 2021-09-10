@@ -44,7 +44,7 @@
   </div>
 </template>
 <script>
-import { getServiceTemplatesAPI, serviceTemplateWithConfigAPI } from '@/api'
+import { queryServiceWorkloads, serviceTemplateWithConfigAPI } from '@/api'
 import ServiceModule from '../serviceModules'
 import Build from './build'
 
@@ -136,7 +136,7 @@ export default {
       this.serviceModules = service_module
     },
     async getServices (init) {
-      const { data } = await getServiceTemplatesAPI(
+      const { data } = await queryServiceWorkloads(
         this.projectName,
         this.envName
       )
