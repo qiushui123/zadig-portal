@@ -61,18 +61,6 @@ export default {
   data () {
     return {
       nodeData: [
-        {
-          label: 'zadig-mimo',
-          name: 'zadig-mimo',
-          key: 0,
-          children: [{ label: 'poetry1', name: 'poetry1', key: 2 }]
-        },
-        {
-          key: 1,
-          label: 'poetry',
-          name: 'poetry',
-          children: [{ label: 'poetry2', name: 'poetry2', key: 3 }]
-        }
       ],
       serviceModules: [],
       build: {

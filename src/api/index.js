@@ -1198,10 +1198,10 @@ export function queryWorkloads (clusterId, namespace, page) {
   return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)
 }
 
-export function queryServiceWorkloads (envName) {
-  return http.get(`/api/aslan/service/workloads?env=${envName}`)
+export function queryServiceWorkloads (projectName, envName) {
+  return http.get(`/api/aslan/service/workloads?productName=${projectName}&env=${envName}`)
 }
 
 export function postWorkloads (payload) {
-  return http.post(`/api/aslan/service/services/workloads`, payload)
+  return http.post(`/api/aslan/service/workloads`, payload)
 }

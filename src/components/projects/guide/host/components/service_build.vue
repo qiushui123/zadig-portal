@@ -1,5 +1,5 @@
 <template>
-  <ServiceBuild />
+  <ServiceBuild :envName="$route.query.envName"/>
 </template>
 <script>
 import ServiceBuild from '@/components/projects/common/hosting/serviceBuild'
