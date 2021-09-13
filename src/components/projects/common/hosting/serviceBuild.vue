@@ -44,7 +44,7 @@
   </div>
 </template>
 <script>
-import { getServiceTemplatesAPI, serviceTemplateWithConfigAPI } from '@/api'
+import { queryServiceWorkloads, serviceTemplateWithConfigAPI } from '@/api'
 import ServiceModule from '../serviceModules'
 import Build from './build'
 
@@ -61,18 +61,6 @@ export default {
   data () {
     return {
       nodeData: [
-        {
-          label: 'zadig-mimo',
-          name: 'zadig-mimo',
-          key: 0,
-          children: [{ label: 'poetry1', name: 'poetry1', key: 2 }]
-        },
-        {
-          key: 1,
-          label: 'poetry',
-          name: 'poetry',
-          children: [{ label: 'poetry2', name: 'poetry2', key: 3 }]
-        }
       ],
       serviceModules: [],
       build: {
@@ -136,7 +124,7 @@ export default {
       this.serviceModules = service_module
     },
     async getServices (init) {
-      const { data } = await getServiceTemplatesAPI(
+      const { data } = await queryServiceWorkloads(
         this.projectName,
         this.envName
       )
@@ -196,7 +184,7 @@ export default {
     .bottom {
       position: absolute;
       bottom: 61px;
-      z-index: 9999;
+      z-index: 999;
       width: calc(~'100% - 340px');
       height: 50px;
       background-color: #fff;

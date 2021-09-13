@@ -50,7 +50,6 @@ import { getClusterListAPI, productHostingNamespaceAPI, queryWorkloads, postWork
 export default {
   name: 'host_env_config',
   data () {
-    // let self = this
     return {
       allCluster: [],
       hostingNamespace: [],
