@@ -1230,6 +1230,6 @@ export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
-export function createHelmProductEnvAPI (payload) {
-  return http.post(`/api/aslan/environment/environments/helm`, payload)
+export function createHelmProductEnvAPI (productName, payload) {
+  return http.post(`/api/aslan/environment/environments/${productName}helm`, payload)
 }

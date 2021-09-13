@@ -810,14 +810,14 @@ export default {
           }
 
           const payload = {
-            productName: this.projectConfig.product_name,
+            source: 'helm',
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
             chartValues: chartValues
           }
 
           this.startDeployLoading = true
-          createHelmProductEnvAPI(payload).then(
+          createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
             res => {
               const envName = payload.envName
               this.startDeployLoading = false
