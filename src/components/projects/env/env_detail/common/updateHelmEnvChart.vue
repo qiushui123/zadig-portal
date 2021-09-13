@@ -50,11 +50,11 @@ const chartInfoTemp = {
   gitRepoConfig: null // : Object
 }
 
-const allChartNameInfoTemp = {
-  serviceName: {
-    envName: chartInfoTemp
-  }
-}
+// const allChartNameInfoTemp = {
+//   serviceName: {
+//     envName: chartInfoTemp
+//   }
+// }
 
 export default {
   name: 'ChartValues',
@@ -66,8 +66,8 @@ export default {
     },
     envNames: {
       /**
-       * Array: [] -> 初始化默认值；[x,y,z] -> 多个环境的 values.yaml
-       * String: 'env' -> 请求某个环境的所有 values.yaml 信息
+       * Array: 展示环境 tab
+       * String: 不展示环境 tab
        */
       type: [Array, String],
       required: true
@@ -105,16 +105,16 @@ export default {
       this.allChartNameInfo = {}
     },
     initAllChartNameInfo () {
+      if (!this.chartNames) {
+        return
+      }
       this.chartNames.forEach(chart => {
-        const envNames = ['DEFAULT'].concat(this.envNames)
         const envInfos = {}
-        envNames.forEach(env => {
-          envInfos[env] = {
-            ...cloneDeep(chartInfoTemp),
-            serviceName: chart.serviceName
-          }
-        })
-        this.$set(this.allChartNameInfo, chart.serviceName, envNames)
+        envInfos.DEFAULT = {
+          ...cloneDeep(chartInfoTemp),
+          ...chart
+        }
+        this.$set(this.allChartNameInfo, chart.serviceName, envInfos)
       })
       this.checkedChart = Object.keys(this.allChartNameInfo)[0]
     },
@@ -130,7 +130,7 @@ export default {
       const serviceNames = this.chartNames
         ? this.chartNames.map(chart => chart.serviceName)
         : []
-      getChartValuesYamlAPI(this.projectName, envName, serviceNames.join(',')).then(
+      getChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
         res => {
           res.forEach(re => {
             if (re.gitRepoConfig) {
@@ -168,18 +168,23 @@ export default {
   watch: {
     envNames: {
       handler (newV, oldV) {
-        let chartNamesByGet = []
+        // 要初始化的环境数据
+        let envNamesByGet = []
         if (!Array.isArray(newV)) {
-          chartNamesByGet = [newV]
+          envNamesByGet = [newV]
         } else if (!oldV) {
-          chartNamesByGet = newV
+          envNamesByGet = newV
         } else if (newV.length > oldV.length) {
-          chartNamesByGet = newV.filter(nv => {
+          envNamesByGet = newV.filter(nv => {
             return !oldV.includes(nv)
           })
         }
-        chartNamesByGet.forEach(nv => {
-          this.getChartValuesYaml(nv)
+        envNamesByGet.forEach(env => {
+          if (env === 'DEFAULT') {
+            this.initAllChartNameInfo()
+          } else {
+            this.getChartValuesYaml(nv)
+          }
         })
       },
       immediate: true

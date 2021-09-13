@@ -230,7 +230,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <ChartValues class="chart-value" ref="chartValuesRef" :envTabs="envTabs" :chartInfos="chartInfos"></ChartValues>
+            <ChartValues class="chart-value" ref="chartValuesRef" :envNames="envNames" :chartNames="chartNames"></ChartValues>
           </el-card>
         </template>
       </div>
@@ -275,11 +275,12 @@ import {
   getClusterListAPI,
   createProductAPI,
   getSingleProjectAPI,
-  getHostListAPI
+  getHostListAPI,
+  createHelmProductEnvAPI
 } from '@api'
 import bus from '@utils/event_bus'
 import { mapGetters } from 'vuex'
-import { uniq, cloneDeep } from 'lodash'
+import { uniq, cloneDeep, pick } from 'lodash'
 import { serviceTypeMap } from '@utils/word_translate'
 import ChartValues from '../env_detail/common/updateHelmEnvChart.vue'
 
@@ -380,8 +381,8 @@ export default {
           }
         ]
       },
-      chartInfos: {},
-      envTabs: ['dev', 'qa'] // []
+      envNames: 'DEFAULT', //
+      chartNames: []
     }
   },
 
@@ -495,17 +496,13 @@ export default {
       this.loading = false
       this.projectConfig.revision = template.revision
       this.projectConfig.vars = template.vars
-      // TODO test start
-      const handled = {}
-      template.chart_infos.forEach(chart => {
-        handled[chart.service_name] = {
+      this.chartNames = template.chart_infos.map(chart => {
+        return {
           serviceName: chart.service_name,
           chartVersion: chart.chart_version,
-          valuesYAML: chart.values_yaml
+          type: 'common'
         }
       })
-      this.chartInfos = handled
-      // TODO test end
       if (
         template.source === '' ||
         template.source === 'spock' ||
@@ -790,23 +787,39 @@ export default {
       }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
-          // TODO start
-          const chartInfo = Object.values(this.chartInfos).map(chart => {
-            return {
-              chart_version: chart.chartVersion,
-              service_name: chart.serviceName,
-              values_yaml: chart.valuesYAML
+          const chartNameInfo = this.$refs.chartValuesRef.getAllChartNameInfo()
+          const chartValues = []
+
+          for (const key in chartNameInfo) {
+            const chartInfo = chartNameInfo[key].DEFAULT
+            let values = pick(chartInfo, [
+              'serviceName',
+              'chartVersion',
+              'yamlSource',
+              'overrideValues'
+            ])
+            if (chartInfo.yamlSource === 'freeEdit') {
+              values = { ...values, valuesYAML: chartInfo.valuesYAML }
+            } else if (chartInfo.yamlSource === 'gitRepo') {
+              chartInfo.gitRepoConfig.valuesPaths = chartInfo.gitRepoConfig.valuesPaths.map(
+                path => path.path
+              )
+              values = { ...values, gitRepoConfig: chartInfo.gitRepoConfig }
             }
-          })
-          // TODO end
-          this.projectConfig.chart_infos = chartInfo
-          const payload = this.$utils.cloneObj(this.projectConfig)
-          const envType = 'test'
-          payload.source = 'helm'
+            chartValues.push(values)
+          }
+
+          const payload = {
+            productName: this.projectConfig.product_name,
+            envName: this.projectConfig.env_name,
+            clusterID: this.projectConfig.cluster_id,
+            chartValues: chartValues
+          }
+
           this.startDeployLoading = true
-          createProductAPI(payload, envType).then(
+          createHelmProductEnvAPI(payload).then(
             res => {
-              const envName = payload.env_name
+              const envName = payload.envName
               this.startDeployLoading = false
               this.$message({
                 message: '创建环境成功',
