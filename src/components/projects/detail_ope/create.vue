@@ -81,8 +81,20 @@
                         </el-radio-group>
                       </el-col>
                   </el-row>
-                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'"
-                          :gutter="5">
+                  <el-row :gutter="5" v-if="projectForm.product_feature.basic_facility==='kubernetes'">
+                    <el-col :span="4">
+                      <span>
+                        环境创建方式
+                      </span>
+                    </el-col>
+                    <el-col :span="10">
+                      <el-radio-group size="mini" v-model="projectForm.product_feature.create_env_type">
+                        <el-radio border label="system">新建集成环境</el-radio>
+                        <el-radio border label="external">托管现有环境</el-radio>
+                      </el-radio-group>
+                    </el-col>
+                  </el-row>
+                  <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'&&projectForm.product_feature.create_env_type==='system'" :gutter="5">
                     <el-col :span="4">
                       <span>部署方式
                         <el-tooltip placement="top">
@@ -191,7 +203,8 @@ export default {
         enabled: true,
         product_feature: {
           basic_facility: 'kubernetes',
-          deploy_type: 'k8s'
+          deploy_type: 'k8s',
+          create_env_type: 'system'
         }
       },
       rules: {
@@ -250,6 +263,10 @@ export default {
         })
         this.$store.dispatch('refreshProjectTemplates')
         if (payload.product_feature.basic_facility === 'kubernetes') {
+          if (payload.product_feature.create_env_type === 'external') {
+            this.$router.push(`/v1/projects/create/${payload.product_name}/host/config?step=1`)
+            return
+          }
           if (payload.product_feature.deploy_type === 'k8s') {
             this.$router.push(`/v1/projects/create/${payload.product_name}/basic/info?rightbar=step`)
           }
