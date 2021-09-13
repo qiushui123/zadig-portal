@@ -56,7 +56,7 @@
           </el-tooltip>
           <div class="log-tip">
             <span>日志量较大时会出现加载过慢的情况，建议使用 CLI 工具查看</span>
-            <a href="/zadig/cli/search-logs/"
+            <a href="https://docs.koderover.com/zadig/cli/search-logs/"
                target="_blank">
               <i class="icon el-icon-question"></i></a>
           </div>
