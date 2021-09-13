@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
-      return getChartValuesYamlAPI(this.projectName, env, service)
+      return getChartValuesYamlAPI(this.projectName, env, [service])
         .then(res => {
           if (res.length) {
             const re = res[0]
@@ -113,7 +113,6 @@ export default {
     generatePayload () {
       const valuesYaml = this.valuesYaml[this.activeEnv]
       let payload = {
-        envName: this.activeEnv,
         yamlSource: valuesYaml.importRepoInfo.yamlSource,
         serviceName: this.serviceName,
         overrideValues: valuesYaml.keyValues
@@ -146,6 +145,7 @@ export default {
         .then(res => {
           addChartValuesYamlByEnvAPI(
             this.projectName,
+            this.activeEnv,
             this.generatePayload()
           ).then(res => {
             this.$message.success(`保存成功`)

@@ -1221,14 +1221,10 @@ export function createTemplateServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
 }
 
-export function addChartValuesYamlByEnvAPI (productName, payload) {
-  return http.post(`/api/aslan/renderset/rendersets/${productName}/renderchart`, payload)
+export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
+  return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)
 }
 
 export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
-  return http.get(`/api/aslan/renderset/rendersets/${productName}/renderchart`, {
-    params: {
-      envName, serviceName
-    }
-  })
+  return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
