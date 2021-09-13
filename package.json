@@ -25,6 +25,7 @@
     "jsencrypt": "3.0.0-rc.1",
     "less": "2.7.2",
     "less-loader": "2.2.3",
+    "loaders.css": "0.1.2",
     "lodash": "4.17.21",
     "mobile-device-detect": "0.3.3",
     "moment": "2.29.1",
