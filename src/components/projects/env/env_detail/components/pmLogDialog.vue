@@ -71,6 +71,12 @@
               >
               </el-button>
             </el-tooltip>
+            <div class="log-tip">
+            <span>日志量较大情况会加载过慢，建议使用cli工具查看</span>
+            <a href="/zadig/cli/search-logs/"
+               target="_blank">
+              <i class="icon el-icon-question"></i></a>
+          </div>
           </div>
         </div>
       </el-card>
@@ -349,6 +355,15 @@ export default {
             background-color: #444 !important;
           }
         }
+      }
+    }
+
+    .log-tip {
+      color: #f56c6c;
+      line-height: 2;
+
+      .icon {
+        color: #f56c6c;
       }
     }
   }

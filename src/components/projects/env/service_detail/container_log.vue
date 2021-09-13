@@ -5,11 +5,11 @@
       <div class="log-container">
         <div class="log-content">
           <xterm-log-container :id="podName"
-                             @closeConnection="showRealTimeLog('','','close')"
-                             @reConnect="refreshLog"
-                             ref="log"
-                             :searchKey="searchKey"
-                             :logs="realtimeLog.data"></xterm-log-container>
+                               @closeConnection="showRealTimeLog('','','close')"
+                               @reConnect="refreshLog"
+                               ref="log"
+                               :searchKey="searchKey"
+                               :logs="realtimeLog.data"></xterm-log-container>
         </div>
         <div class="log-header">
           <div class="search-log-input">
@@ -54,6 +54,12 @@
                        icon="fs-24 iconfont iconArrowUp1-24px">
             </el-button>
           </el-tooltip>
+          <div class="log-tip">
+            <span>日志量较大情况会加载过慢，建议使用cli工具查看</span>
+            <a href="/zadig/cli/search-logs/"
+               target="_blank">
+              <i class="icon el-icon-question"></i></a>
+          </div>
         </div>
       </div>
     </el-card>
@@ -86,8 +92,13 @@ export default {
     showRealTimeLog (pod_name, container_name, operation) {
       if (operation === 'open') {
         if (typeof window.msgServer === 'undefined') {
-          const ownerQ = this.$route.query.envName ? '&envName=' + this.$route.query.envName : ''
-          this.$sse(`/api/aslan/logs/sse/pods/${pod_name}/containers/${container_name}?tails=1000&productName=${this.productName}` + ownerQ)
+          const ownerQ = this.$route.query.envName
+            ? '&envName=' + this.$route.query.envName
+            : ''
+          this.$sse(
+            `/api/aslan/logs/sse/pods/${pod_name}/containers/${container_name}?tails=1000&productName=${this.productName}` +
+              ownerQ
+          )
             .then(sse => {
               // Store SSE object at a higher scope
               window.msgServer = sse
@@ -222,7 +233,7 @@ export default {
   .clearfix::before,
   .clearfix::after {
     display: table;
-    content: "";
+    content: '';
   }
 
   .clearfix {
@@ -441,6 +452,15 @@ export default {
             background-color: #444 !important;
           }
         }
+      }
+    }
+
+    .log-tip {
+      color: #f56c6c;
+      line-height: 2;
+
+      .icon {
+        color: #f56c6c;
       }
     }
   }
