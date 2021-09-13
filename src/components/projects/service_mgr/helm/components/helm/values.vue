@@ -13,7 +13,7 @@
       <ImportValues
         v-else
         ref="importValuesRef"
-        :showDelete="true"
+        showDelete
         :importRepoInfo.sync="valuesYaml[activeEnv].importRepoInfo"
         :resize="{ direction: 'vertical' }"
         @closeValueEdit="valuesYaml[activeEnv].importRepoInfo.yamlSource = 'default'"
@@ -102,7 +102,9 @@ export default {
           keyValues: cloneDeep(keyValues),
           updated: false
         }
-        if (service) { await this.getChartValuesYaml({ env: key, service: service }) }
+        if (service) {
+          await this.getChartValuesYaml({ env: key, service: service })
+        }
       }
 
       this.valuesLoading = false

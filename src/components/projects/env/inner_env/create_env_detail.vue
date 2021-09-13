@@ -230,7 +230,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <ChartValues class="chart-value" ref="chartValuesRef" :envTabs="false" :chartInfos="chartInfos"></ChartValues>
+            <ChartValues class="chart-value" ref="chartValuesRef" :envTabs="envTabs" :chartInfos="chartInfos"></ChartValues>
           </el-card>
         </template>
       </div>
@@ -380,7 +380,8 @@ export default {
           }
         ]
       },
-      chartInfos: {}
+      chartInfos: {},
+      envTabs: ['dev', 'qa'] // []
     }
   },
 

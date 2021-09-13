@@ -43,7 +43,7 @@
           :deleteServer="deleteServer"
           :openRepoModal="openRepoModal"
         />
-        <div class="bottom">
+        <div class="bottom" v-if="!isCreate">
           <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button>
           <el-button size="small" type="primary" :disabled="!updateEnv" @click="update">更新环境</el-button>
         </div>

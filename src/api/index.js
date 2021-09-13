@@ -1225,7 +1225,7 @@ export function addChartValuesYamlByEnvAPI (productName, payload) {
   return http.post(`/api/aslan/renderset/rendersets/${productName}/renderchart`, payload)
 }
 
-export function getChartValuesYamlAPI (productName, envName, serviceName = '') {
+export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/renderset/rendersets/${productName}/renderchart`, {
     params: {
       envName, serviceName

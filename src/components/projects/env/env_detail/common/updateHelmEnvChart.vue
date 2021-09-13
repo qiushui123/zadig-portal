@@ -12,9 +12,24 @@
       </el-tab-pane>
     </el-tabs>
     <div class="values" v-if="checkedChart && serviceNames.length">
-      <div class="title">Chart Version: {{allChartNameInfo[checkedChart].chartVersion}}</div>
-      <ImportValues ref="importValuesRef" :resize="{direction: 'vertical'}" :importRepoInfo="allChartNameInfo[checkedChart]"></ImportValues>
-      <KeyValue ref="keyValueRef" :keyValues="allChartNameInfo[checkedChart].overrideValues"></KeyValue>
+      <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv">
+        <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env"></el-tab-pane>
+      </el-tabs>
+      <div class="content">
+        <div class="title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
+        <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
+          <div class="desc">暂无自定义的 values 文件</div>
+          <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
+        </div>
+        <ImportValues
+          v-show="usedChartNameInfo.yamlSource !== 'default'"
+          showDelete
+          ref="importValuesRef"
+          :resize="{direction: 'vertical'}"
+          :importRepoInfo="usedChartNameInfo"
+        ></ImportValues>
+        <KeyValue ref="keyValueRef" :keyValues="usedChartNameInfo.overrideValues"></KeyValue>
+      </div>
     </div>
   </div>
 </template>
@@ -22,8 +37,10 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
+import { getChartValuesYamlAPI } from '@api'
 import { cloneDeep } from 'lodash'
-const chartInfo = {
+
+const chartInfoTemp = {
   envName: '', // ?: String
   serviceName: '', // : String
   chartVersion: '', // : String
@@ -32,6 +49,13 @@ const chartInfo = {
   valuesYAML: '', // : String
   gitRepoConfig: null // : Object
 }
+
+const allChartNameInfoTemp = {
+  serviceName: {
+    envName: chartInfoTemp
+  }
+}
+
 export default {
   name: 'ChartValues',
   props: {
@@ -40,22 +64,20 @@ export default {
       required: false,
       default: () => null
     },
-    envTabs: {
-      type: [Array, Boolean],
+    envNames: {
+      /**
+       * Array: [] -> 初始化默认值；[x,y,z] -> 多个环境的 values.yaml
+       * String: 'env' -> 请求某个环境的所有 values.yaml 信息
+       */
+      type: [Array, String],
       required: true
-    },
-    chartInfos: {
-      // TODO 这里不应该要 更新环境变量更改后 再删掉  其他不用这个
-      // 结构与 this.allChartNameInfo 保持一致
-      type: Object,
-      required: false,
-      default: () => null
     }
   },
   data () {
     return {
-      allChartNameInfo: {}, // key: serviceName
-      checkedChart: ''
+      allChartNameInfo: {}, // key: serviceName value: Object{ key:envName }
+      checkedChart: '',
+      selectedEnv: 'DEFAULT'
     }
   },
   computed: {
@@ -67,6 +89,12 @@ export default {
           return { serviceName: name, type: 'common' }
         })
       )
+    },
+    projectName () {
+      return this.$route.params.project_name
+    },
+    usedChartNameInfo () {
+      return this.allChartNameInfo[this.checkedChart][this.selectedEnv]
     }
   },
   methods: {
@@ -78,21 +106,16 @@ export default {
     },
     initAllChartNameInfo () {
       this.chartNames.forEach(chart => {
-        this.$set(this.allChartNameInfo, chart.serviceName, {
-          ...cloneDeep(chartInfo),
-          serviceName: chart.serviceName
+        const envNames = ['DEFAULT'].concat(this.envNames)
+        const envInfos = {}
+        envNames.forEach(env => {
+          envInfos[env] = {
+            ...cloneDeep(chartInfoTemp),
+            serviceName: chart.serviceName
+          }
         })
+        this.$set(this.allChartNameInfo, chart.serviceName, envNames)
       })
-      this.checkedChart = Object.keys(this.allChartNameInfo)[0]
-    },
-    initAllChartNameInfoByChartInfos () {
-      for (const key in this.chartInfos) {
-        this.chartInfos[key] = {
-          ...cloneDeep(chartInfo),
-          ...this.chartInfos[key]
-        }
-      }
-      this.allChartNameInfo = this.chartInfos
       this.checkedChart = Object.keys(this.allChartNameInfo)[0]
     },
     validate () {
@@ -102,14 +125,65 @@ export default {
       }
       if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       return Promise.all(valid)
+    },
+    getChartValuesYaml ({ envName }) {
+      const serviceNames = this.chartNames
+        ? this.chartNames.map(chart => chart.serviceName)
+        : []
+      getChartValuesYamlAPI(this.projectName, envName, serviceNames.join(',')).then(
+        res => {
+          res.forEach(re => {
+            if (re.gitRepoConfig) {
+              re.gitRepoConfig.valuesPaths = re.gitRepoConfig.valuesPaths.map(
+                path => {
+                  return {
+                    path: path,
+                    yaml: ''
+                  }
+                }
+              )
+            }
+            const envInfo = {
+              ...cloneDeep(chartInfoTemp),
+              ...re
+            }
+
+            const allChartNameInfo = {}
+
+            allChartNameInfo[re.serviceName] = {
+              ...this.allChartNameInfo[re.serviceName]
+            }
+            allChartNameInfo[re.serviceName][re.envName] = envInfo
+
+            this.$set(
+              this.allChartNameInfo,
+              re.serviceName,
+              allChartNameInfo[re.serviceName]
+            )
+          })
+        }
+      )
     }
   },
-  created () {
-    this[
-      this.chartInfos
-        ? 'initAllChartNameInfoByChartInfos'
-        : 'initAllChartNameInfo'
-    ]()
+  watch: {
+    envNames: {
+      handler (newV, oldV) {
+        let chartNamesByGet = []
+        if (!Array.isArray(newV)) {
+          chartNamesByGet = [newV]
+        } else if (!oldV) {
+          chartNamesByGet = newV
+        } else if (newV.length > oldV.length) {
+          chartNamesByGet = newV.filter(nv => {
+            return !oldV.includes(nv)
+          })
+        }
+        chartNamesByGet.forEach(nv => {
+          this.getChartValuesYaml(nv)
+        })
+      },
+      immediate: true
+    }
   },
   components: {
     ImportValues,
@@ -154,15 +228,24 @@ export default {
   .values {
     box-sizing: border-box;
     width: calc(~'100% - 160px');
-    padding: 20px;
+    padding: 0 20px;
     border: 1px solid #dcdfe6;
     border-left-width: 0;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 
-    .title {
-      line-height: 40px;
+    .content {
+      .title {
+        height: 40px;
+        line-height: 40px;
+      }
+
+      .desc {
+        margin-top: 10px;
+        color: #909399;
+        font-size: 14px;
+      }
     }
   }
 }
