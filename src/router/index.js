@@ -51,7 +51,7 @@ import env_detail from '../components/projects/env/outer_env/env_detail.vue'
 // inside
 import project_env_home from '../components/projects/env/inner_env/home.vue'
 import project_env_detail from '../components/projects/env/inner_env/env_detail.vue'
-import project_env_create from '../components/projects/env/inner_env/create_env_detail.vue'
+import project_env_create from '../components/projects/env/createEnv.vue'
 import project_env_service_detail from '../components/projects/env/inner_env/service_detail.vue'
 import project_env_pm_service_detail from '../components/projects/env/inner_env/pm_service_detail.vue'
 import project_env_service_config from '../components/projects/env/inner_env/service_config.vue'
@@ -95,6 +95,11 @@ import onboarding_projects_not_k8s_info from '../components/projects/guide/not_k
 import onboarding_projects_not_k8s_config from '../components/projects/guide/not_k8s/not_k8s_config.vue'
 import onboarding_projects_not_k8s_deploy from '../components/projects/guide/not_k8s/not_k8s_deploy.vue'
 import onboarding_projects_not_k8s_delivery from '../components/projects/guide/not_k8s/not_k8s_delivery.vue'
+
+// host
+import onboarding_host_config from '../components/projects/guide/host/host_config.vue'
+// import onboarding_host_service_build from '../components/projects/guide/host/service_build.vue'
+// import onboarding_host_run_workflow from '../components/projects/guide/host/run_workflow.vue'
 
 /** ---------------- */
 
@@ -239,6 +244,14 @@ const routes = [
       {
         path: 'projects/create/:project_name/basic/info',
         component: onboarding_projects_info_basic,
+        meta: {
+          requiresAuth: true,
+          title: '新建项目'
+        }
+      },
+      {
+        path: 'projects/create/:project_name/host/config',
+        component: onboarding_host_config,
         meta: {
           requiresAuth: true,
           title: '新建项目'

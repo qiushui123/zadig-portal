@@ -21,6 +21,10 @@ export default {
       this.projectInfo = await getSingleProjectAPI(projectName)
       if (this.projectInfo.product_feature) {
         if (this.projectInfo.product_feature.basic_facility === 'kubernetes') {
+          if (this.projectInfo.product_feature.create_env_type === 'external') {
+            this.currentComponent = () => import('./service_host')
+            return
+          }
           if (this.projectInfo.product_feature.deploy_type === 'helm') {
             this.currentComponent = () => import('./service_helm')
           } else {

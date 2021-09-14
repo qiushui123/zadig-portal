@@ -26,6 +26,9 @@ export function whetherOnboarding (projectTemplate) {
   const productFeature = projectTemplate.product_feature
   const status = projectTemplate.onboarding_status
   const projectName = projectTemplate.product_name
+  if (productFeature.create_env_type === 'external') {
+    return `/v1/projects/create/${projectName}/host/config?step=${status}`
+  }
   if (productFeature.deploy_type === 'k8s') {
     if (productFeature.basic_facility === 'cloud_host') {
       return getRoute(status - 1, 'not_k8s', projectName)

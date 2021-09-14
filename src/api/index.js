@@ -2,9 +2,9 @@ import axios from 'axios'
 import qs from 'qs'
 import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
-const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts']
+const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts', '/api/aslan/environment/kube/workloads']
 const ignoreErrReq = '/api/aslan/services/validateUpdate/'
-const reqExps = /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/groups/
+const reqExps = [/api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/workloads/, /api\/aslan\/environment\/environments\/[a-z-A-Z-0-9]+\/groups/]
 const analyticsReq = 'https://api.koderover.com/api/operation/upload'
 const installationAnalysisReq = 'https://api.koderover.com/api/operation/admin/user'
 const http = axios.create()
@@ -83,9 +83,12 @@ function displayError (error) {
 http.interceptors.response.use(
   (response) => {
     const req = response.config.url.split(/[?#]/)[0]
+    const isInReg = (reqExps.findIndex(element => {
+      return element.test(req)
+    })) >= 0
     if (specialAPIs.includes(req)) {
       return response
-    } else if (reqExps.test(req)) {
+    } else if (isInReg) {
       return response
     } else {
       return response.data
@@ -249,7 +252,7 @@ export function envRevisionsAPI (projectName, envName) {
 
 export function productServicesAPI (projectName, envName, envSource, searchName = '', perPage = 20, page = 1) {
   if (envSource === 'helm' || envSource === 'external') {
-    return http.get(`/api/aslan/environment/environments/${projectName}/groups/${envSource}?envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
+    return http.get(`/api/aslan/environment/environments/${projectName}/workloads?env=${envName}&filter=name=${searchName}&perPage=${perPage}&page=${page}`)
   } else {
     return http.get(`/api/aslan/environment/environments/${projectName}/groups?envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
   }
@@ -273,8 +276,8 @@ export function templatesAPI () {
   return http.get('/api/aslan/project/templates/info')
 }
 
-export function getServiceTemplatesAPI (projectName = '') {
-  return http.get(`/api/aslan/service/services?productName=${projectName}`)
+export function getServiceTemplatesAPI (projectName = '', envName = '') {
+  return http.get(`/api/aslan/service/services?productName=${projectName}&envName=${envName}`)
 }
 
 export function serviceTemplateWithConfigAPI (name, projectName) {
@@ -1067,8 +1070,8 @@ export function getProductInfo (productName, envName = '') {
   return http.get(`/api/aslan/environment/environments/${productName}?envName=${envName}`)
 }
 
-export function getServiceInfo (productName, serviceName, envName = '', envType = '') {
-  return http.get(`/api/aslan/environment/environments/${productName}/services/${serviceName}?envName=${envName}&envType=${envType}`)
+export function getServiceInfo (productName, serviceName, envName = '', envType = '', workLoadType) {
+  return http.get(`/api/aslan/environment/environments/${productName}/services/${serviceName}?envName=${envName}&envType=${envType}&workLoadType=${workLoadType}`)
 }
 
 export function autoUpgradeEnvAPI (projectName, payload, force = '') {
@@ -1228,4 +1231,17 @@ export function updateHelmProductEnvAPI (productName, payload) {
 
 export function updateHelmEnvVarAPI (productName, payload) {
   return http.put(`/api/aslan/environment/environments/${productName}/renderchart`, payload)
+}
+
+// exteranl
+export function queryWorkloads (clusterId, namespace, page) {
+  return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)
+}
+
+export function queryServiceWorkloads (projectName, envName) {
+  return http.get(`/api/aslan/service/workloads?productName=${projectName}&env=${envName}`)
+}
+
+export function postWorkloads (payload) {
+  return http.post(`/api/aslan/service/workloads`, payload)
 }
