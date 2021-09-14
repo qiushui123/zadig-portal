@@ -1007,14 +1007,6 @@ export function updateK8sEnvAPI (product_name, env_name, payload, envType = '', 
   return http.post(`/api/aslan/environment/environments/${product_name}?envName=${env_name}&envType=${envType}&force=${force}`, payload)
 }
 
-export function getHelmEnvVarAPI (projectName, envName) {
-  return http.get(`/api/aslan/environment/environments/${projectName}/helmRenderCharts?envName=${envName}`)
-}
-
-export function updateHelmEnvVarAPI (projectName, envName, payload) {
-  return http.put(`/api/aslan/environment/environments/${projectName}/helmEnvVariable?envName=${envName}`, payload)
-}
-
 export function getHelmEnvChartDiffAPI (projectName, envName) {
   return http.get(`/api/aslan/environment/environments/${projectName}/helmChartVersions?envName=${envName}`)
 }
@@ -1222,10 +1214,18 @@ export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
+export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
+  return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+}
+
 export function createHelmProductEnvAPI (productName, payload) {
   return http.post(`/api/aslan/environment/environments/${productName}/helm`, payload)
 }
 
 export function updateHelmProductEnvAPI (productName, payload) {
   return http.post(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
+}
+
+export function updateHelmEnvVarAPI (productName, payload) {
+  return http.put(`/api/aslan/environment/environments/${productName}/renderchart`, payload)
 }

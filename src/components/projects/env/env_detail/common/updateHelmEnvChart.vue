@@ -37,7 +37,7 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
-import { getChartValuesYamlAPI } from '@api'
+import { getAllChartValuesYamlAPI } from '@api'
 import { cloneDeep, pick } from 'lodash'
 
 const chartInfoTemp = {
@@ -169,7 +169,7 @@ export default {
     },
     getChartValuesYaml ({ envName }) {
       const serviceNames = []
-      getChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
+      getAllChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
         res => {
           res.forEach(re => {
             if (re.gitRepoConfig) {
@@ -220,6 +220,9 @@ export default {
         }
         this.selectedEnv = Array.isArray(newV) ? (newV[newV.length - 1] || 'DEFAULT') : newV
         envNamesByGet.forEach(env => {
+          if (env === 'DEFAULT' || !env) {
+            return
+          }
           this.initAllChartNameInfo(env)
           // this.getChartValuesYaml({ envName: env })
         })
