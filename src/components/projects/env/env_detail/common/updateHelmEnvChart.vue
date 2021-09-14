@@ -218,6 +218,7 @@ export default {
             return !oldV.includes(nv)
           })
         }
+        this.selectedEnv = Array.isArray(newV) ? (newV[newV.length - 1] || 'DEFAULT') : newV
         envNamesByGet.forEach(env => {
           this.initAllChartNameInfo(env)
           // this.getChartValuesYaml({ envName: env })

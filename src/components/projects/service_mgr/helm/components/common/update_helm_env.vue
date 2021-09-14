@@ -19,7 +19,6 @@
 import ChartValues from '@/components/projects/env/env_detail/common/updateHelmEnvChart.vue'
 import { updateHelmProductEnvAPI } from '@api'
 import { mapGetters } from 'vuex'
-import { pick } from 'lodash'
 
 export default {
   name: 'updateHelmEnv',

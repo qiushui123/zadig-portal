@@ -1007,10 +1007,6 @@ export function updateK8sEnvAPI (product_name, env_name, payload, envType = '', 
   return http.post(`/api/aslan/environment/environments/${product_name}?envName=${env_name}&envType=${envType}&force=${force}`, payload)
 }
 
-export function updateHelmEnvAPI (projectName, envName, updateType = '') {
-  return http.put(`/api/aslan/environment/environments/${projectName}/helmEnv?envName=${envName}&updateType=${updateType}`)
-}
-
 export function getHelmEnvVarAPI (projectName, envName) {
   return http.get(`/api/aslan/environment/environments/${projectName}/helmRenderCharts?envName=${envName}`)
 }
