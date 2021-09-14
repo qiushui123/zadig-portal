@@ -200,4 +200,8 @@ export default {
     }
   }
 }
+
+/deep/ .custom-tree-node {
+  overflow: scroll;
+}
 </style>
