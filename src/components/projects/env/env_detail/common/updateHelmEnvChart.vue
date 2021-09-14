@@ -38,7 +38,7 @@
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
 import { getChartValuesYamlAPI } from '@api'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, pick } from 'lodash'
 
 const chartInfoTemp = {
   envName: '', // ?: String
@@ -99,22 +99,63 @@ export default {
   },
   methods: {
     getAllChartNameInfo () {
-      return this.allChartNameInfo
+      const chartValues = []
+      const serviceNames = this.serviceNames.map(chart => chart.serviceName)
+      const chartNameInfo = this.allChartNameInfo
+      const envNames = Array.isArray(this.envNames)
+        ? this.envNames
+        : [this.envNames]
+      for (const serviceName in chartNameInfo) {
+        if (!serviceNames.includes(serviceName)) {
+          continue
+        }
+        const chartInfo = chartNameInfo[serviceName]
+        for (const envName in chartInfo) {
+          if (!envNames.includes(envName)) {
+            continue
+          }
+          let values = pick(chartInfo[envName], [
+            'envName',
+            'serviceName',
+            'chartVersion',
+            'yamlSource',
+            'overrideValues'
+          ])
+          if (values.yamlSource === 'gitRepo') {
+            const gitRepoConfig = cloneDeep(chartInfo[envName].gitRepoConfig)
+            gitRepoConfig.valuesPaths = gitRepoConfig.valuesPaths.map(
+              path => path.path
+            )
+            values = {
+              ...values,
+              gitRepoConfig
+            }
+          } else if (values.yamlSource === 'freeEdit') {
+            values = { ...values, valuesYAML: chartInfo[envName].valuesYAML }
+          }
+          chartValues.push(values)
+        }
+      }
+      return chartValues
     },
     resetAllChartNameInfo () {
       this.allChartNameInfo = {}
     },
-    initAllChartNameInfo () {
+    initAllChartNameInfo (envName = 'DEFAULT') {
       if (!this.chartNames) {
         return
       }
       this.chartNames.forEach(chart => {
         const envInfos = {}
-        envInfos.DEFAULT = {
+        envInfos[envName] = {
           ...cloneDeep(chartInfoTemp),
-          ...chart
+          ...chart,
+          envName: envName === 'DEFAULT' ? '' : envName
         }
-        this.$set(this.allChartNameInfo, chart.serviceName, envInfos)
+        this.$set(this.allChartNameInfo, chart.serviceName, {
+          ...this.allChartNameInfo[chart.serviceName],
+          ...envInfos
+        })
       })
       this.checkedChart = Object.keys(this.allChartNameInfo)[0]
     },
@@ -127,9 +168,7 @@ export default {
       return Promise.all(valid)
     },
     getChartValuesYaml ({ envName }) {
-      const serviceNames = this.chartNames
-        ? this.chartNames.map(chart => chart.serviceName)
-        : []
+      const serviceNames = []
       getChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
         res => {
           res.forEach(re => {
@@ -180,12 +219,17 @@ export default {
           })
         }
         envNamesByGet.forEach(env => {
-          if (env === 'DEFAULT') {
-            this.initAllChartNameInfo()
-          } else {
-            this.getChartValuesYaml(nv)
-          }
+          this.initAllChartNameInfo(env)
+          // this.getChartValuesYaml({ envName: env })
         })
+      },
+      immediate: true
+    },
+    chartNames: {
+      handler (newV, oldV) {
+        if (newV) {
+          this.initAllChartNameInfo()
+        }
       },
       immediate: true
     }

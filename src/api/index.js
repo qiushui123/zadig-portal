@@ -1087,10 +1087,6 @@ export function autoUpgradeEnvAPI (projectName, payload, force = '') {
   return http.put(`/api/aslan/environment/environments/${projectName}/autoUpdate?force=${force}`, payload)
 }
 
-export function autoUpgradeHelmEnvAPI (projectName, payload) {
-  return http.put(`/api/aslan/environment/environments/${projectName}/updateMultiEnv`, payload)
-}
-
 // Login
 export function userLoginAPI (organization_id, payload) {
   return http.post(`/api/directory/user/login?orgId=${organization_id}`, payload)
@@ -1231,5 +1227,9 @@ export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
 }
 
 export function createHelmProductEnvAPI (productName, payload) {
-  return http.post(`/api/aslan/environment/environments/${productName}helm`, payload)
+  return http.post(`/api/aslan/environment/environments/${productName}/helm`, payload)
+}
+
+export function updateHelmProductEnvAPI (productName, payload) {
+  return http.post(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
 }

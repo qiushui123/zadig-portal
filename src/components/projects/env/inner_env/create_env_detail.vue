@@ -787,33 +787,10 @@ export default {
       }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
-          const chartNameInfo = this.$refs.chartValuesRef.getAllChartNameInfo()
-          const chartValues = []
-
-          for (const key in chartNameInfo) {
-            const chartInfo = chartNameInfo[key].DEFAULT
-            let values = pick(chartInfo, [
-              'serviceName',
-              'chartVersion',
-              'yamlSource',
-              'overrideValues'
-            ])
-            if (chartInfo.yamlSource === 'freeEdit') {
-              values = { ...values, valuesYAML: chartInfo.valuesYAML }
-            } else if (chartInfo.yamlSource === 'gitRepo') {
-              chartInfo.gitRepoConfig.valuesPaths = chartInfo.gitRepoConfig.valuesPaths.map(
-                path => path.path
-              )
-              values = { ...values, gitRepoConfig: chartInfo.gitRepoConfig }
-            }
-            chartValues.push(values)
-          }
-
           const payload = {
-            source: 'helm',
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: chartValues
+            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
           }
 
           this.startDeployLoading = true

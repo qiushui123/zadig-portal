@@ -7,7 +7,7 @@
       <el-checkbox-group v-model="checkedEnvList">
         <el-checkbox v-for="(env, index) in envNameList" :key="index" :label="env.envName"></el-checkbox>
       </el-checkbox-group>
-      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envTabs="false" :chartNames="chartNames"></ChartValues>
+      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envNames="checkedEnvList" :chartNames="chartNames"></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
@@ -17,10 +17,9 @@
 </template>
 <script>
 import ChartValues from '@/components/projects/env/env_detail/common/updateHelmEnvChart.vue'
-import {
-  autoUpgradeHelmEnvAPI
-} from '@api'
+import { updateHelmProductEnvAPI } from '@api'
 import { mapGetters } from 'vuex'
+import { pick } from 'lodash'
 
 export default {
   name: 'updateHelmEnv',
@@ -34,18 +33,25 @@ export default {
     }
   },
   methods: {
-    autoUpgradeEnv () {
+    async autoUpgradeEnv () {
+      const res = await this.$refs.chartValuesRef.validate().catch(err => {
+        console.log(err)
+      })
+      if (!res) {
+        return
+      }
       this.$confirm('更新环境, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         const payload = {
-          env_names: this.checkedEnvList
+          envNames: this.checkedEnvList,
+          replacePolicy: 'notUseEnvImage',
+          chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
         }
         const projectName = this.projectName
-        payload.update_type = 'envVar'
-        autoUpgradeHelmEnvAPI(projectName, payload).then((res) => {
+        updateHelmProductEnvAPI(projectName, payload).then(res => {
           this.$router.push(`/v1/projects/detail/${projectName}/envs`)
           this.$message({
             message: '更新环境成功',
@@ -73,7 +79,7 @@ export default {
     ...mapGetters(['productList']),
     envNameList () {
       const envNameList = []
-      this.productList.forEach((element) => {
+      this.productList.forEach(element => {
         if (
           element.product_name === this.projectName &&
           element.source !== 'external'
