@@ -125,7 +125,7 @@
                     </template>
                 </el-tooltip>
                 <template>
-                  <el-button v-if="envSource==='external'" @click="editExternalConfig" type="text">配置托管</el-button>
+                  <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
                 </template>
                 <template>
                     <el-button v-if="(productInfo.status!=='Disconnected'&&productInfo.cluster_id!=='')&&(envSource===''||envSource==='spock'|| envSource==='helm')"
@@ -720,8 +720,15 @@ export default {
     ])
   },
   methods: {
-    editExternalConfig () {
-      this.$router.push(`/v1/projects/detail/${this.projectName}/envs/externalConfig?envName='123'`)
+    editExternalConfig (product_info) {
+      const params = {
+        step: 1,
+        envName: product_info.env_name,
+        namespace: product_info.namespace,
+        productName: product_info.product_name,
+        clusterId: this.clusterId
+      }
+      this.$router.push({ path: `/v1/projects/detail/${this.projectName}/envs/externalConfig`, query: params })
     },
     openUpdateHelmEnv () {
       this.$refs.updateHelmEnvDialog.openDialog()

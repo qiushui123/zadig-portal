@@ -14,11 +14,12 @@ export default {
   methods: {
     async nextStep (step) {
       const status = await this.$refs.addHostEnv.validate()
+      const envName = this.$refs.addHostEnv.form.env_name
       if (status) {
         const res = await this.$refs.addHostEnv.submit()
         if (res) {
           this.$router.push(
-            `/v1/projects/create/${this.$route.params.project_name}/host/config?step=${step}`
+            `/v1/projects/create/${this.$route.params.project_name}/host/config?step=${step}&envName=${envName}`
           )
         }
       }
