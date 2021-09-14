@@ -22,8 +22,7 @@
         <ValueRepo
           v-if="importRepoInfoUse.yamlSource === 'gitRepo'"
           ref="valueRepo"
-          :valueRepoInfo="importRepoInfoUse.gitRepoConfig"
-          @update:valueRepoInfo="importRepoInfoUse.gitRepoConfig = $event"
+          :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig"
         ></ValueRepo>
       </template>
     </div>
@@ -43,7 +42,7 @@ const valueInfo = {
     owner: '',
     repo: '',
     branch: '',
-    valuesPaths: [{ path: '', yaml: '' }]
+    valuesPaths: ['']
   }
 }
 
@@ -69,13 +68,11 @@ export default {
   },
   computed: {
     setResize () {
-      return Object.assign(
-        {
-          height: '300px',
-          direction: 'none'
-        },
-        this.resize
-      )
+      return {
+        height: '300px',
+        direction: 'none',
+        ...this.resize
+      }
     },
     importRepoInfoUse: {
       get () {
@@ -83,11 +80,8 @@ export default {
         if (!this.importRepoInfo.gitRepoConfig) {
           gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
         }
-        // if (this.importRepoInfo.yamlSource === 'default') {
-        //   gitRepoConfig = Object.assign(gitRepoConfig, { yamlSource: 'gitRepo' })
-        // }
         console.log('importRepoInfoUse index:', this.importRepoInfo)
-        return Object.assign(this.importRepoInfo, gitRepoConfig)
+        return { ...this.importRepoInfo, ...gitRepoConfig }
       },
       set (val) {
         this.$emit('update:importRepoInfo', val)

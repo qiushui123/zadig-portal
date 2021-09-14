@@ -122,13 +122,9 @@ export default {
             'overrideValues'
           ])
           if (values.yamlSource === 'gitRepo') {
-            const gitRepoConfig = cloneDeep(chartInfo[envName].gitRepoConfig)
-            gitRepoConfig.valuesPaths = gitRepoConfig.valuesPaths.map(
-              path => path.path
-            )
             values = {
               ...values,
-              gitRepoConfig
+              gitRepoConfig: cloneDeep(chartInfo[envName].gitRepoConfig)
             }
           } else if (values.yamlSource === 'freeEdit') {
             values = { ...values, valuesYAML: chartInfo[envName].valuesYAML }
@@ -172,16 +168,6 @@ export default {
       getAllChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
         res => {
           res.forEach(re => {
-            if (re.gitRepoConfig) {
-              re.gitRepoConfig.valuesPaths = re.gitRepoConfig.valuesPaths.map(
-                path => {
-                  return {
-                    path: path,
-                    yaml: ''
-                  }
-                }
-              )
-            }
             const envInfo = {
               ...cloneDeep(chartInfoTemp),
               ...re
@@ -223,8 +209,8 @@ export default {
           if (env === 'DEFAULT' || !env) {
             return
           }
-          this.initAllChartNameInfo(env)
-          // this.getChartValuesYaml({ envName: env })
+          // this.initAllChartNameInfo(env)
+          this.getChartValuesYaml({ envName: env })
         })
       },
       immediate: true

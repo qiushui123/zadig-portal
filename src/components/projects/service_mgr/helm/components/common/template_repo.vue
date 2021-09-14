@@ -10,7 +10,15 @@
         </el-select>
       </el-form-item>
       <el-form-item label-width="0">
+        <div v-show="importRepoInfo.yamlSource === 'default'" class="default-values">
+          <div class="desc">
+            无自定义的 values 文件
+            <el-button type="text" @click="importRepoInfo.yamlSource = 'gitRepo'">高级配置</el-button>
+          </div>
+        </div>
         <ImportValues
+          v-show="importRepoInfo.yamlSource !== 'default'"
+          showDelete
           ref="importValues"
           :resize="{direction: 'vertical', height: '250px'}"
           :importRepoInfo.sync="importRepoInfo"
@@ -59,7 +67,7 @@ export default {
         moduleName: ''
       },
       importRepoInfo: {
-        yamlSource: 'gitRepo',
+        yamlSource: 'default',
         valuesYAML: '',
         gitRepoConfig: null
       }
@@ -85,7 +93,7 @@ export default {
         moduleName: ''
       }
       this.importRepoInfo = {
-        yamlSource: 'gitRepo',
+        yamlSource: 'default',
         valuesYAML: '',
         gitRepoConfig: null
       }
@@ -114,29 +122,28 @@ export default {
         name: this.tempData.serviceName
       }
       if (this.importRepoInfo.yamlSource === 'freeEdit') {
-        payload = Object.assign(payload, {
+        payload = {
+          ...payload,
           createFrom: {
             templateName: this.tempData.moduleName,
             valuesYAML: this.importRepoInfo.valuesYAML
           }
-        })
+        }
       } else if (this.importRepoInfo.yamlSource === 'gitRepo') {
-        payload = Object.assign(payload, {
+        payload = {
+          ...payload,
           createFrom: {
-            codehostID: this.importRepoInfo.gitRepoConfig.codehostID,
-            owner: this.importRepoInfo.gitRepoConfig.owner,
-            repo: this.importRepoInfo.gitRepoConfig.repo,
-            branch: this.importRepoInfo.gitRepoConfig.branch,
-            valuesPaths: this.importRepoInfo.gitRepoConfig.valuesPaths.map(path => path.path),
+            ...this.importRepoInfo.gitRepoConfig,
             templateName: this.tempData.moduleName
           }
-        })
+        }
       } else {
-        payload = Object.assign(payload, {
+        payload = {
+          ...payload,
           createFrom: {
             templateName: this.tempData.moduleName
           }
-        })
+        }
       }
       const res = await createTemplateServiceAPI(projectName, payload).catch(
         err => {
@@ -149,7 +156,9 @@ export default {
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit('canUpdateEnv', [{ serviceName: payload.name, type: 'create' }])
+        this.$emit('canUpdateEnv', [
+          { serviceName: payload.name, type: 'create' }
+        ])
       }
     }
   },
@@ -165,6 +174,10 @@ export default {
 
 <style lang="less" scoped>
 .template-repo-container {
+  .desc {
+    text-align: right;
+  }
+
   /deep/.el-form {
     .el-form-item {
       margin-bottom: 15px;

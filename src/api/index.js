@@ -1215,7 +1215,7 @@ export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
 }
 
 export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
-  return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+  return http.get(`/api/aslan/environment/rendersets/renderchartunion?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
 export function createHelmProductEnvAPI (productName, payload) {

@@ -68,10 +68,10 @@
     </el-form>
     <div class="file-route">
       <div class="title">文件路径</div>
-      <div v-for="(path, index) in source.valuesPaths" :key="index">
+      <div v-for="(path, index) in valuesPaths" :key="index">
         <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
         <el-button type="text" @click="review(index)">预览</el-button>
-        <el-button v-show="source.valuesPaths.length > 1" type="text" @click="deletePath(index)">移除</el-button>
+        <el-button v-show="valuesPaths.length > 1" type="text" @click="deletePath(index)">移除</el-button>
       </div>
       <el-button icon="el-icon-plus" type="text" size="small" @click="addPath">添加 values 文件</el-button>
       <el-alert v-show="showTip" title="请先添加 value 文件" type="warning" :closable="false"></el-alert>
@@ -89,7 +89,8 @@ export default {
   mixins: [RepoMixin],
   data () {
     return {
-      showTip: false
+      showTip: false,
+      valuesPaths: []
     }
   },
   watch: {
@@ -98,29 +99,35 @@ export default {
         this.$emit('update:valueRepoInfo', cloneDeep(newV))
       },
       deep: true
+    },
+    valuesPaths: {
+      handler (newV) {
+        this.source.valuesPaths = newV.map(val => val.path)
+      },
+      deep: true
     }
   },
   methods: {
     review (index) {
-      console.log('review values.yaml: ', this.source.valuesPaths[index].yaml)
+      console.log('review values.yaml: ', this.valuesPaths[index].yaml)
     },
     deletePath (index) {
-      if (this.source.valuesPaths.length < 2) return
-      this.source.valuesPaths.splice(index, 1)
+      if (this.valuesPaths.length < 2) return
+      this.valuesPaths.splice(index, 1)
     },
     addPath () {
-      if (!this.source.valuesPaths[this.source.valuesPaths.length - 1].path) {
+      if (!this.valuesPaths[this.valuesPaths.length - 1].path) {
         this.showTip = true
         return
       }
       this.showTip = false
-      this.source.valuesPaths.push({
+      this.valuesPaths.push({
         path: '',
         yaml: ''
       })
     },
     validateRoute () {
-      const path = this.source.valuesPaths.find(path => path.path === '')
+      const path = this.valuesPaths.find(path => path.path === '')
       if (path) {
         this.showTip = true
         return Promise.reject()
@@ -132,6 +139,12 @@ export default {
   },
   created () {
     this.source = cloneDeep(this.valueRepoInfo)
+    this.valuesPaths = this.source.valuesPaths.map(val => {
+      return {
+        path: val,
+        yaml: ''
+      }
+    })
   }
 }
 </script>

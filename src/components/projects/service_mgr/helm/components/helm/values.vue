@@ -64,15 +64,6 @@ export default {
             const valueYaml = {}
             valueYaml.updated = false
             valueYaml.keyValues = re.overrideValues
-
-            if (re.gitRepoConfig) {
-              re.gitRepoConfig.valuesPaths = re.gitRepoConfig.valuesPaths.map(
-                path => {
-                  return { path: path, yaml: '' }
-                }
-              )
-            }
-
             valueYaml.importRepoInfo = {
               yamlSource: re.yamlSource,
               valuesYAML: re.valuesYAML || '',
@@ -118,20 +109,15 @@ export default {
         overrideValues: valuesYaml.keyValues
       }
       if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
-        payload = Object.assign(payload, {
+        payload = {
+          ...payload,
           valuesYAML: valuesYaml.importRepoInfo.valuesYAML
-        })
+        }
       } else if (valuesYaml.importRepoInfo.yamlSource === 'gitRepo') {
-        const gitRepoConfig = valuesYaml.importRepoInfo.gitRepoConfig
-        payload = Object.assign(payload, {
-          gitRepoConfig: {
-            codehostID: gitRepoConfig.codehostID,
-            branch: gitRepoConfig.branch,
-            owner: gitRepoConfig.owner,
-            repo: gitRepoConfig.repo,
-            valuesPaths: gitRepoConfig.valuesPaths.map(config => config.path)
-          }
-        })
+        payload = {
+          ...payload,
+          gitRepoConfig: valuesYaml.importRepoInfo.gitRepoConfig
+        }
       }
       return payload
     },

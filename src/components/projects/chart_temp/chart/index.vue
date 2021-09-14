@@ -53,14 +53,13 @@ function tree ({ chartName, files }) {
     path.split('/').reduce((r, name, i, a) => {
       if (!r[name]) {
         r[name] = { result: [] }
-        r.result.push(
-          Object.assign(file, {
-            name,
-            children: r[name].result,
-            chartName,
-            fullPath: `${chartName}/${file.path}`
-          })
-        )
+        r.result.push({
+          ...file,
+          name,
+          children: r[name].result,
+          chartName,
+          fullPath: `${chartName}/${file.path}`
+        })
       }
       return r[name]
     }, level)
@@ -154,12 +153,13 @@ export default {
     getChartTemplates () {
       return getChartTemplatesAPI().then(res => {
         const list = res.map(re => {
-          return Object.assign(re, {
+          return {
+            ...re,
             is_chart: true,
             is_dir: true,
             fullPath: re.name,
             children: []
-          })
+          }
         })
         return list
       })
