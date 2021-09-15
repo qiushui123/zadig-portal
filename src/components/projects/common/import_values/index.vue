@@ -80,7 +80,6 @@ export default {
         if (!this.importRepoInfo.gitRepoConfig) {
           gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
         }
-        console.log('importRepoInfoUse index:', this.importRepoInfo)
         return Object.assign(this.importRepoInfo, gitRepoConfig)
       },
       set (val) {

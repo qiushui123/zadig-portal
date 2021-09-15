@@ -78,7 +78,6 @@ export default {
             envNames: [this.productInfo.env_name],
             chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
           }
-          console.log('--:', payload)
           updateHelmProductEnvAPI(projectName, payload).then(
             (response) => {
               this.updateHelmEnvDialogVisible = false

@@ -96,6 +96,7 @@ export default {
         valuesYAML: '',
         gitRepoConfig: null
       }
+      this.$refs.tempForm.clearValidate()
       this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {

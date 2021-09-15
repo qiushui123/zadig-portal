@@ -83,7 +83,6 @@ export default {
   },
   computed: {
     serviceNames () {
-      console.log('update')
       return (
         this.chartNames ||
         Object.keys(this.allChartNameInfo).map(name => {
@@ -218,7 +217,6 @@ export default {
   watch: {
     envNames: {
       handler (newV, oldV) {
-        console.log('???', newV, oldV)
         // 要初始化的环境数据
         let envNamesByGet = []
         if (!Array.isArray(newV)) {
