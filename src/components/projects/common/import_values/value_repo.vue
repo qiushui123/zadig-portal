@@ -1,6 +1,6 @@
 <template>
   <div class="value-repo-container">
-    <el-form :model="source" :rules="sourceRules" ref="repoForm">
+    <el-form :model="source" :rules="sourceRules" ref="repoForm" :show-message="false" status-icon>
       <el-form-item prop="codehostID">
         <el-select
           v-model="source.codehostID"
@@ -61,13 +61,13 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="branch">
-        <el-select v-model.trim="source.branch" placeholder="请选择" style="width: 100%;" size="small" filterable allow-create clearable>
+        <el-select v-model.trim="source.branch" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
           <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
         </el-select>
       </el-form-item>
     </el-form>
     <div class="file-route">
-      <div class="title">文件路径</div>
+      <div class="desc-title">文件路径</div>
       <div v-for="(path, index) in valuesPaths" :key="index">
         <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
         <el-button type="text" @click="review(index)">预览</el-button>
@@ -163,13 +163,13 @@ export default {
 
   /deep/.el-form {
     .el-form-item {
-      margin-bottom: 12px;
+      margin-bottom: 0;
     }
   }
 
   .file-route {
-    .title {
-      padding: 10px 0;
+    .desc-title {
+      padding: 5px 0;
     }
 
     /deep/.el-input {

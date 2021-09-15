@@ -7,15 +7,15 @@
     <el-divider></el-divider>
     <div class="desc">
       <template>
-        <div class="title">文件来源</div>
-        <el-select v-model="importRepoInfoUse.yamlSource" size="small">
+        <div class="desc-title">文件来源</div>
+        <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40">
           <el-option label="Git 仓库" value="gitRepo"></el-option>
           <el-option label="手动输入" value="freeEdit"></el-option>
           <!-- <el-option label="使用默认" value="default"></el-option> -->
         </el-select>
       </template>
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
-        <div class="title">仓库信息</div>
+        <div class="desc-title">仓库信息</div>
         <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
           <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
         </Resize>
@@ -129,8 +129,8 @@ export default {
   padding: 10px;
   line-height: 1;
 
-  .title {
-    padding: 10px 0;
+  .desc-title {
+    padding: 6px 0;
   }
 
   h4 {
@@ -147,6 +147,11 @@ export default {
   .desc {
     color: #a1a3a7;
     font-size: 14px;
+
+    .height-40 {
+      height: 40px;
+      line-height: 40px;
+    }
 
     /deep/.el-input {
       .el-input__inner {

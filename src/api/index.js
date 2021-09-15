@@ -1226,7 +1226,7 @@ export function createHelmProductEnvAPI (productName, payload) {
 }
 
 export function updateHelmProductEnvAPI (productName, payload) {
-  return http.post(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
+  return http.put(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
 }
 
 export function updateHelmEnvVarAPI (productName, payload) {

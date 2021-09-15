@@ -16,7 +16,7 @@
         <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env"></el-tab-pane>
       </el-tabs>
       <div class="content">
-        <div class="title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
+        <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
         <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
           <div class="desc">暂无自定义的 values 文件</div>
           <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
@@ -264,6 +264,10 @@ export default {
           }
         }
       }
+
+      &.is-top {
+        margin-bottom: 5px;
+      }
     }
 
     .el-tabs__content {
@@ -282,7 +286,7 @@ export default {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 
     .content {
-      .title {
+      .version-title {
         height: 40px;
         line-height: 40px;
       }

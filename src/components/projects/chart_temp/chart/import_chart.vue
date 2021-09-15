@@ -2,7 +2,7 @@
   <div class="import-chart-container">
     <el-form ref="gitForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="模板名称" prop="name">
-        <el-input v-model="tempData.name" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
+        <el-input v-model="tempData.name" placeholder="请输入模板名称" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item label-width="0">
         <GitRepo

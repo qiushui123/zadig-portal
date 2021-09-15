@@ -72,7 +72,9 @@ export default {
     validate () {
       return this.$refs.form.validate().then(() => {
         const len = this.keyValues.length
-        if (len > 0 && this.keyValues[len - 1].add) { this.keyValues[len - 1] = cloneDeep(this.keyValueForm) }
+        if (len > 0 && this.keyValues[len - 1].add) {
+          this.keyValues[len - 1] = cloneDeep(this.keyValueForm)
+        }
         this.$refs.form.clearValidate()
         this.keyValueForm = {
           key: '',
@@ -96,26 +98,33 @@ export default {
 
 <style lang="less" scoped>
 .key-value-outer {
-  padding: 10px 0;
-
   h5 {
-    margin: 14px 0;
-    color: #909399;
-    font-size: 15px;
+    margin: 2px 0 14px;
+    color: #606266;
+    font-size: 14px;
   }
 
   /deep/ .el-table {
     th {
-      padding: 6px 0;
+      padding: 3px 0;
+      font-weight: 500;
       text-align: left;
     }
 
     td {
-      padding: 12px 0 0;
+      padding: 3px 0;
+    }
+
+    .el-table__empty-block {
+      min-height: 48px;
+
+      .el-table__empty-text {
+        line-height: 48px;
+      }
     }
 
     .el-form-item {
-      margin-bottom: 18px;
+      margin-bottom: 0;
     }
   }
 }
