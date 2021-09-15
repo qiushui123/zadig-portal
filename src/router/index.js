@@ -94,7 +94,7 @@ const routes = [
       },
       {
         path: 'projects/create/:project_name/host/config',
-        component: onboarding_host_config,
+        component: () => import(/* webpackChunkName: "onboarding-host" */ '@/components/projects/guide/host/host_config.vue'),
         meta: {
           requiresAuth: true,
           title: '新建项目'
@@ -254,7 +254,7 @@ const routes = [
         children: [
           {
             path: 'create',
-            component: () => import(/* webpackChunkName: "project-env" */ '@/components/projects/env/inner_env/create_env_detail.vue'),
+            component: () => import(/* webpackChunkName: "project-env" */ '@/components/projects/env/createEnv.vue'),
             meta: {
               requiresAuth: true,
               title: '创建环境'
@@ -730,7 +730,7 @@ const routes = [
       },
       {
         path: 'announcement',
-        component: setting_announcement_manage,
+        component: () => import(/* webpackChunkName: "setting" */ '@/components/setting/announcement/manage.vue'),
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
@@ -739,7 +739,7 @@ const routes = [
       },
       {
         path: 'auditlog',
-        component: setting_auditlog_manage,
+        component: () => import(/* webpackChunkName: "setting" */ '@/components/setting/auditlog/manage.vue'),
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
