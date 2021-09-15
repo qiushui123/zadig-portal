@@ -35,7 +35,7 @@ import Codemirror from '../codemirror.vue'
 import ValueRepo from './value_repo.vue'
 
 const valueInfo = {
-  yamlSource: '', // gitRepo or freeEdit or default
+  yamlSource: '', // gitRepo or freeEdit or default(不上传)
   valuesYAML: '',
   gitRepoConfig: {
     codehostID: null,
@@ -81,7 +81,7 @@ export default {
           gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
         }
         console.log('importRepoInfoUse index:', this.importRepoInfo)
-        return { ...this.importRepoInfo, ...gitRepoConfig }
+        return Object.assign(this.importRepoInfo, gitRepoConfig)
       },
       set (val) {
         this.$emit('update:importRepoInfo', val)

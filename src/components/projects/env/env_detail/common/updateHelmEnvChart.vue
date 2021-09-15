@@ -114,20 +114,25 @@ export default {
           if (!envNames.includes(envName)) {
             continue
           }
+          const yamlSource = chartInfo[envName].yamlSource
           let values = pick(chartInfo[envName], [
             'envName',
             'serviceName',
             'chartVersion',
-            'yamlSource',
             'overrideValues'
           ])
-          if (values.yamlSource === 'gitRepo') {
+          if (yamlSource === 'gitRepo') {
             values = {
               ...values,
+              yamlSource,
               gitRepoConfig: cloneDeep(chartInfo[envName].gitRepoConfig)
             }
-          } else if (values.yamlSource === 'freeEdit') {
-            values = { ...values, valuesYAML: chartInfo[envName].valuesYAML }
+          } else if (yamlSource === 'freeEdit') {
+            values = {
+              ...values,
+              yamlSource,
+              valuesYAML: chartInfo[envName].valuesYAML
+            }
           }
           chartValues.push(values)
         }
@@ -204,7 +209,9 @@ export default {
             return !oldV.includes(nv)
           })
         }
-        this.selectedEnv = Array.isArray(newV) ? (newV[newV.length - 1] || 'DEFAULT') : newV
+        this.selectedEnv = Array.isArray(newV)
+          ? newV[newV.length - 1] || 'DEFAULT'
+          : newV
         envNamesByGet.forEach(env => {
           if (env === 'DEFAULT' || !env) {
             return

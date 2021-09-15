@@ -104,18 +104,19 @@ export default {
     generatePayload () {
       const valuesYaml = this.valuesYaml[this.activeEnv]
       let payload = {
-        yamlSource: valuesYaml.importRepoInfo.yamlSource,
         serviceName: this.serviceName,
         overrideValues: valuesYaml.keyValues
       }
       if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
         payload = {
           ...payload,
+          yamlSource: valuesYaml.importRepoInfo.yamlSource,
           valuesYAML: valuesYaml.importRepoInfo.valuesYAML
         }
       } else if (valuesYaml.importRepoInfo.yamlSource === 'gitRepo') {
         payload = {
           ...payload,
+          yamlSource: valuesYaml.importRepoInfo.yamlSource,
           gitRepoConfig: valuesYaml.importRepoInfo.gitRepoConfig
         }
       }
