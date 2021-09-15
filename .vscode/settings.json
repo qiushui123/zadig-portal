@@ -78,7 +78,7 @@
     "source.fixAll.stylelint": true
   },
   "eslint.format.enable": true,
-  "workbench.colorTheme": "Monokai Dimmed",
+  // "workbench.colorTheme": "Monokai Dimmed",
   "files.associations": {
     "*.cjson": "jsonc",
     "*.wxss": "css",
