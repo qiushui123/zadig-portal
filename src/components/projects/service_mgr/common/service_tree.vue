@@ -961,7 +961,7 @@ export default {
         }).then(() => {
           deleteServiceTemplateAPI(data.service_name, data.type, this.projectName, data.visibility).then(() => {
             this.$message.success('删除成功')
-            if (!this.guideMode) {
+            if (!this.guideMode && this.envNameList.length) {
               this.updateEnvDialogVisible = true
             };
             this.$emit('onRefreshService')

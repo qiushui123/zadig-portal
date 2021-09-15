@@ -58,7 +58,7 @@
         />
         <div class="bottom">
            <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button>
-          <el-button size="small" type="primary" :disabled="!updateEnv" @click="update">更新环境</el-button>
+          <el-button size="small" type="primary" :disabled="!updateEnv || !envNameList.length" @click="update">更新环境</el-button>
         </div>
       </div>
       <multipane-resizer class="resizer1"></multipane-resizer>
@@ -110,7 +110,7 @@ import { Multipane, MultipaneResizer } from 'vue-multipane'
 import UpdateHelmEnv from './components/common/update_helm_env'
 import Build from './components/common/build'
 import { deleteServiceTemplateAPI } from '@api'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 const actionList = {
   file: ['delete'],
@@ -251,7 +251,9 @@ export default {
         this.page.expandFileList = []
         deleteServiceTemplateAPI(currentData.service_name, 'helm', this.projectName, 'private').then(res => {
           if (res) {
-            this.updateEnv = true
+            if (this.envNameList.length) {
+              this.updateEnv = true
+            }
             this.$store.dispatch('queryService', { projectName: this.projectName })
           }
         }).catch(error => console.log(error))
@@ -384,8 +386,20 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['productList']),
     projectName () {
       return this.$route.params.project_name
+    },
+    envNameList () {
+      const envNameList = []
+      this.productList.forEach((element) => {
+        if (element.product_name === this.projectName) {
+          envNameList.push({
+            envName: element.env_name
+          })
+        }
+      })
+      return envNameList
     },
     ...mapState({
       service: (state) => state.service_manage.serviceList
