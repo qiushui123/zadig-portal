@@ -12,7 +12,6 @@
       <el-form-item label-width="0">
         <div v-show="importRepoInfo.yamlSource === 'default'" class="default-values">
           <div class="desc">
-            无自定义的 values 文件
             <el-button type="text" @click="importRepoInfo.yamlSource = 'gitRepo'">高级配置</el-button>
           </div>
         </div>
@@ -175,7 +174,7 @@ export default {
 <style lang="less" scoped>
 .template-repo-container {
   .desc {
-    text-align: right;
+    padding-left: 10px;
   }
 
   /deep/.el-form {
