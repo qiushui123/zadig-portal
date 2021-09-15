@@ -228,9 +228,7 @@ import {
   getRepoNameByIdAPI,
   getRepoOwnerByIdAPI,
   getBranchInfoByIdAPI,
-  addHelmChartAPI,
-  getRepoFilesAPI,
-  getPublicRepoFilesAPI
+  addHelmChartAPI
 } from '@api'
 import Gitfile from './gitfile_tree'
 export default {
@@ -398,29 +396,9 @@ export default {
       this.loading = false
     },
     async submit () {
-      const path = ''
       this.$refs.sourceForm.validate().then((res) => {
         this.loading = true
-        if (this.currentService) {
-          if (this.tabName === 'public') {
-            getPublicRepoFilesAPI(path, this.source.url).then((res) => {
-              this.addService()
-            })
-          } else {
-            getRepoFilesAPI(
-              this.source.codehostId,
-              this.source.repoOwner,
-              this.source.repoName,
-              this.source.branchName,
-              path,
-              'gerrit'
-            ).then((res) => {
-              this.addService()
-            })
-          }
-        } else {
-          this.addService()
-        }
+        this.addService()
       })
     }
   },

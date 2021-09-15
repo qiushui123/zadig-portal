@@ -8,6 +8,10 @@
         <subSidebar class="cf-sub-side-bar"></subSidebar>
       </div>
       <div class="content-wrap">
+        <announcement v-for="(ann,index) in announcements"
+                      :key="index"
+                      :title="ann.content.title"
+                      :content="ann.content.content"></announcement>
         <topbar></topbar>
         <router-view>
         </router-view>
@@ -19,17 +23,24 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getCurrentUserInfoAPI } from '@api'
+import { getAnnouncementsAPI, getCurrentUserInfoAPI } from '@api'
 import sidebar from './home/sidebar.vue'
 import subSidebar from './home/sub_sidebar.vue'
 import topbar from './home/topbar.vue'
+import announcement from './home/announcement.vue'
 export default {
   data () {
     return {
+      announcements: [],
       sideWide: true
     }
   },
   methods: {
+    getAnnouncements () {
+      getAnnouncementsAPI().then((res) => {
+        this.announcements = res
+      })
+    },
     checkLogin () {
       return new Promise((resolve, reject) => {
         getCurrentUserInfoAPI().then(
@@ -51,12 +62,14 @@ export default {
   components: {
     sidebar,
     topbar,
-    subSidebar
+    subSidebar,
+    announcement
   },
   created () {
     this.$store.dispatch('getSignupStatus').then(() => {
       this.checkLogin().then((result) => {
         if (result) {
+          this.getAnnouncements()
           if (this.$utils.roleCheck() != null) {
             this.$store.dispatch('getProjectTemplates')
           }

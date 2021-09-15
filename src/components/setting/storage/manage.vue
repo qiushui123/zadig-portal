@@ -248,7 +248,7 @@
               </template>
             </el-table-column>
             <el-table-column width="220px"
-                             label="创建时间">
+                             label="修改时间">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
                 <span>{{ $utils.convertTimestamp(scope.row.update_time) }}</span>

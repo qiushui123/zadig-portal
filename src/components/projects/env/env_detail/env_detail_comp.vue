@@ -55,7 +55,7 @@
              element-loading-spinner="el-icon-loading"
              class="text item">
           <el-row :gutter="10">
-            <template>
+            <template v-if="!pmServiceList.length">
               <el-col :span="3">
                 <div class="grid-content">所属集群:</div>
               </el-col>
@@ -76,10 +76,10 @@
             </el-col>
           </el-row>
           <el-row :gutter="10">
-            <el-col :span="3">
+            <el-col :span="3" v-if="!pmServiceList.length">
               <div class="grid-content">命名空间:</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="8" v-if="!pmServiceList.length">
               <div class="grid-content">{{ envText }}</div>
             </el-col>
             <el-col :span="3">
@@ -201,7 +201,7 @@
         </div>
       </el-card>
       <!--end of basic info-->
-      <el-card v-if="envSource==='external'||envSource==='helm' && ingressList.length > 0"
+      <el-card v-if="(envSource==='external'||envSource==='helm') && ingressList.length > 0"
                class="box-card-stack"
                :body-style="{ padding: '0px', margin: '15px 0 0 0' }">
         <div slot="header"
@@ -247,7 +247,20 @@
              element-loading-text="正在获取服务信息"
              element-loading-spinner="el-icon-loading"
              class="service-container">
-          <el-input v-if="envSource !== 'external' && envSource !== 'helm'"
+          <el-input v-if="envSource !== 'helm' && envSource !== 'external'"
+                    size="mini"
+                    class="search-input"
+                    clearable
+                    v-model="serviceSearch"
+                    placeholder="搜索服务"
+                    @keyup.enter.native="searchServicesByKeyword"
+                    @clear="searchServicesByKeyword">
+            <template slot="append">
+              <el-button class="el-icon-search"
+                         @click="searchServicesByKeyword"></el-button>
+            </template>
+          </el-input>
+                    <el-input v-if="envSource === 'external'"
                     size="mini"
                     class="search-input"
                     clearable
@@ -362,7 +375,7 @@
                              label="服务入口">
               <template slot-scope="scope">
                 <template
-                          v-if="scope.row.ingress.host_info && scope.row.ingress.host_info.length>0">
+                          v-if="scope.row.ingress && scope.row.ingress.host_info && scope.row.ingress.host_info.length>0">
                   <el-tooltip v-for="(ingress,index) in scope.row.ingress.host_info"
                               :key="index"
                               effect="dark"
@@ -399,7 +412,7 @@
                          class="el-icon-refresh"></i>
                   </el-tooltip>
                 </span>
-                <span v-if="(envSource===''||envSource ==='spock')"
+                <span v-if="(envSource===''||envSource ==='spock'||envSource ==='external')"
                       class="operation">
                   <el-tooltip effect="dark"
                               content="查看服务配置"
@@ -513,7 +526,7 @@
       </el-card>
       <UpdateHelmEnvDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateHelmEnvDialog"/>
       <UpdateHelmVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateHelmVarDialog" :projectName="projectName" :envName="envName"/>
-      <UpdateK8sVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog"/>
+      <UpdateK8sVarDialog  :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog"/>
       <PmServiceLog  ref="pmServiceLog"/>
       <RecycleDialog :getProductEnv="getProductEnv" :productInfo="productInfo" :initPageInfo="initPageInfo" :recycleDay="recycleDay" ref="recycleDialog" />
     </div>
@@ -822,27 +835,18 @@ export default {
         if (this.page === 1 && flag !== 'search') {
           await this.getProductEnvInfo(projectName, envName)
         }
-        if (this.envSource === 'external' || this.envSource === 'helm') {
-          const res = await productServicesAPI(projectName, envName, this.envSource)
-          serviceGroup = res.services
-          this.ingressList = res.ingresses
-          this.serviceLoading = false
-          if (serviceGroup && serviceGroup.length) {
-            const { containerServiceList, pmServiceList } = this.handleProductEnvServiceData(serviceGroup)
-            this.containerServiceList = _.orderBy(containerServiceList, 'service_name')
-            this.pmServiceList = _.orderBy(pmServiceList, 'service_name')
-            this.envTotal = this.containerServiceList.length + this.pmServiceList.length
-            this.scrollFinish = true
-          }
-          return
-        }
         this.scrollGetFlag = false
         if (this.page === 1) {
           this.addListener()
         }
         const res = await productServicesAPI(projectName, envName, this.envSource, this.serviceSearch, this.perPage, this.page)
         this.envTotal = res.headers['x-total'] ? parseInt(res.headers['x-total']) : 0
-        serviceGroup = res.data
+        if (this.envSource === 'external' || this.envSource === 'helm') {
+          serviceGroup = res.data.services
+          this.ingressList = res.data.ingresses
+        } else {
+          serviceGroup = res.data
+        }
         this.page++
         this.serviceLoading = false
         if (serviceGroup && serviceGroup.length) {
@@ -1181,10 +1185,10 @@ export default {
     },
     setRoute (scope) {
       if (typeof this.envName === 'undefined') {
-        return `${this.envBasePath}/${scope.row.service_name}?projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}`
+        return `${this.envBasePath}/${scope.row.service_name}?projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}&workLoadType=${scope.row.workLoadType}`
       } else {
         return (
-          `${this.envBasePath}/${scope.row.service_name}?envName=${this.envName}&projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}`
+          `${this.envBasePath}/${scope.row.service_name}?envName=${this.envName}&projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}&workLoadType=${scope.row.workLoadType}`
         )
       }
     },
@@ -1198,6 +1202,9 @@ export default {
       }
     },
     setServiceConfigRoute (scope) {
+      if (this.envSource === 'external') {
+        return `/v1/projects/detail/${scope.row.product_name}/services?envName=${this.envName}&serviceName=${scope.row.service_name}`
+      }
       if (typeof this.envName === 'undefined') {
         return `${this.envBasePath}/${scope.row.service_name}/config?projectName=${this.projectName}&namespace=${this.envText}&originProjectName=${scope.row.product_name}&isProd=${this.isProd}&clusterId=${this.clusterId}&envSource=${this.envSource}`
       } else {

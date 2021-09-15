@@ -93,6 +93,14 @@ const routes = [
         }
       },
       {
+        path: 'projects/create/:project_name/host/config',
+        component: onboarding_host_config,
+        meta: {
+          requiresAuth: true,
+          title: '新建项目'
+        }
+      },
+      {
         path: 'projects/create/:project_name/basic/service',
         component: () => import(/* webpackChunkName: "onboarding-k8s" */ '@/components/projects/guide/service.vue'),
         meta: {
@@ -555,7 +563,7 @@ const routes = [
     ]
   },
   {
-    path: '/v1/enterprise',
+    path: '/v1/users',
     component: onboarding_home,
     meta: {
       requiresAuth: true,
@@ -565,16 +573,11 @@ const routes = [
     children: [
       {
         path: '',
-        component: () => import(/* webpackChunkName: "enterprise-mgr" */ '@/components/enterprise_mgr/home.vue'),
-        meta: {
-          requiresAuth: true,
-          requiresSuperAdmin: true,
-          title: '用户管理'
-        }
+        redirect: 'account/manage'
       },
       {
-        path: 'users/manage',
-        component: () => import(/* webpackChunkName: "enterprise-mgr" */ '@/components/enterprise_mgr/users/manage.vue'),
+        path: 'account/manage',
+        component: () => import(/* webpackChunkName: "users_mgr" */ '@/components/users_mgr/users/manage.vue'),
         meta: {
           requiresAuth: true,
           requiresSuperAdmin: true,
@@ -724,6 +727,24 @@ const routes = [
             }
           }
         ]
+      },
+      {
+        path: 'announcement',
+        component: setting_announcement_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '公告设置'
+        }
+      },
+      {
+        path: 'auditlog',
+        component: setting_auditlog_manage,
+        meta: {
+          requiresAuth: true,
+          requiresSuperAdmin: true,
+          title: '操作日志'
+        }
       }
     ]
   },

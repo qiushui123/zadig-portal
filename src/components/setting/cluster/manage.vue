@@ -98,12 +98,6 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="命名空间"
-                        prop="namespace">
-            <el-input size="small"
-                      v-model="cluster.namespace"
-                      placeholder="请输入命名空间"></el-input>
-          </el-form-item>
           <el-form-item label="描述"
                         prop="description">
             <el-input size="small"
@@ -171,12 +165,6 @@
                 <i class="iconfont iconqita"></i> <span>其它</span>
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="命名空间"
-                        prop="namespace">
-            <el-input size="small"
-                      v-model="swapCluster.namespace"
-                      placeholder="请输入命名空间"></el-input>
           </el-form-item>
           <el-form-item label="描述"
                         prop="description">

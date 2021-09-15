@@ -105,17 +105,17 @@
                 动态选择空闲环境更新
               </el-radio>
             </el-tooltip>
-            <el-tooltip v-if="showPrEnv && webhookSwap.repo.source==='gitlab'"
+            <el-tooltip v-if="isK8sEnv && webhookSwap.repo.source==='gitlab'"
                         content="基于基准环境版本生成一套临时测试环境做 PR 级验证"
                         placement="right">
               <el-radio label="base"
-                        :disabled="!(webhookSwap.namespace.length===1 && showPrEnv && webhookSwap.repo.source==='gitlab')">
+                        :disabled="!(webhookSwap.namespace.length===1 && webhookSwap.repo.source==='gitlab')">
                 设置指定环境为基准环境
               </el-radio>
             </el-tooltip>
           </el-radio-group>
         </div>
-        <el-form-item v-if="webhookSwap.env_update_policy === 'base' && showPrEnv && webhookSwap.repo.source==='gitlab' && showEnvUpdatePolicy"
+        <el-form-item v-if="webhookSwap.env_update_policy === 'base' && webhookSwap.repo.source==='gitlab' && showEnvUpdatePolicy"
                       label="销毁策略">
           <el-select style="width: 100%;"
                      v-model="webhookSwap.env_recycle_policy"
@@ -178,7 +178,7 @@
           <el-checkbox v-model="webhookSwap.auto_cancel">
             <span>自动取消</span>
             <el-tooltip effect="dark"
-                        content="如果你希望只构建最新的提交，则使用这个选项会自动取消队列中的任务"
+                        content="如果您希望只构建最新的提交，则使用这个选项会自动取消队列中的任务"
                         placement="top">
               <i class="el-icon-question"></i>
             </el-tooltip>
@@ -347,7 +347,6 @@
 <script type="text/javascript">
 import bus from '@utils/event_bus'
 import workflowArgs from '../container/workflow_args.vue'
-import { mapGetters } from 'vuex'
 import { listProductAPI, getBranchInfoByIdAPI, singleTestAPI, getAllBranchInfoAPI } from '@api'
 import { uniqBy, get } from 'lodash'
 export default {
@@ -691,20 +690,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['signupStatus']),
-    showPrEnv: {
-      get: function () {
-        if (this.signupStatus && this.signupStatus.features && this.signupStatus.features.length > 0) {
-          if (this.signupStatus.features.includes('pr_create_env')) {
-            return true
-          } else {
-            return false
-          }
-        } else {
-          return false
-        }
-      }
-    },
     showWebhookDialog: {
       get: function () {
         return this.webhookAddMode ? this.webhookAddMode : this.webhookEditMode
@@ -741,6 +726,9 @@ export default {
     },
     matchedProducts () {
       return this.products.filter(p => p.product_name === this.productTmlName)
+    },
+    isK8sEnv () {
+      return this.presets && this.presets[0] && this.presets[0].deploy && this.presets[0].deploy[0].type === 'k8s'
     }
   },
   watch: {

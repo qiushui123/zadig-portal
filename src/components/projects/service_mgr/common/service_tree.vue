@@ -270,7 +270,7 @@
                          size="mini"
                          class="operation-container"
                          icon="el-icon-edit-outline"
-                         @click="() => reEditServiceName(node, data)">
+                         @click.stop="() => reEditServiceName(node, data)">
               </el-button>
               <span :style="{'visibility': showHover[data.service_name] ? 'visible': 'hidden'}"
                     class="operation-container">
@@ -278,15 +278,15 @@
                            type="text"
                            size="mini"
                            icon="el-icon-close"
-                           @click="() => deleteService(node, data)">
+                           @click.stop="() => deleteService(node, data)">
                 </el-button>
                 <el-button v-else-if="data.product_name!==projectName && data.type ==='k8s'"
                            type="text"
                            size="mini"
                            icon="el-icon-close"
-                           @click="() => deleteSharedService(node, data)">
+                           @click.stop="() => deleteSharedService(node, data)">
                 </el-button>
-                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
+                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab' || data.source === 'ilyshin'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
                            type="text"
                            size="mini"
                            icon="el-icon-refresh"
@@ -314,7 +314,7 @@
                       autofocus
                       ref="serviceNamedRef"
                       @blur="inputServiceNameDoneWhenBlur"
-                      @keyup.enter.native="inputServiceNameDoneWhenEnter"
+                      @keyup.enter.native="inputServiceNameDoneWhenBlur"
                       placeholder="请输入服务名称"></el-input>
           </el-form-item>
 
@@ -431,6 +431,10 @@ export default {
       type: Boolean,
       default: false,
       required: false
+    },
+    yamlChange: {
+      type: Boolean,
+      required: true
     }
   },
   data () {
@@ -492,8 +496,8 @@ export default {
             trigger: ['blur', 'change']
           }
         ]
-
-      }
+      },
+      previousNodeKey: ''
     }
   },
 
@@ -522,6 +526,10 @@ export default {
       })
     },
     addSharedService (node, data) {
+      if (this.yamlChange) {
+        this.askSaveYamlConfig()
+        return
+      }
       const services = []
       const payload = this.$utils.cloneObj(this.projectInfo)
       const projectName = this.projectName
@@ -548,6 +556,7 @@ export default {
       })
     },
     deleteSharedService (node, data) {
+      this.previousNodeKey = ''
       let deleteText = ''
       const title = '确认'
       const services = []
@@ -726,6 +735,10 @@ export default {
       updateEnvTemplateAPI(projectName, payload)
     },
     async createService (cmd) {
+      if (this.yamlChange) {
+        this.askSaveYamlConfig()
+        return
+      }
       const res = await getCodeSourceByAdminAPI(1)
       if (cmd && this.deployType === 'k8s') {
         if (cmd === 'platform') {
@@ -756,56 +769,23 @@ export default {
       this.$refs.newServiceNameForm.validate((valid) => {
         if (valid) {
           const val = this.service.newServiceName
-          const node = this.$refs.serviceTree.getNode(val)
-          if (!node) {
-            const data = {
-              label: val,
-              status: 'named',
-              service_name: val,
-              type: this.deployType ? this.deployType : 'k8s',
-              visibility: 'private'
-            }
-            this.services.push(data)
-            this.setServiceSelected(data.service_name)
-            this.$router.replace({ query: { service_name: data.service_name, rightbar: 'help' } })
-            this.$emit('onSelectServiceChange', data)
-            this.showNewServiceInput = false
-            this.service.newServiceName = ''
+          this.previousNodeKey = val
+          // const node = this.$refs.serviceTree.getNode(val)
+          // if (!node) {
+          const data = {
+            label: val,
+            status: 'named',
+            service_name: val,
+            type: this.deployType ? this.deployType : 'k8s',
+            visibility: 'private'
           }
-        }
-      })
-    },
-    inputServiceNameDoneWhenEnter () {
-      this.$refs.newServiceNameForm.validate((valid) => {
-        if (valid) {
-          const val = this.service.newServiceName
-          const node = this.$refs.serviceTree.getNode(val)
-          let data = null
-          if (!node) {
-            data = {
-              label: val,
-              status: 'named',
-              service_name: val,
-              type: this.deployType ? this.deployType : 'k8s',
-              visibility: 'private'
-            }
-          } else {
-            data = {
-              label: 'untitled',
-              status: 'named',
-              service_name: 'untitled',
-              type: this.deployType ? this.deployType : 'k8s',
-              visibility: 'private'
-            }
-          }
-          if (!node) {
-            this.services.push(data)
-          }
+          this.services.push(data)
           this.setServiceSelected(data.service_name)
           this.$router.replace({ query: { service_name: data.service_name, rightbar: 'help' } })
           this.$emit('onSelectServiceChange', data)
           this.showNewServiceInput = false
           this.service.newServiceName = ''
+          // }
         }
       })
     },
@@ -964,6 +944,7 @@ export default {
       })
     },
     deleteService (node, data) {
+      this.previousNodeKey = ''
       if (data.status === 'named') {
         const index = this.services.findIndex(d => d.label === data.label)
         this.services.splice(index, 1)
@@ -994,7 +975,31 @@ export default {
         })
       }
     },
+    askSaveYamlConfig () {
+      return this.$confirm('服务配置未保存，是否保存？', '提示', {
+        confirmButtonText: '保存',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$emit('updateYaml')
+      })
+    },
     selectService (data, node, current) {
+      const levelOneNodeLabel = node.level === 1 ? node.label : node.parent.label
+      // 切换 node 且 yaml 变化时
+      if (this.previousNodeKey && this.previousNodeKey !== levelOneNodeLabel && this.yamlChange) {
+        // 把当前 node 切换回来
+        this.setServiceSelected(this.previousNodeKey)
+        this.askSaveYamlConfig().catch(() => {
+          this.setServiceSelected(levelOneNodeLabel)
+          this.switchTreeNode(data, node, levelOneNodeLabel)
+        })
+      } else {
+        this.switchTreeNode(data, node, levelOneNodeLabel)
+      }
+    },
+    switchTreeNode (data, node, levelOneNodeLabel) {
+      this.previousNodeKey = levelOneNodeLabel
       if (data.type === 'kind') {
         const parentService = node.parent.data
         const routeService = this.$route.query.service_name
