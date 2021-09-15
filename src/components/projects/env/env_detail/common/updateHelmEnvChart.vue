@@ -37,7 +37,7 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
-import { getAllChartValuesYamlAPI } from '@api'
+import { getChartValuesYamlAPI, getAllChartValuesYamlAPI } from '@api'
 import { cloneDeep, pick } from 'lodash'
 
 const chartInfoTemp = {
@@ -71,6 +71,10 @@ export default {
        */
       type: [Array, String],
       required: true
+    },
+    getEnvChart: {
+      default: false,
+      type: Boolean
     }
   },
   data () {
@@ -173,10 +177,11 @@ export default {
       return Promise.all(valid)
     },
     async getChartValuesYaml ({ envName }) {
+      const fn = this.getEnvChart ? getChartValuesYamlAPI : getAllChartValuesYamlAPI
       const serviceNames = this.chartNames
         ? this.chartNames.map(chart => chart.serviceName)
         : []
-      const res = await getAllChartValuesYamlAPI(
+      const res = await fn(
         this.projectName,
         envName,
         serviceNames
