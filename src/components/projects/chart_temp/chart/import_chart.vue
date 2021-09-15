@@ -81,11 +81,11 @@ export default {
       }
 
       if (res) {
-        this.loading = false
-        this.resetField()
         this.$message.success(
           `${this.isUpdate ? '更新' : '导入'}模板 ${this.tempData.name} 成功`
         )
+        this.loading = false
+        this.resetField()
         this.$emit('input', false)
         this.$emit('importChart', {
           create: !this.isUpdate,
