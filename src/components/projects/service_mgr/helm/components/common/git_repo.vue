@@ -99,7 +99,7 @@
                 trigger: 'change',
               }"
         >
-          <el-select v-model.trim="source.branchName" placeholder="请选择" style="width: 100%;" size="small" filterable allow-create clearable>
+          <el-select v-model.trim="source.branchName" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
             <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
           </el-select>
         </el-form-item>
