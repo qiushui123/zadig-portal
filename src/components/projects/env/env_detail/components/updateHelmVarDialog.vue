@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="更新环境变量" :visible.sync="updateHelmEnvVarDialogVisible" width="80%">
     <div v-loading="getHelmEnvVarLoading" class="kv-container">
-      <ChartValues class="chart-value" ref="chartValuesRef" :envNames="envName" ></ChartValues>
+      <ChartValues v-if="updateHelmEnvVarDialogVisible" class="chart-value" ref="chartValuesRef" :envNames="envName"></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" type="primary" :loading="updataHelmEnvVarLoading" @click="updateHelmEnvVar">更新</el-button>
@@ -51,7 +51,6 @@ export default {
         .then(response => {
           this.updataHelmEnvVarLoading = false
           this.updateHelmEnvVarDialogVisible = false
-          this.initData()
           this.fetchAllData()
           this.$message({
             message: '更新环境变量成功，请等待服务升级',
@@ -64,19 +63,6 @@ export default {
     },
     cancelUpdateHelmEnvVar () {
       this.updateHelmEnvVarDialogVisible = false
-      this.initData()
-    },
-    initData () {
-      this.$nextTick(() => {
-        this.$refs.chartValuesRef.resetAllChartNameInfo()
-      })
-    }
-  },
-  watch: {
-    updateHelmEnvVarDialogVisible (value) {
-      if (value) {
-        // this.getHelmEnvVar()
-      }
     }
   }
 }

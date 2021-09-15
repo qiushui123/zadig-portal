@@ -13,9 +13,9 @@
     </el-tabs>
     <div class="values" v-if="checkedChart && serviceNames.length">
       <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv">
-        <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env"></el-tab-pane>
+        <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
       </el-tabs>
-      <div class="content">
+      <div class="content" v-if="usedChartNameInfo">
         <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
         <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
           <div class="desc">暂无自定义的 values 文件</div>
@@ -77,7 +77,8 @@ export default {
     return {
       allChartNameInfo: {}, // key: serviceName value: Object{ key:envName }
       checkedChart: '',
-      selectedEnv: 'DEFAULT'
+      selectedEnv: 'DEFAULT',
+      disabledEnv: []
     }
   },
   computed: {
@@ -94,7 +95,11 @@ export default {
       return this.$route.params.project_name
     },
     usedChartNameInfo () {
-      return this.allChartNameInfo[this.checkedChart][this.selectedEnv]
+      return (
+        (this.allChartNameInfo[this.checkedChart] &&
+          this.allChartNameInfo[this.checkedChart][this.selectedEnv]) ||
+        cloneDeep(chartInfoTemp)
+      )
     }
   },
   methods: {
@@ -168,36 +173,52 @@ export default {
       if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       return Promise.all(valid)
     },
-    getChartValuesYaml ({ envName }) {
-      const serviceNames = []
-      getAllChartValuesYamlAPI(this.projectName, envName, serviceNames).then(
-        res => {
-          res.forEach(re => {
-            const envInfo = {
-              ...cloneDeep(chartInfoTemp),
-              ...re
-            }
-
-            const allChartNameInfo = {}
-
-            allChartNameInfo[re.serviceName] = {
-              ...this.allChartNameInfo[re.serviceName]
-            }
-            allChartNameInfo[re.serviceName][re.envName] = envInfo
-
-            this.$set(
-              this.allChartNameInfo,
-              re.serviceName,
-              allChartNameInfo[re.serviceName]
-            )
-          })
+    async getChartValuesYaml ({ envName }) {
+      const serviceNames = this.chartNames
+        ? this.chartNames.map(chart => chart.serviceName)
+        : []
+      const res = await getAllChartValuesYamlAPI(
+        this.projectName,
+        envName,
+        serviceNames
+      ).catch(err => {
+        this.disabledEnv.push(envName)
+        console.log(err)
+      })
+      if (res) {
+        if (this.disabledEnv.includes(envName)) {
+          const id = this.disabledEnv.indexOf(envName)
+          this.disabledEnv.splice(id, 1)
         }
-      )
+
+        res.forEach(re => {
+          const envInfo = {
+            ...cloneDeep(chartInfoTemp),
+            ...re,
+            envName
+          }
+
+          const allChartNameInfo = {}
+
+          allChartNameInfo[re.serviceName] = {
+            ...this.allChartNameInfo[re.serviceName]
+          }
+          allChartNameInfo[re.serviceName][envName] = envInfo
+
+          this.$set(
+            this.allChartNameInfo,
+            re.serviceName,
+            allChartNameInfo[re.serviceName]
+          )
+        })
+        this.checkedChart = Object.keys(this.allChartNameInfo)[0]
+      }
     }
   },
   watch: {
     envNames: {
       handler (newV, oldV) {
+        console.log('???', newV, oldV)
         // 要初始化的环境数据
         let envNamesByGet = []
         if (!Array.isArray(newV)) {
@@ -216,7 +237,6 @@ export default {
           if (env === 'DEFAULT' || !env) {
             return
           }
-          // this.initAllChartNameInfo(env)
           this.getChartValuesYaml({ envName: env })
         })
       },

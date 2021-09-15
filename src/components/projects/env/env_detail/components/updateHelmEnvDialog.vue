@@ -130,6 +130,8 @@ export default {
     updateHelmEnvDialogVisible (value) {
       if (value) {
         this.getHelmEnvChartDiff()
+      } else {
+        this.chartNames = []
       }
     }
   },

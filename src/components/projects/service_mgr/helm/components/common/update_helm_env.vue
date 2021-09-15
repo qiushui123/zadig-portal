@@ -69,6 +69,9 @@ export default {
   computed: {
     updateHelmEnvDialogVisible: {
       get: function () {
+        if (!this.value) {
+          this.checkedEnvList = []
+        }
         return this.value
       },
       set: function (val) {
