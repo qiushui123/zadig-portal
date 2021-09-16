@@ -4,24 +4,26 @@
     <el-form ref="form" :model="keyValueForm" :rules="rules">
       <el-table :data="keyValues">
         <el-table-column header-align="center" align="left" prop="key" label="键">
-          <template slot-scope="{ row }">
-            <el-form-item v-if="row.add" prop="key">
+          <template slot-scope="{ row, $index }">
+            <el-form-item v-if="keyValueForm.index === $index" prop="key">
               <el-input v-model="keyValueForm.key" placeholder="键" size="small"></el-input>
             </el-form-item>
             <span v-else>{{row.key}}</span>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="left" prop="value" label="值">
-          <template slot-scope="{ row }">
-            <el-form-item v-if="row.add" prop="value">
+          <template slot-scope="{ row, $index }">
+            <el-form-item v-if="keyValueForm.index === $index" prop="value">
               <el-input v-model="keyValueForm.value" placeholder="值" size="small"></el-input>
             </el-form-item>
             <span v-else>{{row.value}}</span>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="left" label="操作" width="50px">
+        <el-table-column header-align="center" align="left" label="操作" width="100px">
           <template slot-scope="{ $index }">
             <el-form-item>
+              <el-button v-if="keyValueForm.index === $index" type="text" @click="saveKeyValue($index)">保存</el-button>
+              <el-button v-else type="text" @click="editKeyValue($index)">编辑</el-button>
               <el-button type="text" @click="deleteKeyValue($index)">删除</el-button>
             </el-form-item>
           </template>
@@ -33,13 +35,13 @@
 </template>
 
 <script>
-import { cloneDeep } from 'lodash'
 export default {
   data () {
     const validateKey = (rule, value, callback) => {
+      const keys = this.keyValues.map(value => value.key)
       if (value === '') {
         callback(new Error('请输入 key 值'))
-      } else if (this.keyValues.map(value => value.key).includes(value)) {
+      } else if (keys.indexOf(value) !== keys.lastIndexOf(value)) {
         callback(new Error('key 值重复'))
       } else {
         callback()
@@ -54,7 +56,8 @@ export default {
     return {
       keyValueForm: {
         key: '',
-        value: ''
+        value: '',
+        index: -1
       }
     }
   },
@@ -65,32 +68,61 @@ export default {
     }
   },
   methods: {
+    saveKeyValue (index) {
+      this.validate(index)
+    },
+    async editKeyValue (index) {
+      const res = await this.validate(this.keyValueForm.index)
+      if (res) {
+        this.keyValueForm = { ...this.keyValues[index], index }
+      }
+    },
     deleteKeyValue (index) {
-      this.keyValues[index].add && this.$refs.form.resetFields()
       this.keyValues.splice(index, 1)
+      const id = this.keyValueForm.index
+      if (id === index) {
+        this.resetValid()
+      } else if (id > index) {
+        this.keyValueForm.index = id - 1
+      }
     },
-    validate () {
-      return this.$refs.form.validate().then(() => {
-        const len = this.keyValues.length
-        if (len > 0 && this.keyValues[len - 1].add) {
-          this.keyValues[len - 1] = cloneDeep(this.keyValueForm)
-        }
-        this.$refs.form.clearValidate()
-        this.keyValueForm = {
-          key: '',
-          value: ''
-        }
-        Promise.resolve()
-      })
-    },
-    addKeyValue () {
-      this.validate().then(() => {
+    async addKeyValue () {
+      const res = await this.validate(this.keyValueForm.index)
+      if (res) {
         this.keyValues.push({
           key: '',
-          value: '',
-          add: true
+          value: ''
         })
-      })
+        this.keyValueForm.index = this.keyValues.length - 1
+      }
+    },
+    validate (index = -1) {
+      if (index === -1) {
+        return true
+      }
+      return this.$refs.form
+        .validate()
+        .then(() => {
+          const { key, value } = this.keyValueForm
+          this.keyValues[index] = {
+            key,
+            value
+          }
+          this.resetValid()
+          return true
+        })
+        .catch(err => {
+          console.log(err)
+          return false
+        })
+    },
+    resetValid () {
+      this.$refs.form.clearValidate()
+      this.keyValueForm = {
+        key: '',
+        value: '',
+        index: -1
+      }
     }
   }
 }

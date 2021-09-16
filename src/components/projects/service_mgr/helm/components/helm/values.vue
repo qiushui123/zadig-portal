@@ -58,9 +58,8 @@ export default {
   methods: {
     handleKeyValue () {
       if (this.$refs.keyValueRef) {
-        return this.$refs.keyValueRef.validate()
+        this.$refs.keyValueRef.resetValid()
       }
-      return true
     },
     getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
       return getChartValuesYamlAPI(this.projectName, env, [service])
@@ -111,7 +110,7 @@ export default {
       const valuesYaml = this.valuesYaml[this.activeEnv]
       let payload = {
         serviceName: this.serviceName,
-        overrideValues: valuesYaml.keyValues
+        overrideValues: valuesYaml.keyValues.filter(value => value.key !== '')
       }
       if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
         payload = {
@@ -133,7 +132,8 @@ export default {
       if (this.$refs.importValuesRef) {
         valid.push(this.$refs.importValuesRef.validate())
       }
-      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      if (this.$refs.keyValueRef) this.$refs.keyValueRef.resetValid()
+      // if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       Promise.all(valid)
         .then(res => {
           addChartValuesYamlByEnvAPI(

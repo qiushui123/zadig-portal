@@ -1,7 +1,7 @@
 <template>
   <div class="helm-chart-yaml-content">
     <el-tabs tab-position="left" type="border-card" v-model="checkedChart" :before-leave="handleKeyValue">
-      <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.serviceName==='delete'">
+      <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.type==='delete'">
         <span slot="label">
           <i
             class="icon"
@@ -11,25 +11,28 @@
         </span>
       </el-tab-pane>
     </el-tabs>
-    <div class="values" v-if="checkedChart && serviceNames.length">
-      <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv" :before-leave="handleKeyValue">
-        <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
-      </el-tabs>
-      <div class="content" v-if="usedChartNameInfo">
-        <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
-        <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
-          <div class="desc">暂无自定义的 values 文件</div>
-          <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
+    <div class="values" v-if="checkedChart && serviceNames.length" :class="{hidden: serviceType==='delete'}">
+      <div class="values-content">
+        <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv" :before-leave="handleKeyValue">
+          <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
+        </el-tabs>
+        <div class="content" v-if="usedChartNameInfo">
+          <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
+          <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
+            <div class="desc">暂无自定义的 values 文件</div>
+            <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
+          </div>
+          <ImportValues
+            v-show="usedChartNameInfo.yamlSource !== 'default'"
+            showDelete
+            ref="importValuesRef"
+            :resize="{direction: 'vertical'}"
+            :importRepoInfo="usedChartNameInfo"
+          ></ImportValues>
+          <KeyValue ref="keyValueRef" :keyValues="usedChartNameInfo.overrideValues"></KeyValue>
         </div>
-        <ImportValues
-          v-show="usedChartNameInfo.yamlSource !== 'default'"
-          showDelete
-          ref="importValuesRef"
-          :resize="{direction: 'vertical'}"
-          :importRepoInfo="usedChartNameInfo"
-        ></ImportValues>
-        <KeyValue ref="keyValueRef" :keyValues="usedChartNameInfo.overrideValues"></KeyValue>
       </div>
+      <div class="mask"></div>
     </div>
   </div>
 </template>
@@ -103,14 +106,18 @@ export default {
           this.allChartNameInfo[this.checkedChart][this.selectedEnv]) ||
         cloneDeep(chartInfoTemp)
       )
+    },
+    serviceType () {
+      return this.serviceNames.find(
+        service => service.serviceName === this.checkedChart
+      ).type
     }
   },
   methods: {
     handleKeyValue () {
       if (this.$refs.keyValueRef) {
-        return this.$refs.keyValueRef.validate()
+        this.$refs.keyValueRef.resetValid()
       }
-      return true
     },
     getAllChartNameInfo () {
       const chartValues = []
@@ -129,6 +136,7 @@ export default {
             continue
           }
           const yamlSource = chartInfo[envName].yamlSource
+          chartInfo[envName].overrideValues = chartInfo[envName].overrideValues.filter(value => value.key !== '')
           let values = pick(chartInfo[envName], [
             'envName',
             'serviceName',
@@ -179,22 +187,23 @@ export default {
       if (this.$refs.importValuesRef) {
         valid.push(this.$refs.importValuesRef.validate())
       }
-      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      if (this.$refs.keyValueRef) this.$refs.keyValueRef.resetValid()
+      // if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       return Promise.all(valid)
     },
     async getChartValuesYaml ({ envName }) {
-      const fn = this.getEnvChart ? getChartValuesYamlAPI : getAllChartValuesYamlAPI
+      const fn = this.getEnvChart
+        ? getChartValuesYamlAPI
+        : getAllChartValuesYamlAPI
       const serviceNames = this.chartNames
         ? this.chartNames.map(chart => chart.serviceName)
         : []
-      const res = await fn(
-        this.projectName,
-        envName,
-        serviceNames
-      ).catch(err => {
-        this.disabledEnv.push(envName)
-        console.log(err)
-      })
+      const res = await fn(this.projectName, envName, serviceNames).catch(
+        err => {
+          this.disabledEnv.push(envName)
+          console.log(err)
+        }
+      )
       if (res) {
         if (this.disabledEnv.includes(envName)) {
           const id = this.disabledEnv.indexOf(envName)
@@ -305,6 +314,7 @@ export default {
   }
 
   .values {
+    position: relative;
     box-sizing: border-box;
     width: calc(~'100% - 160px');
     padding: 0 20px;
@@ -314,16 +324,34 @@ export default {
     border-bottom-right-radius: 4px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 
-    .content {
-      .version-title {
-        height: 40px;
-        line-height: 40px;
-      }
+    .values-content {
+      position: relative;
+      z-index: 0;
 
-      .desc {
-        margin-top: 10px;
-        color: #909399;
-        font-size: 14px;
+      .content {
+        .version-title {
+          height: 40px;
+          line-height: 40px;
+        }
+
+        .desc {
+          margin-top: 10px;
+          color: #909399;
+          font-size: 14px;
+        }
+      }
+    }
+
+    &.hidden {
+      .mask {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0.5);
+        cursor: not-allowed;
       }
     }
   }
