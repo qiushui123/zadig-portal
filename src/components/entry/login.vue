@@ -46,11 +46,7 @@
                 </a>
               </section>
               <div class="bottom">
-                  <a  v-if="showOpensourceOauth"
-                      @click="accountPassLogin=!accountPassLogin">{{accountPassLogin ? '第三方登录' : '账号密码登录'}}</a>
-
                   <a  @click="isLogin=false">找回密码</a>
-                  <a style="border: none;" @click="routerTo('/signup')" v-if="openRegistration && !showOpensourceOauth">注册</a>
               </div>
             </div>
           </div>

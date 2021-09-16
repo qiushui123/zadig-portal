@@ -528,6 +528,9 @@ export default {
     envName () {
       return this.$route.query.envName
     },
+    workLoadType () {
+      return this.$route.query.workLoadType
+    },
     envSource () {
       return this.$route.query.envSource || ''
     },
@@ -568,9 +571,10 @@ export default {
     fetchServiceData () {
       const projectName = this.projectName
       const serviceName = this.serviceName
+      const workLoadType = this.workLoadType
       const envName = this.envName ? this.envName : ''
       const envType = this.isProd ? 'prod' : ''
-      getServiceInfo(projectName, serviceName, envName, envType).then((res) => {
+      getServiceInfo(projectName, serviceName, envName, envType, workLoadType).then((res) => {
         if (res.scales) {
           if (res.scales.length > 0 && res.scales[0].pods.length > 0) {
             this.expands = [res.scales[0].name]
