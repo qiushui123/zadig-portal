@@ -619,7 +619,7 @@ export default {
       },
       serviceSearch: '',
       page: 1,
-      perPage: 20,
+      perPage: 10,
       envTotal: 0,
       scrollGetFlag: true,
       scrollFinish: false
