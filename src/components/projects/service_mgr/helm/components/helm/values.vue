@@ -57,7 +57,10 @@ export default {
   },
   methods: {
     handleKeyValue () {
-      return this.$refs.keyValueRef.validate()
+      if (this.$refs.keyValueRef) {
+        return this.$refs.keyValueRef.validate()
+      }
+      return true
     },
     getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
       return getChartValuesYamlAPI(this.projectName, env, [service])

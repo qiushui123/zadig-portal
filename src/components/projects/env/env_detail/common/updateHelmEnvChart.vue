@@ -107,7 +107,10 @@ export default {
   },
   methods: {
     handleKeyValue () {
-      return this.$refs.keyValueRef.validate()
+      if (this.$refs.keyValueRef) {
+        return this.$refs.keyValueRef.validate()
+      }
+      return true
     },
     getAllChartNameInfo () {
       const chartValues = []
