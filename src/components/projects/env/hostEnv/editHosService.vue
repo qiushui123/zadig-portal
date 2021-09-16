@@ -73,7 +73,7 @@ export default {
       })
       const form = {
         env_name: this.form.envName,
-        cluster_id: this.form.cluster_id,
+        cluster_id: this.form.clusterId,
         namespace: this.form.namespace,
         workloads: workloads,
         product_name: this.projectName
