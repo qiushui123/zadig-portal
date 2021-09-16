@@ -1,7 +1,7 @@
 <template>
   <div class="values-container">
     <h4>变量</h4>
-    <el-tabs v-model="activeEnv">
+    <el-tabs v-model="activeEnv" :before-leave="handleKeyValue">
       <el-tab-pane v-for="tab in tabs" :key="tab" :label="tab" :name="tab"></el-tab-pane>
     </el-tabs>
     <div class="content" :loading="valuesLoading">
@@ -56,6 +56,9 @@ export default {
     }
   },
   methods: {
+    handleKeyValue () {
+      return this.$refs.keyValueRef.validate()
+    },
     getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
       return getChartValuesYamlAPI(this.projectName, env, [service])
         .then(res => {

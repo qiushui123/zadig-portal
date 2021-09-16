@@ -1,6 +1,6 @@
 <template>
   <div class="helm-chart-yaml-content">
-    <el-tabs tab-position="left" type="border-card" v-model="checkedChart">
+    <el-tabs tab-position="left" type="border-card" v-model="checkedChart" :before-leave="handleKeyValue">
       <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.serviceName==='delete'">
         <span slot="label">
           <i
@@ -12,7 +12,7 @@
       </el-tab-pane>
     </el-tabs>
     <div class="values" v-if="checkedChart && serviceNames.length">
-      <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv">
+      <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv" :before-leave="handleKeyValue">
         <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
       </el-tabs>
       <div class="content" v-if="usedChartNameInfo">
@@ -106,6 +106,9 @@ export default {
     }
   },
   methods: {
+    handleKeyValue () {
+      return this.$refs.keyValueRef.validate()
+    },
     getAllChartNameInfo () {
       const chartValues = []
       const serviceNames = this.serviceNames.map(chart => chart.serviceName)
