@@ -88,6 +88,11 @@ export default {
     },
     async addKeyValue () {
       const res = await this.validate(this.keyValueForm.index)
+      const findIndex = this.keyValues.findIndex(value => value.key === '')
+      if (findIndex !== -1) {
+        this.keyValueForm.index = findIndex
+        return
+      }
       if (res) {
         this.keyValues.push({
           key: '',
