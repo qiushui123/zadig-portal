@@ -1229,8 +1229,8 @@ export function updateHelmProductEnvAPI (productName, payload) {
   return http.put(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
 }
 
-export function updateHelmEnvVarAPI (productName, payload) {
-  return http.put(`/api/aslan/environment/environments/${productName}/renderchart`, payload)
+export function updateHelmEnvVarAPI (productName, envName, payload) {
+  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?envName=${envName}`, payload)
 }
 
 // exteranl

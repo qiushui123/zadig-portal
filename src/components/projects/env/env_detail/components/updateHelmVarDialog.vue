@@ -43,11 +43,10 @@ export default {
       }
       const projectName = this.productInfo.product_name
       const payload = {
-        envName: this.productInfo.env_name,
-        renderCharts: this.$refs.chartValuesRef.getAllChartNameInfo()
+        chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
       }
       this.updataHelmEnvVarLoading = true
-      updateHelmEnvVarAPI(projectName, payload)
+      updateHelmEnvVarAPI(projectName, this.productInfo.env_name, payload)
         .then(response => {
           this.updataHelmEnvVarLoading = false
           this.updateHelmEnvVarDialogVisible = false
