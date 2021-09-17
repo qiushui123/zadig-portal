@@ -1312,7 +1312,7 @@ export default {
           this.$emit('listenCreateEvent', 'success')
           this.$message({
             type: 'success',
-            message: '创建非容器服务成功'
+            message: '创建主机服务成功'
           })
         }, () => {
           this.$emit('listenCreateEvent', 'failed')
@@ -1370,7 +1370,7 @@ export default {
           this.$emit('listenCreateEvent', 'success')
           this.$message({
             type: 'success',
-            message: '修改非容器服务成功'
+            message: '修改主机服务成功'
           })
         }, () => {
           this.$emit('listenCreateEvent', 'failed')
@@ -1733,5 +1733,10 @@ export default {
   .drawer-footer {
     padding-top: 20px;
   }
+}
+
+.save-btn {
+  position: absolute;
+  bottom: 20px;
 }
 </style>

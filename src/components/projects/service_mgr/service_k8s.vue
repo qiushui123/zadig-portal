@@ -100,7 +100,7 @@
                        size="small"
                        class="save-btn"
                        @click="toNext"
-                       :disabled="!showNext"
+                       :disabled="!showNext || !envNameList.length"
                        plain>环境更新</el-button>
           </div>
       </div>
