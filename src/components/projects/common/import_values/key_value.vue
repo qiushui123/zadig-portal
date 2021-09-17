@@ -67,6 +67,13 @@ export default {
       type: Array
     }
   },
+  watch: {
+    keyValues (newV, oldV) {
+      if (newV !== oldV) {
+        this.resetValid()
+      }
+    }
+  },
   methods: {
     saveKeyValue (index) {
       this.validate(index)
@@ -101,9 +108,9 @@ export default {
         this.keyValueForm.index = this.keyValues.length - 1
       }
     },
-    validate (index = -1) {
+    validate (index = this.keyValueForm.index) {
       if (index === -1) {
-        return true
+        return Promise.resolve(true)
       }
       return this.$refs.form
         .validate()
@@ -114,15 +121,15 @@ export default {
             value
           }
           this.initForm()
-          return true
+          return Promise.resolve(true)
         })
         .catch(err => {
           console.log(err)
-          return false
+          return Promise.reject(false)
         })
     },
     initForm () {
-      this.$refs.form.clearValidate()
+      this.$refs.form && this.$refs.form.clearValidate()
       this.keyValueForm = {
         key: '',
         value: '',

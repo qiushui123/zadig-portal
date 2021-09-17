@@ -1,6 +1,6 @@
 <template>
   <div class="helm-chart-yaml-content">
-    <el-tabs tab-position="left" type="border-card" v-model="checkedChart" :before-leave="handleKeyValue">
+    <el-tabs tab-position="left" type="border-card" v-model="checkedChart">
       <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.type==='delete'">
         <span slot="label">
           <i
@@ -11,9 +11,9 @@
         </span>
       </el-tab-pane>
     </el-tabs>
-    <div class="values" v-if="checkedChart && serviceNames.length" :class="{hidden: serviceType==='delete'}">
+    <div class="values" v-if="checkedChart && serviceNames.length" :class="{hidden: serviceCanHandle}">
       <div class="values-content">
-        <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv" :before-leave="handleKeyValue">
+        <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv">
           <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
         </el-tabs>
         <div class="content" v-if="usedChartNameInfo">
@@ -107,18 +107,16 @@ export default {
         cloneDeep(chartInfoTemp)
       )
     },
-    serviceType () {
-      return this.serviceNames.find(
-        service => service.serviceName === this.checkedChart
-      ).type
+    serviceCanHandle () {
+      return (
+        this.serviceNames.find(
+          service => service.serviceName === this.checkedChart
+        ).type === 'delete' ||
+        (Array.isArray(this.envNames) && this.selectedEnv === 'DEFAULT')
+      )
     }
   },
   methods: {
-    handleKeyValue () {
-      if (this.$refs.keyValueRef) {
-        this.$refs.keyValueRef.resetValid()
-      }
-    },
     getAllChartNameInfo () {
       const chartValues = []
       const serviceNames = this.serviceNames.map(chart => chart.serviceName)
@@ -136,7 +134,9 @@ export default {
             continue
           }
           const yamlSource = chartInfo[envName].yamlSource
-          chartInfo[envName].overrideValues = chartInfo[envName].overrideValues.filter(value => value.key !== '')
+          chartInfo[envName].overrideValues = chartInfo[
+            envName
+          ].overrideValues.filter(value => value.key !== '')
           let values = pick(chartInfo[envName], [
             'envName',
             'serviceName',
@@ -187,8 +187,7 @@ export default {
       if (this.$refs.importValuesRef) {
         valid.push(this.$refs.importValuesRef.validate())
       }
-      if (this.$refs.keyValueRef) this.$refs.keyValueRef.resetValid()
-      // if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       return Promise.all(valid)
     },
     async getChartValuesYaml ({ envName }) {

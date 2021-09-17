@@ -1,7 +1,7 @@
 <template>
   <div class="values-container">
     <h4>变量</h4>
-    <el-tabs v-model="activeEnv" :before-leave="handleKeyValue">
+    <el-tabs v-model="activeEnv">
       <el-tab-pane v-for="tab in tabs" :key="tab" :label="tab" :name="tab"></el-tab-pane>
     </el-tabs>
     <div class="content" :loading="valuesLoading">
@@ -56,11 +56,6 @@ export default {
     }
   },
   methods: {
-    handleKeyValue () {
-      if (this.$refs.keyValueRef) {
-        this.$refs.keyValueRef.resetValid()
-      }
-    },
     getChartValuesYaml ({ env = this.activeEnv, service = this.serviceName }) {
       return getChartValuesYamlAPI(this.projectName, env, [service])
         .then(res => {
@@ -70,7 +65,7 @@ export default {
             valueYaml.updated = false
             valueYaml.keyValues = re.overrideValues
             valueYaml.importRepoInfo = {
-              yamlSource: re.yamlSource,
+              yamlSource: re.yamlSource || 'default',
               valuesYAML: re.valuesYAML || '',
               gitRepoConfig: re.gitRepoConfig || null
             }
@@ -132,8 +127,7 @@ export default {
       if (this.$refs.importValuesRef) {
         valid.push(this.$refs.importValuesRef.validate())
       }
-      if (this.$refs.keyValueRef) this.$refs.keyValueRef.resetValid()
-      // if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
+      if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       Promise.all(valid)
         .then(res => {
           addChartValuesYamlByEnvAPI(
