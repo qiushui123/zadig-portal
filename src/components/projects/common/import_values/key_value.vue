@@ -22,7 +22,8 @@
         <el-table-column header-align="center" align="left" label="操作" width="100px">
           <template slot-scope="{ $index }">
             <el-form-item>
-              <el-button v-if="keyValueForm.index !== $index" type="text" @click="editKeyValue($index)">编辑</el-button>
+              <el-button v-if="keyValueForm.index === $index" type="text" @click="saveKeyValue($index)">保存</el-button>
+              <el-button v-else type="text" @click="editKeyValue($index)">编辑</el-button>
               <el-button type="text" @click="deleteKeyValue($index)">删除</el-button>
             </el-form-item>
           </template>
@@ -71,9 +72,23 @@ export default {
       if (newV !== oldV) {
         this.resetValid()
       }
+    },
+    keyValueForm: {
+      handler (newV, oldV) {
+        if (newV === oldV) {
+          this.keyValues[newV.index] = {
+            key: newV.key,
+            value: newV.value
+          }
+        }
+      },
+      deep: true
     }
   },
   methods: {
+    saveKeyValue (index) {
+      this.validate(index)
+    },
     async editKeyValue (index) {
       const res = await this.validate(this.keyValueForm.index)
       if (res) {
