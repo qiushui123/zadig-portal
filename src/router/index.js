@@ -98,8 +98,7 @@ import onboarding_projects_not_k8s_delivery from '../components/projects/guide/n
 
 // host
 import onboarding_host_config from '../components/projects/guide/host/host_config.vue'
-// import onboarding_host_service_build from '../components/projects/guide/host/service_build.vue'
-// import onboarding_host_run_workflow from '../components/projects/guide/host/run_workflow.vue'
+import editExternalConfig from '../components/projects/env/hostEnv/editExternalConfig.vue'
 
 /** ---------------- */
 
@@ -423,6 +422,14 @@ const routes = [
             meta: {
               requiresAuth: true,
               title: '集成环境'
+            }
+          },
+          {
+            path: 'externalConfig',
+            component: editExternalConfig,
+            meta: {
+              requiresAuth: true,
+              title: '配置托管环境'
             }
           },
           {

@@ -2,6 +2,7 @@
   <div class="service-container">
     <el-dialog title="是否更新对应环境？"
                :append-to-body="true"
+               v-if="envNameList.length"
                :visible.sync="updateEnvDialogVisible"
                width="40%">
       <el-checkbox-group v-model="selectedEnvs">

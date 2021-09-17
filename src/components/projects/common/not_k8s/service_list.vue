@@ -42,6 +42,7 @@
 <script>
 import { deleteServiceTemplateAPI, getServiceTemplatesAPI } from '@api'
 import UpdateEnv from '../../service_mgr/not_k8s/updateEnv'
+import { mapGetters } from 'vuex'
 
 function compare (a, b) {
   if (a.service_name < b.service_name) {
@@ -139,7 +140,9 @@ export default {
           this.projectName,
           obj.visibility
         ).then(() => {
-          this.$refs.updateEnv.openDialog()
+          if (this.envNameList.length) {
+            this.$refs.updateEnv.openDialog()
+          }
           this.$message({
             type: 'success',
             message: '删除成功'
@@ -156,8 +159,20 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['productList']),
     projectName () {
       return this.$route.params.project_name
+    },
+    envNameList () {
+      const envNameList = []
+      this.productList.forEach((element) => {
+        if (element.product_name === this.projectName) {
+          envNameList.push({
+            envName: element.env_name
+          })
+        }
+      })
+      return envNameList
     }
   },
   created () {

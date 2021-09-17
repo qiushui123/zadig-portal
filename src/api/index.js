@@ -1245,3 +1245,7 @@ export function queryServiceWorkloads (projectName, envName) {
 export function postWorkloads (payload) {
   return http.post(`/api/aslan/service/workloads`, payload)
 }
+
+export function editWorkloads (payload) {
+  return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
+}

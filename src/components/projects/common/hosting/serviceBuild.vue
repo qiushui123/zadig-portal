@@ -164,7 +164,9 @@ export default {
   .left {
     width: 260px;
     height: 100%;
+    border-top: 1px solid #ebedef;
     border-right: 1px solid #ebedef;
+    border-left: 1px solid #ebedef;
 
     .tree {
       box-sizing: border-box;
@@ -197,5 +199,9 @@ export default {
       }
     }
   }
+}
+
+/deep/ .custom-tree-node {
+  overflow: scroll;
 }
 </style>
