@@ -31,6 +31,7 @@
       </el-table>
     </el-form>
     <el-button type="text" @click="addKeyValue" icon="el-icon-plus">添加需要覆盖的键值对</el-button>
+    <span class="valid">{{ validRes }}</span>
   </div>
 </template>
 
@@ -42,7 +43,17 @@ export default {
       if (value === '') {
         callback(new Error('请输入 key 值'))
       } else if (keys.indexOf(value) !== keys.lastIndexOf(value)) {
+        this.validRes = 'key 值重复'
         callback(new Error('key 值重复'))
+      } else {
+        this.validRes = ''
+        callback()
+      }
+    }
+
+    const validateValue = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入 value 值'))
       } else {
         callback()
       }
@@ -50,7 +61,7 @@ export default {
 
     this.rules = {
       key: [{ validator: validateKey, trigger: 'blur' }],
-      value: [{ required: true, message: '请输入 key 值', trigger: 'blur' }]
+      value: [{ validator: validateValue, trigger: 'blur' }]
     }
 
     return {
@@ -58,7 +69,8 @@ export default {
         key: '',
         value: '',
         index: -1
-      }
+      },
+      validRes: ''
     }
   },
   props: {
@@ -140,6 +152,7 @@ export default {
         })
     },
     initForm () {
+      this.validRes = ''
       this.$refs.form && this.$refs.form.clearValidate()
       this.keyValueForm = {
         key: '',
@@ -188,6 +201,13 @@ export default {
     .el-form-item {
       margin-bottom: 0;
     }
+  }
+
+  .valid {
+    display: inline-block;
+    padding-left: 5px;
+    color: #f56c6c;
+    font-size: 12px;
   }
 }
 </style>
