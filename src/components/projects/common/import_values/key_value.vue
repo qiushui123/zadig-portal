@@ -81,7 +81,7 @@ export default {
       this.keyValues.splice(index, 1)
       const id = this.keyValueForm.index
       if (id === index) {
-        this.resetValid()
+        this.initForm()
       } else if (id > index) {
         this.keyValueForm.index = id - 1
       }
@@ -113,7 +113,7 @@ export default {
             key,
             value
           }
-          this.resetValid()
+          this.initForm()
           return true
         })
         .catch(err => {
@@ -121,12 +121,19 @@ export default {
           return false
         })
     },
-    resetValid () {
+    initForm () {
       this.$refs.form.clearValidate()
       this.keyValueForm = {
         key: '',
         value: '',
         index: -1
+      }
+    },
+    resetValid () {
+      this.initForm()
+      const len = this.keyValues.length
+      if (len && this.keyValues[len - 1].key === '') {
+        this.keyValues.splice(len - 1, 1)
       }
     }
   }
