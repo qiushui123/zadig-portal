@@ -442,7 +442,7 @@ export default {
   height: 100%;
   overflow: auto;
   background-color: #fff;
-  user-select: none;
+  // user-select: none;
 
   .modalContent {
     position: fixed;

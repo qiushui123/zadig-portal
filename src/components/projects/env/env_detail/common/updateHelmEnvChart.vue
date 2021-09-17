@@ -16,7 +16,7 @@
         <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv">
           <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
         </el-tabs>
-        <div class="content" v-if="usedChartNameInfo">
+        <div class="v-content" v-if="usedChartNameInfo">
           <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
           <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
             <div class="desc">暂无自定义的 values 文件</div>
@@ -327,7 +327,7 @@ export default {
       position: relative;
       z-index: 0;
 
-      .content {
+      .v-content {
         .version-title {
           height: 40px;
           line-height: 40px;

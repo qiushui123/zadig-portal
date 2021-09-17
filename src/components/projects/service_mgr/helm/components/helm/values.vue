@@ -4,7 +4,7 @@
     <el-tabs v-model="activeEnv">
       <el-tab-pane v-for="tab in tabs" :key="tab" :label="tab" :name="tab"></el-tab-pane>
     </el-tabs>
-    <div class="content" :loading="valuesLoading">
+    <div class="value-content" :loading="valuesLoading">
       <h5>覆盖默认 values 文件</h5>
       <div v-if="valuesYaml[activeEnv].importRepoInfo.yamlSource === 'default'">
         <div class="desc">暂无自定义的 values 文件</div>
@@ -187,7 +187,7 @@ export default {
     font-size: 14px;
   }
 
-  .content {
+  .value-content {
     height: calc(~'100% - 180px');
     overflow: auto;
   }

@@ -154,6 +154,6 @@ export default {
   flex: 1;
   overflow: auto;
   background-color: #fff;
-  user-select: none;
+  // user-select: none;
 }
 </style>
