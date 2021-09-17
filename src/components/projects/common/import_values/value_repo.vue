@@ -70,7 +70,7 @@
       <div class="desc-title">文件路径</div>
       <div v-for="(path, index) in valuesPaths" :key="index">
         <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
-        <el-button type="text" @click="review(index)">预览</el-button>
+        <!-- <el-button type="text" @click="review(index)">预览</el-button> -->
         <el-button v-show="valuesPaths.length > 1" type="text" @click="deletePath(index)">移除</el-button>
       </div>
       <el-button icon="el-icon-plus" type="text" size="small" @click="addPath">添加 values 文件</el-button>
@@ -173,7 +173,8 @@ export default {
     }
 
     /deep/.el-input {
-      width: calc(~'100% - 90px');
+      // width: calc(~'100% - 90px');
+      width: calc(~'100% - 45px');
       margin-right: 10px;
     }
   }

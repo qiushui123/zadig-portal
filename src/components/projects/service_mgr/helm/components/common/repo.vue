@@ -11,7 +11,7 @@
           ref="gitRepo"
         ></GitRepo>
       </el-tab-pane>
-      <el-tab-pane label="Chart 仓库" name="chart">
+      <el-tab-pane label="Chart 仓库" name="chart" disabled>
         <ChartRepo
           @canUpdateEnv="$emit('canUpdateEnv', $event)"
           :currentService="currentService"
