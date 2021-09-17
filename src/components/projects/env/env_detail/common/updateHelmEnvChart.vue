@@ -7,7 +7,9 @@
             class="icon"
             :class="{'el-icon-delete': name.type==='delete', 'el-icon-refresh': name.type==='update', 'el-icon-folder-add': name.type==='create'}"
           ></i>
-          <span class="desc">{{name.serviceName}}</span>
+          <el-tooltip effect="dark" :content="name.serviceName" placement="left">
+            <span class="desc">{{name.serviceName}}</span>
+          </el-tooltip>
         </span>
       </el-tab-pane>
     </el-tabs>
