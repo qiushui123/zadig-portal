@@ -73,7 +73,7 @@ export default {
     padding: 0 10px 20px;
 
     .kv-container {
-      margin: 0 50px;
+      margin: 5px 0;
     }
   }
 }

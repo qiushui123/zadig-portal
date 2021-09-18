@@ -229,7 +229,10 @@ const routes = [
           },
           {
             path: 'charts',
-            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/chart/index.vue')
+            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/chart/index.vue'),
+            meta: {
+              title: 'Chart 模板库'
+            }
           }]
       },
       {

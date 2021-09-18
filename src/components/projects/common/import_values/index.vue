@@ -15,7 +15,7 @@
         </el-select>
       </template>
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
-        <div class="desc-title">仓库信息</div>
+        <div class="desc-title">{{ importRepoInfoUse.yamlSource === 'gitRepo' ? '仓库信息' : '文件内容' }}</div>
         <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
           <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
         </Resize>
@@ -139,6 +139,8 @@ export default {
 
     .icon-delete {
       float: right;
+      color: #f56c6c;
+      font-size: 16px;
       cursor: pointer;
     }
   }

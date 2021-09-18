@@ -121,7 +121,7 @@
     </el-form>
     <el-form v-if="gitName === 'public'" :model="source" :rules="sourceRules" ref="sourceForm" label-width="140px">
       <el-form-item prop="url" label="仓库地址">
-        <el-input v-model="source.url" placeholder="https://github.com/owner/repo"></el-input>
+        <el-input v-model="source.url" placeholder="https://github.com/owner/repo" size="small"></el-input>
       </el-form-item>
       <el-form-item prop="path" label="文件目录：">
         <span :key="item" v-for="item in selectPath">[{{ item }}]&nbsp;</span>
