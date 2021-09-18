@@ -1,6 +1,6 @@
 <template>
   <div class="con">
-     <CodeMirror  @input="changeTxt" ref='codeMirror' :value="msg" :options="options" class="code" />
+    <CodeMirror @input="changeTxt" ref="codeMirror" :value="msg" :options="options" class="code" />
   </div>
 </template>
 
@@ -29,7 +29,8 @@ export default {
         theme: 'neo',
         mode: 'text/yaml',
         lineNumbers: true,
-        line: true
+        line: true,
+        readOnly: true
       }
     }
   },

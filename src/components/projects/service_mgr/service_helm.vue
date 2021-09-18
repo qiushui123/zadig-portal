@@ -5,7 +5,7 @@
   </div>
 </template>
 <script>
-import Code from '../web_code/code'
+import Code from './helm/code'
 export default {
   name: 'service_helm',
   components: {
