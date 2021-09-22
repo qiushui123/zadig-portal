@@ -1,31 +1,43 @@
 <template>
   <div class="key-value-outer">
     <h5>指定需要覆盖的键值对</h5>
-    <el-form ref="form" :model="keyValueForm" :rules="rules">
+    <el-form ref="form" :model="keyValueForm">
       <el-table :data="keyValues">
         <el-table-column header-align="center" align="left" prop="key" label="键">
           <template slot-scope="{ row, $index }">
-            <el-form-item v-if="keyValueForm.index === $index" prop="key">
-              <el-input v-model="keyValueForm.key" placeholder="键" size="small"></el-input>
+            <el-form-item
+              v-if="keyValueForm.keyValues[$index]"
+              :prop="`keyValues[${$index}].key`"
+              :rules="[{
+                  required: true, message: '请输入 key 值', trigger: 'blur'
+              }, {
+                  validator: validateKey, trigger: 'blur'
+              }]"
+            >
+              <el-input v-model="keyValueForm.keyValues[$index].key" placeholder="键" size="small"></el-input>
             </el-form-item>
             <span v-else>{{row.key}}</span>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="left" prop="value" label="值">
           <template slot-scope="{ row, $index }">
-            <el-form-item v-if="keyValueForm.index === $index" prop="value">
-              <el-input v-model="keyValueForm.value" placeholder="值" size="small"></el-input>
+            <el-form-item
+              v-if="keyValueForm.keyValues[$index]"
+              :prop="`keyValues[${$index}].value`"
+              :rules="{
+                validator: validateValue, trigger: 'blur'
+              }"
+            >
+              <el-input v-model="keyValueForm.keyValues[$index].value" placeholder="值" size="small"></el-input>
             </el-form-item>
             <span v-else>{{row.value}}</span>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="left" label="操作" width="100px">
           <template slot-scope="{ $index }">
-            <el-form-item>
-              <el-button v-if="keyValueForm.index === $index" type="text" @click="saveKeyValue($index)">保存</el-button>
-              <el-button v-else type="text" @click="editKeyValue($index)">编辑</el-button>
-              <el-button type="text" @click="deleteKeyValue($index)">删除</el-button>
-            </el-form-item>
+            <el-button v-if="keyValueForm.keyValues[$index]" type="text" @click="keyValues[$index].edit = false">保存</el-button>
+            <el-button v-else type="text" @click="editKeyValue($index)">编辑</el-button>
+            <el-button type="text" @click="keyValues.splice($index, 1)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -38,7 +50,7 @@
 <script>
 export default {
   data () {
-    const validateKey = (rule, value, callback) => {
+    this.validateKey = (rule, value, callback) => {
       const keys = this.keyValues.map(value => value.key)
       if (value === '') {
         callback(new Error('请输入 key 值'))
@@ -51,7 +63,7 @@ export default {
       }
     }
 
-    const validateValue = (rule, value, callback) => {
+    this.validateValue = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入 value 值'))
       } else {
@@ -59,17 +71,7 @@ export default {
       }
     }
 
-    this.rules = {
-      key: [{ validator: validateKey, trigger: 'blur' }],
-      value: [{ validator: validateValue, trigger: 'blur' }]
-    }
-
     return {
-      keyValueForm: {
-        key: '',
-        value: '',
-        index: -1
-      },
       validRes: ''
     }
   },
@@ -80,92 +82,50 @@ export default {
     }
   },
   watch: {
-    keyValues (newV, oldV) {
-      if (newV !== oldV) {
-        this.resetValid()
+    keyValues (nVal, oVal) {
+      if (nVal !== oVal) {
+        this.removeEdit(oVal)
       }
-    },
-    keyValueForm: {
-      handler (newV, oldV) {
-        if (newV === oldV) {
-          this.keyValues[newV.index] = {
-            key: newV.key,
-            value: newV.value
-          }
-        }
-      },
-      deep: true
+    }
+  },
+  computed: {
+    keyValueForm () {
+      return {
+        keyValues: this.keyValues.map(val => {
+          return val.edit ? val : null
+        })
+      }
     }
   },
   methods: {
-    saveKeyValue (index) {
-      this.validate(index)
+    editKeyValue (index) {
+      this.$set(this.keyValues[index], 'edit', true)
     },
-    async editKeyValue (index) {
-      const res = await this.validate(this.keyValueForm.index)
-      if (res) {
-        this.keyValueForm = { ...this.keyValues[index], index }
-      }
+    addKeyValue () {
+      this.keyValues.push({
+        key: '',
+        value: '',
+        edit: true
+      })
     },
-    deleteKeyValue (index) {
-      this.keyValues.splice(index, 1)
-      const id = this.keyValueForm.index
-      if (id === index) {
-        this.initForm()
-      } else if (id > index) {
-        this.keyValueForm.index = id - 1
-      }
-    },
-    async addKeyValue () {
-      const res = await this.validate(this.keyValueForm.index)
-      const findIndex = this.keyValues.findIndex(value => value.key === '')
-      if (findIndex !== -1) {
-        this.keyValueForm.index = findIndex
-        return
-      }
-      if (res) {
-        this.keyValues.push({
-          key: '',
-          value: ''
-        })
-        this.keyValueForm.index = this.keyValues.length - 1
-      }
-    },
-    validate (index = this.keyValueForm.index) {
-      if (index === -1) {
-        return Promise.resolve(true)
-      }
+    validate () {
       return this.$refs.form
         .validate()
         .then(() => {
-          const { key, value } = this.keyValueForm
-          this.keyValues[index] = {
-            key,
-            value
-          }
-          this.initForm()
           return Promise.resolve(true)
         })
         .catch(err => {
           console.log(err)
           return Promise.reject(false)
         })
+        .then(() => {
+          this.removeEdit()
+        })
     },
-    initForm () {
-      this.validRes = ''
-      this.$refs.form && this.$refs.form.clearValidate()
-      this.keyValueForm = {
-        key: '',
-        value: '',
-        index: -1
-      }
-    },
-    resetValid () {
-      this.initForm()
-      const len = this.keyValues.length
-      if (len && this.keyValues[len - 1].key === '') {
-        this.keyValues.splice(len - 1, 1)
-      }
+    removeEdit (kvs = this.keyValues) {
+      kvs.forEach(kv => {
+        delete kv.edit
+      })
     }
   }
 }
