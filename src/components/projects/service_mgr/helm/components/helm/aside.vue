@@ -38,6 +38,7 @@
                   <div slot="content">values.yaml 中可被更新的镜像</div>
                   <span><i class="el-icon-question"></i></span>
                 </el-tooltip>
+                <el-button type="text" size="small" @click="updateMatchRuleFlag = true">更新匹配规则</el-button>
               </h4>
               <!-- <div v-if="allRegistry.length === 0"
                    class="registry-alert">
@@ -95,6 +96,7 @@
         </div>
       </div>
     </div>
+    <MatchRule :value.sync="updateMatchRuleFlag"></MatchRule>
   </div>
 </template>
 <script>
@@ -103,10 +105,7 @@ import bus from '@utils/event_bus'
 import { mapState } from 'vuex'
 import help from './help.vue'
 import values from './values.vue'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/mode/yaml'
-import 'brace/theme/xcode'
-import 'brace/ext/searchbox'
+import MatchRule from './match_rule.vue'
 export default {
   props: {
     changeExpandFileList: Function,
@@ -117,18 +116,6 @@ export default {
   },
   data () {
     return {
-      editorOption: {
-        showLineNumbers: false,
-        showFoldWidgets: false,
-        showGutter: false,
-        showPrintMargin: false,
-        readOnly: true,
-        tabSize: 2,
-        maxLines: Infinity,
-        highlightActiveLine: false,
-        highlightGutterLine: false,
-        displayIndentGuides: false
-      },
       allRegistry: [],
       chartValues: [],
       detectedServices: [],
@@ -137,7 +124,8 @@ export default {
       name: null,
       buildName: null,
       isEdit: false,
-      valuesYamlDeposit: {}
+      valuesYamlDeposit: {},
+      updateMatchRuleFlag: false
     }
   },
   methods: {
@@ -173,9 +161,6 @@ export default {
             rightbar: step
           })
       })
-    },
-    editorInit (e) {
-      e.renderer.$cursorLayer.element.style.opacity = 0
     }
   },
   beforeDestroy () {
@@ -194,8 +179,8 @@ export default {
   },
   components: {
     help,
-    editor: aceEditor,
-    values
+    values,
+    MatchRule
   }
 }
 </script>
@@ -374,25 +359,6 @@ export default {
             .el-table td,
             .el-table th {
               padding: 6px 0;
-            }
-
-            .yaml-container {
-              margin: 5px 0;
-
-              .info {
-                margin: 8px 0;
-
-                .name,
-                .version {
-                  color: #303133;
-                  font-size: 14px;
-                }
-              }
-
-              .editor-container {
-                border: 1px solid #ccc;
-                border-radius: 4px;
-              }
             }
           }
         }

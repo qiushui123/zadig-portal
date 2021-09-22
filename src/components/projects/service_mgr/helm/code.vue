@@ -596,6 +596,8 @@ export default {
   }
 
   .right {
+    position: static;
+    z-index: auto;
     width: 100px;
     background-color: #fff;
   }
