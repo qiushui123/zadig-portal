@@ -48,7 +48,7 @@
                            @onRefreshService="getServices"
                            @onRefreshSharedService="getSharedServices"
                            @onSelectServiceChange="onSelectServiceChange"
-                           @updateYaml="updateYaml"></serviceTree>
+                           @updateYaml="updateYaml($event)"></serviceTree>
             </div>
             <template v-if="service.service_name  &&  services.length >0">
               <template v-if="service.type==='k8s'">
@@ -203,14 +203,20 @@ export default {
       this.detectedServices = res.service_module ? res.service_module : []
       this.systemEnvs = res.system_variable ? res.system_variable : []
     },
-    updateYaml () {
-      this.$refs.serviceEditor.updateService()
+    updateYaml (switchNode) {
+      this.$refs.serviceEditor.updateService().then(() => {
+        if (switchNode) {
+          this.$refs.serviceTree.selectAndSwitchTreeNode()
+        }
+      })
     },
     getYamlKind (payload) {
       this.currentServiceYamlKinds = payload
     },
     jumpToKind (payload) {
-      this.$refs.serviceEditor.jumpToWord(`kind: ${payload.kind}`)
+      this.$nextTick(() => {
+        this.$refs.serviceEditor.jumpToWord(`kind: ${payload.kind}`)
+      })
     },
     async getProducts () {
       await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)

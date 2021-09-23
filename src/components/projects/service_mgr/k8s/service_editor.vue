@@ -166,7 +166,7 @@ export default {
         yaml: yaml,
         source: 'spock'
       }
-      saveServiceTemplateAPI(payload).then((res) => {
+      return saveServiceTemplateAPI(payload).then((res) => {
         this.$message({
           type: 'success',
           message: `服务 ${payload.service_name} 保存成功`
