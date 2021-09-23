@@ -169,7 +169,7 @@ export default {
           this.$message.success(`更新规则成功！`)
           this.updateMatchRule = false
           this.addLoading = false
-          this.$store.dispatch('queryServiceModule', {
+          this.serviceName && this.$store.dispatch('queryServiceModule', {
             projectName: this.projectName,
             serviceName: this.serviceName
           })
