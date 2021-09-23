@@ -65,7 +65,7 @@
                           <el-tooltip placement="top">
                             <div slot="content">
                               Kubernetes：包括自建 K8s 和云厂商提供容器云服务<br />
-                              云主机/物理机：包括物理机和云厂商提供的云服务器
+                              主机：包括物理机和云厂商提供的云服务器
                             </div>
                             <i class="icon el-icon-question"></i>
                           </el-tooltip>
@@ -77,7 +77,7 @@
                           <el-radio border
                                     label="kubernetes">Kubernetes</el-radio>
                           <el-radio border
-                                    label="cloud_host">云主机/物理机</el-radio>
+                                    label="cloud_host">主机</el-radio>
                         </el-radio-group>
                       </el-col>
                   </el-row>

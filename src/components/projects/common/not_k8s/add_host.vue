@@ -3,7 +3,7 @@
     <el-alert type="warning"
               :closable="false">
       <template>
-        主机资源用于物理机服务资源配置<br />
+        主机资源用于主机服务资源配置<br />
         详细配置可参考
         <el-link style="font-size: 14px; vertical-align: baseline;"
                  type="primary"
