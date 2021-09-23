@@ -164,7 +164,7 @@ export default {
     },
     updateMatchRules () {
       this.addLoading = true
-      updateMatchRulesAPI(this.projectName, this.matchRules)
+      updateMatchRulesAPI(this.projectName, { rules: this.matchRules })
         .then(res => {
           this.$message.success(`更新规则成功！`)
           this.updateMatchRule = false
