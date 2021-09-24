@@ -27,6 +27,7 @@
                            active-class="selected"
                            :to="item.url">
                 <li class="pipelines-sub-side-bar__item">
+                  <i v-if="item.icon" class="icon" :class="[item.icon]"></i>
                   <span class="pipeline-name">{{item.name}}</span>
                 </li>
               </router-link>
@@ -238,6 +239,11 @@ export default {
               transition: background-color 150ms ease, color 150ms ease;
               -webkit-box-pack: justify;
               -ms-flex-pack: justify;
+
+              .icon {
+                margin-right: 3px;
+                color: #434548;
+              }
 
               &.selected {
                 background-color: #e1edfa;

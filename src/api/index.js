@@ -1233,6 +1233,14 @@ export function updateHelmEnvVarAPI (productName, envName, payload) {
   return http.put(`/api/aslan/environment/environments/${productName}/renderchart?envName=${envName}`, payload)
 }
 
+export function updateMatchRulesAPI (productName, payload) {
+  return http.put(`/api/aslan/project/products/${productName}/match-rules`, payload)
+}
+
+export function getMatchRulesAPI (productName) {
+  return http.get(`/api/aslan/project/products/${productName}/match-rules`)
+}
+
 // exteranl
 export function queryWorkloads (clusterId, namespace, page) {
   return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)
