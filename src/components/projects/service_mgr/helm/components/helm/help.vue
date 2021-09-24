@@ -25,12 +25,12 @@
           <li>
             格式一：<br>
             image:<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;repository： 仓库地址/命名规则/镜像名<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;repository： 仓库地址/命名空间/镜像名<br>
             &nbsp;&nbsp;&nbsp;&nbsp;tag：标签名<br>
           </li>
           <li>
             格式二：<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;image：仓库地址/命名规则/镜像名:标签名
+            &nbsp;&nbsp;&nbsp;&nbsp;image：仓库地址/命名空间/镜像名:标签名
           </li>
         </ul>
         </p>
