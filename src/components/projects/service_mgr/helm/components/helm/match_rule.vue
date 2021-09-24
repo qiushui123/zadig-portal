@@ -8,7 +8,7 @@
         <div class="rule">
           格式一：
           <br />&nbsp;&nbsp;image:
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;repository: 镜像仓库/项目名/镜像名
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;repository: 仓库地址/命名规则/镜像名
           <br />&nbsp;&nbsp;&nbsp;&nbsp;tag: 标签名
           <br />
         </div>
@@ -17,7 +17,7 @@
         <el-checkbox v-model="systemMatchRules[1].inUse"></el-checkbox>
         <div class="rule">
           格式二：
-          <br />&nbsp;&nbsp;any_key: 镜像仓库/项目名/镜像名:标签名
+          <br />&nbsp;&nbsp;image: 仓库地址/命名规则/镜像名:标签名
           <br />
         </div>
       </div>
@@ -34,7 +34,7 @@
           <el-row :gutter="5">
             <el-col :span="10">
               <el-form-item prop="repo">
-                <el-input v-model="customRule.repo" placeholder="输入仓库地址/项目名变量" size="small"></el-input>
+                <el-input v-model="customRule.repo" placeholder="仓库地址/项目名变量" size="small"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="1" class="separator">/</el-col>
