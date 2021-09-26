@@ -22,7 +22,7 @@
                  class="iconfont iconhelmrepo"></i>
               <i v-else-if="env.source==='spock'"
                  class="el-icon-cloudy"></i>
-              {{`$${env.name}`}}
+              {{`${env.name}`}}
               <el-tag v-if="env.production"
                       effect="light"
                       size="mini"
