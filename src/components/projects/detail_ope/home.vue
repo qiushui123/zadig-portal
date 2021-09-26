@@ -269,7 +269,7 @@ export default {
     this.exitGuideModal()
   },
   mounted () {
-    this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
+    this.$store.dispatch('getProductList')
     this.$store.dispatch('getWorkflowList')
     this.getProjects()
     bus.$emit('show-sidebar', true)
