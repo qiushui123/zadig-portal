@@ -41,7 +41,6 @@ export default {
     openDialog () {
       this.updateEnvDialogVisible = true
     },
-
     async getProducts () {
       await this.$store.dispatch('getProductList')
     },

@@ -16,7 +16,7 @@
                  :key="index">
           <template #title>
             <i class="el-icon-cloudy"></i>
-            {{`$${env.name}`}}
+            {{`${env.name}`}}
             <el-tag v-if="env.clusterType==='生产'"
                     effect="light"
                     size="mini"

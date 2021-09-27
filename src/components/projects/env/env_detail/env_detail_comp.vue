@@ -15,7 +15,7 @@
                  type="card">
           <el-tab-pane v-for="(env,index) in envNameList"
                        :key="index"
-                       :label="`$${env.name}`"
+                       :label="`${env.name}`"
                        :name="env.envName">
             <span slot="label">
               <i v-if="env.source==='helm'"
@@ -116,7 +116,7 @@
                             effect="dark"
                             placement="top">
                     <template v-if="productInfo.status!=='Creating'">
-                      <el-button v-if=" (envSource===''||envSource==='spock')"
+                      <el-button v-if="envSource===''||envSource==='spock'"
                                  type="text"
                                  @click="updateK8sEnv(productInfo)">更新环境</el-button>
                       <el-button v-else-if="envSource==='helm'"
@@ -768,7 +768,6 @@ export default {
         this.initPageInfo()
         this.getEnvNameList()
         this.getEnvServices()
-        this.getProducts()
         this.getCluster()
         this.fetchEnvRevision()
         this.checkProjectFeature()
