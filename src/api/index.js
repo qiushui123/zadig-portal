@@ -235,9 +235,10 @@ export function listProductSSEAPI (params) {
   })
 }
 
-export function getProductsAPI () {
-  return http.get('/api/aslan/environment/environments')
+export function getProductsAPI (projectName = '', production = '') {
+  return http.get(`/api/aslan/environment/environments?projectName=${projectName}&production=${production}`)
 }
+
 export function getDeployEnvByPipelineNameAPI (pipelineName) {
   return http.get(`/api/aslan/workflow/v2/tasks/pipelines/${pipelineName}/products`)
 }
@@ -1004,6 +1005,10 @@ export function updateServiceAPI (product, service, type, env, data, envType = '
       envName: env
     }
   })
+}
+
+export function getProjectWithEnvsAPI (ignoreNoEnvs = true, verbosity = 'brief') {
+  return http.get(`/api/aslan/project/projects?ignoreNoEnvs=${ignoreNoEnvs}&verbosity=${verbosity}`)
 }
 
 export function updateK8sEnvAPI (product_name, env_name, payload, envType = '', force = '') {
