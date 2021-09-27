@@ -585,7 +585,6 @@ export default {
         })
         payload.services = services
         payload.shared_services = payload.shared_services.filter(share => { return share.name !== data.service_name })
-        console.log(payload.shared_services)
         updateEnvTemplateAPI(projectName, payload).then((res) => {
           this.getServiceGroup()
           this.$emit('onRefreshProjectInfo')
