@@ -1239,11 +1239,11 @@ export function updateHelmEnvVarAPI (productName, envName, payload) {
 }
 
 export function updateMatchRulesAPI (productName, payload) {
-  return http.put(`/api/aslan/project/products/${productName}/match-rules`, payload)
+  return http.put(`/api/aslan/project/products/${productName}/searching-rules`, payload)
 }
 
 export function getMatchRulesAPI (productName) {
-  return http.get(`/api/aslan/project/products/${productName}/match-rules`)
+  return http.get(`/api/aslan/project/products/${productName}/searching-rules`)
 }
 
 // exteranl
