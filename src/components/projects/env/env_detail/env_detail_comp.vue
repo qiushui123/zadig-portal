@@ -616,10 +616,10 @@ export default {
   },
   computed: {
     isShowDeleteEnv () {
-      const envSourceLsit = ['', 'spock', 'helm', 'pm']
+      const envSourceList = ['', 'spock', 'helm', 'pm']
       const productInfo = this.productInfo
       const status = productInfo.status
-      return (((status !== 'Disconnected' || status === 'NotFound') && productInfo.cluster_id !== '') && envSourceLsit.includes(this.envSource)) || status === 'Unknown'
+      return (((status !== 'Disconnected' || status === 'NotFound') && productInfo.cluster_id !== '') && envSourceList.includes(this.envSource)) || status === 'Unknown'
     },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
