@@ -128,7 +128,7 @@
                   <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
                 </template>
                 <template>
-                    <el-button v-if="(productInfo.status!=='Disconnected'&&productInfo.cluster_id!=='')&&(envSource===''||envSource==='spock'|| envSource==='helm')"
+                    <el-button  v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
                       删除环境</el-button>
@@ -136,14 +136,7 @@
                                type="text"
                                @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)">
                       取消托管</el-button>
-                    <el-button v-else-if="(productInfo.status==='NotFound'&&productInfo.cluster_id!=='')&&(envSource===''||envSource==='spock'|| envSource==='helm')"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
-                    <el-button v-else-if="productInfo.status==='Unknown'"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
+
                     <el-button v-if="productInfo.status!=='Creating' && (envSource===''||envSource==='spock') && !isPmService"
                                type="text"
                                @click="openRecycleEnvDialog()">环境回收</el-button>
@@ -170,7 +163,7 @@
                                @click="envSource==='helm' ? openUpdateHelmEnv() : updateK8sEnv(productInfo)">更新环境</el-button>
                 </el-tooltip>
                 <template>
-                    <el-button v-if="(productInfo.status!=='Disconnected' && productInfo.cluster_id!=='') && (envSource===''||envSource==='spock' || envSource==='helm')"
+                    <el-button v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
                       删除环境</el-button>
@@ -178,14 +171,6 @@
                                type="text"
                                @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)">
                       取消托管</el-button>
-                    <el-button v-else-if="(productInfo.status==='NotFound' && productInfo.cluster_id!=='') && (envSource===''||envSource==='spock'|| envSource==='helm')"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
-                    <el-button v-else-if="productInfo.status==='Unknown'"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
                 </template>
               </div>
             </el-col>
@@ -630,6 +615,12 @@ export default {
     }
   },
   computed: {
+    isShowDeleteEnv () {
+      const envSourceList = ['', 'spock', 'helm', 'pm']
+      const productInfo = this.productInfo
+      const status = productInfo.status
+      return (((status !== 'Disconnected' || status === 'NotFound') && productInfo.cluster_id !== '') && envSourceList.includes(this.envSource)) || status === 'Unknown'
+    },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
     },
