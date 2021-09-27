@@ -23,7 +23,10 @@
     <div v-else>
       <el-form label-width="200px" ref="create-env-ref" :model="projectConfig" :rules="rules">
         <el-form-item label="环境名称：" prop="env_name">
-          <el-input v-model="projectConfig.env_name" size="small"></el-input>
+          <el-input @input="changeEnvName" v-model="projectConfig.env_name" size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="命名空间：" v-if="projectConfig.source==='system'" prop="defaultNamespace">
+          <el-input v-model="projectConfig.defaultNamespace" size="small"></el-input>
         </el-form-item>
         <el-form-item label="创建方式" prop="source">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
@@ -315,7 +318,9 @@ export default {
         product_name: '',
         cluster_id: '',
         env_name: '',
-        source: 'spock',
+        source: 'system',
+        namespace: '',
+        defaultNamespace: '',
         vars: [],
         revision: null,
         isPublic: true,
@@ -343,6 +348,9 @@ export default {
         ],
         namespace: [
           { required: true, trigger: 'change', message: '请选择命名空间' }
+        ],
+        defaultNamespace: [
+          { required: true, trigger: 'change', message: '命名空间不能为空' }
         ],
         env_name: [
           { required: true, trigger: 'change', validator: validateEnvName }
@@ -415,6 +423,11 @@ export default {
     }
   },
   methods: {
+    changeEnvName (value) {
+      if (this.projectConfig.source === 'system') {
+        this.projectConfig.defaultNamespace = this.projectName + '-env-' + value
+      }
+    },
     async getCluster () {
       const res = await getClusterListAPI()
       if (!this.rollbackMode) {
@@ -757,6 +770,7 @@ export default {
           picked2D.push(picked1D)
           const payload = this.$utils.cloneObj(this.projectConfig)
           payload.source = 'spock'
+          payload.namespace = payload.defaultNamespace
           const envType = 'test'
           this.startDeployLoading = true
           createProductAPI(payload, envType).then(
@@ -792,7 +806,8 @@ export default {
           const payload = {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
+            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo(),
+            namespace: this.projectConfig.defaultNamespace
           }
 
           this.startDeployLoading = true
