@@ -213,7 +213,7 @@ export default {
       this.$refs.serviceEditor.jumpToWord(`kind: ${payload.kind}`)
     },
     async getProducts () {
-      await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
+      await this.$store.dispatch('getProductList')
     },
     autoUpgradeEnv () {
       const payload = {

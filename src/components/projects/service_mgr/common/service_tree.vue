@@ -597,7 +597,7 @@ export default {
       })
     },
     async getProducts () {
-      await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
+      await this.$store.dispatch('getProductList')
     },
     getServiceGroup () {
       this.serviceGroup = []
