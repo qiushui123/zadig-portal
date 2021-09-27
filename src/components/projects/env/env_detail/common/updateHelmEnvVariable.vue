@@ -1,16 +1,16 @@
 <template>
   <div class="helm-env-variable">
-      <div v-show="envVariable.yamlSource === 'default'" class="default-values">
-        <div class="desc">暂无环境默认变量 values 文件</div>
-        <el-button type="text" @click="envVariable.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
-      </div>
-      <ImportValues
-        v-show="envVariable.yamlSource !== 'default'"
-        showDelete
-        ref="importValuesRef"
-        :resize="{direction: 'vertical'}"
-        :importRepoInfo="envVariable"
-      ></ImportValues>
+    <div v-show="envVariable.yamlSource === 'default'" class="default-values">
+      <div class="desc">暂无环境默认变量 values 文件</div>
+      <el-button type="text" @click="envVariable.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
+    </div>
+    <ImportValues
+      v-show="envVariable.yamlSource !== 'default'"
+      showDelete
+      ref="importValuesRef"
+      :resize="{direction: 'vertical'}"
+      :importRepoInfo="envVariable"
+    ></ImportValues>
   </div>
 </template>
 
@@ -20,7 +20,6 @@ import {} from '@api'
 import { cloneDeep } from 'lodash'
 
 const envVariableTemp = {
-  envName: '', // ?: String
   yamlSource: 'default', // : String
   valuesYAML: '', // : String
   gitRepoConfig: null // : Object
@@ -54,23 +53,18 @@ export default {
     },
     getAllEnvVariableInfo () {
       const envVar = this.envVariable
-      let chart = {
-        envName: envVar.envName === 'DEFAULT' ? '' : envVar.envName
-      }
+      let chart = {}
       if (envVar.yamlSource === 'gitRepo') {
         chart = {
-          ...chart,
           yamlSource: envVar.yamlSource,
           gitRepoConfig: cloneDeep(envVar.gitRepoConfig)
         }
       } else if (envVar.yamlSource === 'freeEdit') {
         chart = {
-          ...chart,
           yamlSource: envVar.yamlSource,
           valuesYAML: envVar.valuesYAML
         }
       }
-
       return chart
     },
     resetallEnvVariableInfo () {

@@ -792,31 +792,30 @@ export default {
       }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
+          const valueInfo = this.$refs.helmEnvTemplateRef.getAllInfo()
           const payload = {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: this.$refs.helmEnvTemplateRef.getAllInfo()
+            chartValues: valueInfo.chartInfo,
+            defaultValues: valueInfo.envInfo
           }
-
-          console.log('payload:', payload)
-
-          // this.startDeployLoading = true
-          // createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
-          //   res => {
-          //     const envName = payload.envName
-          //     this.startDeployLoading = false
-          //     this.$message({
-          //       message: '创建环境成功',
-          //       type: 'success'
-          //     })
-          //     this.$router.push(
-          //       `/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`
-          //     )
-          //   },
-          //   () => {
-          //     this.startDeployLoading = false
-          //   }
-          // )
+          this.startDeployLoading = true
+          createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
+            res => {
+              const envName = payload.envName
+              this.startDeployLoading = false
+              this.$message({
+                message: '创建环境成功',
+                type: 'success'
+              })
+              this.$router.push(
+                `/v1/projects/detail/${this.projectName}/envs/detail?envName=${envName}`
+              )
+            },
+            () => {
+              this.startDeployLoading = false
+            }
+          )
         }
       })
     },
