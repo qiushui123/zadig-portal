@@ -25,10 +25,10 @@
         <el-form-item label="环境名称：" prop="env_name">
           <el-input @input="changeEnvName" v-model="projectConfig.env_name" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="命名空间：" v-if="projectConfig.source==='system'" prop="defaultNamespace">
-          <el-input v-model="projectConfig.defaultNamespace" size="small"></el-input>
+        <el-form-item label="命名空间："  v-if="projectConfig.source==='system' && $utils.isEmpty(pmServiceMap)" prop="defaultNamespace">
+          <el-input style="width: 250px;" :disabled="editButtonDisabled" v-model="projectConfig.defaultNamespace" size="small"></el-input><span class="editButton" @click="editButtonDisabled = !editButtonDisabled">{{editButtonDisabled? '编辑' : '完成'}}</span>
         </el-form-item>
-        <el-form-item label="创建方式" prop="source">
+        <el-form-item label="创建方式" prop="source" v-if="$utils.isEmpty(pmServiceMap)">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
             <el-option label="系统创建" value="system"></el-option>
             <el-option label="托管外部环境" value="external"></el-option>
@@ -313,6 +313,7 @@ export default {
   data () {
     return {
       selection: '',
+      editButtonDisabled: true,
       currentProductDeliveryVersions: [],
       projectConfig: {
         product_name: '',
@@ -424,7 +425,7 @@ export default {
   },
   methods: {
     changeEnvName (value) {
-      if (this.projectConfig.source === 'system') {
+      if (this.projectConfig.source === 'system' && this.$utils.isEmpty(this.pmServiceMap)) {
         this.projectConfig.defaultNamespace = this.projectName + '-env-' + value
       }
     },
@@ -1295,5 +1296,12 @@ export default {
       }
     }
   }
+}
+
+.editButton {
+  display: inline-block;
+  margin-left: 10px;
+  color: #1989fa;
+  cursor: pointer;
 }
 </style>
