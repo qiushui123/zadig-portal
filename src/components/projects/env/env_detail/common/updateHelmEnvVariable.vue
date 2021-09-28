@@ -92,7 +92,10 @@ export default {
       return Promise.all(valid)
     },
     async getEnvVariablesYaml ({ envName }) {
-      const res = await getEnvDefaultVariableAPI(this.projectName, envName).catch(err => {
+      const res = await getEnvDefaultVariableAPI(
+        this.projectName,
+        envName
+      ).catch(err => {
         console.log(err)
         this.initEnvVariableInfo(envName)
       })
@@ -105,7 +108,6 @@ export default {
         }
         this.envVariable = cloneDeep(envVar)
       }
-      console.log(':::', this.envVariable)
     }
   },
   watch: {

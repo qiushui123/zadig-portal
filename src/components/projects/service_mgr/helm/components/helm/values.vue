@@ -45,7 +45,11 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
-import { addChartValuesYamlByEnvAPI, getChartValuesYamlAPI, getEnvDefaultVariableAPI } from '@api'
+import {
+  addChartValuesYamlByEnvAPI,
+  getChartValuesYamlAPI,
+  getEnvDefaultVariableAPI
+} from '@api'
 import { cloneDeep } from 'lodash'
 export default {
   props: {
@@ -115,16 +119,18 @@ export default {
         })
     },
     getEnvVariablesYaml ({ env = this.activeEnv }) {
-      return getEnvDefaultVariableAPI(this.projectName, env).then(res => {
-        this.valuesYaml[env].envVarInfo = {
-          initialYaml: res.defaultValues,
-          yamlSource: res.defaultValues ? 'freeEdit' : 'default',
-          valuesYAML: res.defaultValues,
-          gitRepoConfig: null
-        }
-      }).catch(err => {
-        console.log(err)
-      })
+      return getEnvDefaultVariableAPI(this.projectName, env)
+        .then(res => {
+          this.valuesYaml[env].envVarInfo = {
+            initialYaml: res.defaultValues,
+            yamlSource: res.defaultValues ? 'freeEdit' : 'default',
+            valuesYAML: res.defaultValues,
+            gitRepoConfig: null
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
     async initValuesYaml (service = this.serviceName) {
       this.valuesLoading = true
@@ -175,7 +181,10 @@ export default {
       }
       const valuesYaml = this.valuesYaml[this.activeEnv]
       let defaultValues = valuesYaml.envVarInfo
-      if (valuesYaml.envVarInfo.initialYaml && valuesYaml.envVarInfo.yamlSource === 'default') {
+      if (
+        valuesYaml.envVarInfo.initialYaml &&
+        valuesYaml.envVarInfo.yamlSource === 'default'
+      ) {
         defaultValues = {
           yamlSource: 'freeEdit',
           valuesYAML: ''
@@ -195,8 +204,7 @@ export default {
       }
       if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       Promise.all(valid)
-        .then(res => {
-          this.generatePayload()
+        .then(() => {
           addChartValuesYamlByEnvAPI(
             this.projectName,
             this.activeEnv,
