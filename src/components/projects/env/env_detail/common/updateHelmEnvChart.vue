@@ -120,7 +120,7 @@ export default {
   },
   methods: {
     switchTabs () {
-      return this.$refs.importValuesRef.validate()
+      return this.$refs.importValuesRef && this.$refs.importValuesRef.validate()
     },
     getAllChartNameInfo () {
       const chartValues = []

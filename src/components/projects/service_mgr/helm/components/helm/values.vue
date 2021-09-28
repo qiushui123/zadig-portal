@@ -45,7 +45,7 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
-import { addChartValuesYamlByEnvAPI, getChartValuesYamlAPI } from '@api'
+import { addChartValuesYamlByEnvAPI, getChartValuesYamlAPI, getEnvDefaultVariableAPI } from '@api'
 import { cloneDeep } from 'lodash'
 export default {
   props: {
@@ -99,21 +99,29 @@ export default {
         .then(res => {
           if (res.length) {
             const re = res[0]
-            const valueYaml = {}
-            valueYaml.updated = false
-            valueYaml.keyValues = re.overrideValues
-            valueYaml.importRepoInfo = {
+            this.valuesYaml[env].keyValues = re.overrideValues
+            this.valuesYaml[env].importRepoInfo = {
               yamlSource: re.yamlSource || 'default',
               valuesYAML: re.valuesYAML || '',
               gitRepoConfig: re.gitRepoConfig || null
             }
-
-            this.valuesYaml[env] = valueYaml
           }
         })
         .catch(err => {
           console.log(err)
         })
+    },
+    getEnvVariablesYaml ({ env = this.activeEnv }) {
+      return getEnvDefaultVariableAPI(this.projectName, env).then(res => {
+        this.valuesYaml[env].envVarInfo = {
+          initialYaml: res.defaultValues,
+          yamlSource: res.defaultValues ? 'freeEdit' : 'default',
+          valuesYAML: res.defaultValues,
+          gitRepoConfig: null
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     async initValuesYaml (service = this.serviceName) {
       this.valuesLoading = true
@@ -127,13 +135,14 @@ export default {
 
       for (const key in this.valuesYaml) {
         this.valuesYaml[key] = {
-          envVarInfo: cloneDeep(importRepoInfo),
+          envVarInfo: { ...cloneDeep(importRepoInfo), initialYaml: '' },
           importRepoInfo: cloneDeep(importRepoInfo),
           keyValues: cloneDeep(keyValues),
           updated: false
         }
         if (service) {
           await this.getChartValuesYaml({ env: key, service: service })
+          await this.getEnvVariablesYaml({ env: key })
         }
       }
 
@@ -141,47 +150,40 @@ export default {
       return Promise.resolve(this.valuesYaml)
     },
     generatePayload () {
+      const fn = ({ yamlSource, valuesYAML, gitRepoConfig }) => {
+        let res = {}
+        switch (yamlSource) {
+          case 'default':
+            break
+          case 'freeEdit':
+            res = {
+              yamlSource,
+              valuesYAML
+            }
+            break
+          case 'gitRepo':
+            res = {
+              yamlSource,
+              gitRepoConfig
+            }
+            break
+        }
+        return res
+      }
       const valuesYaml = this.valuesYaml[this.activeEnv]
-      let payload = {
+      let defaultValues = valuesYaml.envVarInfo
+      if (valuesYaml.envVarInfo.initialYaml && valuesYaml.envVarInfo.yamlSource === 'default') {
+        defaultValues = {
+          yamlSource: 'freeEdit',
+          valuesYAML: ''
+        }
+      }
+      return {
         serviceName: this.serviceName,
-        overrideValues: valuesYaml.keyValues.filter(value => value.key !== '')
+        overrideValues: valuesYaml.keyValues.filter(value => value.key !== ''),
+        ...fn(valuesYaml.importRepoInfo),
+        defaultValues: fn(defaultValues)
       }
-      if (valuesYaml.importRepoInfo.yamlSource === 'freeEdit') {
-        payload = {
-          ...payload,
-          serviceYaml: {
-            yamlSource: valuesYaml.importRepoInfo.yamlSource,
-            valuesYAML: valuesYaml.importRepoInfo.valuesYAML
-          }
-        }
-      } else if (valuesYaml.importRepoInfo.yamlSource === 'gitRepo') {
-        payload = {
-          ...payload,
-          serviceYaml: {
-            yamlSource: valuesYaml.importRepoInfo.yamlSource,
-            gitRepoConfig: valuesYaml.importRepoInfo.gitRepoConfig
-          }
-        }
-      }
-      if (valuesYaml.envVarInfo.yamlSource === 'freeEdit') {
-        payload = {
-          ...payload,
-          envYaml: {
-            yamlSource: valuesYaml.envVarInfo.yamlSource,
-            valuesYAML: valuesYaml.envVarInfo.valuesYAML
-          }
-        }
-      } else if (valuesYaml.envVarInfo.yamlSource === 'gitRepo') {
-        payload = {
-          ...payload,
-          envYaml: {
-            yamlSource: valuesYaml.envVarInfo.yamlSource,
-            gitRepoConfig: valuesYaml.envVarInfo.gitRepoConfig
-          }
-        }
-      }
-      console.log('payload: ', payload)
-      return payload
     },
     addChartValuesYamlByEnv () {
       const valid = []
@@ -191,14 +193,14 @@ export default {
       if (this.$refs.keyValueRef) valid.push(this.$refs.keyValueRef.validate())
       Promise.all(valid)
         .then(res => {
-          this.generatePayload() // todo: delete
-          // addChartValuesYamlByEnvAPI(
-          //   this.projectName,
-          //   this.activeEnv,
-          //   this.generatePayload()
-          // ).then(res => {
-          //   this.$message.success(`保存成功`)
-          // })
+          this.generatePayload()
+          addChartValuesYamlByEnvAPI(
+            this.projectName,
+            this.activeEnv,
+            this.generatePayload()
+          ).then(res => {
+            this.$message.success(`保存成功`)
+          })
         })
         .catch(err => {
           console.log(err)

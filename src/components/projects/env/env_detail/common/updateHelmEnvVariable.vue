@@ -16,7 +16,7 @@
 
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
-import {} from '@api'
+import { getEnvDefaultVariableAPI } from '@api'
 import { cloneDeep } from 'lodash'
 
 const envVariableTemp = {
@@ -38,6 +38,7 @@ export default {
     }
   },
   data () {
+    this.initialYaml = ''
     return {
       envVariable: {} // envVariableTemp
     }
@@ -53,8 +54,15 @@ export default {
     },
     getAllEnvVariableInfo () {
       const envVar = this.envVariable
-      let chart = {}
-      if (envVar.yamlSource === 'gitRepo') {
+      let chart = {
+        yamlSource: ''
+      }
+      if (this.initialYaml && envVar.yamlSource === 'default') {
+        chart = {
+          yamlSource: 'freeEdit',
+          valuesYAML: ''
+        }
+      } else if (envVar.yamlSource === 'gitRepo') {
         chart = {
           yamlSource: envVar.yamlSource,
           gitRepoConfig: cloneDeep(envVar.gitRepoConfig)
@@ -70,7 +78,7 @@ export default {
     resetallEnvVariableInfo () {
       this.envVariable = {}
     },
-    initallEnvVariableInfo (envName = 'DEFAULT') {
+    initEnvVariableInfo (envName = 'DEFAULT') {
       this.envVariable = {
         ...cloneDeep(envVariableTemp),
         envName: envName === 'DEFAULT' ? '' : envName
@@ -84,26 +92,27 @@ export default {
       return Promise.all(valid)
     },
     async getEnvVariablesYaml ({ envName }) {
-      // todo
-      //   const fn = () => {}
-      //   const res = await fn(this.projectName, envName).catch(err =>
-      //     console.log(err)
-      //   )
-      //   if (res) {
-      //     const envVar = {
-      //       ...cloneDeep(envVariableTemp),
-      //       res
-      //     }
-      //     this.allEnvVariableInfo = cloneDeep(envVar)
-      //   }
-      this.initallEnvVariableInfo(envName)
+      const res = await getEnvDefaultVariableAPI(this.projectName, envName).catch(err => {
+        console.log(err)
+        this.initEnvVariableInfo(envName)
+      })
+      if (res) {
+        this.initialYaml = res.defaultValues
+        const envVar = {
+          ...cloneDeep(envVariableTemp),
+          yamlSource: res.defaultValues ? 'freeEdit' : 'default',
+          valuesYAML: res.defaultValues
+        }
+        this.envVariable = cloneDeep(envVar)
+      }
+      console.log(':::', this.envVariable)
     }
   },
   watch: {
     envNames: {
       handler (newV, oldV) {
         if (newV === 'DEFAULT') {
-          this.initallEnvVariableInfo()
+          this.initEnvVariableInfo()
         } else {
           this.getEnvVariablesYaml({ envName: newV })
         }

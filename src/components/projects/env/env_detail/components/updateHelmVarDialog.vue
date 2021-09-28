@@ -42,24 +42,25 @@ export default {
         return
       }
       const projectName = this.productInfo.product_name
+      const valueInfo = this.$refs.helmEnvTemplateRef.getAllInfo()
       const payload = {
-        chartValues: this.$refs.helmEnvTemplateRef.getAllInfo()
+        chartValues: valueInfo.chartInfo,
+        defaultValues: valueInfo.envInfo
       }
-      console.log('payload:', payload)
-      // this.updataHelmEnvVarLoading = true
-      // updateHelmEnvVarAPI(projectName, this.productInfo.env_name, payload)
-      //   .then(response => {
-      //     this.updataHelmEnvVarLoading = false
-      //     this.updateHelmEnvVarDialogVisible = false
-      //     this.fetchAllData()
-      //     this.$message({
-      //       message: '更新环境变量成功，请等待服务升级',
-      //       type: 'success'
-      //     })
-      //   })
-      //   .catch(() => {
-      //     this.updataHelmEnvVarLoading = false
-      //   })
+      this.updataHelmEnvVarLoading = true
+      updateHelmEnvVarAPI(projectName, this.productInfo.env_name, payload)
+        .then(response => {
+          this.updataHelmEnvVarLoading = false
+          this.updateHelmEnvVarDialogVisible = false
+          this.fetchAllData()
+          this.$message({
+            message: '更新环境变量成功，请等待服务升级',
+            type: 'success'
+          })
+        })
+        .catch(() => {
+          this.updataHelmEnvVarLoading = false
+        })
     },
     cancelUpdateHelmEnvVar () {
       this.updateHelmEnvVarDialogVisible = false
