@@ -16,8 +16,8 @@
       </template>
       <template v-if="importRepoInfoUse.yamlSource !== 'default'">
         <div class="desc-title">{{ importRepoInfoUse.yamlSource === 'gitRepo' ? '仓库信息' : '文件内容' }}</div>
-        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
-          <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
+        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height" @sizeChange="$refs.codemirror.refresh()">
+          <codemirror ref="codemirror" v-model="importRepoInfoUse.valuesYAML"></codemirror>
         </Resize>
         <ValueRepo
           v-if="importRepoInfoUse.yamlSource === 'gitRepo'"

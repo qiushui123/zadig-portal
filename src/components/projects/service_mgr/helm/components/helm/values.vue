@@ -99,11 +99,14 @@ export default {
         .then(res => {
           if (res.length) {
             const re = res[0]
-            this.valuesYaml[env].keyValues = re.overrideValues
-            this.valuesYaml[env].importRepoInfo = {
-              yamlSource: re.yamlSource || 'default',
-              valuesYAML: re.valuesYAML || '',
-              gitRepoConfig: re.gitRepoConfig || null
+            this.valuesYaml[env] = {
+              ...this.valuesYaml[env],
+              keyValues: re.overrideValues || [],
+              importRepoInfo: {
+                yamlSource: re.yamlSource || 'default',
+                valuesYAML: re.valuesYAML || '',
+                gitRepoConfig: re.gitRepoConfig || null
+              }
             }
           }
         })
