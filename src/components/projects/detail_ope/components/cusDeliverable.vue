@@ -9,14 +9,14 @@
      <div class="title">自定义镜像名称</div>
      <div class="item" v-for="key of Object.keys(customerImage)" :key="'image'+key">
          <div class="label">{{customerImage[key].label}}</div>
-         <el-input class="input1" v-model="customerImage[key].service" size="small" ></el-input> &nbsp;:&nbsp;
-         <el-input class="input2" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder"></el-input>
+         <el-input class="input1" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="customerImage[key].service" size="small" placeholder="${SERVICE}" clearable  ></el-input> &nbsp;:&nbsp;
+         <el-input class="input2" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
          <span class="reset" @click="resetFiled('customerImage',key)">重置</span>
      </div>
      <div class="title">自定义 TAR 包名称</div>
      <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
          <div class="label">{{tar[key].label}}</div>
-         <el-input class="input3" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder"></el-input>
+         <el-input class="input3" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
          <span class="reset" @click="resetFiled('tar',key)">重置</span>
      </div>
   </div>
@@ -39,48 +39,48 @@ export default {
         pr: {
           label: 'PR 生成镜像规则',
           service: defaultValue,
-          value: '',
+          value: placeholder[0],
           placeholder: placeholder[0]
         },
         branch: {
           label: 'BRNACH 生成镜像规则',
           service: defaultValue,
-          value: '',
+          value: placeholder[1],
           placeholder: placeholder[1]
         },
         prBranch: {
           label: 'PR + BRANCH 生成镜像规则',
           service: defaultValue,
-          value: '',
+          value: placeholder[2],
           placeholder: placeholder[2]
         },
         tag: {
           label: 'TAG 生成镜像规则',
           service: defaultValue,
-          value: '',
+          value: placeholder[3],
           placeholder: placeholder[3]
         }
       },
       tar: {
         pr: {
           label: 'PR 生成镜像规则',
-          value: '',
+          value: defaultValue + '-' + placeholder[0],
           placeholder: defaultValue + '-' + placeholder[0]
         },
         branch: {
           label: 'BRNACH 生成镜像规则',
           service: defaultValue,
-          value: '',
+          value: defaultValue + '-' + placeholder[1],
           placeholder: defaultValue + '-' + placeholder[1]
         },
         prBranch: {
           label: 'PR + BRANCH 生成镜像规则',
-          value: '',
+          value: defaultValue + '-' + placeholder[2],
           placeholder: defaultValue + '-' + placeholder[2]
         },
         tag: {
           label: 'TAG 生成镜像规则',
-          value: '',
+          value: defaultValue + '-' + placeholder[3],
           placeholder: defaultValue + '-' + placeholder[3]
         }
       },
@@ -91,22 +91,22 @@ export default {
   methods: {
     resetFiled (obj, key) {
       obj === 'customerImage' && (this[obj][key].service = defaultValue)
-      this[obj][key].value = ''
+      this[obj][key].value = this[obj][key].placeholder
     },
     saveConfig () {
       const customerImage = this.customerImage
       const tar = this.tar
       this.custom_image_rule = {
-        pr_rule: (customerImage.pr.service === defaultValue && !customerImage.pr.value) ? null : `${customerImage.pr.service}-${customerImage.pr.value}`,
-        branch_rule: (customerImage.branch.service === defaultValue && !customerImage.branch.value) ? null : `${customerImage.branch.service}-${customerImage.branch.value}`,
-        pr_and_branch_rule: (customerImage.prBranch.service === defaultValue && !customerImage.prBranch.value) ? null : `${customerImage.prBranch.service}-${customerImage.prBranch.value}`,
-        tag_rule: (customerImage.tag.service === defaultValue && !customerImage.tag.value) ? null : `${customerImage.tag.service}-${customerImage.tag.value}`
+        pr_rule: (customerImage.pr.service || defaultValue) + ':' + (customerImage.pr.value || placeholder[0]),
+        branch_rule: (customerImage.branch.service || defaultValue) + ':' + (customerImage.branch.value || placeholder[1]),
+        pr_and_branch_rule: (customerImage.prBranch.service || defaultValue) + ':' + (customerImage.prBranch.value || placeholder[2]),
+        tag_rule: (customerImage.tag.service || defaultValue) + ':' + (customerImage.tag.value || placeholder[3])
       }
       this.custom_tar_rule = {
-        pr_rule: tar.pr.value,
-        branch_rule: tar.branch.value,
-        pr_and_branch_rule: tar.prBranch.value,
-        tag_rule: tar.tag.value
+        pr_rule: tar.pr.value || `${defaultValue}-${placeholder[0]}`,
+        branch_rule: tar.branch.value || `${defaultValue}-${placeholder[1]}`,
+        pr_and_branch_rule: tar.prBranch.value || `${defaultValue}-${placeholder[2]}`,
+        tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
       }
       this.dialogVisible = false
     }
