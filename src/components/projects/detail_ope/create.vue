@@ -139,7 +139,15 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-
+                <el-row style="margin: 10px 0;">
+                  <span class="customer" @click="$refs.cusDeliverable.dialogVisible = true">自定义交付物名称
+                  </span>
+                  <el-tooltip effect="dark"
+                      content="自定义镜像名称；自定义 TAR 包名称"
+                      placement="top">
+                      <i class="el-icon-question"></i>
+                   </el-tooltip>
+                </el-row>
               </el-form>
             </div>
 
@@ -155,11 +163,14 @@
 
       </div>
     </el-dialog>
+    <CusDeliverable ref="cusDeliverable" />
   </div>
 </template>
 <script>
 import { usersAPI, createProjectAPI, getSingleProjectAPI, updateSingleProjectAPI } from '@api'
 import { mapGetters } from 'vuex'
+import CusDeliverable from './components/cusDeliverable.vue'
+
 const pinyin = require('pinyin')
 const validateProductName = (rule, value, callback) => {
   if (typeof value === 'undefined' || value === '') {
@@ -185,6 +196,9 @@ const validateDeployTimeout = (rule, value, callback) => {
   }
 }
 export default {
+  components: {
+    CusDeliverable
+  },
   data () {
     return {
       dialogVisible: true,
@@ -303,6 +317,8 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.isEdit) {
+            this.projectForm.custom_image_rule = this.$refs.cusDeliverable.custom_image_rule
+            this.projectForm.custom_tar_rule = this.$refs.cusDeliverable.custom_tar_rule
             this.updateSingleProject(this.projectForm.product_name, this.projectForm)
           } else {
             this.projectForm.timeout = 10
@@ -437,6 +453,11 @@ export default {
 
           .el-form-item {
             margin-bottom: 5px;
+          }
+
+          .customer {
+            color: #409eff;
+            cursor: pointer;
           }
         }
 
