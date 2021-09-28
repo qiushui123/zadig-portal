@@ -60,7 +60,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          height: '300px',
+          height: '260px',
           direction: 'none'
         }
       }
@@ -70,7 +70,7 @@ export default {
   computed: {
     setResize () {
       return {
-        height: '300px',
+        height: '260px',
         direction: 'none',
         ...this.resize
       }
