@@ -139,7 +139,7 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <el-row style="margin: 10px 0;">
+                <el-row style="margin: 10px 0;" v-if="isEdit">
                   <span class="customer" @click="$refs.cusDeliverable.dialogVisible = true">自定义交付物名称
                   </span>
                   <el-tooltip effect="dark"
@@ -163,7 +163,7 @@
 
       </div>
     </el-dialog>
-    <CusDeliverable ref="cusDeliverable" />
+    <CusDeliverable ref="cusDeliverable" v-if="isEdit" />
   </div>
 </template>
 <script>
