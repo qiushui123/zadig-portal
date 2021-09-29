@@ -97,6 +97,27 @@
 
                 <tr>
                   <td>
+                    <span>密钥</span>
+                  </td>
+                  <td >
+                    <span class="token">
+                      <el-input size="small"
+                                placeholder=""
+                                readonly
+                                type="text"
+                                v-model="currentEditUserInfo.organization.token">
+                        <el-button v-clipboard:copy="currentEditUserInfo.organization.token"
+                                   v-clipboard:success="copySuccess"
+                                   v-clipboard:error="copyError"
+                                   slot="append"
+                                   icon="el-icon-document-copy">复制</el-button>
+                      </el-input>
+
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
                     <span>API Token</span>
                     <support-doc :inline="true"
                                  :keyword="{location:'个人中心',key:'APIToken'}"></support-doc>
