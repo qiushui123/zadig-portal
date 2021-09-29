@@ -163,6 +163,9 @@
                                @click="envSource==='helm' ? openUpdateHelmEnv() : updateK8sEnv(productInfo)">更新环境</el-button>
                 </el-tooltip>
                 <template>
+                  <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
+                </template>
+                <template>
                     <el-button v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
