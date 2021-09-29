@@ -163,7 +163,7 @@
 
       </div>
     </el-dialog>
-    <CusDeliverable ref="cusDeliverable" v-if="isEdit" />
+    <CusDeliverable :customImageRule="projectForm.custom_image_rule" :customTarRule="projectForm.custom_tar_rule" ref="cusDeliverable" v-if="isEdit" />
   </div>
 </template>
 <script>

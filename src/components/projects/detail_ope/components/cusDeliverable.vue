@@ -32,6 +32,10 @@ const defaultValue = '${SERVICE}'
 const placeholder = ['${TIMESTAMP}-${TASK_ID}-${REPO_PR}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}', '${TIMESTAMP}-${TASK_ID}-${REPO_PR}-${REPO_PR}', '${TIMESTAMP}-${REPO_TAG}']
 export default {
   name: 'Deliverable',
+  props: {
+    customImageRule: Object,
+    customTarRule: Object
+  },
   data () {
     return {
       dialogVisible: false,
@@ -109,6 +113,24 @@ export default {
         tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
       }
       this.dialogVisible = false
+    }
+  },
+  watch: {
+    customImageRule (value) {
+      this.customerImage.pr.service = value.pr_rule.splite(':')[0]
+      this.customerImage.pr.value = value.pr_rule.splite(':')[1]
+      this.customerImage.branch.service = value.branch_rule.splite(':')[0]
+      this.customerImage.branch.value = value.branch_rule.splite(':')[1]
+      this.customerImage.prBranch.service = value.pr_and_branch_rule.splite(':')[0]
+      this.customerImage.prBranch.value = value.pr_and_branch_rule.splite(':')[1]
+      this.customerImage.tag.service = value.tag_rule.splite(':')[0]
+      this.customerImage.tag.value = value.tag_rule.splite(':')[1]
+    },
+    customTarRule (value) {
+      this.tar.pr.value = value.pr_rule
+      this.tar.branch.value = value.branch_rule
+      this.tar.prBranch.value = value.pr_and_branch_rule
+      this.tar.tag.value = value.tag_rule
     }
   }
 }
