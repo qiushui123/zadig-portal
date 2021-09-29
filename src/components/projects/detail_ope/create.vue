@@ -11,6 +11,10 @@
           <h1 class="project-contexts-modal__content-title">{{isEdit?'修改项目信息':'开始新建项目'}}</h1>
           <div class="project-contexts-modal__content-container">
             <div class="project-settings__inputs-container">
+              <el-tabs style="width: 100%;" v-model="activeName">
+                <el-tab-pane label="基本信息" name="base"></el-tab-pane>
+                <el-tab-pane label="高级配置" name="advance"></el-tab-pane>
+              </el-tabs>
               <el-form :model="projectForm"
                        :rules="rules"
                        label-position="top"
@@ -43,10 +47,12 @@
                 </el-form-item>
 
                 <el-form-item v-if="isEdit"
+                              v-show="activeName==='advance'"
                               label="服务部署超时（分钟）"
                               prop="timeout">
                   <el-input v-model.number="projectForm.timeout"></el-input>
                 </el-form-item>
+                <CusDeliverable v-show="activeName==='advance'" :customImageRule="projectForm.custom_image_rule" :customTarRule="projectForm.custom_tar_rule" ref="cusDeliverable" v-if="isEdit" />
                 <el-form-item label="描述信息"
                               prop="desc">
                   <el-input type="textarea"
@@ -163,7 +169,6 @@
 
       </div>
     </el-dialog>
-    <CusDeliverable :customImageRule="projectForm.custom_image_rule" :customTarRule="projectForm.custom_tar_rule" ref="cusDeliverable" v-if="isEdit" />
   </div>
 </template>
 <script>
@@ -201,6 +206,7 @@ export default {
   },
   data () {
     return {
+      activeName: 'base',
       dialogVisible: true,
       users: [],
       loading: false,

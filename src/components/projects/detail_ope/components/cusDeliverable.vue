@@ -1,30 +1,19 @@
 <template>
-<el-dialog
-  title="自定义交付物名称"
-  :visible.sync="dialogVisible"
-  width="60%"
-  class="dialog"
-  >
   <div class="content">
      <div class="title">自定义镜像名称</div>
      <div class="item" v-for="key of Object.keys(customerImage)" :key="'image'+key">
          <div class="label">{{customerImage[key].label}}</div>
          <el-input class="input1" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="customerImage[key].service" size="small" placeholder="${SERVICE}" clearable  ></el-input> &nbsp;:&nbsp;
-         <el-input class="input2" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
+         <el-input class="input2" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
          <span class="reset" @click="resetFiled('customerImage',key)">重置</span>
      </div>
      <div class="title">自定义 TAR 包名称</div>
      <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
          <div class="label">{{tar[key].label}}</div>
-         <el-input class="input3" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
+         <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
          <span class="reset" @click="resetFiled('tar',key)">重置</span>
      </div>
   </div>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="saveConfig">确 定</el-button>
-  </span>
-</el-dialog>
 </template>
 <script>
 /* eslint-disable no-template-curly-in-string */
@@ -96,48 +85,52 @@ export default {
     resetFiled (obj, key) {
       obj === 'customerImage' && (this[obj][key].service = defaultValue)
       this[obj][key].value = this[obj][key].placeholder
-    },
-    saveConfig () {
-      const customerImage = this.customerImage
-      const tar = this.tar
-      this.custom_image_rule = {
-        pr_rule: (customerImage.pr.service || defaultValue) + ':' + (customerImage.pr.value || placeholder[0]),
-        branch_rule: (customerImage.branch.service || defaultValue) + ':' + (customerImage.branch.value || placeholder[1]),
-        pr_and_branch_rule: (customerImage.prBranch.service || defaultValue) + ':' + (customerImage.prBranch.value || placeholder[2]),
-        tag_rule: (customerImage.tag.service || defaultValue) + ':' + (customerImage.tag.value || placeholder[3])
-      }
-      this.custom_tar_rule = {
-        pr_rule: tar.pr.value || `${defaultValue}-${placeholder[0]}`,
-        branch_rule: tar.branch.value || `${defaultValue}-${placeholder[1]}`,
-        pr_and_branch_rule: tar.prBranch.value || `${defaultValue}-${placeholder[2]}`,
-        tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
-      }
-      this.dialogVisible = false
     }
+    // saveConfig () {
+    //   const customerImage = this.customerImage
+    //   const tar = this.tar
+    //   this.custom_image_rule = {
+    //     pr_rule: (customerImage.pr.service || defaultValue) + ':' + (customerImage.pr.value || placeholder[0]),
+    //     branch_rule: (customerImage.branch.service || defaultValue) + ':' + (customerImage.branch.value || placeholder[1]),
+    //     pr_and_branch_rule: (customerImage.prBranch.service || defaultValue) + ':' + (customerImage.prBranch.value || placeholder[2]),
+    //     tag_rule: (customerImage.tag.service || defaultValue) + ':' + (customerImage.tag.value || placeholder[3])
+    //   }
+    //   this.custom_tar_rule = {
+    //     pr_rule: tar.pr.value || `${defaultValue}-${placeholder[0]}`,
+    //     branch_rule: tar.branch.value || `${defaultValue}-${placeholder[1]}`,
+    //     pr_and_branch_rule: tar.prBranch.value || `${defaultValue}-${placeholder[2]}`,
+    //     tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
+    //   }
+    //   this.dialogVisible = false
+    // }
   },
   watch: {
     customImageRule (value) {
-      this.customerImage.pr.service = value.pr_rule.splite(':')[0]
-      this.customerImage.pr.value = value.pr_rule.splite(':')[1]
-      this.customerImage.branch.service = value.branch_rule.splite(':')[0]
-      this.customerImage.branch.value = value.branch_rule.splite(':')[1]
-      this.customerImage.prBranch.service = value.pr_and_branch_rule.splite(':')[0]
-      this.customerImage.prBranch.value = value.pr_and_branch_rule.splite(':')[1]
-      this.customerImage.tag.service = value.tag_rule.splite(':')[0]
-      this.customerImage.tag.value = value.tag_rule.splite(':')[1]
+      if (value) {
+        this.customerImage.pr.service = value.pr_rule.split(':')[0]
+        this.customerImage.pr.value = value.pr_rule.split(':')[1]
+        this.customerImage.branch.service = value.branch_rule.split(':')[0]
+        this.customerImage.branch.value = value.branch_rule.split(':')[1]
+        this.customerImage.prBranch.service = value.pr_and_branch_rule.split(':')[0]
+        this.customerImage.prBranch.value = value.pr_and_branch_rule.split(':')[1]
+        this.customerImage.tag.service = value.tag_rule.split(':')[0]
+        this.customerImage.tag.value = value.tag_rule.split(':')[1]
+      }
     },
     customTarRule (value) {
-      this.tar.pr.value = value.pr_rule
-      this.tar.branch.value = value.branch_rule
-      this.tar.prBranch.value = value.pr_and_branch_rule
-      this.tar.tag.value = value.tag_rule
+      if (value) {
+        this.tar.pr.value = value.pr_rule
+        this.tar.branch.value = value.branch_rule
+        this.tar.prBranch.value = value.pr_and_branch_rule
+        this.tar.tag.value = value.tag_rule
+      }
     }
   }
 }
 </script>
 <style lang="less" scoped>
-.dialog {
   .content {
+    width: 100%;
     padding: 10px;
 
     .title {
@@ -174,6 +167,5 @@ export default {
       }
     }
   }
-}
 
 </style>
