@@ -1,6 +1,6 @@
 <template>
   <div class="chart-repo-container">
-    <el-form ref="form" :model="chartData" label-width="100px">
+    <el-form ref="form" :model="chartData" label-width="140px">
       <el-form-item prop="repoAttr" label="仓库属性">
         <el-radio-group v-model="chartData.repoAttr">
           <el-radio label="private">私有库</el-radio>

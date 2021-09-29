@@ -7,7 +7,6 @@
     <div class="value-content" :loading="valuesLoading">
       <h5>覆盖默认 values 文件</h5>
       <div v-if="valuesYaml[activeEnv].importRepoInfo.yamlSource === 'default'">
-        <div class="desc">暂无自定义的 values 文件</div>
         <el-button type="text" @click="valuesYaml[activeEnv].importRepoInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
       </div>
       <ImportValues
@@ -176,14 +175,8 @@ export default {
   overflow: hidden;
 
   h5 {
-    margin: 14px 0;
-    color: #909399;
-    font-size: 15px;
-  }
-
-  .desc {
-    margin-top: 20px;
-    color: #909399;
+    margin: 2px 0;
+    color: #606266;
     font-size: 14px;
   }
 

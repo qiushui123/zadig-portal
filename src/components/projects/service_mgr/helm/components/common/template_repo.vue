@@ -1,6 +1,6 @@
 <template>
   <div class="template-repo-container">
-    <el-form ref="tempForm" :model="tempData" label-width="80px" :rules="rules">
+    <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="服务名称" prop="serviceName">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
       </el-form-item>
@@ -23,7 +23,7 @@
           :importRepoInfo.sync="importRepoInfo"
         ></ImportValues>
       </el-form-item>
-      <el-form-item style="text-align: right;">
+      <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo">导入</el-button>
       </el-form-item>
@@ -175,7 +175,7 @@ export default {
 <style lang="less" scoped>
 .template-repo-container {
   .desc {
-    padding-left: 10px;
+    padding-left: 60px;
   }
 
   /deep/.el-form {

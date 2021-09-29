@@ -216,8 +216,10 @@
                         </el-tag>
                       </span>
                     </el-option>
+                    <el-option>
+                      <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
+                    </el-option>
                   </el-select>
-                  <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
                 </el-form-item>
               </el-col>
               <el-col :span="12">

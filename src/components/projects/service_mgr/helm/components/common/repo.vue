@@ -1,34 +1,38 @@
 <template>
   <div class="form-code-container">
-    <el-tabs type="border-card" v-model="tabName">
-      <el-tab-pane label="Git 仓库" name="git">
-        <GitRepo
-          @triggleAction="$emit('triggleAction')"
-          @canUpdateEnv="$emit('canUpdateEnv', $event)"
-          :currentService="currentService"
-          @input="$emit('input', $event)"
-          :value="value"
-          ref="gitRepo"
-        ></GitRepo>
-      </el-tab-pane>
-      <el-tab-pane label="Chart 仓库" name="chart" disabled>
-        <ChartRepo
-          @canUpdateEnv="$emit('canUpdateEnv', $event)"
-          :currentService="currentService"
-          @input="$emit('input', $event)"
-          :value="value"
-          ref="chartRepo"
-        ></ChartRepo>
-      </el-tab-pane>
-      <el-tab-pane label="模板库" name="template">
-        <TemplateRepo
-          @canUpdateEnv="$emit('canUpdateEnv', $event)"
-          @input="$emit('input', $event)"
-          :value="value"
-          ref="templateRepo"
-        ></TemplateRepo>
-      </el-tab-pane>
-    </el-tabs>
+    <div class="create-origin">
+      <span>服务配置来源</span>
+      <el-radio v-model="tabName" label="git">Git 仓库</el-radio>
+      <el-radio v-model="tabName" label="chart" disabled>Chart 仓库</el-radio>
+      <el-radio v-model="tabName" label="template">模板库</el-radio>
+    </div>
+
+    <GitRepo
+      v-show="tabName === 'git'"
+      @triggleAction="$emit('triggleAction')"
+      @canUpdateEnv="$emit('canUpdateEnv', $event)"
+      :currentService="currentService"
+      @input="$emit('input', $event)"
+      :value="value"
+      ref="gitRepo"
+    ></GitRepo>
+
+    <ChartRepo
+      v-show="tabName === 'chart'"
+      @canUpdateEnv="$emit('canUpdateEnv', $event)"
+      :currentService="currentService"
+      @input="$emit('input', $event)"
+      :value="value"
+      ref="chartRepo"
+    ></ChartRepo>
+
+    <TemplateRepo
+      v-show="tabName === 'template'"
+      @canUpdateEnv="$emit('canUpdateEnv', $event)"
+      @input="$emit('input', $event)"
+      :value="value"
+      ref="templateRepo"
+    ></TemplateRepo>
   </div>
 </template>
 <script>
@@ -61,6 +65,17 @@ export default {
 </script>
 <style lang="less" scoped>
 .form-code-container {
+  .create-origin {
+    span {
+      display: inline-block;
+      width: 128px;
+      margin-bottom: 20px;
+      padding-right: 12px;
+      line-height: 40px;
+      text-align: right;
+    }
+  }
+
   /deep/.el-tabs__content {
     max-height: 500px;
     overflow: auto;
