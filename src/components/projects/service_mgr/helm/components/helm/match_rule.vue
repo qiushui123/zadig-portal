@@ -1,9 +1,9 @@
 <template>
   <el-drawer title="设置匹配规则" :visible.sync="updateMatchRule" :wrapperClosable="false" class="match-rule-container" size="450px">
-    <div class="tooltip">
-      系统会解析镜像名为服务组件
-      <br />项目范围内匹配规则全局生效
-    </div>
+    <ul class="tooltip">
+      <li>系统会解析镜像名为服务组件</li>
+      <li>项目范围内匹配规则全局生效</li>
+    </ul>
     <div class="mr-content" v-loading="pageLoading">
       <div class="mr-title">系统内置规则</div>
       <div class="inner-rule">
@@ -224,6 +224,7 @@ export default {
     color: #e6a23c;
     font-size: 14px;
     line-height: 1.5;
+    list-style: decimal inside;
   }
 
   .mr-content {
