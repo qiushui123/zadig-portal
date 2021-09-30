@@ -6,7 +6,7 @@
           <span style="margin-left: 10px;">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column width="200px" label="环境信息">
+      <!-- <el-table-column width="200px" label="环境信息">
         <template slot-scope="scope">
           <a
             v-if="scope.row.env_name"
@@ -16,8 +16,8 @@
             >{{ `${scope.row.env_name}` }}</a
           >
         </template>
-      </el-table-column>
-      <el-table-column label="服务入口">
+      </el-table-column> -->
+      <!-- <el-table-column label="服务入口">
         <template slot-scope="scope">
           <div
             v-for="(ingress, ingress_index) in scope.row.ingress_infos"
@@ -38,8 +38,8 @@
             </div>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column width="200px" label="包含步骤">
+      </el-table-column> -->
+      <el-table-column width="300px" label="包含步骤">
         <template slot-scope="scope">
           <span>
             <span
@@ -102,9 +102,9 @@
           </span>
         </template>
       </el-table-column>
-      <el-table-column width="150px" label="更新信息（时间/操作人）">
+      <el-table-column width="400px" label="更新信息（时间/操作人）">
         <template slot-scope="scope">
-          {{ $utils.convertTimestamp(scope.row.update_time) }}
+          {{ $utils.convertTimestamp(scope.row.update_time)}}/ {{scope.row.update_by}}
         </template>
       </el-table-column>
       <el-table-column width="120px" label="操作">
@@ -159,12 +159,6 @@ export default {
         const w3 = 'workflow-ops'
         const currentWorkflows = this.$store.getters.workflowList.filter(element => {
           return (element.name.includes(w1) && element.product_tmpl_name === this.projectName) || (element.name.includes(w2) && element.product_tmpl_name === this.projectName) || (element.name.includes(w3) && element.product_tmpl_name === this.projectName)
-        }).map((ele) => {
-          const element = Object.assign({}, ele)
-          if (element.name.includes(w1)) element.env_name = 'qa'
-          if (element.name.includes(w2)) element.env_name = 'dev'
-          if (element.name.includes(w3)) element.env_name = ''
-          return element
         })
         getProjectIngressAPI(projectName).then((res) => {
           currentWorkflows.forEach(workflow => {

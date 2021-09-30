@@ -28,7 +28,6 @@
         <el-form-item label="创建方式" prop="source">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
             <el-option label="系统创建" value="system"></el-option>
-            <el-option label="托管外部环境" value="external"></el-option>
             <el-option v-if="currentProductDeliveryVersions.length > 0" label="版本回溯" value="versionBack"></el-option>
           </el-select>
         </el-form-item>
