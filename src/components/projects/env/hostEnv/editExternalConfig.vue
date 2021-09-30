@@ -9,8 +9,8 @@
       </el-steps>
     </div>
     <div class="currentStep">
-      <div class="step">{{stepMap[activeStep].title}}</div>
-      <span class="des">{{stepMap[activeStep].description}}</span>
+      <div class="step">{{stepMap[currentStep].title}}</div>
+      <span class="des">{{stepMap[currentStep].description}}</span>
       <component ref="component" :envName="$route.query.envName" :projectName="projectName" class="com" :is="componentsList[currentStep]" />
     </div>
     <div class="bottom"><div class="nextstep"  @click="nextStep">{{currentStep===2 ? '完成' : '下一步'}}</div><span class="des" @click="exit" v-if="currentStep===1">退出向导</span></div>
@@ -26,7 +26,6 @@ export default {
   data () {
     return {
       componentsList: [EditHostService, ServiceBuild, RunWorkflow],
-      activeStep: 0,
       stepMap: [{
         title: '第一步',
         description: '修改托管服务'
@@ -73,7 +72,7 @@ export default {
   .title {
     width: 110px;
     height: 30px;
-    margin: 10px 0 10px 60px;
+    margin: 10px 0 10px 30px;
     padding: 5px;
     color: #fff;
     font-weight: 300;
@@ -84,12 +83,12 @@ export default {
   }
 
   .step {
-    width: 40%;
+    width: 80%;
     margin-top: 40px;
   }
 
   .currentStep {
-    margin: 0 0 10px 60px;
+    margin: 0 0 10px 30px;
 
     .step {
       display: inline-block;
@@ -122,7 +121,7 @@ export default {
     position: fixed;
     bottom: 30px;
     z-index: 999;
-    margin: 0 0 10px 60px;
+    margin: 0 0 10px 30px;
     cursor: pointer;
 
     .nextstep {

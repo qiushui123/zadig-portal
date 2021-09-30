@@ -3,7 +3,7 @@
     <div class="title">
       <span><i class="iconfont iconfuwu"></i></span> 检测到的服务组件
       <el-tooltip effect="dark" placement="top">
-        <div slot="content">values.yaml 中可被更新的镜像</div>
+        <div slot="content">可被更新的服务容器名称</div>
         <span><i class="el-icon-question"></i></span>
       </el-tooltip>
     </div>

@@ -85,6 +85,13 @@
                     <el-col :span="4">
                       <span>
                         环境创建方式
+                        <el-tooltip placement="top">
+                            <div slot="content">
+                              新建集成环境：在现有的 Kubernetes 集群新建环境<br />
+                              托管现有环境：托管现有 Kubernetes 集群中的资源
+                            </div>
+                            <i class="icon el-icon-question"></i>
+                        </el-tooltip>
                       </span>
                     </el-col>
                     <el-col :span="10">
@@ -96,7 +103,7 @@
                   </el-row>
                   <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'&&projectForm.product_feature.create_env_type==='system'" :gutter="5">
                     <el-col :span="4">
-                      <span>部署方式
+                      <span>服务部署方式
                         <el-tooltip placement="top">
                           <div slot="content">
                             K8s YAML 部署：使用 K8s 原生的 YAML配置方式部署服务<br />

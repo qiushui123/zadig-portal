@@ -32,7 +32,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <div class="transfer-title">服务列表</div>
+      <div class="transfer-title">选择</div>
       <el-transfer
         filter-placeholder="请输入服务名称"
         v-model="selectService"
@@ -178,6 +178,15 @@ export default {
 
     /deep/ .el-pagination {
       padding: 5px 5px 1px 2px;
+    }
+
+    /deep/ .el-transfer-panel .el-transfer-panel__header .el-checkbox .el-checkbox__label {
+      color: #606266;
+      font-size: 13px;
+    }
+
+    /deep/ .el-button {
+      padding: 10px;
     }
   }
 </style>
