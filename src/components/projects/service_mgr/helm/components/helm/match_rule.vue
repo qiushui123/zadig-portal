@@ -1,5 +1,5 @@
 <template>
-  <el-drawer title="设置匹配规则" :visible.sync="updateMatchRule" :wrapperClosable="false" class="match-rule-container">
+  <el-drawer title="设置匹配规则" :visible.sync="updateMatchRule" :wrapperClosable="false" class="match-rule-container" size="450px">
     <div class="tooltip">
       系统会解析镜像名为服务组件
       <br />项目范围内匹配规则全局生效
@@ -58,12 +58,12 @@
       </div>
       <div class="example-rule">
         <div class="er-title">示例：</div>
+        <div class="er-title">values 文件：</div>
         <div class="rule border">
-          values 文件：
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;deploy:
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image:
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: library/ubuntu
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag: 12.04
+          &nbsp;&nbsp;deploy:
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image:
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: library/ubuntu
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag: 12.04
         </div>
         <div class="er-title">自定义规则：</div>
         <div class="rule">
@@ -227,7 +227,7 @@ export default {
   }
 
   .mr-content {
-    margin-bottom: 50px;
+    margin-bottom: 60px;
     color: #606266;
     font-size: 14px;
 
@@ -250,7 +250,10 @@ export default {
     }
 
     .example-rule {
-      padding: 5px 0;
+      padding: 5px 10px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      box-shadow: 0 0 5px 2px #eee;
 
       .border {
         padding: 5px;
@@ -263,7 +266,8 @@ export default {
       }
 
       .rule {
-        padding-left: 10px;
+        margin-bottom: 10px;
+        padding-left: 5px;
         line-height: 1.5;
 
         .gray-bg {

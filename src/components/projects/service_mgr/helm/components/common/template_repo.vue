@@ -9,7 +9,7 @@
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label-width="0">
+      <el-form-item label-width="40px">
         <div v-show="importRepoInfo.yamlSource === 'default'" class="default-values">
           <div class="desc">
             <el-button type="text" @click="importRepoInfo.yamlSource = 'gitRepo'">高级配置</el-button>
@@ -174,10 +174,6 @@ export default {
 
 <style lang="less" scoped>
 .template-repo-container {
-  .desc {
-    padding-left: 60px;
-  }
-
   /deep/.el-form {
     .el-form-item {
       margin-bottom: 15px;
