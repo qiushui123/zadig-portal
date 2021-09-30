@@ -23,9 +23,12 @@
     <div v-else>
       <el-form label-width="200px" ref="create-env-ref" :model="projectConfig" :rules="rules">
         <el-form-item label="环境名称：" prop="env_name">
-          <el-input v-model="projectConfig.env_name" size="small"></el-input>
+          <el-input @input="changeEnvName" v-model="projectConfig.env_name" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="创建方式" prop="source">
+        <el-form-item label="命名空间："  v-if="projectConfig.source==='system' && $utils.isEmpty(pmServiceMap)" prop="defaultNamespace">
+          <el-input style="width: 250px;" :disabled="editButtonDisabled" v-model="projectConfig.defaultNamespace" size="small"></el-input><span class="editButton" @click="editButtonDisabled = !editButtonDisabled">{{editButtonDisabled? '编辑' : '完成'}}</span>
+        </el-form-item>
+        <el-form-item label="创建方式" prop="source" v-if="$utils.isEmpty(pmServiceMap)">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
             <el-option label="系统创建" value="system"></el-option>
             <el-option v-if="currentProductDeliveryVersions.length > 0" label="版本回溯" value="versionBack"></el-option>
@@ -309,12 +312,15 @@ export default {
   data () {
     return {
       selection: '',
+      editButtonDisabled: true,
       currentProductDeliveryVersions: [],
       projectConfig: {
         product_name: '',
         cluster_id: '',
         env_name: '',
-        source: 'spock',
+        source: 'system',
+        namespace: '',
+        defaultNamespace: '',
         vars: [],
         revision: null,
         isPublic: true,
@@ -342,6 +348,9 @@ export default {
         ],
         namespace: [
           { required: true, trigger: 'change', message: '请选择命名空间' }
+        ],
+        defaultNamespace: [
+          { required: true, trigger: 'change', message: '命名空间不能为空' }
         ],
         env_name: [
           { required: true, trigger: 'change', validator: validateEnvName }
@@ -414,6 +423,11 @@ export default {
     }
   },
   methods: {
+    changeEnvName (value) {
+      if (this.projectConfig.source === 'system' && this.$utils.isEmpty(this.pmServiceMap)) {
+        this.projectConfig.defaultNamespace = this.projectName + '-env-' + value
+      }
+    },
     async getCluster () {
       const res = await getClusterListAPI()
       if (!this.rollbackMode) {
@@ -759,6 +773,7 @@ export default {
           picked2D.push(picked1D)
           const payload = this.$utils.cloneObj(this.projectConfig)
           payload.source = 'spock'
+          payload.namespace = payload.defaultNamespace
           const envType = 'test'
           this.startDeployLoading = true
           createProductAPI(payload, envType).then(
@@ -794,7 +809,8 @@ export default {
           const payload = {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
+            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo(),
+            namespace: this.projectConfig.defaultNamespace
           }
 
           this.startDeployLoading = true
@@ -1282,5 +1298,12 @@ export default {
       }
     }
   }
+}
+
+.editButton {
+  display: inline-block;
+  margin-left: 10px;
+  color: #1989fa;
+  cursor: pointer;
 }
 </style>

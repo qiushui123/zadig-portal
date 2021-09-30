@@ -273,7 +273,7 @@
                   <span :class="$utils._getStatusColor(scope.row.status)"
                         class="service-name"> <i v-if="scope.row.type==='k8s'"
                        class="iconfont service-icon iconrongqifuwu"></i>
-                    {{ scope.row.service_name }}</span>
+                    {{ scope.row.service_display_name || scope.row.service_name }}</span>
                 </router-link>
                 <template
                           v-if="serviceStatus[scope.row.service_name] && serviceStatus[scope.row.service_name]['tpl_updatable'] && envSource!=='helm'">
