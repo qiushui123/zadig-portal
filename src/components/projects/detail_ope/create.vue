@@ -316,6 +316,7 @@ export default {
             this.projectForm.user_ids.push(this.currentUserId)
             if (this.projectForm.product_feature.basic_facility === 'cloud_host') {
               this.projectForm.product_feature.deploy_type = 'k8s'
+              this.projectForm.product_feature.create_env_type = 'system'
             }
             this.createProject(this.projectForm)
           }
