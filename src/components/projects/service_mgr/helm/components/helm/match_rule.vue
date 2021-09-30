@@ -62,12 +62,13 @@
         <div class="rule border">
           &nbsp;&nbsp;deploy:
           <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image:
-          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: library/ubuntu
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repo: library
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: ubuntu
           <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag: 12.04
         </div>
         <div class="er-title">自定义规则：</div>
         <div class="rule">
-          <span class="gray-bg">deploy.image.name</span>
+          <span class="gray-bg">deploy.image.repo</span>
           <span>/</span>
           <span class="gray-bg">deploy.image.name</span>
           <span>:</span>
