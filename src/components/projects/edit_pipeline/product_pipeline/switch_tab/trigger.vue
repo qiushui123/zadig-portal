@@ -633,7 +633,7 @@ export default {
       webhookSwap.repo.name = webhookSwap.name
       webhookSwap.repo.description = webhookSwap.description
       webhookSwap.targets.map(item => {
-        item.product_tmpl_name = this.productTmlName
+        item.product_name = this.productTmlName
         return item
       })
       this.$set(this.webhook.items, index, {
@@ -648,6 +648,7 @@ export default {
           targets: webhookSwap.targets
         }
       })
+
       this.webhookSwap = {
         name: '',
         description: '',
