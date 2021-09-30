@@ -32,10 +32,10 @@ export default {
     return {
       stepMap: [{
         title: '第一步',
-        description: '托管现有环境，后续托管其他测试环境，可以在集成环境模块操作'
+        description: '托管已有 K8s 集群资源，选择服务在 Zadig 中进行管理'
       }, {
         title: '第二步',
-        description: '为服务配置构建脚步，后续可在集成环境做修改'
+        description: '添加构建并配置相关脚本，后续可在工作流中自动更新服务'
       }, {
         title: '第三步',
         description: '运行工作流触发服务的自动化交付'
