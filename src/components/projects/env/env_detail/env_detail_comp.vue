@@ -15,15 +15,15 @@
                  type="card">
           <el-tab-pane v-for="(env,index) in envNameList"
                        :key="index"
-                       :label="`${env.envName}`"
+                       :label="`${env.name}`"
                        :name="env.envName">
             <span slot="label">
               <i v-if="env.source==='helm'"
                  class="iconfont iconhelmrepo"></i>
               <i v-else-if="env.source==='spock'"
                  class="el-icon-cloudy"></i>
-              {{`${env.envName}`}}
-              <el-tag v-if="env.clusterType==='生产'"
+              {{`${env.name}`}}
+              <el-tag v-if="env.production"
                       effect="light"
                       size="mini"
                       type="danger">生产</el-tag>
@@ -116,7 +116,7 @@
                             effect="dark"
                             placement="top">
                     <template v-if="productInfo.status!=='Creating'">
-                      <el-button v-if=" (envSource===''||envSource==='spock')"
+                      <el-button v-if="envSource===''||envSource==='spock'"
                                  type="text"
                                  @click="updateK8sEnv(productInfo)">更新环境</el-button>
                       <el-button v-else-if="envSource==='helm'"
@@ -125,7 +125,10 @@
                     </template>
                 </el-tooltip>
                 <template>
-                    <el-button v-if="(productInfo.status!=='Disconnected'&&productInfo.cluster_id!=='')&&(envSource===''||envSource==='spock'|| envSource==='helm')"
+                  <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
+                </template>
+                <template>
+                    <el-button  v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
                       删除环境</el-button>
@@ -133,14 +136,7 @@
                                type="text"
                                @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)">
                       取消托管</el-button>
-                    <el-button v-else-if="(productInfo.status==='NotFound'&&productInfo.cluster_id!=='')&&(envSource===''||envSource==='spock'|| envSource==='helm')"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
-                    <el-button v-else-if="productInfo.status==='Unknown'"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
+
                     <el-button v-if="productInfo.status!=='Creating' && (envSource===''||envSource==='spock') && !isPmService"
                                type="text"
                                @click="openRecycleEnvDialog()">环境回收</el-button>
@@ -167,7 +163,10 @@
                                @click="envSource==='helm' ? openUpdateHelmEnv() : updateK8sEnv(productInfo)">更新环境</el-button>
                 </el-tooltip>
                 <template>
-                    <el-button v-if="(productInfo.status!=='Disconnected' && productInfo.cluster_id!=='') && (envSource===''||envSource==='spock' || envSource==='helm')"
+                  <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
+                </template>
+                <template>
+                    <el-button v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
                       删除环境</el-button>
@@ -175,14 +174,6 @@
                                type="text"
                                @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)">
                       取消托管</el-button>
-                    <el-button v-else-if="(productInfo.status==='NotFound' && productInfo.cluster_id!=='') && (envSource===''||envSource==='spock'|| envSource==='helm')"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
-                    <el-button v-else-if="productInfo.status==='Unknown'"
-                               type="text"
-                               @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
-                      删除环境</el-button>
                 </template>
               </div>
             </el-col>
@@ -282,7 +273,7 @@
                   <span :class="$utils._getStatusColor(scope.row.status)"
                         class="service-name"> <i v-if="scope.row.type==='k8s'"
                        class="iconfont service-icon iconrongqifuwu"></i>
-                    {{ scope.row.service_name }}</span>
+                    {{ scope.row.service_display_name || scope.row.service_name }}</span>
                 </router-link>
                 <template
                           v-if="serviceStatus[scope.row.service_name] && serviceStatus[scope.row.service_name]['tpl_updatable'] && envSource!=='helm'">
@@ -528,7 +519,7 @@
       <UpdateHelmVarDialog :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateHelmVarDialog" :projectName="projectName" :envName="envName"/>
       <UpdateK8sVarDialog  :fetchAllData="fetchAllData" :productInfo="productInfo" ref="updateK8sVarDialog"/>
       <PmServiceLog  ref="pmServiceLog"/>
-      <RecycleDialog :getProductEnv="getProductEnv" :productInfo="productInfo" :initPageInfo="initPageInfo" :recycleDay="recycleDay" ref="recycleDialog" />
+      <RecycleDialog :getEnvServices="getEnvServices" :productInfo="productInfo" :initPageInfo="initPageInfo" :recycleDay="recycleDay" ref="recycleDialog" />
     </div>
 
 </template>
@@ -537,7 +528,7 @@
 import { getProductStatus, serviceTypeMap } from '@utils/word_translate'
 import { mapGetters } from 'vuex'
 import {
-  envRevisionsAPI, productEnvInfoAPI, productServicesAPI, serviceTemplateAfterRenderAPI,
+  envRevisionsAPI, productEnvInfoAPI, productServicesAPI, serviceTemplateAfterRenderAPI, getProductsAPI,
   updateServiceAPI, updateK8sEnvAPI, restartPmServiceAPI, restartServiceOriginAPI,
   getClusterListAPI, deleteProductEnvAPI, getSingleProjectAPI, getServicePipelineAPI, initSource, rmSource
 } from '@api'
@@ -568,6 +559,12 @@ export default {
       recycleDay: null,
       ctlCancel: null,
       allCluster: [],
+      envNameList: [],
+      containerServiceList: [],
+      pmServiceList: [],
+      ingressList: [],
+      combineTemplate: [],
+      currentServiceWorkflows: [],
       selectVersion: '',
       activeDiffTab: 'template',
       selectVersionDialogVisible: false,
@@ -577,13 +574,9 @@ export default {
       serviceLoading: false,
       isPmService: false,
       showStartProductBuild: false,
-      currentServiceWorkflows: [],
+      helmChartDiffVisible: false,
       currentServiceMeta: null,
-      containerServiceList: [],
-      pmServiceList: [],
-      ingressList: [],
       serviceStatus: {},
-      combineTemplate: [],
       productInfo: {
         is_prod: false
       },
@@ -609,7 +602,6 @@ export default {
         ]
       },
       serviceTypeMap: serviceTypeMap,
-      helmChartDiffVisible: false,
       statusIndicator: {
         Running: 'success',
         Succeeded: 'success',
@@ -626,6 +618,12 @@ export default {
     }
   },
   computed: {
+    isShowDeleteEnv () {
+      const envSourceList = ['', 'spock', 'helm', 'pm']
+      const productInfo = this.productInfo
+      const status = productInfo.status
+      return (((status !== 'Disconnected' || status === 'NotFound') && productInfo.cluster_id !== '') && envSourceList.includes(this.envSource)) || status === 'Unknown'
+    },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
     },
@@ -660,36 +658,6 @@ export default {
     isPublic () {
       return this.productInfo.isPublic
     },
-    envNameList () {
-      const envNameList = []
-      const proEnvList = []
-      this.productList.forEach(element => {
-        if (element.product_name === this.projectName) {
-          if (element.cluster_id) {
-            const cluster = {
-              envName: element.env_name,
-              source: element.source,
-              clusterType: this.getClusterType(element.cluster_id).type,
-              clusterName: this.getClusterType(element.cluster_id).name
-            }
-            if (element.is_prod) {
-              proEnvList.push(cluster)
-            } else {
-              envNameList.push(cluster)
-            }
-          } else {
-            envNameList.push({
-              envName: element.env_name,
-              source: element.source,
-              clusterType: '本地',
-              clusterName: ''
-            })
-          }
-        }
-      })
-      const res = envNameList.concat(proEnvList)
-      return res
-    },
     envName: {
       get: function () {
         if (this.$route.query.envName) {
@@ -717,6 +685,16 @@ export default {
     ])
   },
   methods: {
+    editExternalConfig (product_info) {
+      const params = {
+        step: 1,
+        envName: product_info.env_name,
+        namespace: product_info.namespace,
+        productName: product_info.product_name,
+        clusterId: this.clusterId
+      }
+      this.$router.push({ path: `/v1/projects/detail/${this.projectName}/envs/externalConfig`, query: params })
+    },
     openUpdateHelmEnv () {
       this.$refs.updateHelmEnvDialog.openDialog()
     },
@@ -734,7 +712,7 @@ export default {
     },
     searchServicesByKeyword () {
       this.initPageInfo()
-      this.getProductEnv('search')
+      this.getEnvServices('search')
     },
     onScroll (event) {
       if (!this.scrollGetFlag) {
@@ -745,7 +723,7 @@ export default {
       const scrollHeight = target.scrollHeight
       const clientHeight = target.clientHeight
       if (scrollTop + 1.5 * clientHeight > scrollHeight) {
-        this.getProductEnv()
+        this.getEnvServices()
       }
     },
     initPageInfo () {
@@ -779,14 +757,11 @@ export default {
         }
       })
     },
-    async getProducts () {
-      await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
-    },
     fetchAllData () {
       try {
         this.initPageInfo()
-        this.getProductEnv()
-        this.getProducts()
+        this.getEnvNameList()
+        this.getEnvServices()
         this.getCluster()
         this.fetchEnvRevision()
         this.checkProjectFeature()
@@ -827,7 +802,7 @@ export default {
         }
       })
     },
-    async getProductEnv (flag) {
+    async getEnvServices (flag) {
       const projectName = this.projectName
       const envName = this.envName
       try {
@@ -885,6 +860,16 @@ export default {
         this.productInfo = envInfo
         this.envLoading = false
         this.recycleDay = envInfo.recycle_day ? envInfo.recycle_day : undefined
+      }
+    },
+    async getEnvNameList () {
+      const projectName = this.projectName
+      const envNameList = await getProductsAPI(projectName)
+      envNameList.forEach(element => {
+        element.envName = element.name
+      })
+      if (envNameList) {
+        this.envNameList = _.sortBy(envNameList, (item) => { return item.production })
       }
     },
     handleProductEnvServiceData (serviceGroup) {
@@ -1148,7 +1133,7 @@ export default {
           type: 'success'
         })
         this.initPageInfo()
-        this.getProductEnv()
+        this.getEnvServices()
         this.fetchEnvRevision()
       })
     },
@@ -1165,7 +1150,7 @@ export default {
           type: 'success'
         })
         this.initPageInfo()
-        this.getProductEnv()
+        this.getEnvServices()
         this.fetchEnvRevision()
       })
     },

@@ -120,7 +120,7 @@ export default {
         this.loading = true
       }
       this.selectPath = ''
-      getRepoFilesAPI(codehostId, repoOwner, repoName, branchName, path, type).then((res) => {
+      getRepoFilesAPI({ codehostId, repoOwner, repoName, branchName, path, type }).then((res) => {
         if (path === '') {
           this.loading = false
         }

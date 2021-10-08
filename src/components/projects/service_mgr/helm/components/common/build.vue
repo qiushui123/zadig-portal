@@ -216,8 +216,10 @@
                         </el-tag>
                       </span>
                     </el-option>
+                    <el-option>
+                      <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
+                    </el-option>
                   </el-select>
-                  <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -520,7 +522,7 @@
               <div slot="content">
                 当前可用环境变量如下，可在构建脚本中进行引用<br>
                 $WORKSPACE&nbsp;&nbsp;工作目录<br>
-                $TASK_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工作流 ID<br>
+                $TASK_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工作流任务 ID<br>
                 $IMAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输出镜像名称<br>
                 $SERVICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建的服务名称<br>
                 $DIST_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建出的 Tar 包的目的目录<br>
@@ -1253,30 +1255,6 @@ export default {
       const orgId = this.currentOrganizationId
       this.$set(this.buildConfig, 'name', this.projectName + '-build-' + this.name)
       this.$set(this.jenkinsBuild, 'name', this.projectName + '-build-' + this.name)
-      if (this.isExp) {
-        getBuildConfigDetailAPI(
-          'voting-result-build',
-          this.buildConfigVersion,
-          this.projectName
-        ).then((response) => {
-          response.pre_build.installs.forEach((element) => {
-            element.id = element.name + element.version
-          })
-          this.buildConfig = response
-          if (this.buildConfig.source) {
-            this.source = this.buildConfig.source
-            if (this.source === 'jenkins') {
-              this.jenkinsBuild = response
-            }
-          }
-          if (this.buildConfig.post_build.docker_build) {
-            this.docker_enabled = true
-          }
-          if (this.buildConfig.post_build.file_archive) {
-            this.binary_enabled = true
-          }
-        })
-      }
       const response = await getServiceTargetsAPI(projectName).catch(error => console.log(error))
       if (response) {
         this.serviceTargets = response.map(element => {
@@ -1364,9 +1342,6 @@ export default {
     },
     serviceName () {
       return this.$route.query.service_name
-    },
-    isExp () {
-      return !!this.$route.query.exp
     },
     useWorkspaceCache: {
       get () {

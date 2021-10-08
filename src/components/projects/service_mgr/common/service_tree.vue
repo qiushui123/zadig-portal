@@ -2,6 +2,7 @@
   <div class="service-container">
     <el-dialog title="是否更新对应环境？"
                :append-to-body="true"
+               v-if="envNameList.length"
                :visible.sync="updateEnvDialogVisible"
                width="40%">
       <el-checkbox-group v-model="selectedEnvs">
@@ -286,7 +287,7 @@
                            icon="el-icon-close"
                            @click.stop="() => deleteSharedService(node, data)">
                 </el-button>
-                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab' || data.source === 'ilyshin'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
+                <el-button v-if="data.source && (data.source === 'gerrit'|| data.source === 'gitlab' || data.source==='github' || data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
                            type="text"
                            size="mini"
                            icon="el-icon-refresh"
@@ -550,6 +551,7 @@ export default {
       updateEnvTemplateAPI(projectName, payload).then((res) => {
         this.$message.success('添加共享服务成功')
         this.getServiceGroup()
+        this.$emit('onRefreshProjectInfo')
         this.$emit('onRefreshService')
         this.$emit('onRefreshSharedService')
         this.$emit('update:showNext', true)
@@ -585,6 +587,7 @@ export default {
         payload.shared_services = payload.shared_services.filter(share => { return share.name !== data.service_name })
         updateEnvTemplateAPI(projectName, payload).then((res) => {
           this.getServiceGroup()
+          this.$emit('onRefreshProjectInfo')
           this.$emit('onRefreshSharedService')
           this.$emit('onRefreshService')
           this.$emit('update:showNext', true)
@@ -596,7 +599,7 @@ export default {
       })
     },
     async getProducts () {
-      await this.$store.dispatch('getProductListSSE').closeWhenDestroy(this)
+      await this.$store.dispatch('getProductList')
     },
     getServiceGroup () {
       this.serviceGroup = []

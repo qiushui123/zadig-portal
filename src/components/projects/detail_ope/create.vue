@@ -65,7 +65,7 @@
                           <el-tooltip placement="top">
                             <div slot="content">
                               Kubernetes：包括自建 K8s 和云厂商提供容器云服务<br />
-                              云主机/物理机：包括物理机和云厂商提供的云服务器
+                              主机：包括物理机和云厂商提供的云服务器
                             </div>
                             <i class="icon el-icon-question"></i>
                           </el-tooltip>
@@ -77,7 +77,7 @@
                           <el-radio border
                                     label="kubernetes">Kubernetes</el-radio>
                           <el-radio border
-                                    label="cloud_host">云主机/物理机</el-radio>
+                                    label="cloud_host">主机</el-radio>
                         </el-radio-group>
                       </el-col>
                   </el-row>
@@ -85,6 +85,13 @@
                     <el-col :span="4">
                       <span>
                         环境创建方式
+                        <el-tooltip placement="top">
+                            <div slot="content">
+                              新建集成环境：在现有的 Kubernetes 集群新建环境<br />
+                              托管现有环境：托管现有 Kubernetes 集群中的资源
+                            </div>
+                            <i class="icon el-icon-question"></i>
+                        </el-tooltip>
                       </span>
                     </el-col>
                     <el-col :span="10">
@@ -96,7 +103,7 @@
                   </el-row>
                   <el-row v-if="projectForm.product_feature.basic_facility==='kubernetes'&&projectForm.product_feature.create_env_type==='system'" :gutter="5">
                     <el-col :span="4">
-                      <span>部署方式
+                      <span>服务部署方式
                         <el-tooltip placement="top">
                           <div slot="content">
                             K8s YAML 部署：使用 K8s 原生的 YAML配置方式部署服务<br />
@@ -309,6 +316,7 @@ export default {
             this.projectForm.user_ids.push(this.currentUserId)
             if (this.projectForm.product_feature.basic_facility === 'cloud_host') {
               this.projectForm.product_feature.deploy_type = 'k8s'
+              this.projectForm.product_feature.create_env_type = 'system'
             }
             this.createProject(this.projectForm)
           }

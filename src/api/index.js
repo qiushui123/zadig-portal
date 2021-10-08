@@ -235,9 +235,10 @@ export function listProductSSEAPI (params) {
   })
 }
 
-export function getProductsAPI () {
-  return http.get('/api/aslan/environment/environments')
+export function getProductsAPI (projectName = '', production = '') {
+  return http.get(`/api/aslan/environment/environments?projectName=${projectName}&production=${production}`)
 }
+
 export function getDeployEnvByPipelineNameAPI (pipelineName) {
   return http.get(`/api/aslan/workflow/v2/tasks/pipelines/${pipelineName}/products`)
 }
@@ -280,10 +281,6 @@ export function getServiceTemplatesAPI (projectName = '', envName = '') {
   return http.get(`/api/aslan/service/services?productName=${projectName}&envName=${envName}`)
 }
 
-export function getServiceTemplatesStatAPI () {
-  return http.get('/api/aslan/service/services?requestFrom=stat')
-}
-
 export function serviceTemplateWithConfigAPI (name, projectName) {
   return http.get(`/api/aslan/service/services/${name}?productName=${projectName}`)
 }
@@ -322,10 +319,6 @@ export function getHelmChartProjectChartsAPI (project, projectName = '') {
 
 export function getHelmChartProjectAPI (projectName = '') {
   return http.get(`/api/aslan/service/harbor/project`)
-}
-
-export function addHelmChartAPI (projectName = '', payload) {
-  return http.post(`/api/aslan/service/helm/${projectName}`, payload)
 }
 
 export function updateHelmChartAPI (projectName = '', payload) {
@@ -389,19 +382,30 @@ export function getBuildConfigDetailAPI (name, version, projectName = '') {
   return http.get(`/api/aslan/build/build/${name}/${version}?productName=${projectName}`)
 }
 
-export function getRepoFilesAPI (codehostId, repoOwner, repoName, branchName, path, type, remoteName = 'origin') {
+export function getRepoFilesAPI ({ codehostId = '', repoOwner = '', repoName = '', branchName = '', path = '', type = '', repoLink = '', remoteName = 'origin' }) {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm') {
-    return http.get(`/api/aslan/code/workspace/tree?repo=${encodeRepoName}&path=${path}&branch=${branchName}&owner=${repoOwner}&codehost_id=${codehostId}`)
+  if (type === 'github' || type === 'gitlab' || type === 'helm' || type === 'githubPublic') {
+    let params = {}
+    if (type === 'githubPublic') {
+      params = {
+        path,
+        repoLink
+      }
+    } else {
+      params = {
+        repo: encodeRepoName,
+        path,
+        branch: branchName,
+        owner: repoOwner,
+        codehost_id: codehostId
+      }
+    }
+    return http.get(`/api/aslan/code/workspace/tree`, { params })
   } else if (type === 'gerrit') {
     return http.get(`/api/aslan/code/workspace/git/${codehostId}/${encodeRepoName}/${branchName}/${remoteName}?repoOwner=${repoOwner}&dir=${path}`)
   } else if (type === 'codehub') {
     return http.get(`/api/aslan/code/workspace/codehub/${codehostId}/${encodeRepoName}/${branchName}?&path=${path}`)
   }
-}
-
-export function getPublicRepoFilesAPI (path, url) {
-  return http.get(`/api/aslan/code/workspace/publicRepo?dir=${path}&url=${url}`)
 }
 
 export function getRepoFileServiceAPI (codehostId, repoOwner, repoName, branchName, path, isDir, remoteName = '') {
@@ -1003,20 +1007,12 @@ export function updateServiceAPI (product, service, type, env, data, envType = '
   })
 }
 
+export function getProjectWithEnvsAPI (ignoreNoEnvs = true, verbosity = 'brief') {
+  return http.get(`/api/aslan/project/projects?ignoreNoEnvs=${ignoreNoEnvs}&verbosity=${verbosity}`)
+}
+
 export function updateK8sEnvAPI (product_name, env_name, payload, envType = '', force = '') {
   return http.post(`/api/aslan/environment/environments/${product_name}?envName=${env_name}&envType=${envType}&force=${force}`, payload)
-}
-
-export function updateHelmEnvAPI (projectName, envName, updateType = '') {
-  return http.put(`/api/aslan/environment/environments/${projectName}/helmEnv?envName=${envName}&updateType=${updateType}`)
-}
-
-export function getHelmEnvVarAPI (projectName, envName) {
-  return http.get(`/api/aslan/environment/environments/${projectName}/helmRenderCharts?envName=${envName}`)
-}
-
-export function updateHelmEnvVarAPI (projectName, envName, payload) {
-  return http.put(`/api/aslan/environment/environments/${projectName}/helmEnvVariable?envName=${envName}`, payload)
 }
 
 export function getHelmEnvChartDiffAPI (projectName, envName) {
@@ -1085,10 +1081,6 @@ export function getServiceInfo (productName, serviceName, envName = '', envType 
 
 export function autoUpgradeEnvAPI (projectName, payload, force = '') {
   return http.put(`/api/aslan/environment/environments/${projectName}/autoUpdate?force=${force}`, payload)
-}
-
-export function autoUpgradeHelmEnvAPI (projectName, payload) {
-  return http.put(`/api/aslan/environment/environments/${projectName}/updateMultiEnv`, payload)
 }
 
 // Login
@@ -1192,8 +1184,69 @@ export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
 
-// exteranl
+// module repo
+export function getChartTemplatesAPI () {
+  return http.get(`/api/aslan/template/charts`)
+}
 
+export function getChartTemplateByNameAPI (name) {
+  return http.get(`/api/aslan/template/charts/${name}`)
+}
+
+export function getTemplateFileContentAPI (name, fileName, filePath) {
+  return http.get(`/api/aslan/template/charts/${name}/files?fileName=${fileName}&filePath=${filePath}`)
+}
+
+export function createChartTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/charts`, payload)
+}
+
+export function updateChartTemplateAPI (name, payload) {
+  return http.put(`/api/aslan/template/charts/${name}`, payload)
+}
+
+export function deleteChartTemplateAPI (name) {
+  return http.delete(`/api/aslan/template/charts/${name}`)
+}
+
+export function createTemplateServiceAPI (productName, payload) {
+  return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
+}
+
+// helm env and service
+export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
+  return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)
+}
+
+export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
+  return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+}
+
+export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
+  return http.get(`/api/aslan/environment/environments/estimated-renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+}
+
+export function createHelmProductEnvAPI (productName, payload) {
+  return http.post(`/api/aslan/environment/environments/${productName}/helm`, payload)
+}
+
+export function updateHelmProductEnvAPI (productName, payload) {
+  return http.put(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
+}
+
+export function updateHelmEnvVarAPI (productName, envName, payload) {
+  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?envName=${envName}`, payload)
+}
+
+export function updateMatchRulesAPI (productName, payload) {
+  return http.put(`/api/aslan/project/products/${productName}/searching-rules`, payload)
+}
+
+export function getMatchRulesAPI (productName) {
+  return http.get(`/api/aslan/project/products/${productName}/searching-rules`)
+}
+
+// exteranl
 export function queryWorkloads (clusterId, namespace, page) {
   return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)
 }
@@ -1204,4 +1257,8 @@ export function queryServiceWorkloads (projectName, envName) {
 
 export function postWorkloads (payload) {
   return http.post(`/api/aslan/service/workloads`, payload)
+}
+
+export function editWorkloads (payload) {
+  return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
 }

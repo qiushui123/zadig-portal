@@ -3,7 +3,7 @@
     <el-alert type="warning"
               :closable="false">
       <template>
-        主机资源用于物理机服务资源配置<br />
+        主机资源用于主机服务资源配置<br />
         详细配置可参考
         <el-link style="font-size: 14px; vertical-align: baseline;"
                  type="primary"
@@ -87,6 +87,7 @@
 
 <script>
 import { createHostAPI, updateHostAPI } from '@api'
+import { cloneDeep } from 'lodash'
 const shellKeywords = ['alias', 'bg', 'bind', 'break', 'builtin', 'caller', 'case', 'cd',
   'command', 'compgen', 'complete', 'continue', 'declare', 'dirs',
   'disown', 'echo', 'enable', 'eval', 'exec', 'exit', 'export', 'false',
@@ -160,15 +161,15 @@ export default {
     saveHost () {
       return this.$refs.host.validate()
         .then(async () => {
-          const payload = this.host
+          const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
           const res = await createHostAPI(payload).catch((err) => { console.log(err) })
           if (res) {
-            this.$refs.host.resetFields()
             this.$message({
               type: 'success',
               message: '新增主机信息成功'
             })
+            this.resetFields()
           } else {
             return Promise.reject()
           }
@@ -178,20 +179,23 @@ export default {
       return this.$refs.host.validate()
         .then(async () => {
           const id = this.host.id
-          const payload = this.host
+          const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
           delete payload.origin_private_key
           const res = await updateHostAPI(id, payload).catch((err) => { console.log(err) })
           if (res) {
-            this.$refs.host.resetFields()
             this.$message({
               type: 'success',
               message: '更新主机信息成功'
             })
+            this.resetFields()
           } else {
             return Promise.reject()
           }
         })
+    },
+    resetFields () {
+      this.$refs.host.resetFields()
     }
   }
 }

@@ -45,7 +45,7 @@
 </template>
 <script>
 import { queryServiceWorkloads, serviceTemplateWithConfigAPI } from '@/api'
-import ServiceModule from '../serviceModules'
+import ServiceModule from './serviceModules'
 import Build from './build'
 
 export default {
@@ -164,7 +164,10 @@ export default {
   .left {
     width: 260px;
     height: 100%;
+    overflow: scroll;
+    border-top: 1px solid #ebedef;
     border-right: 1px solid #ebedef;
+    border-left: 1px solid #ebedef;
 
     .tree {
       box-sizing: border-box;
@@ -197,5 +200,9 @@ export default {
       }
     }
   }
+}
+
+/deep/ .custom-tree-node {
+  overflow: scroll;
 }
 </style>

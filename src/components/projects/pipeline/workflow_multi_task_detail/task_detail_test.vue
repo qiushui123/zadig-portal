@@ -70,7 +70,7 @@
                         effect="dark">
               <span v-if="build.tag"
                     class="link">
-                <a v-if="build.source==='github'||build.source==='gitlab'|| build.source==='ilyshin'"
+                <a v-if="build.source==='github'||build.source==='gitlab'"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tags/${build.tag}`"
                    target="_blank">{{build.tag}}
                 </a>
@@ -82,7 +82,7 @@
                         effect="dark">
               <span v-if="build.branch && !build.tag"
                     class="link">
-                <a v-if="build.source==='github'||build.source==='gitlab'|| build.source==='ilyshin'"
+                <a v-if="build.source==='github'||build.source==='gitlab'"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tree/${build.branch}`"
                    target="_blank">{{"Branch-"+build.branch}}
                 </a>
@@ -108,7 +108,7 @@
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/pull/${build.pr}`"
                    target="_blank">{{"PR-"+build.pr}}
                 </a>
-                <a v-if="build.source==='gitlab'|| build.source==='ilyshin'"
+                <a v-if="build.source==='gitlab'"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/merge_requests/${build.pr}`"
                    target="_blank">{{"PR-"+build.pr}}
                 </a>
@@ -123,7 +123,7 @@
                         effect="dark">
               <span v-if="build.commit_id"
                     class="link">
-                <a v-if="build.source==='github'||build.source==='gitlab'|| build.source==='ilyshin'"
+                <a v-if="build.source==='github'||build.source==='gitlab'"
                    :href="`${build.address}/${build.repo_owner}/${build.repo_name}/commit/${build.commit_id}`"
                    target="_blank">{{"Commit-"+build.commit_id.substring(0, 10)}}
                 </a>

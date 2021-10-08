@@ -111,8 +111,8 @@
         <el-table-column label="操作"
                          width="280">
           <template slot-scope="scope">
-            <el-button v-show="usersTableData.length > 1"
-            @click="deleteUser(scope.row)"
+            <el-button v-show="usersTableData.length > 1 && scope.row.directory === 'system'"
+                       @click="deleteUser(scope.row)"
                        type="danger"
                        size="mini"
                        plain>删除</el-button>

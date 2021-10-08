@@ -1,0 +1,93 @@
+{
+  "emmet.syntaxProfiles": {
+    "vue-html": "html",
+    "vue": "html",
+    "vetur.validation.template": true
+  },
+  "vetur.format.defaultFormatter.html": "prettyhtml",
+  "vetur.format.defaultFormatterOptions": {
+    "js-beautify-html": {
+      "wrap_line_length": "100",
+      "wrap_attributes": "force-aligned"
+      // "singleQuote": false,
+    },
+    "prettyhtml": {
+      "printWidth": 140,
+      "singleQuote": false,
+      "wrapAttributes": false
+    },
+    "prettier": {
+      // 使用单引号
+      "singleQuote": true,
+      "semi": false,
+      // 无尾随逗号
+      "trailingComma": "none",
+      // 箭头函数单个参数不加分号
+      "arrowParens": "avoid"
+    }
+  },
+  "vetur.validation.template": true,
+  "prettier.printWidth": 180,
+  "prettier.semi": false,
+  "prettier.singleQuote": true,
+  "gitlens.advanced.messages": {
+    "suppressCommitHasNoPreviousCommitWarning": false,
+    "suppressCommitNotFoundWarning": false,
+    "suppressFileNotUnderSourceControlWarning": false,
+    "suppressGitVersionWarning": false,
+    "suppressLineUncommittedWarning": false,
+    "suppressNoRepositoryWarning": false
+  },
+  "breadcrumbs.enabled": true,
+  "vetur.format.defaultFormatter.js": "prettier-eslint",
+  // 指定 *.js 文件的格式化工具为vscode自带，以符合ESLint规范
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.settings.enableNaturalLanguageSearch": false,
+  "[vue]": {
+    "editor.defaultFormatter": "octref.vetur"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "workbench.startupEditor": "newUntitledFile",
+  "scm.alwaysShowRepositories": true,
+  "bracketPairColorizer.consecutivePairColors": ["()", "[]", "{}", ["Gold", "Orchid", "LightSkyBlue"], "Red"],
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[less]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" // HookyQR.beautify  esbenp.prettier-vscode后
+  },
+  "git.alwaysSignOff": true,
+  "eslint.validate": ["vue", "html", "javascript", "typescript", "javascriptreact", "typescriptreact"],
+  // 保存时代码自动格式化
+  // "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "eslint.format.enable": true,
+  // "workbench.colorTheme": "Monokai Dimmed",
+  "files.associations": {
+    "*.cjson": "jsonc",
+    "*.wxss": "css",
+    "*.wxs": "javascript"
+  },
+  "emmet.includeLanguages": {
+    "wxml": "html"
+  },
+  // 指定wxml的格式化
+  "minapp-vscode.wxmlFormatter": "prettyHtml",
+  "minapp-vscode.disableAutoConfig": true
+}

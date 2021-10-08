@@ -1,10 +1,6 @@
 <template>
   <div class="git-file-container">
-    <el-card
-      class="box-card full git-file-card"
-      v-loading="loading"
-      :body-style="{ padding: '0px', margin: '0' }"
-    >
+    <el-card class="box-card full git-file-card" v-loading="loading" :body-style="{ padding: '0px', margin: '0' }">
       <el-tree
         ref="tree"
         v-if="showTree"
@@ -22,29 +18,24 @@
           <span class="folder-icon">
             <i :class="{ 'el-icon-folder': data.is_dir }"></i>
           </span>
-          <el-tooltip
-            v-if="!data.is_dir"
-            effect="dark"
-            :content="node.label"
-            placement="top"
-          >
+          <el-tooltip v-if="!data.is_dir" effect="dark" :content="node.label" placement="top">
             <span class="file-name">{{ $utils.tailCut(node.label, 40) }}</span>
           </el-tooltip>
           <span v-else class="file-name">{{ node.label }}</span>
           <span class="basic-info">
             <!-- <span v-show="data.name!=='/'&& !data.is_dir"
-                  class="size">{{ data.size + ' Bytes'}}</span> -->
-            <span v-show="data.name !== '/'" class="mod-time">{{
+            class="size">{{ data.size + ' Bytes'}}</span>-->
+            <span v-show="data.name !== '/'" class="mod-time">
+              {{
               $utils.convertTimestamp(data.mod_time)
-            }}</span>
+              }}
+            </span>
           </span>
         </span>
       </el-tree>
       <div>
         <span class="clean-workspace">
-          <el-button size="small" @click="selectFile" type="primary" plain
-            >确定</el-button
-          >
+          <el-button size="small" @click="selectFile" type="primary" plain>确定</el-button>
         </span>
       </div>
     </el-card>
@@ -52,7 +43,7 @@
 </template>
 
 <script>
-import { getRepoFilesAPI, getPublicRepoFilesAPI } from '@api'
+import { getRepoFilesAPI } from '@api'
 export default {
   props: {
     codehostId: {
@@ -87,7 +78,11 @@ export default {
     closeFileTree: Function,
     changeSelectPath: Function,
     type: String,
-    url: String
+    url: String,
+    justSelectOne: {
+      default: false,
+      type: Boolean
+    }
   },
   data () {
     return {
@@ -107,6 +102,9 @@ export default {
   },
   methods: {
     handleCheckChange (data, checked, indeterminate) {
+      if (this.justSelectOne && checked) {
+        this.$refs.tree.setCheckedNodes([data])
+      }
       this.checkedData = this.$refs.tree.getCheckedNodes()
     },
     loadNode (node, resolve) {
@@ -115,46 +113,45 @@ export default {
       const repoName = this.repoName
       const branchName = this.branchName
       const url = this.url
-      const type = 'helm'
       let path = ''
+      let params = {}
       path = node.data ? node.data.full_path : ''
       this.selectPath = ''
       this.loading = true
       if (this.type === 'private') {
-        getRepoFilesAPI(codehostId, repoOwner, repoName, branchName, path, type)
-          .then((res) => {
-            res.forEach((element) => {
-              if (element.is_dir) {
-                element.leaf = false
-              } else {
-                element.leaf = true
-              }
-            })
-            return resolve(res)
-          })
-          .finally(() => {
-            this.loading = false
-          })
+        params = {
+          codehostId,
+          repoOwner,
+          repoName,
+          branchName,
+          path,
+          type: 'helm'
+        }
       } else if (this.type === 'public') {
-        getPublicRepoFilesAPI(path, url)
-          .then((res) => {
-            res.forEach((element) => {
-              if (element.is_dir) {
-                element.leaf = false
-              } else {
-                element.leaf = true
-              }
-            })
-            return resolve(res)
-          })
-          .finally(() => {
-            this.loading = false
-          })
+        params = {
+          repoLink: url,
+          path,
+          type: 'githubPublic'
+        }
       }
+      getRepoFilesAPI(params)
+        .then(res => {
+          res.forEach(element => {
+            if (element.is_dir) {
+              element.leaf = false
+            } else {
+              element.leaf = true
+            }
+          })
+          return resolve(res)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     async selectFile () {
       const checkList = []
-      this.checkedData.forEach((item) => {
+      this.checkedData.forEach(item => {
         if (item.is_dir) {
           checkList.push(item.full_path)
         }
@@ -177,8 +174,10 @@ export default {
     margin: 0;
   }
 
-  .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
-    background-color: #1989fa33;
+  .el-tree--highlight-current {
+    .el-tree-node.is-current > .el-tree-node__content {
+      background-color: #1989fa33;
+    }
   }
 
   .el-tree {

@@ -1,7 +1,10 @@
 <template>
-  <div class="resize"
-       ref="resize"
-       :style="{width: containerWidth, height: height, resize: resize}">
+  <div
+    class="resize"
+    :class="{none: resize === 'none', border: border}"
+    ref="resize"
+    :style="{width: containerWidth, height: height, resize: resize}"
+  >
     <slot></slot>
   </div>
 </template>
@@ -28,6 +31,10 @@ export default {
     resize: {
       type: String,
       default: 'vertical'
+    },
+    border: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
@@ -74,20 +81,23 @@ export default {
   min-height: 100px;
   padding: 6px;
   overflow: hidden;
-  border: 1px solid #ccc;
-  border-radius: 2px;
 
-  &::after {
+  &.border {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  &:not(.none)::after {
     position: absolute;
     right: -2px;
-    bottom: -4px;
+    bottom: -2px;
     width: 5px;
     height: 5px;
     border-top: 4px double transparent;
     border-bottom: 4px double transparent;
     border-left: 4px double #666;
     transform: rotate(45deg);
-    content: " ";
+    content: ' ';
   }
 }
 </style>

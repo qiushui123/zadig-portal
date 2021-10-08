@@ -98,8 +98,10 @@
                     </el-tag>
                   </span>
                 </el-option>
+                <el-option>
+                  <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
+                </el-option>
               </el-select>
-              <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
             </el-form-item>
           </el-col>
           <el-col :span="10">
@@ -319,7 +321,7 @@
               <div slot="content">
                 当前可用环境变量如下，可在构建脚本中进行引用<br>
                 $WORKSPACE&nbsp;&nbsp;工作目录<br>
-                $TASK_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工作流 ID<br>
+                $TASK_ID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工作流任务 ID<br>
                 $IMAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;输出镜像名称<br>
                 $SERVICE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建的服务名称<br>
                 $DIST_DIR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;构建出的 Tar 包的目的目录<br>
@@ -1312,7 +1314,7 @@ export default {
           this.$emit('listenCreateEvent', 'success')
           this.$message({
             type: 'success',
-            message: '创建非容器服务成功'
+            message: '创建主机服务成功'
           })
         }, () => {
           this.$emit('listenCreateEvent', 'failed')
@@ -1370,7 +1372,7 @@ export default {
           this.$emit('listenCreateEvent', 'success')
           this.$message({
             type: 'success',
-            message: '修改非容器服务成功'
+            message: '修改主机服务成功'
           })
         }, () => {
           this.$emit('listenCreateEvent', 'failed')
@@ -1733,5 +1735,10 @@ export default {
   .drawer-footer {
     padding-top: 20px;
   }
+}
+
+.save-btn {
+  position: absolute;
+  bottom: 20px;
 }
 </style>

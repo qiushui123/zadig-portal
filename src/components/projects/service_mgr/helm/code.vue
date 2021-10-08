@@ -1,15 +1,7 @@
 <template>
   <div class="content">
-    <div
-      class="modalContent"
-      :style="`z-index: ${zindex}`"
-      @click="changeModalStatus(null, false, null, true)"
-    >
-      <div
-        class="modal"
-        v-show="modalvalue"
-        :style="`left:${position.left}px;top: ${position.top}px`"
-      >
+    <div class="modalContent" :style="`z-index: ${zindex}`" @click="changeModalStatus(null, false, null, true)">
+      <div class="modal" v-show="modalvalue" :style="`left:${position.left}px;top: ${position.top}px`">
         <!-- <div
           class="item"
           v-if="!(currentData && !currentData.type ==='folder')"
@@ -27,20 +19,15 @@
         <div class="item" v-if="currentData" @click="updateFileName">
           重命名
         </div>
-        <div class="item" v-if="currentData" @click="deleteFile">删除</div> -->
+        <div class="item" v-if="currentData" @click="deleteFile">删除</div>-->
         <div class="item" v-if="currentData.type && (actionList[currentData.type].includes('deleteServer'))" @click="deleteServer">删除服务</div>
-     </div>
+      </div>
     </div>
 
     <multipane class="custom-resizer" layout="vertical">
       <div class="left">
         <div class="title">
-            <el-button  @click="openRepoModal()"
-                size="mini"
-                icon="el-icon-plus"
-                plain
-                circle>
-            </el-button>
+          <el-button @click="openRepoModal()" size="mini" icon="el-icon-plus" plain circle></el-button>
         </div>
         <Folder
           class="folder"
@@ -56,9 +43,9 @@
           :deleteServer="deleteServer"
           :openRepoModal="openRepoModal"
         />
-        <div class="bottom">
-           <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button>
-          <el-button size="small" type="primary" :disabled="!updateEnv" @click="update">更新环境</el-button>
+        <div class="bottom" v-if="!isCreate">
+          <!-- <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button> -->
+          <el-button size="small" type="primary" :disabled="!updateEnv || !envNameList.length" @click="update">更新环境</el-button>
         </div>
       </div>
       <multipane-resizer class="resizer1"></multipane-resizer>
@@ -74,8 +61,15 @@
           />
         </div>
         <div class="code" v-if="page.expandFileList.length">
-          <component v-if="currentCode.type==='components'" :changeExpandFileList="changeExpandFileList" :currentCode="currentCode" v-bind="currentCode" v-bind:is="currentCode.componentsName"></component>
-          <CodeMirror v-if="currentCode.type==='file'"
+          <component
+            v-if="currentCode.type==='components'"
+            :changeExpandFileList="changeExpandFileList"
+            :currentCode="currentCode"
+            v-bind="currentCode"
+            v-bind:is="currentCode.componentsName"
+          ></component>
+          <CodeMirror
+            v-if="currentCode.type==='file'"
             :saveFile="saveFile"
             :changeCodeTxtCache="changeCodeTxtCache"
             :currentCode="currentCode"
@@ -85,17 +79,20 @@
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
       <div :style="{ flexGrow: 1 }" class="right">
-        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" /> <!-- 右侧aside -->
+        <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate" />
+        <!-- 右侧aside -->
       </div>
-      </multipane>
-     <UpdateHelmEnv v-model="updateHelmEnvDialogVisible"/>
-    <el-dialog
-      title="请选择导入源"
-      :visible.sync="dialogVisible"
-      center
-      @close="closeSelectRepo"
-    >
-      <Repo ref="repo" @triggleAction="changeExpandFileList('clear');clearCommitCache()" :currentService="currentService" @canUpdateEnv="updateEnv = true" v-model="dialogVisible" /> <!-- 代码库弹窗 -->
+    </multipane>
+    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
+    <el-dialog title="新建服务" :visible.sync="dialogVisible" center @close="closeSelectRepo">
+      <Repo
+        ref="repo"
+        @triggleAction="changeExpandFileList('clear');clearCommitCache()"
+        :currentService="currentService"
+        @canUpdateEnv="canUpdateEnv($event)"
+        v-model="dialogVisible"
+      />
+      <!-- 代码库弹窗 -->
     </el-dialog>
   </div>
 </template>
@@ -110,7 +107,7 @@ import { Multipane, MultipaneResizer } from 'vue-multipane'
 import UpdateHelmEnv from './components/common/update_helm_env'
 import Build from './components/common/build'
 import { deleteServiceTemplateAPI } from '@api'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 const actionList = {
   file: ['delete'],
@@ -131,6 +128,12 @@ const newFolderNode = {
 }
 export default {
   name: 'vscode',
+  props: {
+    isCreate: {
+      default: false,
+      type: Boolean
+    }
+  },
   components: {
     Folder,
     PageNav,
@@ -164,10 +167,36 @@ export default {
       position: {
         left: 0,
         top: 0
-      }
+      },
+      chartNames: [
+        // { serviceName: 'common', type: 'common' },
+        // { serviceName: 'delete', type: 'delete' },
+        // { serviceName: 'update', type: 'update' },
+        // { serviceName: 'create', type: 'create' }
+      ]
     }
   },
   methods: {
+    handleChartNames (services) {
+      services.forEach(service => {
+        const serviceNames = this.chartNames.map(chart => chart.serviceName)
+        const index = serviceNames.indexOf(service.serviceName)
+        const type = service.type
+        if (type === 'delete') {
+          if (index !== -1) {
+            this.chartNames.splice(index, 1)
+          } else {
+            this.chartNames.push(service)
+          }
+        } else if (index === -1) {
+          this.chartNames.push(service)
+        }
+      })
+    },
+    canUpdateEnv (services) {
+      this.updateEnv = true
+      if (services) this.handleChartNames(services)
+    },
     closeSelectRepo () {
       this.$refs.repo.closeSelectRepo()
     },
@@ -214,7 +243,7 @@ export default {
         this.page.expandFileList = []
       } else {
         const resIndex = this.page.expandFileList.findIndex(
-          (i) => i.id === item.id
+          i => i.id === item.id
         )
         const length = this.page.expandFileList.length
         if (method === 'add') {
@@ -235,7 +264,7 @@ export default {
     deleteFile () {
       this.$refs.folder.remove(this.currentData)
       const resIndex = this.page.expandFileList.findIndex(
-        (i) => i.id === this.currentData.id
+        i => i.id === this.currentData.id
       )
       if (resIndex >= 0) {
         this.changeExpandFileList('del', null, resIndex)
@@ -249,12 +278,24 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
-        deleteServiceTemplateAPI(currentData.service_name, 'helm', this.projectName, 'private').then(res => {
-          if (res) {
-            this.updateEnv = true
-            this.$store.dispatch('queryService', { projectName: this.projectName })
-          }
-        }).catch(error => console.log(error))
+        this.handleChartNames([{ serviceName: currentData.service_name, type: 'delete' }])
+        deleteServiceTemplateAPI(
+          currentData.service_name,
+          'helm',
+          this.projectName,
+          'private'
+        )
+          .then(res => {
+            if (res) {
+              if (this.envNameList.length) {
+                this.updateEnv = true
+              }
+              this.$store.dispatch('queryService', {
+                projectName: this.projectName
+              })
+            }
+          })
+          .catch(error => console.log(error))
       })
     },
     newFile (type) {
@@ -378,17 +419,32 @@ export default {
         // }
         // this.changeExpandFileList('add', item)
       } else {
-        const data = this.nodeData[0].children.filter(node => node.label === 'values.yaml')[0] || this.nodeData[0].children[0]
+        const data =
+          this.nodeData[0].children.filter(
+            node => node.label === 'values.yaml'
+          )[0] || this.nodeData[0].children[0]
         this.$refs.folder.addExpandFileList(data)
       }
     }
   },
   computed: {
+    ...mapGetters(['productList']),
     projectName () {
       return this.$route.params.project_name
     },
+    envNameList () {
+      const envNameList = []
+      this.productList.forEach((element) => {
+        if (element.product_name === this.projectName) {
+          envNameList.push({
+            envName: element.env_name
+          })
+        }
+      })
+      return envNameList
+    },
     ...mapState({
-      service: (state) => state.service_manage.serviceList
+      service: state => state.service_manage.serviceList
     })
   }
 }
@@ -400,7 +456,7 @@ export default {
   height: 100%;
   overflow: auto;
   background-color: #fff;
-  user-select: none;
+  // user-select: none;
 
   .modalContent {
     position: fixed;
@@ -490,7 +546,7 @@ export default {
     background-color: #fff;
     border: 1px solid #dbdbdb;
     border-radius: 5px;
-    content: "";
+    content: '';
   }
 
   .resizer2 {
@@ -510,7 +566,7 @@ export default {
     background-color: #fff;
     border: 1px solid #dbdbdb;
     border-radius: 5px;
-    content: "";
+    content: '';
   }
 
   .center {
@@ -528,7 +584,7 @@ export default {
 
     .code {
       box-sizing: border-box;
-      height: calc(~"100% - 40px");
+      height: calc(~'100% - 40px');
       margin-top: 40px;
       overflow-y: scroll;
       background-color: #fff;
@@ -540,6 +596,8 @@ export default {
   }
 
   .right {
+    position: static;
+    z-index: auto;
     width: 100px;
     background-color: #fff;
   }

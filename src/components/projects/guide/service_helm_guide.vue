@@ -11,7 +11,7 @@
       </div>
     </div>
   <div class="content">
-    <Code ref="code" :service="serviceList" >
+    <Code ref="code" :service="serviceList" isCreate>
     </Code>
   </div>
       <div class="controls__wrap">
@@ -29,7 +29,7 @@
 <script>
 import { mapState } from 'vuex'
 import step from './common/step.vue'
-import Code from '../web_code/code'
+import Code from '../service_mgr/helm/code'
 
 export default {
   name: 'service_helm',
@@ -154,6 +154,6 @@ export default {
   flex: 1;
   overflow: auto;
   background-color: #fff;
-  user-select: none;
+  // user-select: none;
 }
 </style>

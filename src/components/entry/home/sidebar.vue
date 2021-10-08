@@ -1,26 +1,15 @@
 <template>
-  <div @mouseenter="enterSidebar"
-       @mouseleave="leaveSidebar"
-       class="cf-side-bar full-h"
-       :class="{ 'small-sidebar': !showSidebar }">
-    <a @click="changeSidebar"
-       class="sidebar-size-toggler">
+  <div @mouseenter="enterSidebar" @mouseleave="leaveSidebar" class="cf-side-bar full-h" :class="{ 'small-sidebar': !showSidebar }">
+    <a @click="changeSidebar" class="sidebar-size-toggler">
       <i :class="showSidebar?'el-icon-arrow-right':'el-icon-arrow-left'"></i>
     </a>
 
     <div class="cf-side-bar-header">
       <router-link to="/v1/status">
-        <img v-if="showSidebar&&!showBackPath"
-             class="logo"
-             src="@assets/icons/logo/default-logo.png">
-        <img v-if="!showSidebar&&!showBackPath"
-             class="logo"
-             :class="{'small':!showSidebar}"
-             src="@assets/icons/logo/small-logo.png">
+        <img v-if="showSidebar&&!showBackPath" class="logo" src="@assets/icons/logo/default-logo.png" />
+        <img v-if="!showSidebar&&!showBackPath" class="logo" :class="{'small':!showSidebar}" src="@assets/icons/logo/small-logo.png" />
       </router-link>
-      <router-link class="cf-side-bar-header back-to"
-                   v-if="showSidebar&&showBackPath"
-                   :to="backUrl">
+      <router-link class="cf-side-bar-header back-to" v-if="showSidebar&&showBackPath" :to="backUrl">
         <div class="cf-side-bar-header__icon">
           <i class="icon el-icon-back"></i>
         </div>
@@ -29,86 +18,56 @@
           <div class="logo-title logo-title_subtitle">返回上一层</div>
         </div>
       </router-link>
-      <router-link class="cf-side-bar-header"
-                   v-if="!showSidebar&&showBackPath"
-                   :to="backUrl">
+      <router-link class="cf-side-bar-header" v-if="!showSidebar&&showBackPath" :to="backUrl">
         <div class="cf-side-bar-header__icon">
           <i class="icon el-icon-back"></i>
         </div>
       </router-link>
     </div>
     <div class="nav grow-all main-menu cf-sidebar-scroll">
-
-      <div v-for="(item,index) in navList"
-           :key="index"
-           class="category-wrapper"
-           :class="{'divider':!showSidebar}">
-        <h4 v-show="showSidebar"
-            class="category-name">
+      <div v-for="(item,index) in navList" :key="index" class="category-wrapper" :class="{'divider':!showSidebar}">
+        <h4 v-show="showSidebar" class="category-name">
           {{item.category_name}}
-          <span v-if="item.new_feature"
-                class="new-feature">New</span>
+          <span v-if="item.new_feature" class="new-feature">New</span>
         </h4>
-        <div class="nav__new-wrapper"
-             v-for="(nav,nav_index) in navList[index].items"
-             :key="nav_index">
-
-          <div class="nav grow-nothing ">
-            <div @click="collapseMenu(nav)"
-                 v-if="nav.hasSubItem"
-                 class="nav-item">
+        <div class="nav__new-wrapper" v-for="(nav,nav_index) in navList[index].items" :key="nav_index">
+          <div class="nav grow-nothing">
+            <div @click="collapseMenu(nav)" v-if="nav.hasSubItem" class="nav-item">
               <div class="nav-item-icon">
                 <i :class="nav.icon"></i>
               </div>
               <a href="javascript:void(0)">
                 <div class="nav-item-label">
                   {{nav.name}}
-                  <i v-if="nav.isOpened"
-                     class="el-icon-arrow-up arrow"></i>
-                  <i v-else-if="!nav.isOpened"
-                     class="el-icon-arrow-down arrow"></i>
+                  <i v-if="nav.isOpened" class="el-icon-arrow-up arrow"></i>
+                  <i v-else-if="!nav.isOpened" class="el-icon-arrow-down arrow"></i>
                 </div>
               </a>
             </div>
-            <router-link v-else
-                         class="nav-item"
-                         active-class="active"
-                         :to="`/v1/${nav.url}`">
+            <router-link v-else class="nav-item" active-class="active" :to="`/v1/${nav.url}`">
               <div class="nav-item-icon">
                 <i :class="nav.icon"></i>
               </div>
-              <div class="nav-item-label">
-                {{nav.name}}
-              </div>
+              <div class="nav-item-label">{{nav.name}}</div>
             </router-link>
-            <ul v-if="nav.hasSubItem && nav.isOpened"
-                class="sub-menu"
-                style="overflow: hidden;">
+            <ul v-if="nav.hasSubItem && nav.isOpened" class="sub-menu" style="overflow: hidden;">
               <li class="sub-menu-item-group">
                 <ul>
-                  <router-link v-for="(subItem,index) in nav.subItems"
-                               :key="index"
-                               active-class="active"
-                               :to="`/v1/${subItem.url}`">
+                  <router-link v-for="(subItem,index) in nav.subItems" :key="index" active-class="active" :to="`/v1/${subItem.url}`">
                     <li class="sub-menu-item">
                       <span class="sub-item-icon">
                         <i :class="subItem.icon"></i>
                       </span>
-                      <span class="sub-item-label">
-                        {{subItem.name}}
-                      </span>
+                      <span class="sub-item-label">{{subItem.name}}</span>
                     </li>
                   </router-link>
                 </ul>
               </li>
             </ul>
-
           </div>
-
         </div>
 
-        <div class="nav__new-wrapper">
-        </div>
+        <div class="nav__new-wrapper"></div>
       </div>
     </div>
   </div>
@@ -459,7 +418,7 @@ export default {
         height: 1px;
         margin: auto;
         background-color: #c0c4cc;
-        content: "";
+        content: '';
       }
     }
   }

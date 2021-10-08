@@ -10,6 +10,12 @@
                @click="changeRoute('var')">
             <span class="step-name">镜像更新</span>
           </div>
+          <div v-if="isCreate"
+               class="tabs__item"
+               :class="{'selected': $route.query.rightbar === 'values'}"
+               @click="changeRoute('values')">
+            <span class="step-name">变量</span>
+          </div>
           <div class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'help'}"
                @click="changeRoute('help')">
@@ -32,6 +38,7 @@
                   <div slot="content">values.yaml 中可被更新的镜像</div>
                   <span><i class="el-icon-question"></i></span>
                 </el-tooltip>
+                <el-button type="text" size="small" @click="updateMatchRuleFlag = true">更新匹配规则</el-button>
               </h4>
               <!-- <div v-if="allRegistry.length === 0"
                    class="registry-alert">
@@ -77,7 +84,8 @@
                    ></build>
           </div> -->
         </div>
-        <div v-if="$route.query.rightbar === 'help'"
+        <values v-else-if="$route.query.rightbar === 'values'" :valuesYamlDeposit="valuesYamlDeposit"></values>
+        <div v-else-if="$route.query.rightbar === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">帮助</div>
@@ -88,6 +96,7 @@
         </div>
       </div>
     </div>
+    <MatchRule :value.sync="updateMatchRuleFlag"></MatchRule>
   </div>
 </template>
 <script>
@@ -95,28 +104,18 @@ import qs from 'qs'
 import bus from '@utils/event_bus'
 import { mapState } from 'vuex'
 import help from './help.vue'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/mode/yaml'
-import 'brace/theme/xcode'
-import 'brace/ext/searchbox'
+import values from './values.vue'
+import MatchRule from './match_rule.vue'
 export default {
   props: {
-    changeExpandFileList: Function
+    changeExpandFileList: Function,
+    isCreate: {
+      default: false,
+      type: Boolean
+    }
   },
   data () {
     return {
-      editorOption: {
-        showLineNumbers: false,
-        showFoldWidgets: false,
-        showGutter: false,
-        showPrintMargin: false,
-        readOnly: true,
-        tabSize: 2,
-        maxLines: Infinity,
-        highlightActiveLine: false,
-        highlightGutterLine: false,
-        displayIndentGuides: false
-      },
       allRegistry: [],
       chartValues: [],
       detectedServices: [],
@@ -124,7 +123,9 @@ export default {
       serviceName: null,
       name: null,
       buildName: null,
-      isEdit: false
+      isEdit: false,
+      valuesYamlDeposit: {},
+      updateMatchRuleFlag: false
     }
   },
   methods: {
@@ -160,9 +161,6 @@ export default {
             rightbar: step
           })
       })
-    },
-    editorInit (e) {
-      e.renderer.$cursorLayer.element.style.opacity = 0
     }
   },
   beforeDestroy () {
@@ -181,7 +179,8 @@ export default {
   },
   components: {
     help,
-    editor: aceEditor
+    values,
+    MatchRule
   }
 }
 </script>
@@ -360,25 +359,6 @@ export default {
             .el-table td,
             .el-table th {
               padding: 6px 0;
-            }
-
-            .yaml-container {
-              margin: 5px 0;
-
-              .info {
-                margin: 8px 0;
-
-                .name,
-                .version {
-                  color: #303133;
-                  font-size: 14px;
-                }
-              }
-
-              .editor-container {
-                border: 1px solid #ccc;
-                border-radius: 4px;
-              }
             }
           }
         }

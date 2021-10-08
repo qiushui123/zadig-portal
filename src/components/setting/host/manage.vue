@@ -29,7 +29,7 @@
       <el-alert type="info"
                 :closable="false">
         <template>
-          添加主机资源，可用于物理机服务资源配置<br />
+          添加主机资源，可用于主机服务资源配置<br />
           详细配置可参考
           <el-link style="font-size: 14px; vertical-align: baseline;"
                    type="primary"
@@ -194,7 +194,7 @@ export default {
         if (this.operate === 'add') {
           this.addHostData = this.$utils.cloneObj(this.host)
         }
-        this.$refs['add-host'].$refs.host.resetFields()
+        this.$refs['add-host'].resetFields()
         this.host = this.$utils.cloneObj(this.addHostData)
       }
     }
