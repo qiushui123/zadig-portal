@@ -128,7 +128,7 @@ export default {
       let deleteText = ''
       let title = '确认'
       title = `确定要删除 ${obj.service_name} 这个服务吗？`
-      deleteText = `删除操作只会删除系统中服务的定义，如需物理删除，请登陆服务器做服务清理`
+      deleteText = `删除操作只会删除系统中服务的定义，如需物理删除，请登录服务器做服务清理`
       this.$confirm(`${deleteText}`, `${title}`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
