@@ -194,7 +194,7 @@ export default {
         if (this.operate === 'add') {
           this.addHostData = this.$utils.cloneObj(this.host)
         }
-        this.$refs['add-host'].$refs.host.resetFields()
+        this.$refs['add-host'].resetFields()
         this.host = this.$utils.cloneObj(this.addHostData)
       }
     }
