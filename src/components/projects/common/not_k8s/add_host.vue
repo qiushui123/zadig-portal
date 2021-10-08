@@ -87,6 +87,7 @@
 
 <script>
 import { createHostAPI, updateHostAPI } from '@api'
+import { cloneDeep } from 'lodash'
 const shellKeywords = ['alias', 'bg', 'bind', 'break', 'builtin', 'caller', 'case', 'cd',
   'command', 'compgen', 'complete', 'continue', 'declare', 'dirs',
   'disown', 'echo', 'enable', 'eval', 'exec', 'exit', 'export', 'false',
@@ -160,15 +161,15 @@ export default {
     saveHost () {
       return this.$refs.host.validate()
         .then(async () => {
-          const payload = this.host
+          const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
           const res = await createHostAPI(payload)
           if (res) {
-            this.$refs.host.resetFields()
             this.$message({
               type: 'success',
               message: '新增主机信息成功'
             })
+            this.resetFields()
           } else {
             return Promise.reject()
           }
@@ -178,20 +179,23 @@ export default {
       return this.$refs.host.validate()
         .then(async () => {
           const id = this.host.id
-          const payload = this.host
+          const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
           delete payload.origin_private_key
           const res = await updateHostAPI(id, payload)
           if (res) {
-            this.$refs.host.resetFields()
             this.$message({
               type: 'success',
               message: '更新主机信息成功'
             })
+            this.resetFields()
           } else {
             return Promise.reject()
           }
         })
+    },
+    resetFields () {
+      this.$refs.host.resetFields()
     }
   }
 }

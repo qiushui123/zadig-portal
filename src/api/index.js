@@ -384,7 +384,7 @@ export function getBuildConfigDetailAPI (name, version, projectName = '') {
 
 export function getRepoFilesAPI ({ codehostId = '', repoOwner = '', repoName = '', branchName = '', path = '', type = '', repoLink = '', remoteName = 'origin' }) {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
-  if (type === 'github' || type === 'gitlab' || type === 'ilyshin' || type === 'helm' || type === 'githubPublic') {
+  if (type === 'github' || type === 'gitlab' || type === 'helm' || type === 'githubPublic') {
     let params = {}
     if (type === 'githubPublic') {
       params = {
