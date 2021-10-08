@@ -24,7 +24,7 @@
         >
           <codemirror ref="codemirror" v-model="importRepoInfoUse.valuesYAML"></codemirror>
         </Resize>
-        <ValueRepo v-if="importRepoInfoUse.yamlSource === 'gitRepo'" ref="valueRepo" :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig"></ValueRepo>
+        <ValueRepo v-if="importRepoInfoUse.yamlSource === 'gitRepo'" ref="valueRepo" :valueRepoInfo="importRepoInfoUse.gitRepoConfig"></ValueRepo>
       </template>
     </div>
   </div>
@@ -34,6 +34,7 @@
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
 import ValueRepo from './value_repo.vue'
+import { cloneDeep } from 'lodash'
 
 const valueInfo = {
   yamlSource: '', // gitRepo or freeEdit or default(不上传)
@@ -79,7 +80,7 @@ export default {
       get () {
         let gitRepoConfig = {}
         if (!this.importRepoInfo.gitRepoConfig) {
-          gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
+          gitRepoConfig = { gitRepoConfig: cloneDeep(valueInfo.gitRepoConfig) }
         }
         return Object.assign(this.importRepoInfo, gitRepoConfig)
       },
