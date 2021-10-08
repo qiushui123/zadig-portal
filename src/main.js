@@ -3,7 +3,6 @@ import 'loaders.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import 'vant/lib/index.css'
 import Vue from 'vue'
-import VueResource from 'vue-resource'
 import Element from 'element-ui'
 import router from './router/index.js'
 import store from './store'
@@ -28,7 +27,6 @@ Vue.use(sse)
 
 Vue.config.debug = true
 Vue.use(VueClipboard)
-Vue.use(VueResource)
 Vue.use(Element)
 Vue.mixin(mobileGoback)
 Vue.mixin(onboardingStatusMixin)
