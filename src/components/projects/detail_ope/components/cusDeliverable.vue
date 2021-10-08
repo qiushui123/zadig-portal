@@ -1,18 +1,22 @@
 <template>
-  <div class="content">
+  <div class="con">
+    <div style="padding: 10px; border: 1px solid #dcdfe6;">
      <div class="title">自定义镜像名称</div>
      <div class="item" v-for="key of Object.keys(customerImage)" :key="'image'+key">
          <div class="label">{{customerImage[key].label}}</div>
-         <el-input class="input1" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="customerImage[key].service" size="small" placeholder="${SERVICE}" clearable  ></el-input> &nbsp;:&nbsp;
-         <el-input class="input2" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
+         <el-input class="input1" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="customerImage[key].service" size="small" placeholder="${SERVICE}" clearable  ></el-input> &nbsp;:&nbsp;
+         <el-input class="input2" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="customerImage[key].value" size="small" :placeholder="customerImage[key].placeholder" clearable></el-input>
          <span class="reset" @click="resetFiled('customerImage',key)">重置</span>
      </div>
-     <div class="title">自定义 TAR 包名称</div>
-     <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
-         <div class="label">{{tar[key].label}}</div>
-         <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
-         <span class="reset" @click="resetFiled('tar',key)">重置</span>
-     </div>
+    </div>
+    <div style="margin-top: 10px; padding: 10px; border: 1px solid #dcdfe6;">
+      <div class="title">自定义 TAR 包名称</div>
+      <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
+          <div class="label">{{tar[key].label}}</div>
+          <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
+          <span class="reset" @click="resetFiled('tar',key)">重置</span>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -85,24 +89,23 @@ export default {
     resetFiled (obj, key) {
       obj === 'customerImage' && (this[obj][key].service = defaultValue)
       this[obj][key].value = this[obj][key].placeholder
+    },
+    saveConfig () {
+      const customerImage = this.customerImage
+      const tar = this.tar
+      this.custom_image_rule = {
+        pr_rule: (customerImage.pr.service || defaultValue) + ':' + (customerImage.pr.value || placeholder[0]),
+        branch_rule: (customerImage.branch.service || defaultValue) + ':' + (customerImage.branch.value || placeholder[1]),
+        pr_and_branch_rule: (customerImage.prBranch.service || defaultValue) + ':' + (customerImage.prBranch.value || placeholder[2]),
+        tag_rule: (customerImage.tag.service || defaultValue) + ':' + (customerImage.tag.value || placeholder[3])
+      }
+      this.custom_tar_rule = {
+        pr_rule: tar.pr.value || `${defaultValue}-${placeholder[0]}`,
+        branch_rule: tar.branch.value || `${defaultValue}-${placeholder[1]}`,
+        pr_and_branch_rule: tar.prBranch.value || `${defaultValue}-${placeholder[2]}`,
+        tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
+      }
     }
-    // saveConfig () {
-    //   const customerImage = this.customerImage
-    //   const tar = this.tar
-    //   this.custom_image_rule = {
-    //     pr_rule: (customerImage.pr.service || defaultValue) + ':' + (customerImage.pr.value || placeholder[0]),
-    //     branch_rule: (customerImage.branch.service || defaultValue) + ':' + (customerImage.branch.value || placeholder[1]),
-    //     pr_and_branch_rule: (customerImage.prBranch.service || defaultValue) + ':' + (customerImage.prBranch.value || placeholder[2]),
-    //     tag_rule: (customerImage.tag.service || defaultValue) + ':' + (customerImage.tag.value || placeholder[3])
-    //   }
-    //   this.custom_tar_rule = {
-    //     pr_rule: tar.pr.value || `${defaultValue}-${placeholder[0]}`,
-    //     branch_rule: tar.branch.value || `${defaultValue}-${placeholder[1]}`,
-    //     pr_and_branch_rule: tar.prBranch.value || `${defaultValue}-${placeholder[2]}`,
-    //     tag_rule: tar.tag.value || `${defaultValue}-${placeholder[3]}`
-    //   }
-    //   this.dialogVisible = false
-    // }
   },
   watch: {
     customImageRule (value) {
@@ -129,20 +132,20 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .content {
+  .con {
     width: 100%;
-    padding: 10px;
+    // padding: 0 10px;
+    line-height: 20px;
 
     .title {
       color: #303133;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .item {
       display: flex;
       align-items: center;
-      width: 80%;
-      margin: 10px 40px;
+      margin: 10px 20px;
 
       .label {
         flex: 2;

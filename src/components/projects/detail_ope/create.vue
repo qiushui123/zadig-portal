@@ -22,12 +22,14 @@
                        label-width="100px"
                        class="demo-projectForm">
                 <el-form-item label="项目名称"
+                              v-show="activeName !=='advance'"
                               prop="project_name">
                   <el-input @keyup.native="()=>projectForm.project_name=projectForm.project_name.trim()"
                             v-model="projectForm.project_name"></el-input>
                 </el-form-item>
 
                 <el-form-item label="项目主键"
+                              v-show="activeName !=='advance'"
                               prop="product_name">
                   <span slot="label">项目主键
                     <el-tooltip effect="dark"
@@ -52,8 +54,33 @@
                               prop="timeout">
                   <el-input v-model.number="projectForm.timeout"></el-input>
                 </el-form-item>
-                <CusDeliverable v-show="activeName==='advance'" :customImageRule="projectForm.custom_image_rule" :customTarRule="projectForm.custom_tar_rule" ref="cusDeliverable" v-if="isEdit" />
+                <el-form-item v-if="isEdit"
+                              v-show="activeName==='advance'"
+                              label="自定义交付物名称">
+                      <span slot="label">自定义交付物名称
+                        <el-tooltip effect="dark"
+                                  placement="top">
+                          <div slot="content">
+                            镜像和 TAR 包规则可以通过变量和常量组装成默认的镜像名称：<br/>
+                              1. $TIMESTAMP: 时间戳<br/>
+                              2. $TASK_ID: 工作流任务 ID<br/>
+                              3. $REPO_BRANCH: 代码分支名称<br/>
+                              4. $REPO_PR: 代码 PR ID<br/>
+                              5. $REPO_TAG: 代码 TAG<br/>
+                              6. $REPO_COMMIT_ID: 代码 Commit ID<br/>
+                              7. $PROJECT: 项目名称<br/>
+                              8. $SERVICE: 服务名称<br/>
+                              9. $ENV_NAME: 环境名称<br/>
+                              10. 符合 Tag 命名规范要求的字符串常量<br/>
+                              注意：Tag 中的字符只能是大小写字母、数字、中划线、下划线和点，即 [a-zA-Z0-9_.-]，首个字符不能是.或-。Tag 不能超过 127个字符
+                            </div>
+                          <i class="el-icon-question"></i>
+                        </el-tooltip>
+                      </span>
+                      <CusDeliverable v-show="activeName==='advance'" :customImageRule="projectForm.custom_image_rule" :customTarRule="projectForm.custom_tar_rule" ref="cusDeliverable" v-if="isEdit" />
+                </el-form-item>
                 <el-form-item label="描述信息"
+                              v-show="activeName !=='advance'"
                               prop="desc">
                   <el-input type="textarea"
                             :rows="2"
@@ -63,6 +90,7 @@
 
                 </el-form-item>
                 <el-form-item v-if="!isEdit"
+                              v-show="activeName !=='advance'"
                               label="项目特点"
                               prop="desc">
                   <el-row :gutter="5">
@@ -124,6 +152,7 @@
                   </el-row>
                 </el-form-item>
                 <el-row v-if="isEdit"
+                        v-show="activeName !=='advance'"
                         :gutter="5">
                   <el-col :span="24">
                     <el-form-item label="项目管理员"
@@ -145,15 +174,6 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <el-row style="margin: 10px 0;" v-if="isEdit">
-                  <span class="customer" @click="$refs.cusDeliverable.dialogVisible = true">自定义交付物名称
-                  </span>
-                  <el-tooltip effect="dark"
-                      content="自定义镜像名称；自定义 TAR 包名称"
-                      placement="top">
-                      <i class="el-icon-question"></i>
-                   </el-tooltip>
-                </el-row>
               </el-form>
             </div>
 
@@ -172,6 +192,7 @@
   </div>
 </template>
 <script>
+
 import { usersAPI, createProjectAPI, getSingleProjectAPI, updateSingleProjectAPI } from '@api'
 import { mapGetters } from 'vuex'
 import CusDeliverable from './components/cusDeliverable.vue'
@@ -323,6 +344,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.isEdit) {
+            this.$refs.cusDeliverable.saveConfig()
             this.projectForm.custom_image_rule = this.$refs.cusDeliverable.custom_image_rule
             this.projectForm.custom_tar_rule = this.$refs.cusDeliverable.custom_tar_rule
             this.updateSingleProject(this.projectForm.product_name, this.projectForm)
