@@ -21,7 +21,6 @@
         <div class="v-content" v-if="usedChartNameInfo">
           <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
           <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
-            <div class="desc">暂无自定义的 values 文件</div>
             <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
           </div>
           <ImportValues
@@ -337,10 +336,8 @@ export default {
           line-height: 40px;
         }
 
-        .desc {
-          margin-top: 10px;
-          color: #909399;
-          font-size: 14px;
+        .default-values {
+          margin-bottom: 14px;
         }
       }
     }

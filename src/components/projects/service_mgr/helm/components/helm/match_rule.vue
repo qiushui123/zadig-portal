@@ -1,6 +1,9 @@
 <template>
-  <el-drawer title="设置匹配规则" :visible.sync="updateMatchRule" :wrapperClosable="false" class="match-rule-container">
-    <div class="tooltip">设置规则后，系统会根据规则自动匹配服务组件信息，服务组件名为镜像名。</div>
+  <el-drawer title="设置匹配规则" :visible.sync="updateMatchRule" :wrapperClosable="false" class="match-rule-container" size="450px">
+    <ul class="tooltip">
+      <li>系统会解析镜像名为服务组件</li>
+      <li>项目范围内匹配规则全局生效</li>
+    </ul>
     <div class="mr-content" v-loading="pageLoading">
       <div class="mr-title">系统内置规则</div>
       <div class="inner-rule">
@@ -53,10 +56,29 @@
         </el-form>
         <el-button type="text" @click="addMatchRule">添加</el-button>
       </div>
+      <div class="example-rule">
+        <div class="er-title">示例：</div>
+        <div class="er-title">values 文件：</div>
+        <div class="rule border">
+          &nbsp;&nbsp;deploy:
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image:
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repo: library
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: ubuntu
+          <br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tag: 12.04
+        </div>
+        <div class="er-title">自定义规则：</div>
+        <div class="rule">
+          <span class="gray-bg">deploy.image.repo</span>
+          <span>/</span>
+          <span class="gray-bg">deploy.image.name</span>
+          <span>:</span>
+          <span class="gray-bg">deploy.image.tag</span>
+        </div>
+      </div>
     </div>
     <div class="mr-footer">
       <el-button type="primary" :loading="addLoading" @click="updateMatchRules" plain>保存</el-button>
-      <el-tag type="primary" style="margin-left: 10px;">保存规则且重新匹配服务组件</el-tag>
+      <span class="tootip">保存规则且重新匹配服务组件</span>
     </div>
   </el-drawer>
 </template>
@@ -169,10 +191,11 @@ export default {
           this.$message.success(`更新规则成功！`)
           this.updateMatchRule = false
           this.addLoading = false
-          this.serviceName && this.$store.dispatch('queryServiceModule', {
-            projectName: this.projectName,
-            serviceName: this.serviceName
-          })
+          this.serviceName &&
+            this.$store.dispatch('queryServiceModule', {
+              projectName: this.projectName,
+              serviceName: this.serviceName
+            })
         })
         .catch(err => {
           console.log(err)
@@ -198,13 +221,15 @@ export default {
 
   .tooltip {
     margin-bottom: 10px;
+    margin-left: 10px;
     color: #e6a23c;
     font-size: 14px;
     line-height: 1.5;
+    list-style: decimal inside;
   }
 
   .mr-content {
-    margin-bottom: 50px;
+    margin-bottom: 60px;
     color: #606266;
     font-size: 14px;
 
@@ -223,6 +248,33 @@ export default {
       .rule {
         padding-left: 10px;
         line-height: 1.5;
+      }
+    }
+
+    .example-rule {
+      padding: 5px 10px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      box-shadow: 0 0 5px 2px #eee;
+
+      .border {
+        padding: 5px;
+        background: #eee;
+        border-radius: 5px;
+      }
+
+      .er-title {
+        padding: 8px 0;
+      }
+
+      .rule {
+        margin-bottom: 10px;
+        padding-left: 5px;
+        line-height: 1.5;
+
+        .gray-bg {
+          background: #eee;
+        }
       }
     }
 
@@ -258,6 +310,14 @@ export default {
     position: absolute;
     bottom: 10px;
     left: 20px;
+
+    .tootip {
+      margin-bottom: 10px;
+      margin-left: 10px;
+      color: #409eff;
+      font-size: 14px;
+      line-height: 1.5;
+    }
   }
 }
 </style>

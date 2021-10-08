@@ -11,7 +11,7 @@
           1
         </div>
         <p class="pipelines-aside-help__step-list-item-text">
-          导入服务，支持三种方式：从 Git 仓库导入/ Chart 仓库导入/引用模板库
+          新建服务，选择服务配置来源，支持三种方式：Git 仓库/ Chart 仓库/模板库
         </p>
       </li>
       <li class="pipelines-aside-help__step-list-item">
