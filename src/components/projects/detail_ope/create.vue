@@ -482,11 +482,6 @@ export default {
           .el-form-item {
             margin-bottom: 5px;
           }
-
-          .customer {
-            color: #409eff;
-            cursor: pointer;
-          }
         }
 
         .small-title {
