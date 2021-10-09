@@ -625,7 +625,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "user-setting" */ '@/components/profile/home.vue'),
         meta: {
           requiresAuth: true,
-          title: '用户设置'
+          title: '账号设置'
         }
       },
       {
@@ -633,7 +633,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "user-setting" */ '@/components/profile/manage.vue'),
         meta: {
           requiresAuth: true,
-          title: '用户设置'
+          title: '账号设置'
         }
       }
     ]
@@ -843,7 +843,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "mobile" */ '@/mobile/profile.vue'),
         meta: {
           requiresAuth: true,
-          title: '用户设置'
+          title: '账号设置'
         }
       }
     ]
