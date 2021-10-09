@@ -84,7 +84,7 @@
       </div>
     </multipane>
     <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
-    <el-dialog title="新建服务" :visible.sync="dialogVisible" center @close="closeSelectRepo">
+    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible.sync="dialogVisible" center @close="closeSelectRepo">
       <Repo
         ref="repo"
         @triggleAction="changeExpandFileList('clear');clearCommitCache()"

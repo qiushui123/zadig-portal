@@ -73,7 +73,8 @@ export default {
     }
   },
   props: {
-    value: Boolean
+    value: Boolean,
+    currentService: Object
   },
   computed: {
     dialogVisible: {
@@ -83,6 +84,43 @@ export default {
       set: function (value) {
         this.$emit('input', value)
       }
+    }
+  },
+  watch: {
+    value: {
+      handler (val) {
+        if (val && this.currentService) {
+          const createFrom = this.currentService.create_from
+          this.tempData = {
+            serviceName: createFrom.service_name,
+            moduleName: createFrom.template_name
+          }
+          if (createFrom.yaml_data) {
+            const yamlData = createFrom.yaml_data
+            if (yamlData.yaml_source === 'freeEdit') {
+              this.importRepoInfo = {
+                yamlSource: 'freeEdit',
+                valuesYAML: yamlData.yaml_content,
+                gitRepoConfig: null
+              }
+            } else if (yamlData.yaml_source === 'gitRepo') {
+              const gitConfig = yamlData.git_repo_config
+              this.importRepoInfo = {
+                yamlSource: 'gitRepo',
+                valuesYAML: '',
+                gitRepoConfig: {
+                  codehostID: gitConfig.codehost_id,
+                  owner: gitConfig.owner,
+                  repo: gitConfig.repo,
+                  branch: gitConfig.branch,
+                  valuesPaths: yamlData.values_paths
+                }
+              }
+            }
+          }
+        }
+      },
+      immediate: true
     }
   },
   methods: {

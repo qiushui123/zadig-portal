@@ -380,19 +380,35 @@ export default {
   watch: {
     value: {
       handler (value) {
-        const currentService = this.currentService
-        if (value && currentService) {
-          if (currentService.src_path) {
-            this.gitName = 'public'
-          } else {
-            this.gitName = 'private'
+        if (value && this.currentService) {
+          if (this.currentService.source) {
+            const currentService = this.currentService.create_from
+            if (this.currentService.source === 'publicRepo') {
+              this.gitName = 'public'
+              this.source.url = currentService.repo_link
+            } else {
+              this.gitName = 'private'
+              const gitRepoConfig = currentService.git_repo_config
+              this.source.codehostId = gitRepoConfig.codehost_id
+              this.source.branchName = gitRepoConfig.branch
+              this.source.repoName = gitRepoConfig.repo
+              this.source.repoOwner = gitRepoConfig.owner
+            }
+            this.selectPath = [currentService.load_path]
+          } else { // 老数据
+            const currentService = this.currentService
+            if (currentService.src_path) {
+              this.gitName = 'public'
+            } else {
+              this.gitName = 'private'
+            }
+            this.source.codehostId = currentService.codehost_id
+            this.source.branchName = currentService.branch_name
+            this.source.repoName = currentService.repo_name
+            this.source.repoOwner = currentService.repo_owner
+            this.source.url = currentService.src_path
+            this.selectPath = [currentService.load_path]
           }
-          this.source.codehostId = currentService.codehost_id
-          this.source.branchName = currentService.branch_name
-          this.source.repoName = currentService.repo_name
-          this.source.repoOwner = currentService.repo_owner
-          this.source.url = currentService.src_path
-          this.selectPath = [currentService.load_path]
           this.isUpdate = true
         } else {
           this.isUpdate = false

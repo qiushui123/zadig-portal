@@ -11,7 +11,7 @@
       v-show="tabName === 'git'"
       @triggleAction="$emit('triggleAction')"
       @canUpdateEnv="$emit('canUpdateEnv', $event)"
-      :currentService="currentService"
+      :currentService="gitCurrentService"
       @input="$emit('input', $event)"
       :value="value"
       ref="gitRepo"
@@ -20,7 +20,7 @@
     <ChartRepo
       v-show="tabName === 'chart'"
       @canUpdateEnv="$emit('canUpdateEnv', $event)"
-      :currentService="currentService"
+      :currentService="chartCurrentService"
       @input="$emit('input', $event)"
       :value="value"
       ref="chartRepo"
@@ -30,6 +30,7 @@
       v-show="tabName === 'template'"
       @canUpdateEnv="$emit('canUpdateEnv', $event)"
       @input="$emit('input', $event)"
+      :currentService="templateCurrentService"
       :value="value"
       ref="templateRepo"
     ></TemplateRepo>
@@ -42,12 +43,32 @@ import TemplateRepo from './template_repo.vue'
 export default {
   data () {
     return {
-      tabName: 'git'
+      tabName: '',
+      gitCurrentService: null,
+      chartCurrentService: null,
+      templateCurrentService: null
     }
   },
   props: {
     value: Boolean,
     currentService: Object
+  },
+  watch: {
+    currentService: {
+      handler (val) {
+        this.gitCurrentService = null
+        this.chartCurrentService = null
+        this.templateCurrentService = null
+        if (val && val.source && val.source === 'chartTemplate') {
+          this.tabName = 'template'
+          this.templateCurrentService = val
+        } else {
+          this.tabName = 'git'
+          this.gitCurrentService = val
+        }
+      },
+      immediate: true
+    }
   },
   methods: {
     closeSelectRepo () {
