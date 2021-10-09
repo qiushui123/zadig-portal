@@ -87,10 +87,10 @@ export default {
     }
   },
   watch: {
-    value: {
+    currentService: {
       handler (val) {
-        if (val && this.currentService) {
-          const createFrom = this.currentService.create_from
+        if (val) {
+          const createFrom = val.create_from
           this.tempData = {
             serviceName: createFrom.service_name,
             moduleName: createFrom.template_name

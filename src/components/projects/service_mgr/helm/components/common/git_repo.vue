@@ -378,36 +378,35 @@ export default {
     }
   },
   watch: {
-    value: {
+    currentService: {
       handler (value) {
-        if (value && this.currentService) {
-          if (this.currentService.source) {
-            const currentService = this.currentService.create_from
-            if (this.currentService.source === 'publicRepo') {
+        if (value) {
+          if (value.source) {
+            const createFrom = value.create_from
+            if (value.source === 'publicRepo') {
               this.gitName = 'public'
-              this.source.url = currentService.repo_link
+              this.source.url = createFrom.repo_link
             } else {
               this.gitName = 'private'
-              const gitRepoConfig = currentService.git_repo_config
+              const gitRepoConfig = createFrom.git_repo_config
               this.source.codehostId = gitRepoConfig.codehost_id
               this.source.branchName = gitRepoConfig.branch
               this.source.repoName = gitRepoConfig.repo
               this.source.repoOwner = gitRepoConfig.owner
             }
-            this.selectPath = [currentService.load_path]
+            this.selectPath = [createFrom.load_path]
           } else { // 老数据
-            const currentService = this.currentService
-            if (currentService.src_path) {
+            if (value.src_path) {
               this.gitName = 'public'
             } else {
               this.gitName = 'private'
             }
-            this.source.codehostId = currentService.codehost_id
-            this.source.branchName = currentService.branch_name
-            this.source.repoName = currentService.repo_name
-            this.source.repoOwner = currentService.repo_owner
-            this.source.url = currentService.src_path
-            this.selectPath = [currentService.load_path]
+            this.source.codehostId = value.codehost_id
+            this.source.branchName = value.branch_name
+            this.source.repoName = value.repo_name
+            this.source.repoOwner = value.repo_owner
+            this.source.url = value.src_path
+            this.selectPath = [value.load_path]
           }
           this.isUpdate = true
         } else {
