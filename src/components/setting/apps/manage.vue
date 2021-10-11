@@ -55,12 +55,12 @@
           </el-form-item>
           <el-form-item label="安装脚本"
                         prop="scripts">
-            <AceEditor v-model="createApp.scripts"
+            <Editor v-model="createApp.scripts"
                     lang="sh"
                     theme="monokai"
                     :options="option"
                     width="100%"
-                    height="220"></AceEditor>
+                    height="220"></Editor>
           </el-form-item>
         </el-form>
         <div slot="footer"
@@ -116,11 +116,11 @@
           </el-form-item>
           <el-form-item label="安装脚本"
                         prop="scripts">
-            <AceEditor v-model="swapApp.scripts"
+            <Editor v-model="swapApp.scripts"
                     lang="sh"
                     theme="monokai"
                     width="100%"
-                    height="220"></AceEditor>
+                    height="220"></Editor>
           </el-form-item>
         </el-form>
         <div slot="footer"
@@ -231,7 +231,7 @@
 
 <script>
 
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import { getAllAppsAPI, createAppAPI, updateAppAPI, deleteAppAPI, getProxyConfigAPI, updateProxyConfigAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
@@ -461,7 +461,7 @@ export default {
     this.getApps()
   },
   components: {
-    AceEditor
+    Editor
   }
 }
 </script>

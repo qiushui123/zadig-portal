@@ -447,11 +447,11 @@
             <el-row>
               <el-col  class="deploy-script"  :span="24">
                 <Resize :height="'150px'">
-                  <AceEditor v-model="buildConfig.scripts"
+                  <Editor v-model="buildConfig.scripts"
                         lang="sh"
                         theme="xcode"
                         width="100%"
-                        height="100%"></AceEditor>
+                        height="100%"></Editor>
                 </Resize>
               </el-col>
             </el-row>
@@ -534,11 +534,11 @@
               <div class="divider item"></div>
               <el-row>
                 <el-col :span="24">
-                  <AceEditor v-model="buildConfig.post_build.scripts"
+                  <Editor v-model="buildConfig.post_build.scripts"
                           lang="sh"
                           theme="xcode"
                           width="100%"
-                          height="300px"></AceEditor>
+                          height="300px"></Editor>
                 </el-col>
               </el-row>
             </div>
@@ -567,7 +567,7 @@
 <script>
 import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
 import qs from 'qs'
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {
@@ -1044,7 +1044,7 @@ export default {
     }
   },
   components: {
-    AceEditor,
+    Editor,
     Resize
   }
 

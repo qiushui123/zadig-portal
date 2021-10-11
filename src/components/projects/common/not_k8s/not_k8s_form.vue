@@ -343,11 +343,11 @@
           <el-col :span="24"
                   class="deploy-script">
             <Resize :height="'150px'">
-              <AceEditor v-model="buildConfig.scripts"
+              <Editor v-model="buildConfig.scripts"
                     lang="sh"
                     theme="xcode"
                     width="100%"
-                    height="100%"></AceEditor>
+                    height="100%"></Editor>
             </Resize>
           </el-col>
         </el-row>
@@ -540,12 +540,12 @@
           <el-row>
             <el-col :span="24"
                     class="deploy-script">
-              <AceEditor v-model="buildConfig.pm_deploy_scripts"
+              <Editor v-model="buildConfig.pm_deploy_scripts"
                       lang="sh"
                       theme="xcode"
                       width="100%"
                       height="300px">
-              </AceEditor>
+              </Editor>
             </el-col>
           </el-row>
         </el-form>
@@ -721,7 +721,7 @@
 </template>
 <script>
 import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI } from '@api'
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
 import AddHost from './add_host.vue'
@@ -1560,7 +1560,7 @@ export default {
     this.loadPage()
   },
   components: {
-    AceEditor,
+    Editor,
     Resize,
     AddHost
   }

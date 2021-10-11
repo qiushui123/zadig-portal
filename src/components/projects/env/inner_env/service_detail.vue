@@ -373,14 +373,14 @@
                          size="small"
                          class="at-right">复制</el-button>
             </div>
-            <AceEditor v-show="obj.expanded"
+            <Editor v-show="obj.expanded"
                     :value="obj.readableText"
                     :options="exportModal.editorOption"
                     @init="editorInit($event, obj)"
                     lang="yaml"
                     theme="tomorrow_night"
                     width="100%"
-                    height="800"></AceEditor>
+                    height="800"></Editor>
           </div>
         </div>
       </template>
@@ -427,7 +427,7 @@
 import containerLog from '../service_detail/container_log.vue'
 import { restartPodAPI, restartServiceAPI, scaleServiceAPI, scaleEventAPI, podEventAPI, exportYamlAPI, imagesAPI, updateServiceImageAPI, getServiceInfo } from '@api'
 import moment from 'moment'
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import bus from '@utils/event_bus'
 import { fullScreen } from '@/utilities/full_screen'
 export default {
@@ -804,7 +804,7 @@ export default {
   },
   components: {
     containerLog,
-    AceEditor
+    Editor
   }
 }
 </script>

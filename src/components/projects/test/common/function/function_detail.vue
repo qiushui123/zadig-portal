@@ -351,11 +351,11 @@
             <div>
               <el-row>
                 <el-col :span="24">
-                  <AceEditor v-model="test.scripts"
+                  <Editor v-model="test.scripts"
                           lang="sh"
                           theme="xcode"
                           width="100%"
-                          height="200px"></AceEditor>
+                          height="200px"></Editor>
                 </el-col>
               </el-row>
             </div>
@@ -395,7 +395,7 @@
 import testTrigger from '@/components/common/test_trigger.vue'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import {
   getAllAppsAPI, getImgListAPI, productTemplatesAPI, getCodeSourceAPI, createTestAPI, updateTestAPI, singleTestAPI
 } from '@api'
@@ -767,7 +767,7 @@ export default {
     }
   },
   components: {
-    AceEditor,
+    Editor,
     testTrigger
   }
 }

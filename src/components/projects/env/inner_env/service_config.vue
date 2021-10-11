@@ -27,12 +27,12 @@
                    plain
                    circle></el-button>
       </div>
-      <AceEditor v-model="fullScreenEditObj.value"
+      <Editor v-model="fullScreenEditObj.value"
               lang="sh"
               theme="xcode"
               :width="editorProperty.width"
               :height="editorProperty.height"
-      ></AceEditor>
+      ></Editor>
       <div class="show-diff"
            v-if="updateValue">
         <h1>修改期间后台配置变动</h1>
@@ -158,7 +158,7 @@
 </template>
 
 <script>
-import AceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import moment from 'moment'
 import qs from 'qs'
 import bus from '@utils/event_bus'
@@ -467,7 +467,7 @@ export default {
       })
   },
   components: {
-    AceEditor
+    Editor
   }
 }
 </script>
