@@ -445,12 +445,7 @@
             <el-col class="deploy-script"
                     :span="24">
                 <Resize :resize="'both'">
-                  <editor v-model="buildConfig.scripts"
-                          lang="sh"
-                          theme="xcode"
-                          :options="editorOption"
-                          width="100%"
-                          height="100%"></editor>
+                  <AceEditor v-model="buildConfig.scripts"></AceEditor>
                 </Resize>
             </el-col>
           </el-row>
@@ -541,12 +536,7 @@
             <div class="divider item"></div>
             <el-row>
               <el-col :span="24">
-                <editor v-model="buildConfig.post_build.scripts"
-                        lang="sh"
-                        theme="xcode"
-                        :options="editorOption"
-                        width="100%"
-                        height="300px"></editor>
+                <AceEditor v-model="buildConfig.post_build.scripts" height="300px"></AceEditor>
               </el-col>
             </el-row>
           </div>
@@ -598,10 +588,7 @@
 </template>
 <script>
 import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/theme/xcode'
-import 'brace/mode/sh'
-import 'brace/ext/searchbox'
+import AceEditor from '@/common/aceEditor'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
@@ -1065,7 +1052,7 @@ export default {
     })
   },
   components: {
-    editor: aceEditor,
+    AceEditor,
     Resize
   }
 
