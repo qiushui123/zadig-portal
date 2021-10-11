@@ -98,7 +98,7 @@
                     </el-tag>
                   </span>
                 </el-option>
-                <el-option>
+                <el-option value="NEWCUSTOM">
                   <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
                 </el-option>
               </el-select>
