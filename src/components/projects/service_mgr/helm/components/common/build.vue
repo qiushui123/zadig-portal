@@ -823,6 +823,8 @@ import {
   queryJenkinsJob, queryJenkinsParams
 } from '@api'
 import aceEditor from 'vue2-ace-bind'
+import 'brace/theme/xcode'
+import 'brace/mode/sh'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {
