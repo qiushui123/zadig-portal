@@ -599,6 +599,8 @@
 <script>
 import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
 import aceEditor from 'vue2-ace-bind'
+import 'brace/theme/xcode'
+import 'brace/mode/sh'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
