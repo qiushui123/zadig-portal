@@ -10377,8 +10377,8 @@ vue-virtual-scroll-list@2.3.2:
 
 vue2-ace-bind@0.0.6:
   version "0.0.6"
-  resolved "https://registry.yarnpkg.com/vue2-ace-bind/-/vue2-ace-bind-0.0.6.tgz#b55d2dc51531900d8bac77233d8fb268db9c5a4a"
-  integrity sha512-uZugK0DwtlT49SqMEgKev8bfKN8sC09JrQUamGSM0px8QsGd1Bx/HqVuJNkvB3hWjxWiWtgUzGqwowjOjOep1A==
+  resolved "https://registry.npmmirror.com/vue2-ace-bind/download/vue2-ace-bind-0.0.6.tgz?cache=0&sync_timestamp=1633955214742&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fvue2-ace-bind%2Fdownload%2Fvue2-ace-bind-0.0.6.tgz#b55d2dc51531900d8bac77233d8fb268db9c5a4a"
+  integrity sha1-tV0txRUxkA2LrHcjPY+yaNucWko=
   dependencies:
     brace "^0.11.1"
 
