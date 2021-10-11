@@ -91,6 +91,8 @@
                          placeholder="请选择"
                          size="small"
                          filterable
+                         remote
+                         :remote-method="(key)=> getBranchInfoById(repo_index,config.repos[repo_index].codehost_id,config.repos[repo_index].repo_owner,config.repos[repo_index].repo_name,key)"
                          allow-create
                          :loading="codeInfo[repo_index].loading.branch"
                          clearable>
@@ -358,19 +360,19 @@ export default {
       this.config.repos.splice(index, 1)
     },
     searchNamespace (index, query) {
-      const id = this.config.repos[index].codehost_id
-      const codehostType = (this.allCodeHosts.find(item => { return item.id === id })).type
-      if (codehostType === 'github' && query !== '') {
-        const items = this.$utils.filterObjectArrayByKey('name', query, this.codeInfo[index].origin_repo_owners)
-        this.$set(this.codeInfo[index], 'repo_owners', items || [])
-        if (this.allCodeHosts && this.allCodeHosts.length > 1) {
-          this.config.repos[index].repo_owner = ''
-          this.config.repos[index].repo_name = ''
-          this.config.repos[index].branch = ''
-        }
-      } else {
-        this.getRepoOwnerById(index, id, query)
-      }
+      // const id = this.config.repos[index].codehost_id
+      // const codehostType = (this.allCodeHosts.find(item => { return item.id === id })).type
+      // if (codehostType === 'github' && query !== '') {
+      //   const items = this.$utils.filterObjectArrayByKey('name', query, this.codeInfo[index].origin_repo_owners)
+      //   this.$set(this.codeInfo[index], 'repo_owners', items || [])
+      //   if (this.allCodeHosts && this.allCodeHosts.length > 1) {
+      //     this.config.repos[index].repo_owner = ''
+      //     this.config.repos[index].repo_name = ''
+      //     this.config.repos[index].branch = ''
+      //   }
+      // } else {
+      this.getRepoOwnerById(index, id, query)
+      // }
     },
     getRepoNameById (index, id, repo_owner, key = '') {
       const item = (this.codeInfo[index].repo_owners.find(item => { return item.path === repo_owner }))
@@ -392,14 +394,14 @@ export default {
       this.config.repos[index].repo_name = ''
       this.config.repos[index].branch = ''
     },
-    getBranchInfoById (index, id, repo_owner, repo_name) {
+    getBranchInfoById (index, id, repo_owner, repo_name, key = '') {
       const repoItem = (this.codeInfo[index].repos.find(item => { return item.name === repo_name }))
       const repoId = repoItem.repo_id ? repoItem.repo_id : ''
       const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
       if (repo_owner && repo_name) {
         this.codeInfo[index].branches = []
         this.setLoadingState(index, 'branch', true)
-        getBranchInfoByIdAPI(id, repo_owner, repo_name, repoUUID).then((res) => {
+        getBranchInfoByIdAPI(id, repo_owner, repo_name, repoUUID, key).then((res) => {
           this.$set(this.codeInfo[index], 'branches', res || [])
           this.setLoadingState(index, 'branch', false)
         })
