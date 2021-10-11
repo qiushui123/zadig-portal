@@ -200,7 +200,7 @@
                   <el-popover
                     placement="left"
                     width="400"
-                    trigger="click">
+                    trigger="hover">
                     <el-table :data="row.envs">
                       <el-table-column property="key" label="Key"></el-table-column>
                       <el-table-column property="value" label="Value"></el-table-column>
