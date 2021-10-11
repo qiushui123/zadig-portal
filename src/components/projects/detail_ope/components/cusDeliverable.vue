@@ -13,7 +13,7 @@
       <div class="title">自定义 TAR 包名称</div>
       <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
           <div class="label">{{tar[key].label}}</div>
-          <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
+          <el-input class="input3" oninput="value=value.replace(/[^\a-\z\A-\Z0-9\\_\.\-\$\{}]/g,'')" v-model="tar[key].value" size="small" :placeholder="tar[key].placeholder" clearable></el-input>
           <span class="reset" @click="resetFiled('tar',key)">重置</span>
       </div>
     </div>
@@ -22,7 +22,7 @@
 <script>
 /* eslint-disable no-template-curly-in-string */
 const defaultValue = '${SERVICE}'
-const placeholder = ['${TIMESTAMP}-${TASK_ID}-${REPO_PR}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}', '${TIMESTAMP}-${TASK_ID}-${REPO_PR}-${REPO_PR}', '${TIMESTAMP}-${REPO_TAG}']
+const placeholder = ['${TIMESTAMP}-${TASK_ID}-${REPO_PR}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}-${REPO_PR}', '${TIMESTAMP}-${REPO_TAG}']
 export default {
   name: 'Deliverable',
   props: {

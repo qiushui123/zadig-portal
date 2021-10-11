@@ -62,15 +62,15 @@
                                   placement="top">
                           <div slot="content">
                             镜像和 TAR 包规则可以通过变量和常量组装成默认的镜像名称：<br/>
-                              1. $TIMESTAMP: 时间戳<br/>
-                              2. $TASK_ID: 工作流任务 ID<br/>
-                              3. $REPO_BRANCH: 代码分支名称<br/>
-                              4. $REPO_PR: 代码 PR ID<br/>
-                              5. $REPO_TAG: 代码 TAG<br/>
-                              6. $REPO_COMMIT_ID: 代码 Commit ID<br/>
-                              7. $PROJECT: 项目名称<br/>
-                              8. $SERVICE: 服务名称<br/>
-                              9. $ENV_NAME: 环境名称<br/>
+                              1. 时间戳: ${TIMESTAMP}<br/>
+                              2. 工作流任务 ID: ${TASK_ID}<br/>
+                              3. 代码分支名称: ${REPO_BRANCH}<br/>
+                              4. 代码 PR ID: ${REPO_PR}<br/>
+                              5. 代码 TAG: ${REPO_TAG}<br/>
+                              6. 代码 Commit ID: ${REPO_COMMIT_ID}<br/>
+                              7. 项目名称: ${PROJECT}<br/>
+                              8. 服务名称: ${SERVICE}<br/>
+                              9. 环境名称: ${ENV_NAME}<br/>
                               10. 符合 Tag 命名规范要求的字符串常量<br/>
                               注意：Tag 中的字符只能是大小写字母、数字、中划线、下划线和点，即 [a-zA-Z0-9_.-]，首个字符不能是.或-。Tag 不能超过 127个字符
                             </div>
