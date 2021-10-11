@@ -572,6 +572,7 @@ import qs from 'qs'
 import aceEditor from 'vue2-ace-bind'
 import 'brace/theme/xcode'
 import 'brace/mode/sh'
+import 'brace/ext/searchbox'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {

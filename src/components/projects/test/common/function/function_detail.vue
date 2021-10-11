@@ -397,6 +397,9 @@ import testTrigger from '@/components/common/test_trigger.vue'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import aceEditor from 'vue2-ace-bind'
+import 'brace/theme/xcode'
+import 'brace/mode/sh'
+import 'brace/ext/searchbox'
 import {
   getAllAppsAPI, getImgListAPI, productTemplatesAPI, getCodeSourceAPI, createTestAPI, updateTestAPI, singleTestAPI
 } from '@api'

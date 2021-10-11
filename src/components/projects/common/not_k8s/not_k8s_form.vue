@@ -726,6 +726,7 @@ import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigD
 import aceEditor from 'vue2-ace-bind'
 import 'brace/theme/xcode'
 import 'brace/mode/sh'
+import 'brace/ext/searchbox'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
 import AddHost from './add_host.vue'

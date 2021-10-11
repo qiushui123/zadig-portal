@@ -601,6 +601,7 @@ import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI
 import aceEditor from 'vue2-ace-bind'
 import 'brace/theme/xcode'
 import 'brace/mode/sh'
+import 'brace/ext/searchbox'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
