@@ -27,12 +27,12 @@
                    plain
                    circle></el-button>
       </div>
-      <editor v-model="fullScreenEditObj.value"
+      <AceEditor v-model="fullScreenEditObj.value"
               lang="sh"
               theme="xcode"
               :width="editorProperty.width"
               :height="editorProperty.height"
-              :options="option"></editor>
+      ></AceEditor>
       <div class="show-diff"
            v-if="updateValue">
         <h1>修改期间后台配置变动</h1>
@@ -158,13 +158,7 @@
 </template>
 
 <script>
-import aceEditor from 'vue2-ace-bind'
-import 'brace/mode/javascript'
-import 'brace/mode/sh'
-import 'brace/theme/chrome'
-import 'brace/theme/xcode'
-import 'brace/theme/terminal'
-import 'brace/ext/searchbox'
+import AceEditor from 'vue2-ace-bind'
 import moment from 'moment'
 import qs from 'qs'
 import bus from '@utils/event_bus'
@@ -188,14 +182,6 @@ export default {
         keyIndex: 0
       },
       dialogEditorVisible: false,
-      option: {
-        enableEmmet: true,
-        showLineNumbers: false,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
-      },
       editorProperty: {
         width: '100%',
         height: this.$utils.getViewPort().height - 60
@@ -481,7 +467,7 @@ export default {
       })
   },
   components: {
-    editor: aceEditor
+    AceEditor
   }
 }
 </script>

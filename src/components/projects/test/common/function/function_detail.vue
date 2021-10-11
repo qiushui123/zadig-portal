@@ -351,12 +351,11 @@
             <div>
               <el-row>
                 <el-col :span="24">
-                  <editor v-model="test.scripts"
+                  <AceEditor v-model="test.scripts"
                           lang="sh"
                           theme="xcode"
-                          :options="editorOption"
                           width="100%"
-                          height="200px"></editor>
+                          height="200px"></AceEditor>
                 </el-col>
               </el-row>
             </div>
@@ -396,10 +395,7 @@
 import testTrigger from '@/components/common/test_trigger.vue'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/theme/xcode'
-import 'brace/mode/sh'
-import 'brace/ext/searchbox'
+import AceEditor from 'vue2-ace-bind'
 import {
   getAllAppsAPI, getImgListAPI, productTemplatesAPI, getCodeSourceAPI, createTestAPI, updateTestAPI, singleTestAPI
 } from '@api'
@@ -458,14 +454,6 @@ export default {
           }
         },
         test_type: 'function'
-      },
-      editorOption: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
       },
       rules: {
         name: [
@@ -779,7 +767,7 @@ export default {
     }
   },
   components: {
-    editor: aceEditor,
+    AceEditor,
     testTrigger
   }
 }

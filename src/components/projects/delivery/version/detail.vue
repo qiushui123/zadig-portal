@@ -26,14 +26,14 @@
                          size="small"
                          class="at-right">复制</el-button>
             </div>
-            <editor v-show="obj.expanded"
+            <AceEditor v-show="obj.expanded"
                     :value="obj.readableText"
                     :options="exportModal.editorOption"
                     @init="editorInit($event, obj)"
                     lang="yaml"
                     theme="tomorrow_night"
                     width="100%"
-                    height="800"></editor>
+                    height="800"></AceEditor>
           </div>
         </div>
       </template>
@@ -398,12 +398,8 @@
 import { getVersionListAPI } from '@api'
 import { uniqBy } from 'lodash'
 import bus from '@utils/event_bus'
-import aceEditor from 'vue2-ace-bind'
+import AceEditor from 'vue2-ace-bind'
 import runWorkflowFromVersion from './container/run_workflow.vue'
-import 'brace/mode/yaml'
-import 'brace/theme/xcode'
-import 'brace/theme/tomorrow_night'
-import 'brace/ext/searchbox'
 export default {
   data () {
     return {
@@ -613,7 +609,7 @@ export default {
     this.getVersionDetail()
   },
   components: {
-    editor: aceEditor,
+    AceEditor,
     runWorkflowFromVersion
   }
 }

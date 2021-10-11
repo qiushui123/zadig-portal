@@ -447,12 +447,11 @@
             <el-row>
               <el-col  class="deploy-script"  :span="24">
                 <Resize :height="'150px'">
-                  <editor v-model="buildConfig.scripts"
+                  <AceEditor v-model="buildConfig.scripts"
                         lang="sh"
                         theme="xcode"
-                        :options="editorOption"
                         width="100%"
-                        height="100%"></editor>
+                        height="100%"></AceEditor>
                 </Resize>
               </el-col>
             </el-row>
@@ -535,12 +534,11 @@
               <div class="divider item"></div>
               <el-row>
                 <el-col :span="24">
-                  <editor v-model="buildConfig.post_build.scripts"
+                  <AceEditor v-model="buildConfig.post_build.scripts"
                           lang="sh"
                           theme="xcode"
-                          :options="editorOption"
                           width="100%"
-                          height="300px"></editor>
+                          height="300px"></AceEditor>
                 </el-col>
               </el-row>
             </div>
@@ -569,10 +567,7 @@
 <script>
 import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
 import qs from 'qs'
-import aceEditor from 'vue2-ace-bind'
-import 'brace/theme/xcode'
-import 'brace/mode/sh'
-import 'brace/ext/searchbox'
+import AceEditor from 'vue2-ace-bind'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {
@@ -635,14 +630,6 @@ export default {
         post_build: {
         },
         targets: []
-      },
-      editorOption: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
       },
       stcov_enabled: false,
       docker_enabled: false,
@@ -1057,7 +1044,7 @@ export default {
     }
   },
   components: {
-    editor: aceEditor,
+    AceEditor,
     Resize
   }
 
