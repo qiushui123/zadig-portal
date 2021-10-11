@@ -54,17 +54,20 @@ export default {
     currentService: Object
   },
   watch: {
-    currentService: {
+    value: {
       handler (val) {
         this.gitCurrentService = null
         this.chartCurrentService = null
         this.templateCurrentService = null
-        if (val && val.source && val.source === 'chartTemplate') {
-          this.tabName = 'template'
-          this.templateCurrentService = val
-        } else {
-          this.tabName = 'git'
-          this.gitCurrentService = val
+        if (val) {
+          const cs = this.currentService
+          if (cs && cs.source && cs.source === 'chartTemplate') {
+            this.tabName = 'template'
+            this.templateCurrentService = cs
+          } else {
+            this.tabName = 'git'
+            this.gitCurrentService = cs
+          }
         }
       },
       immediate: true
