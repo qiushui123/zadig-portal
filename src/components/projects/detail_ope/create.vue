@@ -13,7 +13,7 @@
             <div class="project-settings__inputs-container">
               <el-tabs style="width: 100%;" v-model="activeName">
                 <el-tab-pane label="基本信息" name="base"></el-tab-pane>
-                <el-tab-pane label="高级配置" name="advance"></el-tab-pane>
+                <el-tab-pane label="高级配置" v-if="isEdit" name="advance"></el-tab-pane>
               </el-tabs>
               <el-form :model="projectForm"
                        :rules="rules"

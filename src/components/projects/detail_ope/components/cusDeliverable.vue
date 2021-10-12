@@ -60,23 +60,23 @@ export default {
       },
       tar: {
         pr: {
-          label: 'PR 生成镜像规则',
+          label: 'PR 生成 TAR 包规则',
           value: defaultValue + '-' + placeholder[0],
           placeholder: defaultValue + '-' + placeholder[0]
         },
         branch: {
-          label: 'BRNACH 生成镜像规则',
+          label: 'BRNACH 生成 TAR 包规则',
           service: defaultValue,
           value: defaultValue + '-' + placeholder[1],
           placeholder: defaultValue + '-' + placeholder[1]
         },
         prBranch: {
-          label: 'PR + BRANCH 生成镜像规则',
+          label: 'PR + BRANCH 生成 TAR 包规则',
           value: defaultValue + '-' + placeholder[2],
           placeholder: defaultValue + '-' + placeholder[2]
         },
         tag: {
-          label: 'TAG 生成镜像规则',
+          label: 'TAG 生成 TAR 包规则',
           value: defaultValue + '-' + placeholder[3],
           placeholder: defaultValue + '-' + placeholder[3]
         }
