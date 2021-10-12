@@ -649,7 +649,7 @@ export function updateCodeSourceAPI (code_source_id, payload) {
 }
 
 export function getRepoOwnerByIdAPI (id, key = '') {
-  return http.get(`/api/aslan/code/codehost/${id}/namespaces?page=1&perPage=100&key=${key}`)
+  return http.get(`/api/aslan/code/codehost/${id}/namespaces`)
 }
 
 export function getRepoNameByIdAPI (id, type, repo_owner, key = '', project_uuid = '') {

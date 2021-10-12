@@ -360,19 +360,19 @@ export default {
       this.config.repos.splice(index, 1)
     },
     searchNamespace (index, query) {
-      // const id = this.config.repos[index].codehost_id
-      // const codehostType = (this.allCodeHosts.find(item => { return item.id === id })).type
-      // if (codehostType === 'github' && query !== '') {
-      //   const items = this.$utils.filterObjectArrayByKey('name', query, this.codeInfo[index].origin_repo_owners)
-      //   this.$set(this.codeInfo[index], 'repo_owners', items || [])
-      //   if (this.allCodeHosts && this.allCodeHosts.length > 1) {
-      //     this.config.repos[index].repo_owner = ''
-      //     this.config.repos[index].repo_name = ''
-      //     this.config.repos[index].branch = ''
-      //   }
-      // } else {
-      this.getRepoOwnerById(index, id, query)
-      // }
+      const id = this.config.repos[index].codehost_id
+      const codehostType = (this.allCodeHosts.find(item => { return item.id === id })).type
+      if (codehostType === 'github' && query !== '') {
+        const items = this.$utils.filterObjectArrayByKey('name', query, this.codeInfo[index].origin_repo_owners)
+        this.$set(this.codeInfo[index], 'repo_owners', items || [])
+        if (this.allCodeHosts && this.allCodeHosts.length > 1) {
+          this.config.repos[index].repo_owner = ''
+          this.config.repos[index].repo_name = ''
+          this.config.repos[index].branch = ''
+        }
+      } else {
+        this.getRepoOwnerById(index, id, query)
+      }
     },
     getRepoNameById (index, id, repo_owner, key = '') {
       const item = (this.codeInfo[index].repo_owners.find(item => { return item.path === repo_owner }))
