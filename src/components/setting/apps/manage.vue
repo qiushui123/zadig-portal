@@ -55,12 +55,12 @@
           </el-form-item>
           <el-form-item label="安装脚本"
                         prop="scripts">
-            <editor v-model="createApp.scripts"
+            <Editor v-model="createApp.scripts"
                     lang="sh"
                     theme="monokai"
                     :options="option"
                     width="100%"
-                    height="220"></editor>
+                    height="220"></Editor>
           </el-form-item>
         </el-form>
         <div slot="footer"
@@ -116,12 +116,11 @@
           </el-form-item>
           <el-form-item label="安装脚本"
                         prop="scripts">
-            <editor v-model="swapApp.scripts"
+            <Editor v-model="swapApp.scripts"
                     lang="sh"
                     theme="monokai"
-                    :options="option"
                     width="100%"
-                    height="220"></editor>
+                    height="220"></Editor>
           </el-form-item>
         </el-form>
         <div slot="footer"
@@ -232,12 +231,7 @@
 
 <script>
 
-import aceEditor from 'vue2-ace-bind'
-import 'brace/mode/sh'
-import 'brace/theme/xcode'
-import 'brace/theme/terminal'
-import 'brace/theme/monokai'
-import 'brace/ext/searchbox'
+import Editor from 'vue2-ace-bind'
 import { getAllAppsAPI, createAppAPI, updateAppAPI, deleteAppAPI, getProxyConfigAPI, updateProxyConfigAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
@@ -278,14 +272,6 @@ export default {
       dialogAppDelVisible: false,
       loading: true,
       availableApps: [],
-      option: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
-      },
       showPopper: {},
       rules: {
         name: [{ required: true, message: '请填写应用名称', trigger: 'blur' }],
@@ -475,7 +461,7 @@ export default {
     this.getApps()
   },
   components: {
-    editor: aceEditor
+    Editor
   }
 }
 </script>

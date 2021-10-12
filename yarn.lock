@@ -10375,10 +10375,10 @@ vue-virtual-scroll-list@2.3.2:
   resolved "https://registry.npm.taobao.org/vue-virtual-scroll-list/download/vue-virtual-scroll-list-2.3.2.tgz#20dcdab58cbba4ca8b466ba1c8f318af358d647c"
   integrity sha1-INzatYy7pMqLRmuhyPMYrzWNZHw=
 
-vue2-ace-bind@0.0.5:
-  version "0.0.5"
-  resolved "https://registry.npm.taobao.org/vue2-ace-bind/download/vue2-ace-bind-0.0.5.tgz#d35dd990b8f1f971d07989e7af2dfe7340c315a4"
-  integrity sha1-013ZkLjx+XHQeYnnry3+c0DDFaQ=
+vue2-ace-bind@0.0.6:
+  version "0.0.6"
+  resolved "https://registry.npmmirror.com/vue2-ace-bind/download/vue2-ace-bind-0.0.6.tgz?cache=0&sync_timestamp=1633955214742&other_urls=https%3A%2F%2Fregistry.npmmirror.com%2Fvue2-ace-bind%2Fdownload%2Fvue2-ace-bind-0.0.6.tgz#b55d2dc51531900d8bac77233d8fb268db9c5a4a"
+  integrity sha1-tV0txRUxkA2LrHcjPY+yaNucWko=
   dependencies:
     brace "^0.11.1"
 
