@@ -61,7 +61,7 @@
                         <el-tooltip effect="dark"
                                   placement="top">
                           <div slot="content">
-                            镜像和 TAR 包规则可以通过变量和常量组装成默认的镜像名称：<br/>
+                            镜像和 TAR 包规则可以通过变量和常量组装生成：<br/>
                               1. 时间戳: ${TIMESTAMP}<br/>
                               2. 工作流任务 ID: ${TASK_ID}<br/>
                               3. 代码分支名称: ${REPO_BRANCH}<br/>
