@@ -29,7 +29,7 @@
       <van-tabbar-item replace
                        name="profile"
                        to="/mobile/profile"
-                       icon="user-circle-o">用户设置</van-tabbar-item>
+                       icon="user-circle-o">账号设置</van-tabbar-item>
     </van-tabbar>
 
   </div>

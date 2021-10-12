@@ -217,7 +217,7 @@ export default {
           category_name: '设置',
           items: [
             {
-              name: '用户设置',
+              name: '账号设置',
               icon: 'iconfont iconfenzucopy',
               url: 'profile'
             },

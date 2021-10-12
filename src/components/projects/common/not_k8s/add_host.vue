@@ -163,7 +163,7 @@ export default {
         .then(async () => {
           const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
-          const res = await createHostAPI(payload)
+          const res = await createHostAPI(payload).catch((err) => { console.log(err) })
           if (res) {
             this.$message({
               type: 'success',
@@ -182,7 +182,7 @@ export default {
           const payload = cloneDeep(this.host)
           payload.private_key = window.btoa(payload.private_key)
           delete payload.origin_private_key
-          const res = await updateHostAPI(id, payload)
+          const res = await updateHostAPI(id, payload).catch((err) => { console.log(err) })
           if (res) {
             this.$message({
               type: 'success',
