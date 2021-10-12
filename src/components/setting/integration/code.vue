@@ -65,28 +65,26 @@
                        value="codehub"></el-option>
             <el-option label="Gerrit"
                        value="gerrit"></el-option>
-            <el-option label="ilyshin"
-                       value="ilyshin"></el-option>
           </el-select>
         </el-form-item>
-        <template v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'||codeEdit.type==='github'">
-          <el-form-item v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'"
+        <template v-if="codeAdd.type==='gitlab'||codeEdit.type==='github'">
+          <el-form-item v-if="codeAdd.type==='gitlab'"
                         label="GitLab 服务 URL"
                         prop="address">
             <el-input v-model="codeEdit.address"
                       placeholder="GitLab 服务 URL"
                       auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item :label="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
+          <el-form-item :label="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
                         prop="applicationId">
             <el-input v-model="codeEdit.applicationId"
-                      :placeholder="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
+                      :placeholder="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
                       auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item :label="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
+          <el-form-item :label="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
                         prop="clientSecret">
             <el-input v-model="codeEdit.clientSecret"
-                      :placeholder="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
+                      :placeholder="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item v-if="codeEdit.type==='github'"
@@ -245,24 +243,24 @@
                        value="gerrit"></el-option>
           </el-select>
         </el-form-item>
-        <template v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin' || codeAdd.type ==='github'">
-          <el-form-item v-if="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'"
+        <template v-if="codeAdd.type==='gitlab' || codeAdd.type ==='github'">
+          <el-form-item v-if="codeAdd.type==='gitlab'"
                         :label="codeAdd.type==='gitlab'?'GitLab 服务 URL':'服务 URL'"
                         prop="address">
             <el-input v-model="codeAdd.address"
                       :placeholder="codeAdd.type==='gitlab'?'GitLab 服务 URL':'服务 URL'"
                       auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item :label="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
+          <el-form-item :label="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
                         prop="applicationId">
             <el-input v-model="codeAdd.applicationId"
-                      :placeholder="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Application ID':'Client ID'"
+                      :placeholder="codeAdd.type==='gitlab'?'Application ID':'Client ID'"
                       auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item :label="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
+          <el-form-item :label="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
                         prop="clientSecret">
             <el-input v-model="codeAdd.clientSecret"
-                      :placeholder="codeAdd.type==='gitlab'||codeAdd.type==='ilyshin'?'Secret':'Client Secret'"
+                      :placeholder="codeAdd.type==='gitlab'?'Secret':'Client Secret'"
                       auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item v-if="codeAdd.type==='github'"
@@ -382,7 +380,7 @@
           <el-table-column label="代码源">
             <template slot-scope="scope">
               <span
-                    v-if="scope.row.type==='gitlab'||scope.row.type==='gerrit'||scope.row.type==='codehub'|| scope.row.type==='ilyshin'">{{scope.row.type}}</span>
+                    v-if="scope.row.type==='gitlab'||scope.row.type==='gerrit'||scope.row.type==='codehub'">{{scope.row.type}}</span>
               <span
                     v-if="scope.row.type==='github'">{{scope.row.type}}({{scope.row.namespace}})</span>
             </template>
@@ -574,7 +572,7 @@ export default {
               message: '代码源添加成功',
               type: 'success'
             })
-            if (payload.type === 'gitlab' || payload.type === 'ilyshin' || payload.type === 'github') {
+            if (payload.type === 'gitlab' || payload.type === 'github') {
               this.goToCodeHostAuth(code_source_id, redirect_url, provider)
             }
             this.handleCodeCancel()
@@ -593,7 +591,7 @@ export default {
           const provider = this.codeEdit.type
           updateCodeSourceAPI(code_source_id, payload).then((res) => {
             this.getCodeConfig()
-            if (payload.type === 'gitlab' || payload.type === 'ilyshin' || payload.type === 'github') {
+            if (payload.type === 'gitlab' || payload.type === 'github') {
               this.$message({
                 message: '代码源修改成功，正在前往授权',
                 type: 'success'

@@ -1,6 +1,6 @@
 <template>
   <div class="template-repo-container">
-    <el-form ref="tempForm" :model="tempData" label-width="80px" :rules="rules">
+    <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="服务名称" prop="serviceName">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
       </el-form-item>
@@ -9,7 +9,7 @@
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label-width="0">
+      <el-form-item label-width="40px">
         <div v-show="importRepoInfo.yamlSource === 'default'" class="default-values">
           <div class="desc">
             <el-button type="text" @click="importRepoInfo.yamlSource = 'gitRepo'">高级配置</el-button>
@@ -23,7 +23,7 @@
           :importRepoInfo.sync="importRepoInfo"
         ></ImportValues>
       </el-form-item>
-      <el-form-item style="text-align: right;">
+      <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo">导入</el-button>
       </el-form-item>
@@ -174,10 +174,6 @@ export default {
 
 <style lang="less" scoped>
 .template-repo-container {
-  .desc {
-    padding-left: 10px;
-  }
-
   /deep/.el-form {
     .el-form-item {
       margin-bottom: 15px;

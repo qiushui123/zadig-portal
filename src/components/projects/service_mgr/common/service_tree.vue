@@ -287,7 +287,7 @@
                            icon="el-icon-close"
                            @click.stop="() => deleteSharedService(node, data)">
                 </el-button>
-                <el-button v-if="data.source && (data.source === 'gerrit'||data.source === 'gitlab' || data.source === 'ilyshin'||data.source==='github' ||data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
+                <el-button v-if="data.source && (data.source === 'gerrit'|| data.source === 'gitlab' || data.source==='github' || data.source==='codehub' ) && data.type==='k8s' && data.product_name=== projectName "
                            type="text"
                            size="mini"
                            icon="el-icon-refresh"
@@ -978,13 +978,14 @@ export default {
         })
       }
     },
-    askSaveYamlConfig () {
+    askSaveYamlConfig (switchNode = false) {
       return this.$confirm('服务配置未保存，是否保存？', '提示', {
+        distinguishCancelAndClose: true,
         confirmButtonText: '保存',
-        cancelButtonText: '取消',
+        cancelButtonText: '放弃',
         type: 'warning'
       }).then(() => {
-        this.$emit('updateYaml')
+        this.$emit('updateYaml', switchNode)
       })
     },
     selectService (data, node, current) {
@@ -993,13 +994,25 @@ export default {
       if (this.previousNodeKey && this.previousNodeKey !== levelOneNodeLabel && this.yamlChange) {
         // 把当前 node 切换回来
         this.setServiceSelected(this.previousNodeKey)
-        this.askSaveYamlConfig().catch(() => {
-          this.setServiceSelected(levelOneNodeLabel)
-          this.switchTreeNode(data, node, levelOneNodeLabel)
+        this.askSaveYamlConfig(true).then(() => {
+          this.justStoreSwitchNode = { data, node, levelOneNodeLabel }
+        }).catch(action => {
+          if (action === 'cancel') {
+            this.justStoreSwitchNode = { data, node, levelOneNodeLabel }
+            this.selectAndSwitchTreeNode()
+          } else if (action === 'close') {
+            console.log('关闭')
+          }
         })
       } else {
         this.switchTreeNode(data, node, levelOneNodeLabel)
       }
+    },
+    selectAndSwitchTreeNode () {
+      const { data, node, levelOneNodeLabel } = this.justStoreSwitchNode
+      this.setServiceSelected(levelOneNodeLabel)
+      this.switchTreeNode(data, node, levelOneNodeLabel)
+      this.justStoreSwitchNode = {}
     },
     switchTreeNode (data, node, levelOneNodeLabel) {
       this.previousNodeKey = levelOneNodeLabel

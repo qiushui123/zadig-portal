@@ -163,6 +163,9 @@
                                @click="envSource==='helm' ? openUpdateHelmEnv() : updateK8sEnv(productInfo)">更新环境</el-button>
                 </el-tooltip>
                 <template>
+                  <el-button v-if="envSource==='external'" @click="editExternalConfig(productInfo)" type="text">配置托管</el-button>
+                </template>
+                <template>
                     <el-button v-if="isShowDeleteEnv"
                                type="text"
                                @click="deleteProduct(productInfo.product_name,productInfo.env_name)">
@@ -270,7 +273,7 @@
                   <span :class="$utils._getStatusColor(scope.row.status)"
                         class="service-name"> <i v-if="scope.row.type==='k8s'"
                        class="iconfont service-icon iconrongqifuwu"></i>
-                    {{ scope.row.service_name }}</span>
+                    {{ scope.row.service_display_name || scope.row.service_name }}</span>
                 </router-link>
                 <template
                           v-if="serviceStatus[scope.row.service_name] && serviceStatus[scope.row.service_name]['tpl_updatable'] && envSource!=='helm'">

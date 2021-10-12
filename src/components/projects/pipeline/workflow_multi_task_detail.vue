@@ -94,7 +94,7 @@
                                     effect="dark">
                           <span v-if="build.tag"
                                 class="link">
-                            <a v-if="build.source==='github'|| build.source==='ilyshin' ||build.source==='gitlab'"
+                            <a v-if="build.source==='github'|| build.source==='gitlab'"
                                :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tags/${build.tag}`"
                                target="_blank">{{build.tag}}
                             </a>
@@ -106,7 +106,7 @@
                                     effect="dark">
                           <span v-if="build.branch && !build.tag"
                                 class="link">
-                            <a v-if="build.source==='github'||build.source==='gitlab'|| build.source==='ilyshin'"
+                            <a v-if="build.source==='github'||build.source==='gitlab'"
                                :href="`${build.address}/${build.repo_owner}/${build.repo_name}/tree/${build.branch}`"
                                target="_blank">{{"Branch-"+build.branch}}
                             </a>
@@ -131,7 +131,7 @@
                                :href="`${build.address}/${build.repo_owner}/${build.repo_name}/pull/${build.pr}`"
                                target="_blank">{{"PR-"+build.pr}}
                             </a>
-                            <a v-if="build.source==='gitlab' || build.source==='ilyshin'"
+                            <a v-if="build.source==='gitlab'"
                                :href="`${build.address}/${build.repo_owner}/${build.repo_name}/merge_requests/${build.pr}`"
                                target="_blank">{{"PR-"+build.pr}}
                             </a>
@@ -146,7 +146,7 @@
                                     effect="dark">
                           <span v-if="build.commit_id"
                                 class="link">
-                            <a v-if="build.source==='github'||build.source==='gitlab' || build.source==='ilyshin' "
+                            <a v-if="build.source==='github'||build.source==='gitlab'"
                                :href="`${build.address}/${build.repo_owner}/${build.repo_name}/commit/${build.commit_id}`"
                                target="_blank">{{build.commit_id.substring(0, 8)}}
                             </a>
@@ -173,7 +173,7 @@
                 </template>
               </el-table-column>
               <el-table-column label="Issue 追踪"
-                               width="200">
+                               width="160">
                 <template slot-scope="scope">
                   <div v-if="scope.row.issues.length > 0">
                     <el-popover v-for="(issue,index) in scope.row.issues"
@@ -193,6 +193,20 @@
                     </el-popover>
                   </div>
                   <span v-else> 暂无 Issue </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="环境变量" width="100">
+                <template slot-scope="{ row }">
+                  <el-popover
+                    placement="left"
+                    width="400"
+                    trigger="hover">
+                    <el-table :data="row.envs">
+                      <el-table-column property="key" label="Key"></el-table-column>
+                      <el-table-column property="value" label="Value"></el-table-column>
+                    </el-table>
+                    <el-button slot="reference" type="text">查看</el-button>
+                  </el-popover>
                 </template>
               </el-table-column>
             </el-table>
@@ -648,6 +662,10 @@ export default {
         }
       })
       const buildArr = this.$utils.mapToArray(this.buildDeployMap, '_target').filter(item => item.buildv2SubTask.type === 'buildv2')
+      const envs = {}
+      this.workflow.targets && this.workflow.targets.forEach(target => {
+        envs[target.name] = target.envs
+      })
       const summary = buildArr.map(element => {
         let currentIssues = jiraIssues.find(item => { return item.service_name === element._target })
         if (!currentIssues) {
@@ -656,7 +674,8 @@ export default {
         return {
           service_name: element._target,
           builds: _.get(element, 'buildv2SubTask.job_ctx.builds', ''),
-          issues: currentIssues ? currentIssues.issues : []
+          issues: currentIssues ? currentIssues.issues : [],
+          envs: envs[element._target] || []
         }
       })
       return summary

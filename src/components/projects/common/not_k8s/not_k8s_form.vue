@@ -98,8 +98,10 @@
                     </el-tag>
                   </span>
                 </el-option>
+                <el-option value="NEWCUSTOM">
+                  <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
+                </el-option>
               </el-select>
-              <router-link to="/v1/system/imgs" style="color: #409eff; white-space: nowrap;">创建</router-link>
             </el-form-item>
           </el-col>
           <el-col :span="10">
@@ -518,7 +520,7 @@
               <el-radio :label="true">使用 SSH Agent 远程部署
                 <el-tooltip placement="top">
                   <div slot="content">
-                    使用 SSH Agent 远程部署：安全登陆到目标机器，执行部署操作，可在系统设置-主机管理中进行配置
+                    使用 SSH Agent 远程部署：安全登录到目标机器，执行部署操作，可在系统设置-主机管理中进行配置
                   </div>
                   <i class="icon el-icon-question"></i>
                 </el-tooltip>

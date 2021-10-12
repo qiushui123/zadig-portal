@@ -328,7 +328,7 @@ export default {
 
   },
   created () {
-    bus.$emit('set-topbar-title', { title: '用户设置', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: '账号设置', breadcrumb: [] })
     bus.$emit('set-sub-sidebar-title', {
       title: '',
       routerList: []

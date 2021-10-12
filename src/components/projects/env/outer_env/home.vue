@@ -15,6 +15,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { orderBy } from 'lodash'
 import { getProjectWithEnvsAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
@@ -36,7 +37,7 @@ export default {
   methods: {
     async getProducts () {
       const projectsWithEnvs = await getProjectWithEnvsAPI()
-      const routerList = projectsWithEnvs.filter(product => {
+      const routerList = orderBy(projectsWithEnvs, ['name']).filter(product => {
         return !this.getOnboardingTemplates.includes(product.name)
       }).map(element => {
         return { name: element.name, url: `/v1/envs/detail/${element.name}?envName=${element.envs[0]}` }
