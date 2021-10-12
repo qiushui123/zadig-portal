@@ -794,7 +794,6 @@ export default {
       },
       buildConfig: {
         service_name: '',
-        version: 'stable',
         name: '',
         desc: '',
         repos: [],
@@ -964,14 +963,14 @@ export default {
           return element.name === val
         })
         if (findItem) {
-          this.syncBuildConfig(val, this.buildConfigVersion, this.projectName)
+          this.syncBuildConfig(val, this.projectName)
         }
       }
     },
-    syncBuildConfig (buildName, version, projectName) {
-      getBuildConfigDetailAPI(buildName, version, projectName).then((response) => {
+    syncBuildConfig (buildName, projectName) {
+      getBuildConfigDetailAPI(buildName, projectName).then((response) => {
         response.pre_build.installs.forEach(element => {
-          element.id = element.name + element.version
+          element.id = element.name
         })
         let originServiceName = ''
         if (!this.isEdit) {
@@ -1172,7 +1171,6 @@ export default {
         if (valid) {
           this.buildConfig.pre_build.installs.push({
             name: '',
-            version: '',
             id: ''
           })
         } else {
@@ -1183,7 +1181,6 @@ export default {
     addFirstBuildApp () {
       this.buildConfig.pre_build.installs.push({
         name: '',
-        version: '',
         id: ''
       })
     },
@@ -1380,7 +1377,6 @@ export default {
     addNewService (obj) {
       this.buildConfig = {
         service_name: obj.service_name,
-        version: 'stable',
         name: '',
         desc: '',
         repos: [],
@@ -1501,7 +1497,7 @@ export default {
             }])
           }
           if (this.pmService.build_name) {
-            this.syncBuildConfig(this.pmService.build_name, this.buildConfigVersion, projectName)
+            this.syncBuildConfig(this.pmService.build_name, projectName)
           } else {
             this.$set(this.buildConfig, 'service_name', this.pmService.service_name)
           }
@@ -1537,9 +1533,6 @@ export default {
   computed: {
     projectName () {
       return this.$route.params.project_name
-    },
-    buildConfigVersion () {
-      return 'stable'
     },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id

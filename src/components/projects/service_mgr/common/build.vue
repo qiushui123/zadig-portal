@@ -594,7 +594,6 @@ export default {
       }],
       jenkinsJobList: [],
       jenkinsBuild: {
-        version: 'stable',
         name: '',
         desc: '',
         targets: [],
@@ -609,7 +608,6 @@ export default {
       },
       buildConfig: {
         timeout: 60,
-        version: 'stable',
         name: '',
         desc: '',
         repos: [],
@@ -699,9 +697,6 @@ export default {
     }
   },
   methods: {
-    clearSelectVersion (index) {
-      this.buildConfig.pre_build.installs[index].version = ''
-    },
     addFirstCacheDir () {
       if (!this.buildConfig.caches || this.buildConfig.caches.length === 0) {
         this.$set(this.buildConfig, 'caches', [])
@@ -725,7 +720,6 @@ export default {
         if (valid) {
           this.buildConfig.pre_build.installs.push({
             name: '',
-            version: '',
             id: ''
           })
         } else {
@@ -736,7 +730,6 @@ export default {
     addFirstBuildApp () {
       this.buildConfig.pre_build.installs.push({
         name: '',
-        version: '',
         id: ''
       })
     },
@@ -934,9 +927,9 @@ export default {
       const projectName = this.projectName
       const orgId = this.currentOrganizationId
       if (this.isEdit) {
-        getBuildConfigDetailAPI(this.buildConfigName, this.buildConfigVersion, this.projectName).then((response) => {
+        getBuildConfigDetailAPI(this.buildConfigName, this.projectName).then((response) => {
           response.pre_build.installs.forEach(element => {
-            element.id = element.name + element.version
+            element.id = element.name
           })
           response.targets.forEach(t => {
             t.key = t.service_name + '/' + t.service_module
@@ -1008,9 +1001,6 @@ export default {
     },
     buildAdd () {
       return this.$route.query.build_add ? this.$route.query.build_add : false
-    },
-    buildConfigVersion () {
-      return 'stable'
     },
     buildServiceName () {
       return this.$route.query.service_name
