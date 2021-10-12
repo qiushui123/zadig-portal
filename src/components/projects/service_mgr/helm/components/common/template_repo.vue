@@ -2,10 +2,10 @@
   <div class="template-repo-container">
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="服务名称" prop="serviceName">
-        <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
+        <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
-        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small">
+        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate">
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
@@ -69,7 +69,8 @@ export default {
         yamlSource: 'default',
         valuesYAML: '',
         gitRepoConfig: null
-      }
+      },
+      isUpdate: false
     }
   },
   props: {
@@ -118,6 +119,9 @@ export default {
               }
             }
           }
+          this.isUpdate = true
+        } else {
+          this.isUpdate = false
         }
       },
       immediate: true
@@ -195,7 +199,7 @@ export default {
           projectName: this.$route.params.project_name
         })
         this.$emit('canUpdateEnv', [
-          { serviceName: payload.name, type: 'create' }
+          { serviceName: payload.name, type: this.isUpdate ? 'update' : 'create' }
         ])
       }
     }

@@ -2,9 +2,11 @@
   <div class="form-code-container">
     <div class="create-origin">
       <span>服务配置来源</span>
-      <el-radio v-model="tabName" label="git">Git 仓库</el-radio>
-      <el-radio v-model="tabName" label="chart" disabled>Chart 仓库</el-radio>
-      <el-radio v-model="tabName" label="template">模板库</el-radio>
+      <el-radio-group v-model="tabName" :disabled="isUpdate">
+        <el-radio label="git">Git 仓库</el-radio>
+        <el-radio label="chart" disabled>Chart 仓库</el-radio>
+        <el-radio label="template">模板库</el-radio>
+      </el-radio-group>
     </div>
 
     <GitRepo
@@ -46,7 +48,8 @@ export default {
       tabName: '',
       gitCurrentService: null,
       chartCurrentService: null,
-      templateCurrentService: null
+      templateCurrentService: null,
+      isUpdate: false
     }
   },
   props: {
@@ -61,12 +64,16 @@ export default {
         this.templateCurrentService = null
         if (val) {
           const cs = this.currentService
-          if (cs && cs.source && cs.source === 'chartTemplate') {
-            this.tabName = 'template'
-            this.templateCurrentService = cs
+          this.tabName = 'git'
+          this.gitCurrentService = cs
+          if (cs) {
+            this.isUpdate = true
+            if (cs.source && cs.source === 'chartTemplate') {
+              this.tabName = 'template'
+              this.templateCurrentService = cs
+            }
           } else {
-            this.tabName = 'git'
-            this.gitCurrentService = cs
+            this.isUpdate = false
           }
         }
       },
