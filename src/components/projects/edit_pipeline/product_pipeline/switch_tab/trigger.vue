@@ -49,6 +49,8 @@
                      v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
+                     remote
+                     :remote-method="(key)=> getBranchInfoById(key)"
                      clearable
                      placeholder="请选择">
             <el-option v-for="(branch,index) in webhookBranches[webhookSwap.repo.repo_name]"
@@ -359,6 +361,7 @@ export default {
       }
     }
     return {
+      currentRepo: null,
       testInfos: [],
       gotScheduleRepo: false,
       currentForcedUserInput: {},
@@ -551,7 +554,8 @@ export default {
       this.currenteditWebhookIndex = index
       const webhookSwap = this.$utils.cloneObj(this.webhook.items[index])
       if (webhookSwap.main_repo.codehost_id && webhookSwap.main_repo.repo_owner && webhookSwap.main_repo.repo_name) {
-        this.getBranchInfoById(webhookSwap.main_repo.codehost_id, webhookSwap.main_repo.repo_owner, webhookSwap.main_repo.repo_name)
+        this.currentRepo = webhookSwap.main_repo
+        this.getBranchInfoById('')
       }
       this.webhookSwap = {
         name: webhookSwap.main_repo.name,
@@ -688,14 +692,16 @@ export default {
         this.products = res
       })
     },
-    getBranchInfoById (id, repo_owner, repo_name) {
-      getBranchInfoByIdAPI(id, repo_owner, repo_name).then((res) => {
-        this.$set(this.webhookBranches, repo_name, res)
+    getBranchInfoById (key) {
+      const currentRepo = this.currentRepo
+      getBranchInfoByIdAPI(currentRepo.codehost_id, currentRepo.repo_owner, currentRepo.repo_name, '', key).then((res) => {
+        this.$set(this.webhookBranches, currentRepo.repo_name, res)
       })
     },
     repoChange (currentRepo) {
       this.webhookSwap.events = []
-      this.getBranchInfoById(currentRepo.codehost_id, currentRepo.repo_owner, currentRepo.repo_name)
+      this.currentRepo = currentRepo
+      this.getBranchInfoById('')
     }
   },
   computed: {

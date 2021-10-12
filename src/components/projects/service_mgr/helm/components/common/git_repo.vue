@@ -73,7 +73,8 @@
                   getBranchInfoById(
                     source.codehostId,
                     source.repoOwner,
-                    source.repoName
+                    source.repoName,
+                    ''
                   )
                 "
             v-model.trim="source.repoName"
@@ -99,7 +100,7 @@
                 trigger: 'change',
               }"
         >
-          <el-select v-model.trim="source.branchName" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
+          <el-select v-model.trim="source.branchName" placeholder="请选择分支" style="width: 100%;" size="small" filterable  remote :remote-method="(key)=> getBranchInfoById(source.codehostId,source.repoOwner,source.repoName, key)" allow-create clearable>
             <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
           </el-select>
         </el-form-item>
@@ -280,10 +281,10 @@ export default {
         this.$set(this.codeInfo, 'repos', res)
       })
     },
-    getBranchInfoById (id, repoOwner, repoName) {
+    getBranchInfoById (id, repoOwner, repoName, key) {
       this.source.branchName = ''
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(id, repoOwner, repoName).then(res => {
+        getBranchInfoByIdAPI(id, repoOwner, repoName, '', key).then(res => {
           this.$set(this.codeInfo, 'branches', res)
         })
       }

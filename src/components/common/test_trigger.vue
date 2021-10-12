@@ -29,6 +29,8 @@
           <el-select v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
+                     remote
+                     :remote-method="(key)=> getBranchInfoById(key)"
                      clearable
                      placeholder="请选择">
             <el-option v-for="(branch,index) in webhookBranches[webhookSwap.repo.repo_name]"
@@ -172,7 +174,8 @@ export default {
       },
       currenteditWebhookIndex: null,
       webhookEditMode: false,
-      webhookAddMode: false
+      webhookAddMode: false,
+      currentRepo: null
     }
   },
   props: {
@@ -268,14 +271,16 @@ export default {
         this.webhook.enabled = false
       }
     },
-    getBranchInfoById (id, repo_owner, repo_name) {
-      getBranchInfoByIdAPI(id, repo_owner, repo_name).then((res) => {
-        this.$set(this.webhookBranches, repo_name, res)
+    getBranchInfoById (key) {
+      const currentRepo = this.currentRepo
+      getBranchInfoByIdAPI(currentRepo.codehost_id, currentRepo.repo_owner, currentRepo.repo_name, '', key).then((res) => {
+        this.$set(this.webhookBranches, currentRepo.repo_name, res)
       })
     },
     repoChange (currentRepo) {
       this.webhookSwap.events = []
-      this.getBranchInfoById(currentRepo.codehost_id, currentRepo.repo_owner, currentRepo.repo_name)
+      this.currentRepo = currentRepo
+      this.getBranchInfoById('')
     }
   },
   computed: {

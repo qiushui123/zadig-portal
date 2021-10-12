@@ -93,7 +93,7 @@
             <el-form-item label="代码库名称"
                           prop="repoName"
                           :rules="{required: true, message: '名称不能为空', trigger: 'change'}">
-              <el-select @change="getBranchInfoById(source.codehostId,source.repoOwner,source.repoName)"
+              <el-select @change="getBranchInfoById(source.codehostId,source.repoOwner,source.repoName, '')"
                          @clear="clearRepoName"
                          v-model.trim="source.repoName"
                          remote
@@ -120,6 +120,8 @@
                          style="width: 100%;"
                          size="small"
                          filterable
+                         remote
+                         :remote-method="(key)=> getBranchInfoById(source.codehostId,source.repoOwner,source.repoName, key)"
                          allow-create
                          clearable>
                 <el-option v-for="(branch,branch_index) in codeInfo['branches']"
@@ -915,12 +917,12 @@ export default {
       this.source.path = ''
       this.source.services = []
     },
-    getBranchInfoById (id, repoOwner, repoName) {
+    getBranchInfoById (id, repoOwner, repoName, key) {
       const repoItem = (this.codeInfo.repos.find(item => { return item.name === repoName }))
       const repoUUID = repoItem.repo_uuid ? repoItem.repo_uuid : ''
       this.source.repoUUID = repoUUID
       if (repoName && repoOwner) {
-        getBranchInfoByIdAPI(id, repoOwner, repoName, repoUUID).then((res) => {
+        getBranchInfoByIdAPI(id, repoOwner, repoName, repoUUID, key).then((res) => {
           this.$set(this.codeInfo, 'branches', res)
         })
         this.source.branchName = ''
