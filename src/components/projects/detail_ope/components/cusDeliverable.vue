@@ -22,7 +22,7 @@
 <script>
 /* eslint-disable no-template-curly-in-string */
 const defaultValue = '{{.SERVICE}}'
-const placeholder = ['${TIMESTAMP}-${TASK_ID}-${REPO_PR}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}-${REPO_PR}', '${TIMESTAMP}-${REPO_TAG}']
+const placeholder = ['{{.TIMESTAMP}}-{{.TASK_ID}}-{{.REPO_PR}}', '{{.TIMESTAMP}}-{{.TASK_ID}}-{{.REPO_BRANCH}}', '{{.TIMESTAMP}}-{{.TASK_ID}}-{{.REPO_BRANCH}}-{{.REPO_PR}}', '{{.TIMESTAMP}}-{{.REPO_TAG}}']
 export default {
   name: 'Deliverable',
   props: {
