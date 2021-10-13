@@ -64,7 +64,7 @@
             <el-form-item :label="repo_index === 0 ? (shortDescription?'名称':'代码库名称') : ''"
                           :prop="'repos.' + repo_index + '.repo_name'"
                           :rules="{required: true, message: '名称不能为空', trigger: 'blur'}">
-              <el-select @change="getBranchInfoById(repo_index,config.repos[repo_index].codehost_id,config.repos[repo_index].repo_owner,config.repos[repo_index].repo_name)"
+              <el-select @change="getBranchInfoById(repo_index,config.repos[repo_index].codehost_id,config.repos[repo_index].repo_owner,config.repos[repo_index].repo_name, '')"
                          v-model.trim="config.repos[repo_index].repo_name"
                          remote
                          :remote-method="(query)=>{searchProject(repo_index,query)}"
