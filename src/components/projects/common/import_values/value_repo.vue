@@ -66,7 +66,7 @@
         </el-select>
       </el-form-item>
     </el-form>
-    <div class="file-route">
+    <div v-if="showFilePath" class="file-route">
       <div class="desc-title">文件路径</div>
       <div v-for="(path, index) in valuesPaths" :key="index">
         <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
@@ -84,7 +84,11 @@ import { cloneDeep } from 'lodash'
 
 export default {
   props: {
-    valueRepoInfo: Object
+    valueRepoInfo: Object,
+    showFilePath: {
+      default: true,
+      type: Boolean
+    }
   },
   mixins: [RepoMixin],
   data () {

@@ -1,27 +1,24 @@
 <template>
   <div class="template-repo-container">
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
-      <el-form-item label="服务名称" prop="serviceName">
+      <h4 class="flex-center" style="padding-left: 40px;">
+        <span>Chart 模板</span>
+        <el-button type="text" @click="triggerSubstantial">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
+      </h4>
+      <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
+      </el-form-item>
+      <el-form-item v-else label="服务名称">
+        <span style="line-height: 41px;">批量创建的服务名称为 values 文件名称</span>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
         <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small">
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
+      <h4 style="padding-left: 40px;">Values 文件</h4>
       <el-form-item label-width="40px">
-        <div v-show="importRepoInfo.yamlSource === 'default'" class="default-values">
-          <div class="desc">
-            <el-button type="text" @click="importRepoInfo.yamlSource = 'gitRepo'">高级配置</el-button>
-          </div>
-        </div>
-        <ImportValues
-          v-show="importRepoInfo.yamlSource !== 'default'"
-          showDelete
-          ref="importValues"
-          :resize="{direction: 'vertical', height: '250px'}"
-          :importRepoInfo.sync="importRepoInfo"
-        ></ImportValues>
+        <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
       </el-form-item>
       <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
@@ -32,8 +29,12 @@
 </template>
 
 <script>
-import ImportValues from '@/components/projects/common/import_values/index.vue'
-import { createTemplateServiceAPI, getChartTemplatesAPI } from '@api'
+import ImportValues from './template_repo/import_values.vue'
+import {
+  createTemplateServiceAPI,
+  createTemplateMultiServiceAPI,
+  getChartTemplatesAPI
+} from '@api'
 
 const rules = {
   serviceName: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
@@ -66,10 +67,11 @@ export default {
         moduleName: ''
       },
       importRepoInfo: {
-        yamlSource: 'default',
+        yamlSource: 'gitRepo',
         valuesYAML: '',
         gitRepoConfig: null
-      }
+      },
+      substantial: false
     }
   },
   props: {
@@ -86,13 +88,17 @@ export default {
     }
   },
   methods: {
+    triggerSubstantial () {
+      this.substantial = !this.substantial
+      this.closeSelectRepo()
+    },
     closeSelectRepo () {
       this.tempData = {
         serviceName: '',
         moduleName: ''
       }
       this.importRepoInfo = {
-        yamlSource: 'default',
+        yamlSource: 'gitRepo',
         valuesYAML: '',
         gitRepoConfig: null
       }
@@ -105,17 +111,7 @@ export default {
         return res
       })
     },
-    async importTempRepo () {
-      const valid1 = await this.$refs.importValues
-        .validate()
-        .catch(err => console.log(err))
-      const valid2 = await this.$refs.tempForm.validate().catch(err => {
-        console.log(err)
-      })
-      if (!valid1 || !valid2) {
-        return
-      }
-
+    async createTemplateService () {
       const projectName = this.$route.params.project_name
       let payload = {
         source: 'chartTemplate',
@@ -137,13 +133,6 @@ export default {
             templateName: this.tempData.moduleName
           }
         }
-      } else {
-        payload = {
-          ...payload,
-          createFrom: {
-            templateName: this.tempData.moduleName
-          }
-        }
       }
       const res = await createTemplateServiceAPI(projectName, payload).catch(
         err => {
@@ -160,6 +149,67 @@ export default {
           { serviceName: payload.name, type: 'create' }
         ])
       }
+    },
+    async createTemplateMultiService () {
+      const projectName = this.$route.params.project_name
+      const payload = {
+        source: 'chartTemplate',
+        createFrom: { templateName: this.tempData.moduleName },
+        valuesData: {
+          yamlSource: 'gitRepo',
+          gitRepoConfig: this.importRepoInfo.gitRepoConfig
+        }
+      }
+      const res = await createTemplateMultiServiceAPI(
+        projectName,
+        payload
+      ).catch(err => {
+        console.log(err)
+      })
+      if (res) {
+        this.$message.success(`导入模板成功`)
+        this.dialogVisible = false
+        this.$store.dispatch('queryService', {
+          projectName: this.$route.params.project_name
+        })
+        this.$emit(
+          'canUpdateEnv',
+          res.successServices.map(service => {
+            return {
+              serviceName: service,
+              type: 'create'
+            }
+          })
+        )
+        if (res.failedServices.length) {
+          let message = ``
+          res.failedServices.forEach(fail => {
+            message += `<div>${fail.path}: ${fail.error}</div>`
+          })
+          this.$message.error({
+            dangerouslyUseHTMLString: true,
+            message,
+            duration: 0,
+            showClose: true
+          })
+        }
+      }
+    },
+    async importTempRepo () {
+      const valid1 = await this.$refs.importValues
+        .validate()
+        .catch(err => console.log(err))
+      const valid2 = await this.$refs.tempForm.validate().catch(err => {
+        console.log(err)
+      })
+      if (!valid1 || !valid2) {
+        return
+      }
+      if (this.substantial) {
+        this.createTemplateMultiService()
+      } else {
+        this.createTemplateService()
+      }
     }
   },
   components: {
@@ -174,6 +224,17 @@ export default {
 
 <style lang="less" scoped>
 .template-repo-container {
+  h4 {
+    margin: 0;
+  }
+
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: -16px;
+  }
+
   /deep/.el-form {
     .el-form-item {
       margin-bottom: 15px;
