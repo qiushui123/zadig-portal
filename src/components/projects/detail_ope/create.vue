@@ -71,7 +71,6 @@
                               <span class="tooltip-key" v-html="'{{.PROJECT}}'"></span>        项目名称<br/>
                               <span class="tooltip-key" v-html="'{{.SERVICE}}'"></span>      服务名称<br/>
                               <span class="tooltip-key" v-html="'{{.ENV_NAME}}'">${ENV_NAME}</span>       环境名称<br/>
-                              符合 Tag 命名规范要求的字符串常量<br/>
                               注意：常量字符只能是大小写字母、数字、中划线、下划线和点，即 [a-zA-Z0-9_.-]，首个字符不能是&nbsp;.&nbsp;或&nbsp;-。不能超过 127 个字符
                             </div>
                           <i class="el-icon-question"></i>
