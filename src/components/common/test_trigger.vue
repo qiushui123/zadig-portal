@@ -206,7 +206,8 @@ export default {
       this.webhookEditMode = true
       this.currenteditWebhookIndex = index
       const webhookSwap = this.$utils.cloneObj(this.webhook.items[index])
-      this.getBranchInfoById(webhookSwap.main_repo.codehost_id, webhookSwap.main_repo.repo_owner, webhookSwap.main_repo.repo_name)
+      this.currentRepo = webhookSwap.main_repo
+      this.getBranchInfoById('')
       this.webhookSwap = {
         auto_cancel: webhookSwap.auto_cancel,
         repo: webhookSwap.main_repo,
