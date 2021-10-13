@@ -1,38 +1,37 @@
 <template>
   <div class="values-outer">
-    <div class="desc-title">文件来源</div>
-    <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40" :disabled="substantial">
-      <el-option label="Git 仓库" value="gitRepo"></el-option>
-      <el-option label="手动输入" value="freeEdit"></el-option>
-    </el-select>
-    <div class="desc-title">{{ importRepoInfoUse.yamlSource === 'gitRepo' ? '仓库信息' : '文件内容' }}</div>
-    <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" height="220px">
-      <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
-    </Resize>
+    <div class="repo-attr">
+      <span class="desc-title">文件来源</span>
+      <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40" :disabled="substantial">
+        <el-option label="Git 仓库" value="gitRepo"></el-option>
+        <el-option label="手动输入" value="freeEdit"></el-option>
+      </el-select>
+    </div>
+    <div v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="repo-attr">
+      <span class="desc-title">文件内容</span>
+      <Resize class="mirror" height="220px">
+        <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
+      </Resize>
+    </div>
     <div v-if="importRepoInfoUse.yamlSource === 'gitRepo'">
-      <ValueRepo ref="valueRepo" :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig" :showFilePath="false"></ValueRepo>
-      <div>
+      <ValueRepo ref="valueRepo" :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig" :showFilePath="false" :hiddenLabel="false"></ValueRepo>
+      <div class="repo-attr">
         <div class="desc-title">
-          <el-tooltip v-if="!substantial" effect="dark" content="按照覆盖顺序依次选择 values 文件，后选的文件会覆盖先选的文件。" placement="right">
+          <el-tooltip v-if="!substantial" effect="dark" content="按照覆盖顺序依次选择 values 文件，后选的文件会覆盖先选的文件。" placement="top">
             <span>文件路径</span>
           </el-tooltip>
           <span v-else>文件路径</span>
         </div>
-        <div class="overflow-auto">
-          <div v-for="(path, index) in importRepoInfoUse.gitRepoConfig.valuesPaths" :key="index" style="margin-left: 0.5rem;">
-            <span style="line-height: 18px;">{{path}}</span>
-            <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
+        <div style="margin-top: 6px;">
+          <div v-show="importRepoInfoUse.gitRepoConfig.valuesPaths.length" class="overflow-auto">
+            <div v-for="(path, index) in importRepoInfoUse.gitRepoConfig.valuesPaths" :key="index">
+              <span style="line-height: 18px;">{{path}}</span>
+              <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
+            </div>
           </div>
+          <el-button :disabled="canSelectFile" type="primary" round plain size="mini" @click="showFileSelectDialog = true">选择 values 文件</el-button>
+          <div v-show="showErrorTip" class="error-tip">请选择 values 文件</div>
         </div>
-        <el-button
-          :disabled="canSelectFile"
-          type="primary"
-          round
-          plain
-          size="mini"
-          @click="showFileSelectDialog = true"
-          style="margin-top: 12px;"
-        >选择 values 文件</el-button>
       </div>
       <el-dialog title="请选择服务的 values 文件" :visible.sync="showFileSelectDialog" append-to-body>
         <Repertory :gitRepoConfig="importRepoInfoUse.gitRepoConfig" @checkedPath="checkedPath" :checkOne="!substantial"></Repertory>
@@ -63,7 +62,8 @@ const valueInfo = {
 export default {
   data () {
     return {
-      showFileSelectDialog: false
+      showFileSelectDialog: false,
+      showErrorTip: false
     }
   },
   props: {
@@ -108,7 +108,14 @@ export default {
     validate () {
       if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
         const valueRepo = this.$refs.valueRepo
-        return Promise.all([valueRepo.validate()])
+        let validFile = null
+        if (this.importRepoInfoUse.gitRepoConfig.valuesPaths.length) {
+          validFile = Promise.resolve()
+        } else {
+          this.showErrorTip = true
+          validFile = Promise.reject()
+        }
+        return Promise.all([valueRepo.validate(), validFile])
       } else {
         return Promise.all([Promise.resolve(true)])
       }
@@ -117,6 +124,7 @@ export default {
       this.$nextTick(() => {
         if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
           this.$refs.valueRepo.resetSource(this.importRepoInfoUse.gitRepoConfig)
+          this.showErrorTip = false
         }
       })
     }
@@ -133,17 +141,31 @@ export default {
 <style lang="less" scoped>
 .values-outer {
   margin-top: 10px;
-  padding: 10px;
   color: #606266;
   font-size: 14px;
   line-height: 1;
 
-  .desc-title {
-    line-height: 1.2;
+  .repo-attr {
+    display: flex;
+
+    .desc-title {
+      flex: 0 0 128px;
+      width: 128px;
+      padding-right: 12px;
+      line-height: 40px;
+      text-align: right;
+    }
+  }
+
+  .error-tip {
+    margin-top: 10px;
+    color: #f56c6c;
+    font-size: 12px;
   }
 
   .overflow-auto {
     max-height: 90px;
+    margin: 4px 0 12px;
     overflow: auto;
 
     &::-webkit-scrollbar-track {

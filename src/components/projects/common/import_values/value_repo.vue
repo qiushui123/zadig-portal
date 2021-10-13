@@ -1,7 +1,17 @@
 <template>
   <div class="value-repo-container">
-    <el-form :model="source" :rules="sourceRules" ref="repoForm" :show-message="false" status-icon>
-      <el-form-item prop="codehostID">
+    <el-form
+      :model="source"
+      :rules="sourceRules"
+      ref="repoForm"
+      :show-message="false"
+      status-icon
+      label-position="right"
+      :label-width="hiddenLabel ? '0px' : '140px'"
+      class="value-repo-form"
+      :class="{'hidden-label': hiddenLabel}"
+    >
+      <el-form-item prop="codehostID" label="托管平台">
         <el-select
           v-model="source.codehostID"
           size="small"
@@ -25,7 +35,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="owner">
+      <el-form-item prop="owner" label="代码库拥有者">
         <el-select
           v-model="source.owner"
           size="small"
@@ -37,8 +47,7 @@
           <el-option v-for="(repo, index) in codeInfo['repoOwners']" :key="index" :label="repo.name" :value="repo.name"></el-option>
         </el-select>
       </el-form-item>
-
-      <el-form-item prop="repo">
+      <el-form-item prop="repo" label="代码库名称">
         <el-select
           @change="
                   getBranchInfoById(
@@ -60,7 +69,7 @@
           <el-option v-for="(repo, index) in codeInfo['repos']" :key="index" :label="repo.name" :value="repo.name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item prop="branch">
+      <el-form-item prop="branch" label="分支">
         <el-select v-model.trim="source.branch" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
           <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
         </el-select>
@@ -86,6 +95,10 @@ export default {
   props: {
     valueRepoInfo: Object,
     showFilePath: {
+      default: true,
+      type: Boolean
+    },
+    hiddenLabel: {
       default: true,
       type: Boolean
     }
@@ -166,8 +179,16 @@ export default {
   }
 
   /deep/.el-form {
-    .el-form-item {
-      margin-bottom: 0;
+    &.value-repo-form {
+      .el-form-item {
+        margin-bottom: 0;
+      }
+    }
+
+    &.hidden-label {
+      .el-form-item__label {
+        display: none;
+      }
     }
   }
 
