@@ -275,14 +275,13 @@ export default {
     return {
       buildV2: [],
       jenkinsBuild: []
-      // codeInfo: {}
 
     }
   },
   methods: {
     changeReleaseMethod (repo) {
-      // repo.tag = ''
-      // repo.branch = ''
+      repo.tag = ''
+      repo.branch = ''
     },
     async queryBranchInfo (repo, key) {
       const repoUUID = repo.repo_uuid ? repo.repo_uuid : ''
