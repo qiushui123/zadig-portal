@@ -988,6 +988,7 @@ export default {
         if (valid) {
           this.buildConfig.pre_build.installs.push({
             name: '',
+            version: '',
             id: ''
           })
         } else {
@@ -998,6 +999,7 @@ export default {
     addFirstBuildApp () {
       this.buildConfig.pre_build.installs.push({
         name: '',
+        version: '',
         id: ''
       })
     },

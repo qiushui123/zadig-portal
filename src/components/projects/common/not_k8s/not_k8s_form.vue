@@ -970,7 +970,7 @@ export default {
     syncBuildConfig (buildName, projectName) {
       getBuildConfigDetailAPI(buildName, projectName).then((response) => {
         response.pre_build.installs.forEach(element => {
-          element.id = element.name
+          element.id = element.name + element.version
         })
         let originServiceName = ''
         if (!this.isEdit) {
@@ -1171,6 +1171,7 @@ export default {
         if (valid) {
           this.buildConfig.pre_build.installs.push({
             name: '',
+            version: '',
             id: ''
           })
         } else {
@@ -1181,6 +1182,7 @@ export default {
     addFirstBuildApp () {
       this.buildConfig.pre_build.installs.push({
         name: '',
+        version: '',
         id: ''
       })
     },

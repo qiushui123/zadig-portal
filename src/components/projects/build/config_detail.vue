@@ -745,6 +745,7 @@ export default {
         if (valid) {
           this.buildConfig.pre_build.installs.push({
             name: '',
+            version: '',
             id: ''
           })
         } else {
@@ -755,6 +756,7 @@ export default {
     addFirstBuildApp () {
       this.buildConfig.pre_build.installs.push({
         name: '',
+        version: '',
         id: ''
       })
     },
@@ -942,7 +944,7 @@ export default {
       if (!this.isCreate) {
         getBuildConfigDetailAPI(this.buildConfigName, this.projectName).then((response) => {
           response.pre_build.installs.forEach(element => {
-            element.id = element.name
+            element.id = element.name + element.version
           })
           response.targets.forEach(t => {
             t.key = t.service_name + '/' + t.service_module
