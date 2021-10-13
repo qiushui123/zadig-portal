@@ -98,7 +98,7 @@
                     </el-tag>
                   </span>
                 </el-option>
-                <el-option>
+                <el-option value="NEWCUSTOM">
                   <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
                 </el-option>
               </el-select>
@@ -343,12 +343,11 @@
           <el-col :span="24"
                   class="deploy-script">
             <Resize :height="'150px'">
-              <editor v-model="buildConfig.scripts"
+              <Editor v-model="buildConfig.scripts"
                     lang="sh"
                     theme="xcode"
-                    :options="editorOption"
                     width="100%"
-                    height="100%"></editor>
+                    height="100%"></Editor>
             </Resize>
           </el-col>
         </el-row>
@@ -541,13 +540,12 @@
           <el-row>
             <el-col :span="24"
                     class="deploy-script">
-              <editor v-model="buildConfig.pm_deploy_scripts"
+              <Editor v-model="buildConfig.pm_deploy_scripts"
                       lang="sh"
                       theme="xcode"
-                      :options="editorOption"
                       width="100%"
                       height="300px">
-              </editor>
+              </Editor>
             </el-col>
           </el-row>
         </el-form>
@@ -723,7 +721,7 @@
 </template>
 <script>
 import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI } from '@api'
-import aceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
 import AddHost from './add_host.vue'
@@ -781,14 +779,6 @@ export default {
         ip: '',
         user_name: '',
         private_key: ''
-      },
-      editorOption: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
       },
       pmService: {
         service_name: '',
@@ -1570,7 +1560,7 @@ export default {
     this.loadPage()
   },
   components: {
-    editor: aceEditor,
+    Editor,
     Resize,
     AddHost
   }

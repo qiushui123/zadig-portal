@@ -156,7 +156,7 @@
                   <router-link to="/v1/profile/info">
                     <li class="profile-list__item">
                       <i class="iconfont iconfenzucopy"></i>
-                      <span class="profile-list__text">用户设置</span>
+                      <span class="profile-list__text">账号设置</span>
                     </li>
                   </router-link>
                   <li class="profile-list__item profile-list__with-icon">

@@ -198,7 +198,7 @@
                       </el-tag>
                     </span>
                   </el-option>
-                  <el-option>
+                  <el-option value="NEWCUSTOM">
                     <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
                   </el-option>
                 </el-select>
@@ -445,12 +445,7 @@
             <el-col class="deploy-script"
                     :span="24">
                 <Resize :resize="'both'">
-                  <editor v-model="buildConfig.scripts"
-                          lang="sh"
-                          theme="xcode"
-                          :options="editorOption"
-                          width="100%"
-                          height="100%"></editor>
+                  <Editor  v-model="buildConfig.scripts"></Editor>
                 </Resize>
             </el-col>
           </el-row>
@@ -541,12 +536,7 @@
             <div class="divider item"></div>
             <el-row>
               <el-col :span="24">
-                <editor v-model="buildConfig.post_build.scripts"
-                        lang="sh"
-                        theme="xcode"
-                        :options="editorOption"
-                        width="100%"
-                        height="300px"></editor>
+                <Editor  v-model="buildConfig.post_build.scripts" height="300px"></Editor>
               </el-col>
             </el-row>
           </div>
@@ -598,7 +588,7 @@
 </template>
 <script>
 import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
-import aceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
@@ -1062,7 +1052,7 @@ export default {
     })
   },
   components: {
-    editor: aceEditor,
+    Editor,
     Resize
   }
 

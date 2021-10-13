@@ -216,7 +216,7 @@
                         </el-tag>
                       </span>
                     </el-option>
-                    <el-option>
+                    <el-option value="NEWCUSTOM">
                       <router-link to="/v1/system/imgs" style="color: #606266;">新建自定义构建镜像</router-link>
                     </el-option>
                   </el-select>
@@ -543,13 +543,12 @@
             <el-row>
               <el-col class="deploy-script" :span="24">
                 <Resize :height="'150px'">
-                  <editor
+                  <Editor
                     v-model="buildConfig.scripts"
                     lang="sh"
                     theme="xcode"
-                    :options="editorOption"
                     width="100%"
-                    height="100%"></editor>
+                    height="100%"></Editor>
                 </Resize>
               </el-col>
             </el-row>
@@ -652,14 +651,13 @@
               <div class="divider item"></div>
               <el-row>
                 <el-col :span="24">
-                  <editor
+                  <Editor
                     v-model="buildConfig.post_build.scripts"
                     lang="sh"
                     theme="xcode"
-                    :options="editorOption"
                     width="100%"
                     height="300px"
-                  ></editor>
+                  ></Editor>
                 </el-col>
               </el-row>
             </div>
@@ -822,7 +820,7 @@ import {
   getServiceTargetsAPI,
   queryJenkinsJob, queryJenkinsParams
 } from '@api'
-import aceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {
@@ -891,14 +889,6 @@ export default {
         scripts: '#!/bin/bash\nset -e',
         main_file: '',
         post_build: {}
-      },
-      editorOption: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
       },
       stcov_enabled: false,
       docker_enabled: false,
@@ -1366,7 +1356,7 @@ export default {
     }
   },
   components: {
-    editor: aceEditor,
+    Editor,
     Resize
   }
 }
