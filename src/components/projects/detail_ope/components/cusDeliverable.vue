@@ -1,6 +1,6 @@
 <template>
   <div class="con">
-    <div style="padding: 10px; border: 1px solid #dcdfe6;">
+    <div class="image-content">
      <div class="title">自定义镜像名称</div>
      <div class="item" v-for="key of Object.keys(customerImage)" :key="'image'+key">
          <div class="label">{{customerImage[key].label}}</div>
@@ -9,7 +9,7 @@
          <span class="reset" @click="resetFiled('customerImage',key)">重置</span>
      </div>
     </div>
-    <div style="margin-top: 10px; padding: 10px; border: 1px solid #dcdfe6;">
+    <div class="tar-content">
       <div class="title">自定义 TAR 包名称</div>
       <div class="item" v-for="key of Object.keys(tar)" :key="'tar'+key">
           <div class="label">{{tar[key].label}}</div>
@@ -21,7 +21,7 @@
 </template>
 <script>
 /* eslint-disable no-template-curly-in-string */
-const defaultValue = '${SERVICE}'
+const defaultValue = '{{.SERVICE}}'
 const placeholder = ['${TIMESTAMP}-${TASK_ID}-${REPO_PR}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}', '${TIMESTAMP}-${TASK_ID}-${REPO_BRANCH}-${REPO_PR}', '${TIMESTAMP}-${REPO_TAG}']
 export default {
   name: 'Deliverable',
@@ -132,43 +132,56 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .con {
-    width: 100%;
-    // padding: 0 10px;
-    line-height: 20px;
+.con {
+  width: 100%;
+  // padding: 0 10px;
+  line-height: 20px;
 
-    .title {
-      color: #303133;
-      font-size: 14px;
+  .image-content {
+    padding: 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 2px;
+  }
+
+  .tar-content {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 2px;
+  }
+
+  .title {
+    color: #303133;
+    font-size: 14px;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    margin: 10px 20px;
+
+    .label {
+      flex: 2.8;
     }
 
-    .item {
-      display: flex;
-      align-items: center;
-      margin: 10px 20px;
+    .input1 {
+      flex: 2;
+    }
 
-      .label {
-        flex: 2;
-      }
+    .input2 {
+      flex: 5;
+    }
 
-      .input1 {
-        flex: 2;
-      }
+    .input3 {
+      flex: 7;
+    }
 
-      .input2 {
-        flex: 5;
-      }
-
-      .input3 {
-        flex: 7;
-      }
-
-      .reset {
-        margin-left: 10px;
-        color: #409eff;
-        cursor: pointer;
-      }
+    .reset {
+      margin-left: 10px;
+      color: #409eff;
+      cursor: pointer;
     }
   }
+}
 
 </style>

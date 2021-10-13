@@ -11,9 +11,9 @@
           <h1 class="project-contexts-modal__content-title">{{isEdit?'修改项目信息':'开始新建项目'}}</h1>
           <div class="project-contexts-modal__content-container">
             <div class="project-settings__inputs-container">
-              <el-tabs style="width: 100%;" v-model="activeName">
+              <el-tabs style="width: 100%;"  v-if="isEdit"  v-model="activeName">
                 <el-tab-pane label="基本信息" name="base"></el-tab-pane>
-                <el-tab-pane label="高级配置" v-if="isEdit" name="advance"></el-tab-pane>
+                <el-tab-pane label="高级配置" name="advance"></el-tab-pane>
               </el-tabs>
               <el-form :model="projectForm"
                        :rules="rules"
@@ -62,17 +62,17 @@
                                   placement="top">
                           <div slot="content">
                             镜像和 TAR 包规则可以通过变量和常量组装生成：<br/>
-                              1. 时间戳: ${TIMESTAMP}<br/>
-                              2. 工作流任务 ID: ${TASK_ID}<br/>
-                              3. 代码分支名称: ${REPO_BRANCH}<br/>
-                              4. 代码 PR ID: ${REPO_PR}<br/>
-                              5. 代码 TAG: ${REPO_TAG}<br/>
-                              6. 代码 Commit ID: ${REPO_COMMIT_ID}<br/>
-                              7. 项目名称: ${PROJECT}<br/>
-                              8. 服务名称: ${SERVICE}<br/>
-                              9. 环境名称: ${ENV_NAME}<br/>
-                              10. 符合 Tag 命名规范要求的字符串常量<br/>
-                              注意：Tag 中的字符只能是大小写字母、数字、中划线、下划线和点，即 [a-zA-Z0-9_.-]，首个字符不能是.或-。Tag 不能超过 127个字符
+                              <span class="tooltip-key">${TIMESTAMP}</span>      时间戳 <br/>
+                              <span class="tooltip-key">${TASK_ID}</span>        工作流任务 ID<br/>
+                              <span class="tooltip-key">${REPO_BRANCH}</span>    代码分支名称<br/>
+                              <span class="tooltip-key">${REPO_PR}</span>        代码 PR ID<br/>
+                              <span class="tooltip-key">${REPO_TAG}</span>       代码 TAG<br/>
+                              <span class="tooltip-key">${REPO_COMMIT_ID}</span> 代码 Commit ID<br/>
+                              <span class="tooltip-key">${PROJECT}</span>        项目名称<br/>
+                              <span class="tooltip-key">{{serviceTag}}</span>      服务名称<br/>
+                              <span class="tooltip-key">${ENV_NAME}</span>       环境名称<br/>
+                              符合 Tag 命名规范要求的字符串常量<br/>
+                              注意：常量字符只能是大小写字母、数字、中划线、下划线和点，即 [a-zA-Z0-9_.-]，首个字符不能是&nbsp;.&nbsp;或&nbsp;-。不能超过 127 个字符
                             </div>
                           <i class="el-icon-question"></i>
                         </el-tooltip>
@@ -235,6 +235,7 @@ export default {
   data () {
     return {
       activeName: 'base',
+      serviceTag: '{{.SERVICE}}',
       dialogVisible: true,
       users: [],
       loading: false,
@@ -419,6 +420,11 @@ export default {
 </script>
 
 <style lang="less" >
+.tooltip-key {
+  display: inline-block;
+  width: 130px;
+}
+
 .create-project {
   .icon {
     cursor: pointer;
