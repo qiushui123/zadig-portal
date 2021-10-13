@@ -10,7 +10,7 @@
 
       <el-table-column label="代码库"  >
         <template slot-scope="scope"  v-if="scope.row.build" >
-          <el-row v-for="build of scope.row.build.repos"
+          <el-row v-for="(build) of scope.row.build.repos"
                   class="build-row"
                   :key="build._id_">
             <template v-if="!build.use_default">
@@ -22,17 +22,20 @@
               </el-col>
               <template v-if="build.showBranch">
                 <el-col :span="7">
-                  <el-select v-if="build.branchNames && build.branchNames.length > 0"
+                  <el-select v-if="build.branches && build.branches.length > 0"
                              v-model.trim="build.branch"
                              filterable
+                             remote
+                             :remote-method="(key)=> queryBranchInfo(build, key)"
                              clearable
                              allow-create
                              size="small"
                              placeholder="请选择分支">
-                    <el-option v-for="branch of build.branchNames"
-                               :key="branch"
-                               :label="branch"
-                               :value="branch"></el-option>
+                    <el-option v-for="(branch,branch_index) in build.branches"
+                              :key="branch_index"
+                              :label="branch.name"
+                              :value="branch.name">
+                    </el-option>
                   </el-select>
                   <el-tooltip v-else
                               content="请求分支失败，请手动输入分支"
@@ -265,18 +268,41 @@
 
 <script>
 import deployIcons from './deploy_icons'
+import { getBranchInfoByIdAPI } from '@api'
 
 export default {
   data () {
     return {
       buildV2: [],
       jenkinsBuild: []
+      // codeInfo: {}
+
     }
   },
   methods: {
     changeReleaseMethod (repo) {
-      repo.tag = ''
-      repo.branch = ''
+      // repo.tag = ''
+      // repo.branch = ''
+    },
+    async queryBranchInfo (repo, key) {
+      const repoUUID = repo.repo_uuid ? repo.repo_uuid : ''
+      const res = await getBranchInfoByIdAPI(repo.codehost_id, repo.repo_owner, repo.repo_name, repoUUID, key).catch(error => console.log(error))
+      if (res) {
+        repo.branches = res
+      }
+    },
+    getBranchInfoById (repos) {
+      repos.forEach(async (repo) => {
+        const repoUUID = repo.repo_uuid ? repo.repo_uuid : ''
+        this.$set(repo, 'branches', [])
+
+        if (repo.repo_owner && repo.repo_name) {
+          const res = await getBranchInfoByIdAPI(repo.codehost_id, repo.repo_owner, repo.repo_name, repoUUID).catch(error => console.log(error))
+          if (res) {
+            repo.branches = res
+          }
+        }
+      })
     }
   },
   props: {
@@ -293,6 +319,11 @@ export default {
       handler (value) {
         this.buildV2 = value.filter(item => !item.jenkins_build_args)
         this.jenkinsBuild = value.filter(item => item.jenkins_build_args)
+        this.buildV2.forEach((item) => {
+          if (item.build.repos) {
+            this.getBranchInfoById(item.build.repos)
+          }
+        })
       },
       immediate: true
 
