@@ -2,10 +2,10 @@
   <div class="template-repo-container">
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <el-form-item label="服务名称" prop="serviceName">
-        <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small"></el-input>
+        <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
-        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small">
+        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate">
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
@@ -69,11 +69,13 @@ export default {
         yamlSource: 'default',
         valuesYAML: '',
         gitRepoConfig: null
-      }
+      },
+      isUpdate: false
     }
   },
   props: {
-    value: Boolean
+    value: Boolean,
+    currentService: Object
   },
   computed: {
     dialogVisible: {
@@ -83,6 +85,46 @@ export default {
       set: function (value) {
         this.$emit('input', value)
       }
+    }
+  },
+  watch: {
+    currentService: {
+      handler (val) {
+        if (val) {
+          const createFrom = val.create_from
+          this.tempData = {
+            serviceName: createFrom.service_name,
+            moduleName: createFrom.template_name
+          }
+          if (createFrom.yaml_data) {
+            const yamlData = createFrom.yaml_data
+            if (yamlData.yaml_source === 'freeEdit') {
+              this.importRepoInfo = {
+                yamlSource: 'freeEdit',
+                valuesYAML: yamlData.yaml_content,
+                gitRepoConfig: null
+              }
+            } else if (yamlData.yaml_source === 'gitRepo') {
+              const gitConfig = yamlData.git_repo_config
+              this.importRepoInfo = {
+                yamlSource: 'gitRepo',
+                valuesYAML: '',
+                gitRepoConfig: {
+                  codehostID: gitConfig.codehost_id,
+                  owner: gitConfig.owner,
+                  repo: gitConfig.repo,
+                  branch: gitConfig.branch,
+                  valuesPaths: yamlData.values_paths
+                }
+              }
+            }
+          }
+          this.isUpdate = true
+        } else {
+          this.isUpdate = false
+        }
+      },
+      immediate: true
     }
   },
   methods: {
@@ -157,7 +199,7 @@ export default {
           projectName: this.$route.params.project_name
         })
         this.$emit('canUpdateEnv', [
-          { serviceName: payload.name, type: 'create' }
+          { serviceName: payload.name, type: this.isUpdate ? 'update' : 'create' }
         ])
       }
     }
