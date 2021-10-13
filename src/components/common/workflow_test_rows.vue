@@ -22,17 +22,19 @@
               </el-col>
               <template>
                 <el-col :span="7">
-                  <el-select v-if="build.branchNames && build.branchNames.length > 0"
+                  <el-select v-if="build.branches && build.branches.length > 0"
                              v-model="build.branch"
                              filterable
+                             remote
+                             :remote-method="(key)=> queryBranchInfo(build, key)"
                              allow-create
                              clearable
                              size="small"
                              placeholder="请选择分支">
-                    <el-option v-for="branch of build.branchNames"
-                               :key="branch"
-                               :label="branch"
-                               :value="branch"></el-option>
+                    <el-option v-for="branch of build.branches"
+                               :key="branch.name"
+                               :label="branch.name"
+                               :value="branch.name"></el-option>
                   </el-select>
                   <el-tooltip v-else
                               content="请求分支失败，请手动输入分支"
@@ -122,6 +124,8 @@
 </template>
 
 <script>
+import { getBranchInfoByIdAPI } from '@api'
+
 export default {
   data () {
     return {
@@ -131,12 +135,46 @@ export default {
     changeReleaseMethod (repo) {
       repo.tag = ''
       repo.branch = ''
+    },
+    async queryBranchInfo (repo, key) {
+      const repoUUID = repo.repo_uuid ? repo.repo_uuid : ''
+      const res = await getBranchInfoByIdAPI(repo.codehost_id, repo.repo_owner, repo.repo_name, repoUUID, key).catch(error => console.log(error))
+      if (res) {
+        repo.branches = res
+      }
+    },
+    getBranchInfoById (repos) {
+      repos.forEach(async (repo) => {
+        const repoUUID = repo.repo_uuid ? repo.repo_uuid : ''
+        this.$set(repo, 'branches', [])
+
+        if (repo.repo_owner && repo.repo_name) {
+          const res = await getBranchInfoByIdAPI(repo.codehost_id, repo.repo_owner, repo.repo_name, repoUUID).catch(error => console.log(error))
+          if (res) {
+            repo.branches = res
+          }
+        }
+      })
     }
   },
   props: {
     runnerTests: {
       type: Array,
       required: true
+    }
+  },
+  watch: {
+    runnerTests: {
+      handler (value) {
+        console.log(value)
+        value.forEach((item) => {
+          if (item.builds) {
+            this.getBranchInfoById(item.builds)
+          }
+        })
+      },
+      immediate: true
+
     }
   }
 }
