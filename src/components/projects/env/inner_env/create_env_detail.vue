@@ -232,7 +232,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :chartNames="chartNames"></HelmEnvTemplate>
+            <ChartValues class="chart-value" ref="chartValuesRef" :envNames="envNames" :chartNames="chartNames"></ChartValues>
           </el-card>
         </template>
       </div>
@@ -284,7 +284,7 @@ import bus from '@utils/event_bus'
 import { mapGetters } from 'vuex'
 import { uniq, cloneDeep } from 'lodash'
 import { serviceTypeMap } from '@utils/word_translate'
-import HelmEnvTemplate from '../env_detail/components/updateHelmEnvTemp.vue'
+import ChartValues from '../env_detail/common/updateHelmEnvChart.vue'
 
 const validateKey = (rule, value, callback) => {
   if (typeof value === 'undefined' || value === '') {
@@ -798,7 +798,7 @@ export default {
       })
     },
     async deployHelmEnv () {
-      const res = await this.$refs.helmEnvTemplateRef.validate().catch(err => {
+      const res = await this.$refs.chartValuesRef.validate().catch(err => {
         console.log(err)
       })
       if (!res) {
@@ -806,14 +806,13 @@ export default {
       }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
-          const valueInfo = this.$refs.helmEnvTemplateRef.getAllInfo()
           const payload = {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: valueInfo.chartInfo,
-            defaultValues: valueInfo.envInfo,
+            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo(),
             namespace: this.projectConfig.defaultNamespace
           }
+
           this.startDeployLoading = true
           createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
             res => {
@@ -889,7 +888,7 @@ export default {
     })
   },
   components: {
-    HelmEnvTemplate
+    ChartValues
   }
 }
 </script>
@@ -1019,7 +1018,7 @@ export default {
     .chart-value {
       width: 80%;
       min-width: 450px;
-      margin-left: 5px;
+      margin-left: 3%;
     }
   }
 

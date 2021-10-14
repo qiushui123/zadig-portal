@@ -34,9 +34,6 @@ export default {
     }, 200),
     handleSave (event) {
       this.$emit('saveValue', { event, value: this.value })
-    },
-    refresh () {
-      this.$refs.cmEditor.codemirror.refresh()
     }
   },
   components: {
