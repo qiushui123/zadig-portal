@@ -123,7 +123,20 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="镜像仓库">
+      <el-form-item label="对象存储" v-if="isPm">
+        <el-select v-model="pickedStorage"
+                   filterable
+                   clearable
+                   size="medium"
+                   class="full-width">
+          <el-option v-for="(item,index) of storageList"
+                     :key="index"
+                     :label="item.bucket"
+                     :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="镜像仓库" v-else>
         <el-select v-model="pickedRegistry"
                    filterable
                    clearable
@@ -272,7 +285,7 @@ import virtualListItem from './virtual_list_item'
 import workflowBuildRows from '@/components/common/workflow_build_rows.vue'
 import workflowTestRows from '@/components/common/workflow_test_rows.vue'
 import deployIcons from '@/components/common/deploy_icons'
-import { listProductAPI, precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getBuildTargetsAPI, getRegistryWhenBuildAPI, imagesAPI, getSingleProjectAPI } from '@api'
+import { listProductAPI, precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getBuildTargetsAPI, getRegistryWhenBuildAPI, imagesAPI, getSingleProjectAPI, getStorageListAPI } from '@api'
 import virtualScrollList from 'vue-virtual-scroll-list'
 
 export default {
@@ -285,6 +298,7 @@ export default {
       pickedBuildTarget: [],
       imageMap: [],
       pickedRegistry: '',
+      pickedStorage: '',
       specificEnv: true,
       runner: {
         workflow_name: '',
@@ -302,6 +316,7 @@ export default {
       fastSelect: false,
       createVersion: false,
       isHelm: false,
+      isPm: false,
       versionInfo: {
         version: '',
         enabled: true,
@@ -319,7 +334,8 @@ export default {
         size: 34,
         start: 0
       },
-      startAll: {}
+      startAll: {},
+      storageList: []
     }
   },
   computed: {
@@ -341,13 +357,7 @@ export default {
         }), 'service_name')
       } else if (this.artifactDeployEnabled) {
         const k8sServices = this.runner.targets.filter(element => {
-          for (let index = 0; index < element.deploy.length; index++) {
-            const deployItem = element.deploy[index]
-            if (deployItem.type !== 'pm') {
-              return element
-            }
-          }
-          return false
+          return element
         })
         allNames = sortBy(k8sServices.map(element => {
           element.key = element.name + '/' + element.service_name
@@ -466,12 +476,20 @@ export default {
   methods: {
     async checkProjectFeature (projectName) {
       const res = await getSingleProjectAPI(projectName)
-      if (res.product_feature) {
-        if (res.product_feature.basic_facility === 'kubernetes') {
-          if (res.product_feature.deploy_type === 'helm') {
-            this.isHelm = true
-          }
+      const productFeature = res.product_feature
+      if (productFeature.deploy_type === 'k8s') {
+        if (productFeature.basic_facility === 'cloud_host') {
+          this.isPm = true
+          this.getStorageList()
         }
+      } else if (productFeature.deploy_type === 'helm') {
+        this.isHelm = true
+      }
+    },
+    async getStorageList () {
+      const res = await getStorageListAPI().catch(error => console.log(error))
+      if (res) {
+        this.storageList = res
       }
     },
     changeVirtualData (event, row, index) {
@@ -859,6 +877,7 @@ export default {
         this.precreate(`${product} / ${namespace}`)
       }
     })
+    this.checkProjectFeature(projectName)
   },
   props: {
     workflowName: {

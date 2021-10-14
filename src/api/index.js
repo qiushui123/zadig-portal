@@ -1262,3 +1262,8 @@ export function postWorkloads (payload) {
 export function editWorkloads (payload) {
   return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
 }
+
+// deleverable
+export function getTars (payload) {
+  return http.post(`api/aslan/system/s3storage/${payload.id}/release/tars/search`, payload)
+}
