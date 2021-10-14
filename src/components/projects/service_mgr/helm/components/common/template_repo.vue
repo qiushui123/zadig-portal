@@ -17,9 +17,7 @@
         </el-select>
       </el-form-item>
       <h4 style="padding-left: 40px;">Values 文件</h4>
-      <el-form-item label-width="0px">
-        <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
-      </el-form-item>
+      <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
       <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo">导入</el-button>

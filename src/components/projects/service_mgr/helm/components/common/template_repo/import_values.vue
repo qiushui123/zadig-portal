@@ -1,38 +1,34 @@
 <template>
   <div class="values-outer">
-    <div class="repo-attr">
-      <span class="desc-title">文件来源</span>
-      <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40" :disabled="substantial">
+    <el-form-item label="文件来源" class="margin-bottom-0">
+      <el-select v-model="importRepoInfoUse.yamlSource" size="small" :disabled="substantial">
         <el-option label="Git 仓库" value="gitRepo"></el-option>
         <el-option label="手动输入" value="freeEdit"></el-option>
       </el-select>
-    </div>
-    <div v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="repo-attr">
-      <span class="desc-title">文件内容</span>
-      <Resize class="mirror" height="220px">
+    </el-form-item>
+    <el-form-item label="文件内容" v-if="importRepoInfoUse.yamlSource === 'freeEdit'">
+      <Resize class="mirror" height="204px">
         <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
       </Resize>
-    </div>
+    </el-form-item>
     <div v-if="importRepoInfoUse.yamlSource === 'gitRepo'">
       <ValueRepo ref="valueRepo" :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig" :showFilePath="false" :hiddenLabel="false"></ValueRepo>
-      <div class="repo-attr">
-        <div class="desc-title">
+      <el-form-item>
+        <template slot="label">
           <el-tooltip v-if="!substantial" effect="dark" content="按照覆盖顺序依次选择 values 文件，后选的文件会覆盖先选的文件。" placement="top">
             <span>文件路径</span>
           </el-tooltip>
           <span v-else>文件路径</span>
-        </div>
-        <div style="margin-top: 6px;">
-          <div v-show="importRepoInfoUse.gitRepoConfig.valuesPaths.length" class="overflow-auto">
-            <div v-for="(path, index) in importRepoInfoUse.gitRepoConfig.valuesPaths" :key="index">
-              <span style="line-height: 18px;">{{path}}</span>
-              <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
-            </div>
+        </template>
+        <div v-show="importRepoInfoUse.gitRepoConfig.valuesPaths.length" class="overflow-auto">
+          <div v-for="(path, index) in importRepoInfoUse.gitRepoConfig.valuesPaths" :key="index">
+            <span style="line-height: 18px;">{{path}}</span>
+            <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
           </div>
-          <el-button :disabled="canSelectFile" type="primary" round plain size="mini" @click="showFileSelectDialog = true">选择 values 文件</el-button>
-          <div v-show="showErrorTip" class="error-tip">请选择 values 文件</div>
         </div>
-      </div>
+        <el-button :disabled="canSelectFile" type="primary" round plain size="mini" @click="showFileSelectDialog = true">选择 values 文件</el-button>
+        <span v-show="showErrorTip" class="error-tip">请选择 values 文件</span>
+      </el-form-item>
       <el-dialog title="请选择服务的 values 文件" :visible.sync="showFileSelectDialog" append-to-body>
         <Repertory :gitRepoConfig="importRepoInfoUse.gitRepoConfig" @checkedPath="checkedPath" :checkOne="!substantial"></Repertory>
       </el-dialog>
@@ -101,6 +97,9 @@ export default {
       this.importRepoInfoUse.gitRepoConfig.valuesPaths = uniq(
         valuesPaths.concat(data)
       )
+      if (this.importRepoInfoUse.gitRepoConfig.valuesPaths.length) {
+        this.showErrorTip = false
+      }
     },
     deletePath (index) {
       this.importRepoInfoUse.gitRepoConfig.valuesPaths.splice(index, 1)
@@ -145,28 +144,22 @@ export default {
   font-size: 14px;
   line-height: 1;
 
-  .repo-attr {
-    display: flex;
-
-    .desc-title {
-      flex: 0 0 128px;
-      width: 128px;
-      padding-right: 12px;
-      line-height: 40px;
-      text-align: right;
-    }
+  /deep/.el-form-item.margin-bottom-0 {
+    margin-bottom: 0;
   }
 
   .error-tip {
     margin-top: 10px;
     color: #f56c6c;
     font-size: 12px;
+    line-height: 1;
   }
 
   .overflow-auto {
     max-height: 90px;
-    margin: 4px 0 12px;
+    margin: 9px 0;
     overflow: auto;
+    line-height: 20px;
 
     &::-webkit-scrollbar-track {
       background-color: #f5f5f5;
@@ -184,11 +177,6 @@ export default {
       border-radius: 6px;
       box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }
-  }
-
-  .height-40 {
-    height: 40px;
-    line-height: 40px;
   }
 
   /deep/.el-input {
