@@ -20,7 +20,7 @@
       <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
       <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" size="small" @click="importTempRepo">导入</el-button>
+        <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -69,7 +69,8 @@ export default {
         valuesYAML: '',
         gitRepoConfig: null
       },
-      substantial: false
+      substantial: false,
+      importLoading: false
     }
   },
   props: {
@@ -137,6 +138,7 @@ export default {
           console.log(err)
         }
       )
+      this.importLoading = false
       if (res) {
         this.$message.success(`导入模板 ${payload.name} 成功`)
         this.dialogVisible = false
@@ -158,12 +160,17 @@ export default {
           gitRepoConfig: this.importRepoInfo.gitRepoConfig
         }
       }
+      const sId = setTimeout(() => {
+        this.$message.info('服务过多，请耐心等待！')
+      }, 5000)
       const res = await createTemplateMultiServiceAPI(
         projectName,
         payload
       ).catch(err => {
         console.log(err)
       })
+      clearTimeout(sId)
+      this.importLoading = false
       if (res) {
         this.$message.success(`导入模板成功`)
         this.dialogVisible = false
@@ -203,6 +210,7 @@ export default {
       if (!valid1 || !valid2) {
         return
       }
+      this.importLoading = true
       if (this.substantial) {
         this.createTemplateMultiService()
       } else {
