@@ -1264,6 +1264,6 @@ export function editWorkloads (payload) {
 }
 
 // deleverable
-export function getTars (payload) {
+export function getTarsApi (payload) {
   return http.post(`api/aslan/system/s3storage/${payload.id}/release/tars/search`, payload)
 }

@@ -158,7 +158,12 @@
                          label="服务"
                          width="150px">
         </el-table-column>
-        <el-table-column label="镜像">
+        <el-table-column v-if="isPm" label="交付物">
+          <template  slot-scope="scope">
+            <StoragePick v-if="pickedStorage" :id="pickedStorage" :name="scope.row.name" v-model="scope.row"/>
+          </template>
+        </el-table-column >
+        <el-table-column v-else label="镜像">
           <template slot-scope="scope">
             <div class="workflow-build-rows">
               <el-row class="build-row">
@@ -287,7 +292,7 @@ import workflowTestRows from '@/components/common/workflow_test_rows.vue'
 import deployIcons from '@/components/common/deploy_icons'
 import { listProductAPI, precreateWorkflowTaskAPI, getAllBranchInfoAPI, runWorkflowAPI, getBuildTargetsAPI, getRegistryWhenBuildAPI, imagesAPI, getSingleProjectAPI, getStorageListAPI } from '@api'
 import virtualScrollList from 'vue-virtual-scroll-list'
-
+import StoragePick from './storage_pick.vue'
 export default {
   data () {
     return {
@@ -903,7 +908,8 @@ export default {
     workflowBuildRows,
     workflowTestRows,
     deployIcons,
-    virtualScrollList
+    virtualScrollList,
+    StoragePick
   }
 }
 </script>
