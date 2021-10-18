@@ -673,7 +673,6 @@ export default {
         clone.registry_id = this.pickedRegistry
         clone.artifact_args = []
         clone.targets.forEach(element => {
-          console.log(element)
           clone.artifact_args.push({
             service_name: element.service_name,
             name: element.name,
