@@ -678,7 +678,7 @@ export default {
             name: element.name,
             image: element.image,
             workflow_name: element.workflow_name || '',
-            task_id: element.task_id || '',
+            task_id: element.task_id || 0,
             file_name: element.file_name || '',
             url: element.url || '',
             deploy: element.deploy
