@@ -10,12 +10,6 @@
                @click="changeRoute('var')">
             <span class="step-name">镜像更新</span>
           </div>
-          <div v-if="isCreate"
-               class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'values'}"
-               @click="changeRoute('values')">
-            <span class="step-name">变量</span>
-          </div>
           <div class="tabs__item"
                :class="{'selected': $route.query.rightbar === 'help'}"
                @click="changeRoute('help')">
@@ -84,7 +78,6 @@
                    ></build>
           </div> -->
         </div>
-        <values v-else-if="$route.query.rightbar === 'values'" :valuesYamlDeposit="valuesYamlDeposit"></values>
         <div v-else-if="$route.query.rightbar === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
@@ -104,15 +97,10 @@ import qs from 'qs'
 import bus from '@utils/event_bus'
 import { mapState } from 'vuex'
 import help from './help.vue'
-import values from './values.vue'
 import MatchRule from './match_rule.vue'
 export default {
   props: {
-    changeExpandFileList: Function,
-    isCreate: {
-      default: false,
-      type: Boolean
-    }
+    changeExpandFileList: Function
   },
   data () {
     return {
@@ -179,7 +167,6 @@ export default {
   },
   components: {
     help,
-    values,
     MatchRule
   }
 }
