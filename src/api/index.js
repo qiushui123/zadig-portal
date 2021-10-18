@@ -1184,7 +1184,7 @@ export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
 
-// module repo
+// Template Helm
 export function getChartTemplatesAPI () {
   return http.get(`/api/aslan/template/charts`)
 }
@@ -1211,6 +1211,28 @@ export function deleteChartTemplateAPI (name) {
 
 export function createTemplateServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
+}
+
+// Template Dockerfile
+
+export function getDockerfileTemplatesAPI () {
+  return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)
+}
+
+export function createDockerfileTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile`, payload)
+}
+
+export function updateDockerfileTemplateAPI (id, payload) {
+  return http.put(`/api/aslan/template/dockerfile/${id}`, payload)
+}
+
+export function getDockerfileAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}`)
+}
+
+export function deleteDockerfileTemplateAPI (id) {
+  return http.delete(`/api/aslan/template/dockerfile/${id}`)
 }
 
 // helm env and service

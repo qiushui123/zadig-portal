@@ -1,5 +1,10 @@
 <template>
   <div class="build-config-container">
+    <el-drawer title="Dockerfile 预览"
+               :visible.sync="showDockerfile"
+               direction="rtl">
+        <!-- <add-code @cancel="showDockerfile = false"></add-code> -->
+    </el-drawer>
     <div class="jenkins"
          v-show="source === 'jenkins'">
       <div class="section">
@@ -476,12 +481,42 @@
                 <template slot="prepend">$WORKSPACE/</template>
               </el-input>
             </el-form-item>
-            <el-form-item label="Dockerfile 文件的完整路径："
+            <el-form-item label="Dockerfile 来源："
+                          prop="source">
+              <el-select size="small" style="width: 100%;" v-model="buildConfig.post_build.source" placeholder="请选择">
+                <el-option
+                  label="代码仓库"
+                  value="local">
+                </el-option>
+                <el-option
+                  label="模板库"
+                  value="templates">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="buildConfig.post_build.source === 'local'" label="Dockerfile 文件的完整路径："
                           prop="docker_file">
               <el-input v-model="buildConfig.post_build.docker_build.docker_file"
                         size="small">
                 <template slot="prepend">$WORKSPACE/</template>
               </el-input>
+            </el-form-item>
+            <el-form-item v-if="buildConfig.post_build.source === 'template'"  label="选择模板："
+                          prop="template_name">
+              <el-select style="width: 95%;" size="small" filterable v-model="buildConfig.post_build.template_id" placeholder="请选择">
+                <el-option
+                  label="template 1"
+                  value="template1">
+                </el-option>
+                <el-option
+                  label="template 2"
+                  value="template2">
+                </el-option>
+              </el-select>
+              <el-button style="margin-left: 5px;" type="text" @click="viewDockerfile"> 预览</el-button>
+              <div v-if="buildConfig.post_build.template_id" class="dockerfile-args-container">
+                <span>ARG k1=v1 k2=v2 k3=v3 k4=v4</span>
+              </div>
             </el-form-item>
             <el-form-item label="镜像构建参数：">
               <el-tooltip effect="dark"
@@ -647,7 +682,6 @@ export default {
           parameters: []
         },
         scripts: '#!/bin/bash\nset -e',
-        main_file: '',
         post_build: {
         }
       },
@@ -659,10 +693,10 @@ export default {
         displayIndentGuides: false,
         showPrintMargin: false
       },
-      stcov_enabled: false,
       docker_enabled: false,
       binary_enabled: false,
       post_script_enabled: false,
+      showDockerfile: false,
       allApps: [],
       allRegistry: [],
       serviceTargets: [],
@@ -691,16 +725,6 @@ export default {
           {
             type: 'string',
             message: '请填写Dockerfile路径',
-            required: true,
-            trigger: 'blur'
-          }
-        ]
-      },
-      stcov_rules: {
-        main_file: [
-          {
-            type: 'string',
-            message: '请填写main文件路径',
             required: true,
             trigger: 'blur'
           }
@@ -798,9 +822,6 @@ export default {
           build_args: ''
         })
       }
-      if (command === 'stcov') {
-        this.stcov_enabled = true
-      }
       if (command === 'binary') {
         this.binary_enabled = true
         if (!this.buildConfig.post_build) {
@@ -818,10 +839,6 @@ export default {
         this.$set(this.buildConfig.post_build, 'scripts', '#!/bin/bash\nset -e')
       }
       this.$nextTick(this.$utils.scrollToBottom)
-    },
-    removeStcov () {
-      this.stcov_enabled = false
-      delete this.buildConfig.main_file
     },
     removeDocker () {
       this.docker_enabled = false
@@ -937,6 +954,9 @@ export default {
       if (res) {
         this.jenkinsBuild.jenkins_build.jenkins_build_params = res
       }
+    },
+    viewDockerfile () {
+      this.showDockerfile = true
     },
     loadPage () {
       const projectName = this.projectName
@@ -1166,6 +1186,15 @@ export default {
 
   .registry-alert {
     margin-bottom: 10px;
+  }
+
+  .dockerfile-args-container {
+    line-height: 1;
+
+    span {
+      color: #606266;
+      font-size: 14px;
+    }
   }
 
   .section {

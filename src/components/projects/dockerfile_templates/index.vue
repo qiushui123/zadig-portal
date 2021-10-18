@@ -13,14 +13,9 @@ export default {
       title: '模板库',
       routerList: [
         {
-          name: 'Chart',
-          url: `/v1/projects/template/charts`,
-          icon: 'iconfont iconhelmrepo'
-        },
-        {
-          name: 'Dockerfile',
+          name: 'Dockerfile 模板',
           url: `/v1/projects/template/dockerfiles`,
-          icon: 'iconfont icondocker'
+          icon: 'iconfont iconhelmrepo'
         }
       ]
     })
