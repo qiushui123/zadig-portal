@@ -160,7 +160,7 @@
         </el-table-column>
         <el-table-column v-if="isPm" label="交付物">
           <template  slot-scope="scope">
-            <StoragePick v-if="pickedStorage" :id="pickedStorage" :name="scope.row.name" v-model="scope.row"/>
+            <StoragePick v-if="pickedStorage" :id="pickedStorage" :name="scope.row.name" v-model="pickedTargets[scope.$index]"/>
           </template>
         </el-table-column >
         <el-table-column v-else label="镜像">
@@ -668,15 +668,20 @@ export default {
       ]
       const clone = this.$utils.cloneObj(this.runner)
       // filter picked targets
-      clone.targets = clone.targets.filter(t => t.picked)
+      clone.targets = this.pickedTargets
       if (this.artifactDeployEnabled) {
         clone.registry_id = this.pickedRegistry
         clone.artifact_args = []
         clone.targets.forEach(element => {
+          console.log(element)
           clone.artifact_args.push({
             service_name: element.service_name,
             name: element.name,
             image: element.image,
+            workflow_name: element.workflow_name || '',
+            task_id: element.task_id || '',
+            file_name: element.file_name || '',
+            url: element.url || '',
             deploy: element.deploy
           })
         })
@@ -759,6 +764,7 @@ export default {
           invalidService.push(item.name)
         }
       })
+      const deliverable = this.pickedTargets.find(item => item.task_id)
       if (this.artifactDeployEnabled) {
         if (this.pickedTargets.length === 0) {
           this.$message({
@@ -773,9 +779,15 @@ export default {
               type: 'error'
             })
             return false
-          } else if (invalidService.length > 0) {
+          } else if (invalidService.length > 0 && !this.isPm) {
             this.$message({
               message: invalidService.join(',') + ' 服务尚未选择镜像',
+              type: 'error'
+            })
+            return false
+          } else if (this.isPm && !deliverable) {
+            this.$message({
+              message: invalidService.join(',') + ' 服务尚未选择交付物',
               type: 'error'
             })
             return false

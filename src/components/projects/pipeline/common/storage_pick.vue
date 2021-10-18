@@ -1,6 +1,6 @@
 <template>
-  <el-select @change="changeTar" filterable clearable size="small" placeholder="请选择交付物">
-    <el-option v-for="item in tarList" :key="item.task_id" :label="item.file_name"></el-option>
+  <el-select @change="changeTar" v-model="tar" filterable clearable size="small" placeholder="请选择交付物">
+    <el-option v-for="item in tarList" :key="item.task_id" :value="item.task_id" :label="item.file_name"></el-option>
   </el-select>
 </template>
 <script>
@@ -14,7 +14,8 @@ export default {
   },
   data () {
     return {
-      tarList: []
+      tarList: [],
+      tar: null
     }
   },
   methods: {
@@ -28,15 +29,10 @@ export default {
         this.tarList = res
       }
     },
-    changeTar (item) {
-      let obj = {
-        service_name: value.service_name,
-        name: value.name
-      }
-      if (item) {
-        obj = { ...obj, workflow_name: item.workflow_name, task_id: item.task_id, file_name: item.file_name, url: item.url }
-      }
-      this.$emit('change', obj)
+    changeTar (task_id) {
+      const item = this.tarList.find(item => item.task_id === task_id)
+      const obj = { ...this.value, workflow_name: item.workflow_name, task_id: item.task_id, file_name: item.file_name, url: item.url }
+      this.$emit('input', obj)
     }
   },
   mounted () {
