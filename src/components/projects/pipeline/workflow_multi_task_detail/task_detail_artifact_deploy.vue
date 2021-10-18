@@ -51,12 +51,20 @@
           </el-col>
         </el-row>
         <el-row :gutter="0">
-          <el-col :span="6">
+          <el-col :span="6" v-if="deploy.artifact_info">
+            <div class="grid-content item-title">
+              <i class="iconfont iconSliceCopy"></i> 交付物信息
+            </div>
+          </el-col>
+          <el-col :span="6"  v-if="deploy.artifact_info">
+            <div>{{deploy.artifact_info.file_name}}</div>
+          </el-col>
+          <el-col :span="6"  v-if="!deploy.artifact_info">
             <div class="grid-content item-title">
               <i class="iconfont iconSliceCopy"></i> 镜像信息
             </div>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="6"  v-if="!deploy.artifact_info">
             <el-tooltip effect="dark"
                         :content="deploy.image"
                         placement="top">

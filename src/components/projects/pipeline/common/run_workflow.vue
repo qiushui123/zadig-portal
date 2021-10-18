@@ -203,7 +203,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div v-if="artifactDeployEnabled && !isHelm"
+      <div v-if="artifactDeployEnabled && !isHelm && !isPm"
           class="create-version">
         <div class="create-checkbox">
           <el-checkbox v-model="createVersion">创建版本</el-checkbox>
