@@ -2,9 +2,7 @@
 <template>
   <el-card class="repertory-container" v-loading="loading">
     <el-alert type="warning" :closable="false" v-if="!checkOne">
-      <div class="noti-desc">注意：</div>
-      <div class="noti-desc">1. 一份 values 文件会被定义成一个服务</div>
-      <div class="noti-desc">2. 批量创建的服务名称为 values 文件名称</div>
+      提示：一份 values 文件会被定义成一个服务，服务名称即为 values 文件名称。
     </el-alert>
     <el-tree
       ref="tree"
@@ -106,9 +104,5 @@ export default {
 /deep/.el-alert {
   margin-top: -5px;
   margin-bottom: 10px;
-
-  .noti-desc {
-    margin-bottom: 3px;
-  }
 }
 </style>

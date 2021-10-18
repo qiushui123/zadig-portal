@@ -16,7 +16,7 @@
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <h4 style="padding-left: 40px;">Values 文件</h4>
+      <h4 style="padding-left: 40px;">values 文件</h4>
       <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
       <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
