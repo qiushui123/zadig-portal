@@ -378,8 +378,8 @@ export default {
       }
 
       .avatar {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         margin-bottom: 10px;
         border-radius: 50%;
       }
