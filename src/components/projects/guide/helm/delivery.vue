@@ -1,125 +1,114 @@
 <template>
   <div class="projects-delivery-container">
     <div class="guide-container">
-      <step :activeStep="3" :stepThreeTitle="`配置环境`">
-      </step>
+      <step :activeStep="3" :stepThreeTitle="`配置环境`"></step>
       <div class="current-step-container">
         <div class="title-container">
           <span class="first">第四步</span>
           <span class="second">运行工作流触发服务的自动化交付</span>
         </div>
         <div class="account-integrations cf-block__list">
-          <el-table v-loading="loading"
-                    :data="mapWorkflows"
-                    style="width: 100%;">
+          <el-table v-loading="loading" :data="mapWorkflows" style="width: 100%;">
             <el-table-column label="工作流名称">
               <template slot-scope="scope">
                 <span style="margin-left: 10px;">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column width="200px"
-                             label="环境信息">
+            <el-table-column width="200px" label="环境信息">
               <template slot-scope="scope">
-                <a v-if="scope.row.env_name"
-                   class="env-name"
-                   :href="`/v1/projects/detail/${ scope.row.product_tmpl_name}/envs/detail?envName=${ scope.row.env_name}`"
-                   target="_blank">{{ `${scope.row.env_name}`}}</a>
+                <a
+                  v-if="scope.row.env_name"
+                  class="env-name"
+                  :href="`/v1/projects/detail/${ scope.row.product_tmpl_name}/envs/detail?envName=${ scope.row.env_name}`"
+                  target="_blank"
+                >{{ `${scope.row.env_name}`}}</a>
               </template>
             </el-table-column>
             <el-table-column label="服务入口">
               <template slot-scope="scope">
-                <div v-for="(ingress,ingress_index) in scope.row.ingress_infos"
-                     :key="ingress_index">
-                  <div v-for="(item,host_index) in scope.row.ingress_infos[ingress_index]['host_info']"
-                       :key="host_index">
-                    <a style="color: #1989fa;"
-                       :href="`http://${item.host}`"
-                       target="_blank">{{item.host}}</a>
+                <div v-for="(ingress,ingress_index) in scope.row.ingress_infos" :key="ingress_index">
+                  <div v-for="(item,host_index) in scope.row.ingress_infos[ingress_index]['host_info']" :key="host_index">
+                    <a style="color: #1989fa;" :href="`http://${item.host}`" target="_blank">{{item.host}}</a>
                   </div>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column width="200px"
-                             label="包含步骤">
+            <el-table-column width="200px" label="包含步骤">
               <template slot-scope="scope">
                 <span>
-                  <span
-                        v-if="!$utils.isEmpty(scope.row.build_stage) && scope.row.build_stage.enabled">
+                  <span v-if="!$utils.isEmpty(scope.row.build_stage) && scope.row.build_stage.enabled">
                     <el-tag size="small">构建部署</el-tag>
-                    <span v-if="scope.row.test_stage.enabled||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)||scope.row.distribute_stage.enabled"
-                          class="step-arrow"><i class="el-icon-right"></i></span>
+                    <span
+                      v-if="scope.row.test_stage.enabled||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)||scope.row.distribute_stage.enabled"
+                      class="step-arrow"
+                    >
+                      <i class="el-icon-right"></i>
+                    </span>
                   </span>
-                  <span
-                        v-if="!$utils.isEmpty(scope.row.artifact_stage) && scope.row.artifact_stage.enabled">
+                  <span v-if="!$utils.isEmpty(scope.row.artifact_stage) && scope.row.artifact_stage.enabled">
                     <el-tag size="small">交付物部署</el-tag>
-                    <span v-if="scope.row.test_stage.enabled||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)||scope.row.distribute_stage.enabled"
-                          class="step-arrow"><i class="el-icon-right"></i></span>
+                    <span
+                      v-if="scope.row.test_stage.enabled||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)||scope.row.distribute_stage.enabled"
+                      class="step-arrow"
+                    >
+                      <i class="el-icon-right"></i>
+                    </span>
                   </span>
                   <span
-                        v-if="(!$utils.isEmpty(scope.row.test_stage) && scope.row.test_stage.enabled)||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)">
+                    v-if="(!$utils.isEmpty(scope.row.test_stage) && scope.row.test_stage.enabled)||(!$utils.isEmpty(scope.row.security_stage)&&scope.row.security_stage.enabled)"
+                  >
                     <el-tag size="small">测试</el-tag>
-                    <span v-if="scope.row.distribute_stage.enabled"
-                          class="step-arrow"><i class="el-icon-right"></i></span>
+                    <span v-if="scope.row.distribute_stage.enabled" class="step-arrow">
+                      <i class="el-icon-right"></i>
+                    </span>
                   </span>
-                  <el-tag v-if="!$utils.isEmpty(scope.row.distribute_stage) &&  scope.row.distribute_stage.enabled"
-                          size="small">分发</el-tag>
+                  <el-tag v-if="!$utils.isEmpty(scope.row.distribute_stage) &&  scope.row.distribute_stage.enabled" size="small">分发</el-tag>
                 </span>
               </template>
             </el-table-column>
-            <el-table-column width="150px"
-                             label="更新信息（时间/操作人）">
-              <template slot-scope="scope">
-                {{$utils.convertTimestamp(scope.row.update_time)}}
-              </template>
+            <el-table-column width="150px" label="更新信息（时间/操作人）">
+              <template slot-scope="scope">{{$utils.convertTimestamp(scope.row.update_time)}}</template>
             </el-table-column>
-            <el-table-column width="120px"
-                             label="操作">
+            <el-table-column width="120px" label="操作">
               <template slot-scope="scope">
-                <el-button type="success"
-                           size="mini"
-                           round
-                           @click="runCurrentTask(scope.row)"
-                           plain>点击运行</el-button>
+                <span v-if="pipeStatus.status !== 'success'">准备中，请稍后...</span>
+                <el-button v-else type="success" size="mini" round @click="runCurrentTask(scope.row)" plain>点击运行</el-button>
               </template>
             </el-table-column>
           </el-table>
-
         </div>
       </div>
       <div class="other-operation">
-        <h3 class="pipelines-aside-help__step-header">
-          您可能还需要：
-        </h3>
+        <h3 class="pipelines-aside-help__step-header">您可能还需要：</h3>
         <ul class="pipelines-aside-help__step-list">
-          <li class="pipelines-aside-help__step-list-item"><a target="_blank"
-               href="https://docs.koderover.com/zadig/project/workflow/#git-webhook"
-               class="pipelines-aside-help__step-list-item-link"><i class="icon el-icon-link"></i>
-              <span class="pipelines-aside-help__step-list-item-link-text">
-                配置 Git Webhook 自动触发服务升级</span></a></li>
+          <li class="pipelines-aside-help__step-list-item">
+            <a
+              target="_blank"
+              href="https://docs.koderover.com/zadig/project/workflow/#git-webhook"
+              class="pipelines-aside-help__step-list-item-link"
+            >
+              <i class="icon el-icon-link"></i>
+              <span class="pipelines-aside-help__step-list-item-link-text">配置 Git Webhook 自动触发服务升级</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
         <router-link :to="`/v1/projects/detail/${projectName}`">
-          <button type="primary"
-                  size="small"
-                  class="save-btn"
-                  :disabled="loading"
-                  plain>完成</button>
+          <button type="primary" size="small" class="save-btn" :disabled="loading" plain>完成</button>
         </router-link>
       </div>
     </div>
-    <el-dialog :visible.sync="taskDialogVisible"
-               title="运行 产品-工作流"
-               custom-class="run-workflow"
-               width="60%"
-               class="dialog">
-      <run-workflow v-if="taskDialogVisible"
-                    :workflowName="workflow.name"
-                    :workflowMeta="workflow"
-                    :targetProduct="workflow.product_tmpl_name"
-                    @success="hideAfterSuccess"></run-workflow>
+    <el-dialog :visible.sync="taskDialogVisible" title="运行 产品-工作流" custom-class="run-workflow" width="60%" class="dialog">
+      <run-workflow
+        v-if="taskDialogVisible"
+        :workflowName="workflow.name"
+        :workflowMeta="workflow"
+        :targetProduct="workflow.product_tmpl_name"
+        @success="hideAfterSuccess"
+      ></run-workflow>
     </el-dialog>
   </div>
 </template>
@@ -127,46 +116,59 @@
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
 import runWorkflow from '../../pipeline/common/run_workflow.vue'
-import { getProjectIngressAPI } from '@api'
+import { getProjectIngressAPI, generatePipeAPI } from '@api'
 export default {
   data () {
     return {
       loading: true,
       workflow: {},
       taskDialogVisible: false,
-      mapWorkflows: []
+      mapWorkflows: [],
+      pipeStatus: { status: '' }
     }
   },
   methods: {
     getWorkflows () {
       this.loading = true
-      this.$store.dispatch('refreshWorkflowList').then(() => {
-        this.loading = false
-      }).then(() => {
-        const projectName = this.projectName
-        const w1 = 'workflow-qa'
-        const w2 = 'workflow-dev'
-        const w3 = 'workflow-ops'
-        const currentWorkflows = this.$store.getters.workflowList.filter(element => {
-          return (element.name.includes(w1) && element.product_tmpl_name === this.projectName) || (element.name.includes(w2) && element.product_tmpl_name === this.projectName) || (element.name.includes(w3) && element.product_tmpl_name === this.projectName)
-        }).map((ele) => {
-          const element = Object.assign({}, ele)
-          if (element.name.includes(w1)) element.env_name = 'qa'
-          if (element.name.includes(w2)) element.env_name = 'dev'
-          if (element.name.includes(w3)) element.env_name = ''
-          return element
+      this.$store
+        .dispatch('refreshWorkflowList')
+        .then(() => {
+          this.loading = false
         })
-        getProjectIngressAPI(projectName).then((res) => {
-          currentWorkflows.forEach(workflow => {
-            res.forEach(ingress => {
-              if (ingress.env_name === workflow.env_name) {
-                workflow.ingress_infos = ingress.ingress_infos
-              }
+        .then(() => {
+          const projectName = this.projectName
+          const w1 = 'workflow-qa'
+          const w2 = 'workflow-dev'
+          const w3 = 'workflow-ops'
+          const currentWorkflows = this.$store.getters.workflowList
+            .filter(element => {
+              return (
+                (element.name.includes(w1) &&
+                  element.product_tmpl_name === this.projectName) ||
+                (element.name.includes(w2) &&
+                  element.product_tmpl_name === this.projectName) ||
+                (element.name.includes(w3) &&
+                  element.product_tmpl_name === this.projectName)
+              )
             })
+            .map(ele => {
+              const element = Object.assign({}, ele)
+              if (element.name.includes(w1)) element.env_name = 'qa'
+              if (element.name.includes(w2)) element.env_name = 'dev'
+              if (element.name.includes(w3)) element.env_name = ''
+              return element
+            })
+          getProjectIngressAPI(projectName).then(res => {
+            currentWorkflows.forEach(workflow => {
+              res.forEach(ingress => {
+                if (ingress.env_name === workflow.env_name) {
+                  workflow.ingress_infos = ingress.ingress_infos
+                }
+              })
+            })
+            this.mapWorkflows = currentWorkflows
           })
-          this.mapWorkflows = currentWorkflows
         })
-      })
     },
     runCurrentTask (scope) {
       this.workflow = scope
@@ -174,6 +176,20 @@ export default {
     },
     hideAfterSuccess () {
       this.taskDialogVisible = false
+    },
+    generatePipe () {
+      let pipeTimer = null
+      const fn = () => {
+        if (this.pipeStatus && this.pipeStatus.status !== 'success') {
+          generatePipeAPI(this.projectName).then(res => {
+            this.$set(this, 'pipeStatus', res)
+          })
+          pipeTimer = setTimeout(fn, 1000)
+        } else {
+          clearInterval(pipeTimer)
+        }
+      }
+      fn()
     }
   },
   computed: {
@@ -183,14 +199,22 @@ export default {
   },
   created () {
     this.getWorkflows()
-    bus.$emit(`set-topbar-title`, { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, url: '' }] })
+    bus.$emit(`set-topbar-title`, {
+      title: '',
+      breadcrumb: [
+        { title: '项目', url: '/v1/projects' },
+        { title: this.projectName, url: '' }
+      ]
+    })
     bus.$emit(`set-sub-sidebar-title`, {
       title: '',
       routerList: []
     })
+    this.generatePipe()
   },
   components: {
-    step, runWorkflow
+    step,
+    runWorkflow
   },
   onboardingStatus: 0
 }
@@ -216,7 +240,7 @@ export default {
   }
 
   .guide-container {
-    min-height: calc(~"100% - 70px");
+    min-height: calc(~'100% - 70px');
     margin-top: 10px;
 
     .current-step-container {

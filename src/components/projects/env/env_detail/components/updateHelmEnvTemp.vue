@@ -83,12 +83,19 @@ export default {
 .helm-env-template {
   margin-top: -1px;
 
-  /deep/.el-collapse-item__wrap {
-    border-bottom-width: 0;
+  /deep/.el-collapse-item {
+    .el-collapse-item__header {
+      padding-left: 8px;
+    }
 
-    .el-collapse-item__content {
-      padding-bottom: 10px;
-      line-height: inherit;
+    .el-collapse-item__wrap {
+      border-bottom-width: 0;
+
+      .el-collapse-item__content {
+        padding-bottom: 10px;
+        padding-left: 8px;
+        line-height: inherit;
+      }
     }
   }
 }

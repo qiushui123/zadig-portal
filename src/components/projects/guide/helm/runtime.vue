@@ -30,7 +30,7 @@
             </el-tab-pane>
           </el-tabs>
           <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName"></HelmEnvTemplate>
-          <div>
+          <div class="ai-bottom">
             <el-button type="primary" size="small" @click="createHelmProductEnv">创建环境</el-button>
           </div>
         </div>
@@ -164,8 +164,8 @@ export default {
         }
 
         .el-tabs__new-tab {
-          color: #3289e4;
-          border-color: #3289e4;
+          color: #67c23a;
+          border-color: #67c23a;
         }
 
         .tab-label {
@@ -188,6 +188,10 @@ export default {
           }
         }
 
+        .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
+          border-bottom-color: #f5f7f7;
+        }
+
         .el-tabs--card > .el-tabs__header .el-tabs__item.is-active,
         .el-tabs--card > .el-tabs__header .el-tabs__item:hover {
           .el-icon-close {
@@ -199,6 +203,10 @@ export default {
             width: 14px;
             margin-left: 10px;
           }
+        }
+
+        .ai-bottom {
+          margin-top: 10px;
         }
       }
 
