@@ -6,7 +6,6 @@
                      layout="vertical">
             <div class="file-tree-container">
               <fileTree :files="files"
-                           :showNext.sync="showNext"
                            :fileChange="fileChange"
                            ref="fileTree"
                            @onRefreshFile="getFiles"
@@ -20,7 +19,6 @@
                      :style="{ minWidth: '300px', width: '500px' }">
                   <fileEditor ref="fileEditor"
                                     :fileInTree="file"
-                                    :showNext.sync="showNext"
                                     :fileChange.sync="fileChange"
                                     @onRefreshFile="getFiles"
                                     @onUpdateFile="onUpdateFile"></fileEditor>
@@ -28,9 +26,7 @@
                 <multipane-resizer></multipane-resizer>
                 <aside class="pipelines__aside pipelines__aside_right"
                        :style="{ flexGrow: 1 }">
-                  <FileAside :file="file"
-                                   :detectedEnvs="detectedEnvs"
-                                   @getServiceModules="getServiceModules"> </FileAside>
+                  <FileAside :file="file"></FileAside>
                 </aside>
 
               </template>
@@ -61,8 +57,7 @@ import fileTree from './file_tree.vue'
 import { sortBy } from 'lodash'
 import bus from '@utils/event_bus'
 import {
-  getDockerfileTemplatesAPI,
-  getDockerfileAPI
+  getDockerfileTemplatesAPI, getDockerfileAPI
 } from '@api'
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 export default {
@@ -70,8 +65,6 @@ export default {
     return {
       file: {},
       files: [],
-      detectedEnvs: [],
-      detectedServices: [],
       systemEnvs: [],
       showNext: false,
       fileChange: false
@@ -93,17 +86,7 @@ export default {
         })), 'name')
       })
     },
-    getServiceModules () {
-      const fileName = this.file.name
-      const projectName = this.projectName
-      serviceTemplateWithConfigAPI(fileName, projectName).then(res => {
-        this.detectedEnvs = res.custom_variable ? res.custom_variable : []
-        this.detectedServices = res.service_module ? res.service_module : []
-        this.systemEnvs = res.system_variable ? res.system_variable : []
-      })
-    },
     onUpdateFile ({ name, status, res }) {
-      this.showNext = true
       this.$router.replace({
         query: Object.assign(
           {},

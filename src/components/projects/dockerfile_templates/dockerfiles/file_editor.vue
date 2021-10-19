@@ -17,7 +17,17 @@
               </div>
             </div>
           </div>
-
+        </div>
+        <div v-if="errors.length > 0"
+             class="yaml-errors__container yaml-errors__accordion-opened">
+          <ul class="yaml-errors__errors-list">
+            <li v-for="(error,index) in errors"
+                :key="index"
+                class="yaml-errors__errors-list-item">
+              <div class="yaml-errors__errors-list-item-counter"> {{index+1}} </div>
+              <div class="yaml-errors__errors-list-item-text">{{error}}</div>
+            </li>
+          </ul>
         </div>
         <div
              class="controls__wrap">
@@ -47,7 +57,7 @@ import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
-import { validateYamlAPI, getDockerfileAPI, createDockerfileTemplateAPI, updateDockerfileTemplateAPI } from '@api'
+import { validateDockerfileAPI, getDockerfileAPI, createDockerfileTemplateAPI, updateDockerfileTemplateAPI } from '@api'
 const parser = require('docker-file-parser')
 
 export default {
@@ -77,16 +87,6 @@ export default {
       },
       stagedFile: {},
       initFileContent: '',
-      mockRes: [{
-        id: 'd1',
-        name: 'dockerfile 1',
-        content: '# Dockerfile 1 Install Ghost\n'
-      },
-      {
-        id: 'd2',
-        name: 'dockerfile 2',
-        content: '# Dockerfile 2 Install Ghost\n'
-      }],
       newCode: ''
     }
   },
@@ -165,17 +165,21 @@ export default {
           this.stagedFile[this.file.name] = newCode
         }
       }
-    }, 100),
+    }, 500),
     validateFile (code) {
       const options = { includeComments: false }
       console.log(parser.parse(code, options))
-      // validateYamlAPI().then((res) => {
-      //   if (res && res.length > 0) {
-      //     this.errors = res
-      //   } else if (res && res.length === 0) {
-      //     this.errors = []
-      //   }
-      // })
+      const payload = {
+        content: code
+      }
+      validateDockerfileAPI(payload).then((res) => {
+        this.errors = []
+        if (res && res.error) {
+          this.errors.push(res.error)
+        } else if (res && res.error === '') {
+          this.errors = []
+        }
+      })
     },
     editorFocus () {
       this.codemirror.focus()

@@ -1227,6 +1227,10 @@ export function updateDockerfileTemplateAPI (id, payload) {
   return http.put(`/api/aslan/template/dockerfile/${id}`, payload)
 }
 
+export function validateDockerfileAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile/validation`, payload)
+}
+
 export function getDockerfileAPI (id) {
   return http.get(`/api/aslan/template/dockerfile/${id}`)
 }
