@@ -1,11 +1,10 @@
 
 <template>
   <el-card class="repertory-container" v-loading="loading">
-    <el-alert type="warning" :closable="false" v-if="!checkOne">
-      提示：一份 values 文件会被定义成一个服务，服务名称即为 values 文件名称。
-    </el-alert>
+    <el-alert type="warning" :closable="false" v-if="!checkOne">提示：一份 values 文件会被定义成一个服务，服务名称即为 values 文件名称。</el-alert>
     <el-tree
       ref="tree"
+      v-if="showTree"
       :props="defaultProps"
       :load="loadNode"
       lazy
@@ -13,6 +12,7 @@
       highlight-current
       node-key="full_path"
       @check-change="handleCheckChange"
+      :default-expanded-keys="defaultExpanded"
       :check-strictly="checkOne"
     >
       <span class="custom-tree-node" slot-scope="{node, data}">
@@ -34,7 +34,9 @@ export default {
         label: 'name',
         isLeaf: 'leaf'
       },
-      loading: true
+      loading: true,
+      defaultExpanded: [],
+      showTree: true
     }
   },
   props: {
@@ -59,6 +61,10 @@ export default {
     handleCheckChange (data, checked) {
       if (this.checkOne && checked) {
         this.$refs.tree.setCheckedKeys([data.full_path])
+        return
+      }
+      if (checked && data.is_dir) {
+        this.defaultExpanded.push(data.full_path)
       }
     },
     emitCheckedPath () {
@@ -67,6 +73,12 @@ export default {
         .filter(key => key.endsWith('.yaml'))
       this.$refs.tree.setCheckedKeys([])
       this.$emit('checkedPath', checkedKeys)
+
+      this.defaultExpanded = []
+      this.showTree = false
+      this.$nextTick(() => {
+        this.showTree = true
+      })
     },
     loadNode (node, resolve) {
       const path = (node.data && node.data.full_path) || ''
@@ -87,6 +99,15 @@ export default {
             element.leaf = false
           } else {
             element.leaf = true
+          }
+        })
+        this.$nextTick(() => {
+          if (node.checked) {
+            node.childNodes.forEach(child => {
+              if (!child.isLeaf) {
+                this.defaultExpanded.push(child.data.full_path)
+              }
+            })
           }
         })
         return resolve(res)
