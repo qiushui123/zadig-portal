@@ -32,7 +32,7 @@
                 <el-table-column prop="value"
                                  label="构建">
                   <template slot-scope="scope">
-                    <span v-if="scope.row.build_name">{{scope.row.build_name}}</span>
+                    <router-link v-if="scope.row.build_name" :to="`/v1/projects/detail/${scope.row.project_name}/builds/detail/${scope.row.build_name}`">{{scope.row.build_name}}</router-link>
                     <span v-else>空</span>
                   </template>
                 </el-table-column>

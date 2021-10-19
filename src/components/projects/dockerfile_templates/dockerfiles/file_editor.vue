@@ -1,6 +1,6 @@
 <template>
   <div
-       class="pipeline-workflow__column pipeline-workflow__column_left pipeline-workflow__column--w100p">
+       class="pipeline-workflow__column file-editor pipeline-workflow__column--w100p">
     <div class="white-box-with-shadow">
         <div class="white-box-with-shadow__content">
           <div class="row cf-pipeline-yml-build__wrapper">
@@ -58,7 +58,6 @@ import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
 import { validateDockerfileAPI, createDockerfileTemplateAPI, updateDockerfileTemplateAPI } from '@api'
-const parser = require('docker-file-parser')
 
 export default {
   props: {
@@ -146,8 +145,6 @@ export default {
       }
     }, 500),
     validateFile (code) {
-      // const options = { includeComments: false }
-      // console.log(parser.parse(code, options))
       const payload = {
         content: code
       }

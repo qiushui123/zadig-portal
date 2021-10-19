@@ -1,5 +1,5 @@
 <template>
-  <div class="template-container">
+  <div class="dockerfile-template-container">
     <router-view></router-view>
   </div>
 </template>
@@ -24,8 +24,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.template-container {
+.dockerfile-template-container {
   display: flex;
   height: 100%;
+  overflow: hidden;
 }
 </style>

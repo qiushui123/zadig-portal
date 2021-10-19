@@ -82,6 +82,7 @@ export default {
 
 <style lang="less">
 a {
+  color: #1989fa;
   text-decoration: none;
 }
 

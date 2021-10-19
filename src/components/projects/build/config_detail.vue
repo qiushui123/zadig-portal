@@ -1,9 +1,20 @@
 <template>
   <div class="build-config-container">
-    <el-drawer title="Dockerfile 预览"
+    <el-drawer title="Dockerfile 模板预览"
                :visible.sync="showDockerfile"
                direction="rtl">
-        <!-- <add-code @cancel="showDockerfile = false"></add-code> -->
+      <Codemirror v-model="dockerfileTemplate.content" :cmOption="{
+        tabSize: 2,
+        readOnly: true,
+        theme: 'neo',
+        mode: 'text/x-dockerfile',
+        lineNumbers: false,
+        line: true,
+        showGutter: false,
+        displayIndentGuides: false,
+        showPrintMargin: false,
+        collapseIdentical: true
+      }" class="mirror"></Codemirror>
     </el-drawer>
     <div class="jenkins"
          v-show="source === 'jenkins'">
@@ -483,40 +494,40 @@
             </el-form-item>
             <el-form-item label="Dockerfile 来源："
                           prop="source">
-              <el-select size="small" style="width: 100%;" v-model="buildConfig.post_build.source" placeholder="请选择">
+              <el-select size="small" style="width: 100%;" v-model="buildConfig.post_build.docker_build.source" placeholder="请选择">
                 <el-option
                   label="代码仓库"
                   value="local">
                 </el-option>
                 <el-option
                   label="模板库"
-                  value="templates">
+                  value="template">
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item v-if="buildConfig.post_build.source === 'local'" label="Dockerfile 文件的完整路径："
+            <el-form-item v-if="buildConfig.post_build.docker_build.source === 'local'" label="Dockerfile 文件的完整路径："
                           prop="docker_file">
               <el-input v-model="buildConfig.post_build.docker_build.docker_file"
                         size="small">
                 <template slot="prepend">$WORKSPACE/</template>
               </el-input>
             </el-form-item>
-            <el-form-item v-if="buildConfig.post_build.source === 'template'"  label="选择模板："
+            <el-form-item v-if="buildConfig.post_build.docker_build.source === 'template'"  label="选择模板："
                           prop="template_name">
-              <el-select style="width: 95%;" size="small" filterable v-model="buildConfig.post_build.template_id" placeholder="请选择">
-                <el-option
-                  label="template 1"
-                  value="template1">
-                </el-option>
-                <el-option
-                  label="template 2"
-                  value="template2">
+              <el-select style="width: 95%;" size="small" filterable @change="getDockerfileTemplate" v-model="buildConfig.post_build.docker_build.template_id" placeholder="请选择">
+                <el-option v-for="(template,index) in dockerfileTemplates"
+                  :key="index"
+                  :label="template.name"
+                  :value="template.id">
                 </el-option>
               </el-select>
-              <el-button style="margin-left: 5px;" type="text" @click="viewDockerfile"> 预览</el-button>
-              <div v-if="buildConfig.post_build.template_id" class="dockerfile-args-container">
-                <span>ARG k1=v1 k2=v2 k3=v3 k4=v4</span>
+              <template >
+              <el-button :disabled="!buildConfig.post_build.docker_build.template_id" style="margin-left: 5px;" type="text" @click="showDockerfile = true"> 预览</el-button>
+              <div v-if="dockerfileTemplate.variable && dockerfileTemplate.variable.length > 0" class="dockerfile-args-container">
+                <span>ARG</span>
+                <span v-for="(item,index) in dockerfileTemplate.variable" :key="index">{{`${item.key}=${item.value}`}}</span>
               </div>
+              </template>
             </el-form-item>
             <el-form-item label="镜像构建参数：">
               <el-tooltip effect="dark"
@@ -622,9 +633,10 @@
   </div>
 </template>
 <script>
-import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
+import { getBuildConfigDetailAPI, getAllAppsAPI, getDockerfileTemplatesAPI, getDockerfileAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
 import Editor from 'vue2-ace-bind'
 import bus from '@utils/event_bus'
+import Codemirror from '@/components/projects/common/codemirror.vue'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
@@ -642,6 +654,7 @@ export default {
   data () {
     return {
       source: 'zadig',
+      dockerfileTemplate: {},
       orginOptions: [{
         value: 'zadig',
         label: 'Zadig 构建'
@@ -701,6 +714,7 @@ export default {
       allRegistry: [],
       serviceTargets: [],
       allCodeHosts: [],
+      dockerfileTemplates: [],
       showBuildAdvancedSetting: {},
       createRules: {
         name: [
@@ -955,8 +969,13 @@ export default {
         this.jenkinsBuild.jenkins_build.jenkins_build_params = res
       }
     },
-    viewDockerfile () {
-      this.showDockerfile = true
+    async getDockerfileTemplate (id) {
+      const res = await getDockerfileAPI(id).catch(err => {
+        console.log(err)
+      })
+      if (res) {
+        this.dockerfileTemplate = res
+      }
     },
     loadPage () {
       const projectName = this.projectName
@@ -981,6 +1000,9 @@ export default {
           }
           if (this.buildConfig.post_build.docker_build) {
             this.docker_enabled = true
+            if (this.buildConfig.post_build.docker_build.template_id) {
+              this.getDockerfileTemplate(this.buildConfig.post_build.docker_build.template_id)
+            }
           }
           if (this.buildConfig.post_build.file_archive) {
             this.binary_enabled = true
@@ -995,6 +1017,9 @@ export default {
         this.allApps = apps.map((app, index) => {
           return { name: app.name, version: app.version, id: app.name + app.version }
         })
+      })
+      getDockerfileTemplatesAPI().then((res) => {
+        this.dockerfileTemplates = res.dockerfile_template
       })
       getCodeSourceAPI(orgId).then((response) => {
         this.allCodeHosts = response
@@ -1065,7 +1090,8 @@ export default {
   },
   components: {
     Editor,
-    Resize
+    Resize,
+    Codemirror
   }
 
 }
