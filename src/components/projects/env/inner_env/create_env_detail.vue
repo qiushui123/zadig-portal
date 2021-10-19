@@ -815,7 +815,7 @@ export default {
             namespace: this.projectConfig.defaultNamespace
           }
           this.startDeployLoading = true
-          createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
+          createHelmProductEnvAPI(this.projectConfig.product_name, [payload]).then(
             res => {
               const envName = payload.envName
               this.startDeployLoading = false

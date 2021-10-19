@@ -1,7 +1,7 @@
 <template>
   <div class="projects-delivery-container">
     <div class="guide-container">
-      <step :activeStep="3">
+      <step :activeStep="3" :stepThreeTitle="`配置环境`">
       </step>
       <div class="current-step-container">
         <div class="title-container">

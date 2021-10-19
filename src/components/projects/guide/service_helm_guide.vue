@@ -1,7 +1,7 @@
 <template>
 <div class="con">
     <div class="guide-container">
-      <step :activeStep="2">
+      <step :activeStep="2" :stepThreeTitle="`配置环境`">
       </step>
       <div class="current-step-container">
         <div class="title-container">
@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     toNext () {
-      this.$router.push(`/v1/projects/create/${this.projectName}/basic/runtime?serviceName=${this.serviceName}&serviceType=${this.serviceType}`)
+      this.$router.push(`/v1/projects/create/${this.projectName}/helm/runtime?serviceName=${this.serviceName}&serviceType=${this.serviceType}`)
     },
     async querytHelmChartService () {
       this.$store.dispatch('queryService', { projectName: this.projectName })
