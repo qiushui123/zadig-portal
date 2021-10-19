@@ -26,7 +26,9 @@ export default {
           this.currentComponents = CreatHostEnv
         } else {
           this.currentComponents = CreatEnvDetail
-        }
+        }// Compatible with old project
+      } else {
+        this.currentComponents = CreatEnvDetail
       }
     }
   },
