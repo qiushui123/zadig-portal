@@ -4,7 +4,7 @@
   </el-select>
 </template>
 <script>
-import { getTarsApi } from '@/api'
+import { getArtifactFileAPI } from '@/api'
 export default {
   name: 'storagePick',
   props: {
@@ -24,7 +24,7 @@ export default {
         id: this.id,
         names: [this.name]
       }
-      const res = await getTarsApi(params).catch(error => cosnole.log(error))
+      const res = await getArtifactFileAPI(params).catch(error => cosnole.log(error))
       if (res) {
         this.tarList = res
       }

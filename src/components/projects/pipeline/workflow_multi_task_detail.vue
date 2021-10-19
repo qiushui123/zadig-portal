@@ -394,7 +394,7 @@
                   class="build-deploy-table">
           <el-table-column type="expand">
             <template slot-scope="scope">
-              <task-detail-artifact-deploy :deploy="scope.row.artifact_deploySubTask">
+              <task-detail-artifact-deploy :deploy="scope.row.artifact_deploySubTask" :workflowName="workflowName" :taskID="taskID">
               </task-detail-artifact-deploy>
             </template>
           </el-table-column>
