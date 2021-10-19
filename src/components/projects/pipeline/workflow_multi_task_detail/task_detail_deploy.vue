@@ -78,7 +78,7 @@
               </span>
               <router-link v-else
                            class="env-link"
-                           :to="`/v1/projects/detail/${deploy.product_name}/envs/detail/${deploy.service_name}?envName=${deploy.env_name}&projectName=${deploy.product_name}&namespace=${deploy.namespace}`">
+                           :to="serviceUrl(deploy)">
                 {{deploy.service_name}}</router-link>
             </div>
           </el-col>
@@ -90,16 +90,24 @@
 
 <script>
 import mixin from '@utils/task_detail_mixin'
+import qs from 'qs'
 
 export default {
   data () {
     return {
     }
   },
-  computed: {
-
-  },
   methods: {
+    serviceUrl (deploy) {
+      const path = `/v1/projects/detail/${deploy.product_name}/envs/detail/${deploy.service_name}`
+      const query = {
+        envName: deploy.env_name,
+        projectName: deploy.product_name,
+        namespace: deploy.namespace,
+        clusterId: deploy.cluster_id ? deploy.cluster_id : ''
+      }
+      return path + '?' + qs.stringify(query)
+    }
   },
   props: {
     deploys: {
