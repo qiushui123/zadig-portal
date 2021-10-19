@@ -1,198 +1,96 @@
 <template>
   <div class="projects-runtime-container">
     <div class="guide-container">
-      <step :activeStep="2" :stepThreeTitle="`配置环境`">
-      </step>
+      <step :activeStep="2" :stepThreeTitle="`配置环境`"></step>
       <div class="current-step-container">
         <div class="title-container">
           <span class="first">第三步</span>
-          <span class="second">将服务加入运行环境，并准备对应的交付工作流，后续均可在项目中进行配置</span>
+          <span class="second">配置变量，按需创建环境。后续可在项目中调整。</span>
         </div>
         <div class="account-integrations cf-block__list">
-          <div class="title">
-            <h4>环境准备</h4>
-            <el-alert v-if="envFailure.length > 0||timeOut"
-                      type="warning">
-              <template v-solt:title>
-                环境正在准备中，可点击 “下一步” 或者
-                <el-button type="text"
-                           @click="jumpEnv">查看环境状态</el-button>
-                <i v-if="jumpLoading"
-                   class="el-icon-loading"></i>
-              </template>
-            </el-alert>
+          <div class="second">配置以下几套环境：</div>
+          <el-tabs v-model="activeName" type="card" :addable="isConfig" @edit="handleTabsEdit">
+            <el-tab-pane
+              v-for="env in envInfos"
+              :key="env.envName"
+              :label="env.envName"
+              :name="env.initName"
+              :closable="!env.isEdit && isConfig"
+            >
+              <span slot="label">
+                <span v-if="env.isEdit && isConfig" class="tab-label">
+                  <el-input v-model="env.envName" :placeholder="env.initName"></el-input>
+                  <i class="el-icon-finished" @click="env.isEdit = false" v-if="isConfig"></i>
+                </span>
+                <span v-else class="tab-label">
+                  {{env.envName}}
+                  <i class="el-icon-edit" @click="env.isEdit = true" v-if="isConfig"></i>
+                </span>
+              </span>
+            </el-tab-pane>
+          </el-tabs>
+          <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName"></HelmEnvTemplate>
+          <div>
+            <el-button type="primary" size="small" @click="createHelmProductEnv">创建环境</el-button>
           </div>
-          <div class="cf-block__item">
-            <div class="account-box-item">
-              <div class="account-box-item__info integration-card">
-                <div class="integration-card__image">
-                  <el-button v-if="envSuccess.length === 2"
-                             type="success"
-                             icon="el-icon-check"
-                             circle></el-button>
-                  <el-button v-else
-                             icon="el-icon-loading"
-                             circle></el-button>
-                </div>
-                <div class="integration-card__info">
-                  <div v-for="(env,index) in envStatus"
-                       :key="index"
-                       class="integration-details">
-                    <template v-if="env.env_name==='dev'">
-                      <span class="env-name">
-                        开发环境：dev
-                      </span>
-                      <span class="desc">，开发日常自测、业务联调</span>
-                      <el-link v-if="env.err_message!==''"
-                               type="warning">{{env.err_message}}</el-link>
-                    </template>
-                    <template v-if="env.env_name==='qa'"
-                              class="env-item">
-                      <span class="env-name">测试环境：qa
-                      </span>
-                      <span class="desc">，测试环境（自动化测试、业务验收）</span>
-                      <el-link v-if="env.err_message!==''"
-                               type="warning">{{env.err_message}}</el-link>
-                    </template>
-
-                  </div>
-                </div>
-              </div>
-              <div class="account-box-item__controls">
-              </div>
-            </div>
-          </div>
-          <div class="title">
-            <h4>工作流准备</h4>
-            <el-alert v-if="pipeStatus.err_message"
-                      :title="pipeStatus.err_message"
-                      type="error">
-            </el-alert>
-          </div>
-          <div class="cf-block__item">
-            <div class="account-box-item">
-              <div class="account-box-item__info integration-card">
-                <div class="integration-card__image">
-                  <el-button v-if="pipeStatus.status === 'success'"
-                             type="success"
-                             icon="el-icon-check"
-                             circle></el-button>
-                  <el-button v-else
-                             icon="el-icon-loading"
-                             circle></el-button>
-                </div>
-                <div class="integration-card__info">
-                  <div class="integration-details">
-                    开发工作流：{{projectName}}-workflow-dev，应用日常升级，用于开发自测和联调
-                  </div>
-                  <div class="integration-details">
-                    测试工作流：{{projectName}}-workflow-qa，应用按需升级，用于自动化测试和业务验收
-                  </div>
-                  <div class="integration-details">
-                    运维工作流：{{projectName}}-workflow-ops，业务按需发布，用于版本升级和业务上线
-                  </div>
-                </div>
-              </div>
-              <div class="account-box-item__controls">
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
         <router-link :to="`/v1/projects/create/${projectName}/helm/delivery`">
-          <button v-if="!getResult"
-                  type="primary"
-                  class="save-btn"
-                  disabled
-                  plain>下一步</button>
-          <button v-else-if="getResult"
-                  type="primary"
-                  class="save-btn"
-                  plain>下一步</button>
+          <button v-if="!getResult" type="primary" class="save-btn" disabled plain>下一步</button>
+          <button v-else-if="getResult" type="primary" class="save-btn" plain>下一步</button>
         </router-link>
-        <div class="run-button">
-        </div>
+        <div class="run-button"></div>
       </div>
     </div>
   </div>
 </template>
 <script>
+import HelmEnvTemplate from '@/components/projects/env/env_detail/components/updateHelmEnvTemp.vue'
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
-import { generateEnvAPI, generatePipeAPI } from '@api'
+import { createHelmProductEnvAPI } from '@api'
 export default {
   data () {
     return {
-      envStatus: [{ env_name: 'dev' }, { env_name: 'qa' }],
-      pipeStatus: {},
+      envInfos: [
+        { envName: 'dev', isEdit: false, initName: 'dev' },
+        { envName: 'qa', isEdit: false, initName: 'qa' }
+      ],
       getResult: false,
-      envTimer: 0,
-      pipeTimer: 0,
-      secondCount: 0,
-      timeOut: 0,
-      jumpLoading: false
+      activeName: 'dev',
+      isConfig: true
     }
   },
   methods: {
-    jumpEnv () {
-      this.$confirm('确认跳出后就不再进入 onboarding 流程。', '确认跳出产品交付向导？', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.jumpLoading = true
-        this.saveOnboardingStatus(this.projectName, 0).then((res) => {
-          this.$router.push(`/v1/projects/detail/${this.projectName}/envs`)
-        }).catch(() => {
-          this.jumpLoading = false
-        })
-      }).catch(() => {
-        this.$message.info('取消跳转')
-      })
+    createHelmProductEnv () {
+      const payload = {
+        envName: '',
+        clusterID: '',
+        chartValues: '',
+        defaultValues: '',
+        namespace: ''
+      }
+      createHelmProductEnvAPI('', [payload])
     },
-    generateEnv (projectName, envType) {
-      const getEnv = new Promise((resolve, reject) => {
-        generateEnvAPI(projectName, envType).then((res) => {
-          this.$set(this, 'envStatus', res)
-          resolve(res)
-        }).catch((err) => {
-          console.log(err)
+    handleTabsEdit (targetName, action) {
+      this.envLength = this.envLength + 1 || this.envInfos.length
+      if (action === 'add') {
+        const newTabName = `env-${this.envLength}`
+        this.envInfos.push({
+          envName: newTabName,
+          isEdit: false,
+          initName: newTabName
         })
-      })
-      getEnv.then((env_res) => {
-        const successResult = env_res.filter(env => env.status === 'Running')
-        const failureResult = env_res.filter(env => (env.err_message && env.err_message !== ''))
-        if (successResult.length === 2) {
-          clearInterval(this.envTimer)
-          this.timeOut = false
-          this.getResult = true
+        this.activeName = newTabName
+      }
+      if (action === 'remove') {
+        this.envInfos = this.envInfos.filter(env => env.initName !== targetName)
+        if (this.activeName === targetName) {
+          this.activeName = this.envInfos[0] ? this.envInfos[0].envName : ''
         }
-        if (failureResult.length >= 1) {
-          clearInterval(this.envTimer)
-          this.timeOut = false
-          this.getResult = true
-        }
-        if (this.secondCount === 60) {
-          clearInterval(this.envTimer)
-          this.timeOut = true
-          this.getResult = true
-        }
-        this.pipeTimer = setInterval(() => {
-          this.generatePipe(this.projectName)
-        }, 1000)
-      })
-    },
-    generatePipe (projectName) {
-      if (this.pipeStatus.status === 'success') {
-        clearInterval(this.pipeTimer)
-      } else {
-        generatePipeAPI(projectName).then((res) => {
-          this.$set(this, 'pipeStatus', res)
-        })
       }
     }
   },
@@ -200,40 +98,27 @@ export default {
     projectName () {
       return this.$route.params.project_name
     },
-    envType () {
-      return 'helm'
-    },
-    envSuccess () {
-      const result = this.envStatus.filter(env => env.status === 'Running')
-      return result
-    },
-    envFailure () {
-      const result = this.envStatus.filter(env => (env.err_message && env.err_message !== ''))
-      return result
+    envNames () {
+      return this.envInfos.map(info => info.initName)
     }
   },
   created () {
-    if (this.envTimer) {
-      clearInterval(this.envTimer)
-    } else {
-      this.envTimer = setInterval(() => {
-        this.secondCount++
-        this.generateEnv(this.projectName, this.envType)
-      }, 1000)
-    };
     bus.$emit(`show-sidebar`, true)
-    bus.$emit(`set-topbar-title`, { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, url: '' }] })
+    bus.$emit(`set-topbar-title`, {
+      title: '',
+      breadcrumb: [
+        { title: '项目', url: '/v1/projects' },
+        { title: this.projectName, url: '' }
+      ]
+    })
     bus.$emit(`set-sub-sidebar-title`, {
       title: '',
       routerList: []
     })
   },
-  beforeDestroy () {
-    clearInterval(this.envTimer)
-    clearInterval(this.pipeTimer)
-  },
   components: {
-    step
+    step,
+    HelmEnvTemplate
   },
   onboardingStatus: 3
 }
@@ -246,20 +131,8 @@ export default {
   overflow: auto;
   background-color: #f5f7f7;
 
-  .page-title-container {
-    display: flex;
-    padding: 0 20px;
-
-    h1 {
-      width: 100%;
-      color: #4c4c4c;
-      font-weight: 300;
-      text-align: center;
-    }
-  }
-
   .guide-container {
-    min-height: calc(~"100% - 70px");
+    min-height: calc(~'100% - 70px');
     margin-top: 10px;
 
     .current-step-container {
@@ -284,9 +157,47 @@ export default {
       }
 
       .account-integrations {
-        .el-alert--warning {
-          .el-button--text {
-            color: inherit;
+        .second {
+          margin-bottom: 8px;
+          color: #4c4c4c;
+          font-size: 13px;
+        }
+
+        .el-tabs__new-tab {
+          color: #3289e4;
+          border-color: #3289e4;
+        }
+
+        .tab-label {
+          display: inline-flex;
+          align-items: center;
+
+          .el-input {
+            width: auto;
+
+            .el-input__inner {
+              border-color: #fff;
+            }
+          }
+
+          .el-icon-edit,
+          .el-icon-finished {
+            width: 0;
+            overflow: hidden;
+            transform-origin: 100% 50%;
+          }
+        }
+
+        .el-tabs--card > .el-tabs__header .el-tabs__item.is-active,
+        .el-tabs--card > .el-tabs__header .el-tabs__item:hover {
+          .el-icon-close {
+            font-size: 16px;
+          }
+
+          .el-icon-edit,
+          .el-icon-finished {
+            width: 14px;
+            margin-left: 10px;
           }
         }
       }
@@ -299,105 +210,6 @@ export default {
         overflow-y: auto;
         background-color: inherit;
         -webkit-box-flex: 1;
-
-        .title {
-          h4 {
-            margin: 10px 0;
-            color: #4c4c4c;
-            font-weight: 400;
-            text-decoration: underline;
-          }
-
-          a {
-            color: inherit;
-            text-decoration-color: inherit;
-          }
-        }
-
-        .cf-block__item {
-          min-height: 102px;
-
-          .account-box-item {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 20px 30px;
-            background-color: #fff;
-            -webkit-box-shadow: 0 3px 2px 1px rgba(0, 0, 0, 0.05);
-            box-shadow: 0 3px 2px 1px rgba(0, 0, 0, 0.05);
-            filter: progid:dximagetransform.microsoft.dropshadow(OffX=0, OffY=3px, Color='#0D000000');
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            -webkit-box-pack: justify;
-            -ms-flex-pack: justify;
-
-            .integration-card {
-              display: -webkit-box;
-              display: -ms-flexbox;
-              display: flex;
-              align-items: center;
-              justify-content: flex-start;
-              -webkit-box-align: center;
-              -ms-flex-align: center;
-              -webkit-box-pack: start;
-              -ms-flex-pack: start;
-
-              .integration-card__image {
-                width: 64px;
-
-                .el-button.is-circle {
-                  padding: 6px;
-                  border-radius: 50%;
-                }
-              }
-
-              .cf-sub-title {
-                color: #2f2f2f;
-                font-weight: bold;
-                font-size: 16px;
-                text-align: left;
-              }
-
-              .integration-details {
-                margin-bottom: 5px;
-                color: #4c4c4c;
-                font-size: 14px;
-                line-height: 20px;
-
-                .env-name {
-                  display: inline-block;
-                }
-
-                .desc {
-                  display: inline-block;
-                  width: 250px;
-                }
-              }
-            }
-
-            .integration-card > * {
-              -ms-flex: 0 0 auto;
-              flex: 0 0 auto;
-              -webkit-box-flex: 0;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .alert {
-    display: flex;
-    padding: 0 25px;
-
-    .el-alert {
-      margin-bottom: 35px;
-
-      .el-alert__title {
-        font-size: 15px;
       }
     }
   }
@@ -410,7 +222,6 @@ export default {
     z-index: 2;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 60px;
     margin: 0 15px;
     padding: 0 10px;
@@ -418,16 +229,7 @@ export default {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.05);
 
     .controls__right {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      align-items: center;
-      margin-right: 10px;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-
       .save-btn {
-        margin-right: 15px;
         padding: 10px 17px;
         color: #fff;
         font-weight: bold;

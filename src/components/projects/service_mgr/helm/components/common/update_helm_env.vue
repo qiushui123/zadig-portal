@@ -7,7 +7,7 @@
       <el-checkbox-group v-model="checkedEnvList">
         <el-checkbox v-for="(env, index) in envNameList" :key="index" :label="env.envName"></el-checkbox>
       </el-checkbox-group>
-      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envNames="checkedEnvList" :chartNames="chartNames"></ChartValues>
+      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envNames="checkedEnvList" :chartNames="chartNames" showEnvTabs></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>

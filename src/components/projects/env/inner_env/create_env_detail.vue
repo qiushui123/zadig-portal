@@ -232,7 +232,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :chartNames="chartNames"></HelmEnvTemplate>
+            <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :chartNames="chartNames"></HelmEnvTemplate>
           </el-card>
         </template>
       </div>

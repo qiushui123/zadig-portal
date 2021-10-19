@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="更新环境变量" :visible.sync="updateHelmEnvVarDialogVisible" width="80%">
     <div v-loading="getHelmEnvVarLoading" class="kv-container">
-      <HelmEnvTemplate v-if="updateHelmEnvVarDialogVisible" class="chart-value" ref="helmEnvTemplateRef" :envNames="envName" getEnvChart></HelmEnvTemplate>
+      <HelmEnvTemplate v-if="updateHelmEnvVarDialogVisible" class="chart-value" ref="helmEnvTemplateRef" :envNames="[envName]" getEnvChart></HelmEnvTemplate>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" type="primary" :loading="updataHelmEnvVarLoading" @click="updateHelmEnvVar">更新</el-button>

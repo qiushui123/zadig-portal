@@ -1,6 +1,6 @@
 <template>
   <div class="helm-chart-yaml-content">
-    <el-tabs tab-position="left" type="border-card" v-model="checkedChart" :before-leave="switchTabs">
+    <el-tabs tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
       <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.type==='delete'">
         <span slot="label">
           <i
@@ -13,9 +13,9 @@
         </span>
       </el-tab-pane>
     </el-tabs>
-    <div class="values" v-if="checkedChart && serviceNames.length" :class="{hidden: serviceCanHandle}">
+    <div class="values" v-if="selectedChart && serviceNames.length" :class="{hidden: serviceNotHandle}">
       <div class="values-content">
-        <el-tabs v-if="Array.isArray(envNames)" v-model="selectedEnv" :before-leave="switchTabs">
+        <el-tabs v-if="showEnvTabs" v-model="selectedEnv" :before-leave="switchTabs">
           <el-tab-pane :label="env" :name="env" v-for="env in envNames" :key="env" :disabled="disabledEnv.includes(env)"></el-tab-pane>
         </el-tabs>
         <div class="v-content" v-if="usedChartNameInfo">
@@ -69,12 +69,21 @@ export default {
       default: () => null
     },
     envNames: {
-      /**
-       * Array: 展示环境 tab
-       * String: 不展示环境 tab
-       */
-      type: [Array, String],
-      required: true
+      // 环境列表
+      type: Array,
+      required: false,
+      default: () => []
+    },
+    handledEnv: {
+      // 正在处理的环境名称
+      type: String,
+      required: false
+    },
+    showEnvTabs: {
+      // 是否展示环境tab
+      default: false,
+      type: Boolean,
+      required: false
     },
     getEnvChart: {
       default: false,
@@ -84,7 +93,7 @@ export default {
   data () {
     return {
       allChartNameInfo: {}, // key: serviceName value: Object{ key:envName }
-      checkedChart: '',
+      selectedChart: '',
       selectedEnv: 'DEFAULT',
       disabledEnv: []
     }
@@ -102,18 +111,19 @@ export default {
       return this.$route.params.project_name
     },
     usedChartNameInfo () {
+      const selectedEnv = this.handledEnv || this.selectedEnv
       return (
-        (this.allChartNameInfo[this.checkedChart] &&
-          this.allChartNameInfo[this.checkedChart][this.selectedEnv]) ||
+        (this.allChartNameInfo[this.selectedChart] &&
+          this.allChartNameInfo[this.selectedChart][selectedEnv]) ||
         cloneDeep(chartInfoTemp)
       )
     },
-    serviceCanHandle () {
+    serviceNotHandle () {
       return (
         this.serviceNames.find(
-          service => service.serviceName === this.checkedChart
+          service => service.serviceName === this.selectedChart
         ).type === 'delete' ||
-        (Array.isArray(this.envNames) && this.selectedEnv === 'DEFAULT')
+        (this.showEnvTabs && this.selectedEnv === 'DEFAULT')
       )
     }
   },
@@ -125,9 +135,7 @@ export default {
       const chartValues = []
       const serviceNames = this.serviceNames.map(chart => chart.serviceName)
       const chartNameInfo = this.allChartNameInfo
-      const envNames = Array.isArray(this.envNames)
-        ? this.envNames
-        : [this.envNames]
+      const envNames = this.envNames.length ? this.envNames : ['DEFAULT']
       for (const serviceName in chartNameInfo) {
         if (!serviceNames.includes(serviceName)) {
           continue
@@ -184,7 +192,7 @@ export default {
           ...envInfos
         })
       })
-      this.checkedChart = Object.keys(this.allChartNameInfo)[0]
+      this.selectedChart = Object.keys(this.allChartNameInfo)[0]
     },
     validate () {
       const valid = []
@@ -233,33 +241,35 @@ export default {
             allChartNameInfo[re.serviceName]
           )
         })
-        this.checkedChart = Object.keys(this.allChartNameInfo)[0]
+        this.selectedChart = Object.keys(this.allChartNameInfo)[0]
       }
     }
   },
   watch: {
     envNames: {
       handler (newV, oldV) {
-        // 要初始化的环境数据
-        let envNamesByGet = []
-        if (!Array.isArray(newV)) {
-          envNamesByGet = [newV]
-        } else if (!oldV) {
-          envNamesByGet = newV
-        } else if (newV.length > oldV.length) {
-          envNamesByGet = newV.filter(nv => {
-            return !oldV.includes(nv)
+        if (newV) {
+          const envNamesByGet = oldV
+            ? newV.filter(nv => {
+              return !oldV.includes(nv)
+            })
+            : newV
+          this.selectedEnv = newV[newV.length - 1] || 'DEFAULT'
+          envNamesByGet.forEach(env => {
+            if (env === 'DEFAULT' || !env) {
+              return
+            }
+            this.getChartValuesYaml({ envName: env })
           })
         }
-        this.selectedEnv = Array.isArray(newV)
-          ? newV[newV.length - 1] || 'DEFAULT'
-          : newV
-        envNamesByGet.forEach(env => {
-          if (env === 'DEFAULT' || !env) {
-            return
-          }
-          this.getChartValuesYaml({ envName: env })
-        })
+      },
+      immediate: true
+    },
+    handledEnv: {
+      handler (newV, oldV) {
+        if (newV && !this.envNames.includes(newV)) {
+          this.getChartValuesYaml({ envName: newV })
+        }
       },
       immediate: true
     },

@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog title="更新环境" :visible.sync="updateHelmEnvDialogVisible" width="60%" class="kr-container">
-      <ChartValues v-if="chartNames.length" class="chart-value" ref="chartValuesRef" :envNames="productInfo.env_name" :chartNames="chartNames"></ChartValues>
+      <ChartValues v-if="chartNames.length" class="chart-value" ref="chartValuesRef" :envNames="[productInfo.env_name]" :chartNames="chartNames"></ChartValues>
       <!-- <div class="policy">
         <div class="title">更新策略</div>
         <el-radio-group v-model="replacePolicy">

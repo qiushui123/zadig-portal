@@ -4,7 +4,7 @@
       <EnvValues ref="envValuesRef" :envNames="envNames"></EnvValues>
     </el-collapse-item>
     <el-collapse-item :title="`${serviceVariableTitle}变量`" name="service">
-      <ChartValues ref="chartValuesRef" :chartNames="chartNames" :envNames="envNames" :getEnvChart="getEnvChart"></ChartValues>
+      <ChartValues ref="chartValuesRef" :chartNames="chartNames" :envNames="envNames" :handledEnv="handledEnv" :getEnvChart="getEnvChart" :showEnvTabs="showEnvTabs"></ChartValues>
     </el-collapse-item>
   </el-collapse>
 </template>
@@ -26,12 +26,22 @@ export default {
       default: () => null
     },
     envNames: {
+      type: Array,
+      required: false,
+      default: () => []
+    },
+    handledEnv: {
+      // 正在处理的环境名称
+      type: String,
+      required: false,
+      default: ''
+    },
+    showEnvTabs: {
       /**
-       * Array: 展示环境 tab
-       * String: 不展示环境 tab
+       * 是否展示具体服务信息的环境tab
        */
-      type: [Array, String],
-      required: true
+      default: false,
+      type: Boolean
     },
     getEnvChart: {
       default: false,
