@@ -7,10 +7,10 @@
             <div class="cf-pipeline-yml-build__editor cf-pipeline-yml-build__editor_inline">
               <div
                    class="cf-pipeline-yml-build__editor-wrapper"
-                   @keydown.meta.83.prevent="updateServiceByKeyword">
+                   @keydown.meta.83.prevent="updateFileWhenEnter">
                 <codemirror style="width: 100%; height: 100%;"
                             ref="myCm"
-                            :value="file.content"
+                            :value="fileContent.content"
                             :options="cmOptions"
                             @input="onCmCodeChange">
                 </codemirror>
@@ -34,7 +34,7 @@
           <div class="controls__right">
             <el-button type="primary"
                        size="small"
-                       :disabled="disabledSave || !fileChange"
+                       :disabled="disabledSave"
                        @click="updateFile">保存</el-button>
           </div>
         </div>
@@ -57,20 +57,22 @@ import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
-import { validateDockerfileAPI, getDockerfileAPI, createDockerfileTemplateAPI, updateDockerfileTemplateAPI } from '@api'
+import { validateDockerfileAPI, createDockerfileTemplateAPI, updateDockerfileTemplateAPI } from '@api'
 const parser = require('docker-file-parser')
 
 export default {
   props: {
-    fileInTree: {
+    fileContent: {
       type: Object,
       required: true
     },
-    fileChange: Boolean
+    fileContentChange: {
+      type: Boolean,
+      required: true
+    }
   },
   data () {
     return {
-      // codemirror options
       cmOptions: {
         tabSize: 5,
         readOnly: false,
@@ -81,7 +83,6 @@ export default {
         collapseIdentical: true
       },
       errors: [],
-      info: { message: '' },
       file: {
         content: ''
       },
@@ -91,36 +92,17 @@ export default {
     }
   },
   methods: {
-    keepInitFileContent (newContent) {
-      this.initFileContent = newContent
-      this.$emit('update:fileChange', this.initFileContent !== this.file.content)
-    },
-    async getFile (val) {
-      const id = val ? val.id : null
-      const status = val.status
-      if (id && status === 'added') {
-        const res = await getDockerfileAPI(
-          id
-        ).catch(err => {
-          console.log(err)
-        })
-        if (res) {
-          this.file = res
-          this.keepInitFileContent(res.content)
-        }
-      }
-    },
-    updateServiceByKeyword () {
-      const cantSave = this.disabledSave || !this.fileChange
-      if (cantSave) {
+    updateFileWhenEnter () {
+      const disabledSave = this.disabledSave
+      if (disabledSave) {
         return
       }
       this.updateFile()
     },
     async updateFile () {
-      const fileName = this.file.name
-      const fileId = this.file.id
-      const content = this.file.content
+      const fileName = this.fileContent.name
+      const fileId = this.fileContent.id
+      const content = this.fileContent.content
       const status = this.fileStatus
       const payload = {
         name: fileName,
@@ -133,8 +115,7 @@ export default {
           console.log(err)
         })
         if (res) {
-          this.keepInitFileContent(content)
-          this.$emit('onUpdateFile', { name: fileName, status: this.file.status, payload })
+          this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
             message: `模板 ${fileName}更新成功`
@@ -146,8 +127,7 @@ export default {
           console.log(err)
         })
         if (res) {
-          this.keepInitFileContent(content)
-          this.$emit('onUpdateFile', { name: fileName, status: this.file.status, payload })
+          this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
             message: `模板 ${fileName} 创建成功`
@@ -157,18 +137,17 @@ export default {
     },
     onCmCodeChange: debounce(function (newCode) {
       this.errors = []
-      this.file.content = newCode
-      this.$emit('update:fileChange', this.initFileContent !== newCode)
-      if (this.file.content) {
+      this.fileContent.content = newCode
+      if (this.fileContent.content) {
         this.validateFile(newCode)
-        if (this.file.status === 'named') {
-          this.stagedFile[this.file.name] = newCode
+        if (this.fileContent.status === 'named') {
+          this.stagedFile[this.fileContent.name] = newCode
         }
       }
     }, 500),
     validateFile (code) {
-      const options = { includeComments: false }
-      console.log(parser.parse(code, options))
+      // const options = { includeComments: false }
+      // console.log(parser.parse(code, options))
       const payload = {
         content: code
       }
@@ -190,38 +169,16 @@ export default {
       return this.$refs.myCm.codemirror
     },
     fileName () {
-      return this.fileInTree.name
+      return this.fileContent.name
     },
     fileId () {
-      return this.fileInTree.id
+      return this.fileContent.id
     },
     fileStatus () {
-      return this.fileInTree.status
+      return this.fileContent.status
     },
     disabledSave () {
-      return this.errors.length > 0
-    }
-  },
-  watch: {
-    fileInTree: {
-      handler (val, old_val) {
-        if (val.status === 'added') {
-          this.getFile(val)
-        } else if (val.status === 'named') {
-          this.file = {
-            content: '',
-            name: val.name,
-            status: 'named'
-          }
-          this.initFileContent = ''
-          this.$emit('update:fileChange', this.initFileContent !== this.file.content)
-          if (this.stagedFile[val.name]) {
-            this.file.content = this.stagedFile[val.name]
-          }
-          this.$refs.myCm && this.editorFocus()
-        }
-      },
-      immediate: true
+      return this.errors.length > 0 || !this.fileContentChange
     }
   },
   mounted () {

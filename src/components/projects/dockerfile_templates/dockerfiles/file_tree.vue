@@ -119,7 +119,7 @@ export default {
       type: Array,
       required: true
     },
-    fileChange: {
+    fileContentChange: {
       type: Boolean,
       required: true
     }
@@ -171,7 +171,7 @@ export default {
       })
     },
     async createFile () {
-      if (this.fileChange) {
+      if (this.fileContentChange) {
         this.askSaveYamlConfig()
       } else {
         this.showNewServiceInput = true
@@ -250,7 +250,7 @@ export default {
     selectFile (data, node, current) {
       const levelOneNodeLabel = node.level === 1 ? node.label : node.parent.label
       // 切换 node 且 yaml 变化时
-      if (this.previousNodeKey && this.previousNodeKey !== levelOneNodeLabel && this.fileChange) {
+      if (this.previousNodeKey && this.previousNodeKey !== levelOneNodeLabel && this.fileContentChange) {
         // 把当前 node 切换回来
         this.setFileSelected(this.previousNodeKey)
         this.askSaveYamlConfig(true).then(() => {

@@ -6,7 +6,7 @@
                      layout="vertical">
             <div class="file-tree-container">
               <fileTree :files="files"
-                           :fileChange="fileChange"
+                           :fileContentChange="fileContentChange"
                            ref="fileTree"
                            @onRefreshFile="getFiles"
                            @onSelectFileChange="onSelectFileChange"
@@ -18,15 +18,15 @@
                 <div class="file-editor-container"
                      :style="{ minWidth: '300px', width: '500px' }">
                   <fileEditor ref="fileEditor"
-                                    :fileInTree="file"
-                                    :fileChange.sync="fileChange"
+                                    :fileContent="fileContent"
+                                    :fileContentChange="fileContentChange"
                                     @onRefreshFile="getFiles"
                                     @onUpdateFile="onUpdateFile"></fileEditor>
                 </div>
                 <multipane-resizer></multipane-resizer>
                 <aside class="pipelines__aside pipelines__aside_right"
                        :style="{ flexGrow: 1 }">
-                  <FileAside :file="file"></FileAside>
+                  <FileAside :fileContent="fileContent"></FileAside>
                 </aside>
 
               </template>
@@ -63,11 +63,12 @@ import { Multipane, MultipaneResizer } from 'vue-multipane'
 export default {
   data () {
     return {
-      file: {},
+      fileInTree: {},
+      fileContent: {
+        content: ''
+      },
       files: [],
-      systemEnvs: [],
-      showNext: false,
-      fileChange: false
+      initFileContent: ''
     }
   },
   methods: {
@@ -75,16 +76,32 @@ export default {
       this.$refs.fileTree.createFile()
     },
     onSelectFileChange (file) {
-      this.$set(this, 'file', file)
+      this.$set(this, 'fileInTree', file)
     },
     getFiles () {
-      this.$set(this, 'file', {})
+      this.$set(this, 'fileInTree', {})
       getDockerfileTemplatesAPI().then((res) => {
         this.files = sortBy((res.dockerfile_template.map(file => {
           file.status = 'added'
           return file
         })), 'name')
       })
+    },
+    async getFile (val) {
+      const id = val ? val.id : null
+      const status = val.status
+      if (id && status === 'added') {
+        const res = await getDockerfileAPI(
+          id
+        ).catch(err => {
+          console.log(err)
+        })
+        if (res) {
+          res.status = 'added'
+          this.fileContent = res
+          this.initFileContent = res.content
+        }
+      }
     },
     onUpdateFile ({ name, status, res }) {
       this.$router.replace({
@@ -96,7 +113,7 @@ export default {
             rightbar: 'var'
           })
       })
-      if (status === 'named') {
+      if (status === 'added') {
         this.getFiles()
       }
     },
@@ -111,10 +128,30 @@ export default {
   computed: {
     fileName () {
       return this.$route.query.name
+    },
+    fileContentChange () {
+      return this.initFileContent !== this.fileContent.content
     }
   },
   watch: {
-
+    fileInTree: {
+      handler (val, old_val) {
+        if (val.status === 'added') {
+          this.getFile(val)
+        } else if (val.status === 'named') {
+          this.fileContent = {
+            content: '',
+            name: val.name,
+            status: 'named'
+          }
+          // if (this.stagedFile[val.name]) {
+          //   this.fileInTree.content = this.stagedFile[val.name]
+          // }
+          // this.$refs.myCm && this.editorFocus()
+        }
+      },
+      immediate: false
+    }
   },
   mounted () {
     bus.$emit('set-topbar-title', { title: 'Dockerfile 模板库', breadcrumb: [] })

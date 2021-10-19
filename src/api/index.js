@@ -1239,6 +1239,10 @@ export function deleteDockerfileTemplateAPI (id) {
   return http.delete(`/api/aslan/template/dockerfile/${id}`)
 }
 
+export function getDockerfileTemplateBuildReferenceAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}/reference`)
+}
+
 // helm env and service
 export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
   return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)

@@ -13,7 +13,6 @@
                @click="changeRoute('build')">
             <span class="step-name">引用列表</span>
           </div>
-
         </div>
       </div>
       <div class="aside__content">
@@ -24,23 +23,16 @@
           </header>
           <div class="pipeline-workflow-box__content">
             <section>
-              <el-table :data="sysEnvs"
+              <el-table :data="buildReference"
                         stripe
                         style="width: 100%;">
-                <el-table-column prop="key"
+                <el-table-column prop="project_name"
                                  label="项目">
                 </el-table-column>
                 <el-table-column prop="value"
                                  label="构建">
                   <template slot-scope="scope">
-                    <span v-if="scope.row.value">{{scope.row.value}}</span>
-                    <span v-else>空</span>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="value"
-                                 label="变量">
-                  <template slot-scope="scope">
-                    <span v-if="scope.row.value">{{scope.row.value}}</span>
+                    <span v-if="scope.row.build_name">{{scope.row.build_name}}</span>
                     <span v-else>空</span>
                   </template>
                 </el-table-column>
@@ -55,7 +47,7 @@
           </header>
           <div class="pipeline-workflow-box__content">
             <section>
-              <el-table :data="sysEnvs"
+              <el-table :data="fileContent.variable"
                         stripe
                         style="width: 100%;">
                 <el-table-column prop="key"
@@ -70,124 +62,7 @@
                 </el-table-column>
               </el-table>
             </section>
-            <!-- <section>
-              <h4>
-                <span><i class="iconfont icontanhao"></i></span> 自定义变量
-                <el-tooltip effect="dark"
-                            :content="'自定义变量通过'+' {{'+'.key}} ' +' 声明'"
-                            placement="top">
-                  <span><i class="el-icon-question"></i></span>
-                </el-tooltip>
-              </h4>
-              <div class="kv-container">
-                <el-table :data="customEnvs"
-                          style="width: 100%;">
-                  <el-table-column label="Key">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.key }}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="Value">
-                    <template slot-scope="scope">
-                      <el-input size="small"
-                                :disabled="!editEnvIndex[scope.$index]"
-                                v-model="scope.row.value"
-                                type="textarea"
-                                :autosize="{ minRows: 1, maxRows: 4}"
-                                placeholder="请输入内容"></el-input>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="操作"
-                                   width="150">
-                    <template slot-scope="scope">
-                        <span class="operate">
-                              <el-button v-if="!editEnvIndex[scope.$index]"
-                                         type="text"
-                                         @click="editRenderKey(scope.$index,scope.row.state)"
-                                         class="edit">编辑</el-button>
-                              <el-button v-if="editEnvIndex[scope.$index]"
-                                         type="text"
-                                         @click="saveRenderKey(scope.$index,scope.row.state)"
-                                         class="edit">保存</el-button>
-                              <el-button v-if="scope.row.state === 'unused'"
-                                         type="text"
-                                         @click="deleteRenderKey(scope.$index,scope.row.state)"
-                                         class="delete">移除</el-button>
-                            <el-tooltip v-if="scope.row.state === 'present'||scope.row.state === 'new'"
-                                        effect="dark"
-                                        content="服务中已经用到的 Key 无法被删除"
-                                        placement="top">
-                              <span class="el-icon-question"></span>
-                            </el-tooltip>
-                          </span>
-                    </template>
-                  </el-table-column>
-                </el-table>
-                <div v-if="addKeyInputVisable"
-                     class="add-key-container">
-                  <el-table :data="addKeyData"
-                            :show-header="false"
-                            style="width: 100%;">
-                    <el-table-column>
-                      <template slot-scope="{ row }">
-                        <el-form :model="row"
-                                 :rules="keyCheckRule"
-                                 ref="addKeyForm"
-                                 hide-required-asterisk>
-                          <el-form-item label="Key"
-                                        prop="key"
-                                        inline-message>
-                            <el-input size="small"
-                                      type="textarea"
-                                      :autosize="{ minRows: 1, maxRows: 4}"
-                                      v-model="row.key"
-                                      placeholder="Key">
-                            </el-input>
-                          </el-form-item>
-                        </el-form>
-                      </template>
-                    </el-table-column>
-                    <el-table-column>
-                      <template slot-scope="{ row }">
-                        <el-form :model="row"
-                                 :rules="keyCheckRule"
-                                 ref="addValueForm"
-                                 hide-required-asterisk>
-                          <el-form-item label="Value"
-                                        prop="value"
-                                        inline-message>
-                            <el-input size="small"
-                                      type="textarea"
-                                      :autosize="{ minRows: 1, maxRows: 4}"
-                                      v-model="row.value"
-                                      placeholder="Value">
-                            </el-input>
-                          </el-form-item>
-                        </el-form>
-                      </template>
-                    </el-table-column>
-                    <el-table-column width="140">
-                      <template>
-                        <span style="display: inline-block; margin-bottom: 15px;">
-                          <el-button @click="addRenderKey()"
-                                     type="text">确认</el-button>
-                          <el-button @click="addKeyInputVisable=false"
-                                     type="text">取消</el-button>
-                        </span>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                </div>
-                  <div>
-                    <el-button size="medium"
-                               class="add-kv-btn"
-                               @click="addKeyInputVisable=true"
-                               type="text">
-                      <i class="el-icon-circle-plus-outline"></i>添加
-                    </el-button>
-                  </div>
-              </div>
-            </section> -->
+
           </div>
         </div>
       </div>
@@ -195,70 +70,28 @@
   </div>
 </template>
 <script>
-import bus from '@utils/event_bus'
-import { serviceTemplateWithConfigAPI } from '@api'
-const validateKey = (rule, value, callback) => {
-  if (typeof value === 'undefined' || value === '') {
-    callback(new Error('请输入 Key'))
-  } else {
-    if (!/^[a-zA-Z0-9_]+$/.test(value)) {
-      callback(new Error('Key 只支持字母大小写和数字，特殊字符只支持下划线'))
-    } else {
-      callback()
-    }
-  }
-}
+import { getDockerfileTemplateBuildReferenceAPI } from '@api'
+
 export default {
   data () {
     return {
-      serviceModules: this.detectedServices,
-      sysEnvs: this.systemEnvs,
-      customEnvs: this.detectedEnvs,
-      addKeyInputVisable: false,
-      editEnvIndex: {},
-      addKeyData: [
-        {
-          key: '',
-          value: '',
-          state: 'unused'
-        }
-      ],
-      keyCheckRule: {
-        key: [
-          {
-            type: 'string',
-            required: true,
-            validator: validateKey,
-            trigger: 'blur'
-          }
-        ],
-        value: [
-          {
-            type: 'string',
-            required: false,
-            message: 'value',
-            trigger: 'blur'
-          }
-        ]
-      }
+      buildReference: []
     }
   },
   methods: {
-    getServiceModules () {
-      this.$emit('getServiceModules')
-    },
-    getServiceTemplateWithConfig () {
-      if (this.file && this.file.type === 'k8s' && this.file.status === 'added') {
-        this.changeRoute('var')
-        serviceTemplateWithConfigAPI(this.file.service_name, this.projectNameOfService).then(res => {
-          this.serviceModules = res.service_module
-          this.sysEnvs = res.system_variable
+    async getBuildReference () {
+      if (this.fileContent && this.fileContent.status === 'added') {
+        const res = await getDockerfileTemplateBuildReferenceAPI(
+          this.fileContent.id
+        ).catch(err => {
+          console.log(err)
         })
+        if (res) {
+          this.buildReference = res
+        }
       }
     },
     changeRoute (step) {
-      this.$route.query.service_project_name && (delete this.$route.query.service_project_name)
-      this.$route.query.build_name && (delete this.$route.query.build_name)
       this.$router.replace({
         query: Object.assign(
           {},
@@ -267,114 +100,25 @@ export default {
             rightbar: step
           })
       })
-    },
-
-    checkExistVars () {
-      return new Promise((resolve, reject) => {
-        const isDuplicate = this.detectedEnvs.map((item) => { return item.key }).some((item, idx) => {
-          return this.detectedEnvs.map((item) => { return item.key }).indexOf(item) !== idx
-        })
-        if (isDuplicate) {
-          this.$message({
-            message: '变量列表中存在相同的 Key 请检查后再保存',
-            type: 'warning'
-          })
-          reject(new Error('cancel save'))
-        } else {
-          resolve()
-        }
-      })
-    },
-    addRenderKey () {
-      if (this.addKeyData[0].key !== '') {
-        this.$refs.addKeyForm.validate(valid => {
-          if (valid) {
-            this.customEnvs.push(this.$utils.cloneObj(this.addKeyData[0]))
-            this.projectForm.vars = this.customEnvs
-            this.checkExistVars()
-              .then(() => {
-                this.updateEnvTemplate(this.projectName, this.projectForm)
-                this.addKeyData[0].key = ''
-                this.addKeyData[0].value = ''
-              })
-              .catch(() => {
-                this.addKeyData[0].key = ''
-                this.addKeyData[0].value = ''
-                this.$refs.addKeyForm.resetFields()
-                this.$refs.addValueForm.resetFields()
-                this.addKeyInputVisable = false
-                console.log('error')
-              })
-          } else {
-            return false
-          }
-        })
-      }
-    },
-    editRenderKey (index, state) {
-      this.$set(this.editEnvIndex, index, true)
-    },
-    saveRenderKey (index, state) {
-      this.$set(this.editEnvIndex, index, false)
-      this.projectForm.vars = this.customEnvs
-      this.updateEnvTemplate(this.projectName, this.projectForm)
-    },
-    deleteRenderKey (index, state) {
-      if (state === 'present') {
-        this.$confirm('该 Key 被产品引用，确定删除', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.customEnvs.splice(index, 1)
-          this.projectForm.vars = this.customEnvs
-          this.updateEnvTemplate(this.projectName, this.projectForm)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
-      } else {
-        this.customEnvs.splice(index, 1)
-        this.projectForm.vars = this.customEnvs
-        this.updateEnvTemplate(this.projectName, this.projectForm)
-      }
     }
   },
-  created () {
-    // this.getServiceTemplateWithConfig()
-    bus.$on(`save-var`, () => {
-      this.updateEnvTemplate(this.projectName, this.projectForm)
-    })
-  },
-  beforeDestroy () {
-    bus.$off('save-var')
-  },
   props: {
-    detectedEnvs: {
-      required: false,
-      type: Array
-    },
-    file: {
+    fileContent: {
       required: false,
       type: Object
     }
 
   },
   watch: {
-    detectedEnvs (val) {
-      this.customEnvs = val
-    },
-    file (val) {
-      if (val) {
-        this.getServiceTemplateWithConfig()
-      }
+    fileContent: {
+      handler (val, old_val) {
+        if (val) {
+          this.getBuildReference(val.id)
+        }
+      },
+      immediate: false
     }
-  },
-  computed: {
-  },
-  components: {
+
   }
 }
 </script>
