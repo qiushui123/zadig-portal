@@ -112,7 +112,6 @@ export default {
       name: null,
       buildName: null,
       isEdit: false,
-      valuesYamlDeposit: {},
       updateMatchRuleFlag: false
     }
   },

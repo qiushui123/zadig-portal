@@ -21,7 +21,7 @@
         <div class="v-content" v-if="usedChartNameInfo">
           <div class="version-title">Chart Version: {{usedChartNameInfo.chartVersion}}</div>
           <div v-show="usedChartNameInfo.yamlSource === 'default'" class="default-values">
-            <el-button type="text" @click="usedChartNameInfo.yamlSource = 'gitRepo'" icon="el-icon-plus">添加 values 文件</el-button>
+            <el-button type="text" @click="usedChartNameInfo.yamlSource = 'freeEdit'" icon="el-icon-plus">添加 values 文件</el-button>
           </div>
           <ImportValues
             v-show="usedChartNameInfo.yamlSource !== 'default'"
@@ -58,8 +58,8 @@ const chartInfoTemp = {
   chartVersion: '', // : String
   yamlSource: 'default', // : String
   overrideValues: [], // : Object{key,value}[]
-  valuesYAML: '', // : String
-  gitRepoConfig: null // : Object
+  overrideYaml: '', // : String
+  gitRepoConfig: null // : Object [Not use, just record]
 }
 
 // const allChartNameInfoTemp = {
@@ -164,28 +164,17 @@ export default {
           if (!envNames.includes(envName)) {
             continue
           }
-          const yamlSource = chartInfo[envName].yamlSource
           chartInfo[envName].overrideValues = chartInfo[
             envName
           ].overrideValues.filter(value => value.key !== '')
-          let values = pick(chartInfo[envName], [
+          const values = pick(chartInfo[envName], [
             'envName',
             'serviceName',
             'chartVersion',
             'overrideValues'
           ])
-          if (yamlSource === 'gitRepo') {
-            values = {
-              ...values,
-              yamlSource,
-              gitRepoConfig: cloneDeep(chartInfo[envName].gitRepoConfig)
-            }
-          } else if (yamlSource === 'freeEdit') {
-            values = {
-              ...values,
-              yamlSource,
-              valuesYAML: chartInfo[envName].valuesYAML
-            }
+          if (chartInfo[envName].yamlSource !== 'default') {
+            values.overrideYaml = chartInfo[envName].overrideYaml
           }
           chartValues.push(values)
         }

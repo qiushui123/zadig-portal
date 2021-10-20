@@ -1218,10 +1218,6 @@ export function createTemplateMultiServiceAPI (productName, payload) {
 }
 
 // helm env and service
-export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/rendersets/renderset?productName=${productName}&envName=${envName}`, payload)
-}
-
 export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }

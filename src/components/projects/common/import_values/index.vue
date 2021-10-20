@@ -7,13 +7,13 @@
     </h4>
     <el-divider></el-divider>
     <Resize class="desc mirror" :resize="setResize.direction" :height="setResize.height" @sizeChange="$refs.codemirror.refresh()">
-      <codemirror ref="codemirror" v-model="importRepoInfoUse.valuesYAML"></codemirror>
+      <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml"></codemirror>
     </Resize>
     <el-dialog title="从 Git 仓库导入" :visible.sync="showGitImportDialog" append-to-body>
       <ValueRepo ref="valueRepo" :valueRepoInfo="importRepoInfoUse.gitRepoConfig"></ValueRepo>
       <div slot="footer">
         <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="importValuesYaml" size="small">导 入</el-button>
+        <el-button type="primary" @click="importOverrideYaml" size="small">导 入</el-button>
       </div>
     </el-dialog>
   </div>
@@ -26,8 +26,8 @@ import ValueRepo from './value_repo.vue'
 import { cloneDeep } from 'lodash'
 
 const valueInfo = {
-  yamlSource: '', // gitRepo or freeEdit or default(不上传)
-  valuesYAML: '',
+  yamlSource: '', // freeEdit or default(不上传)
+  overrideYaml: '',
   gitRepoConfig: {
     codehostID: null,
     owner: '',
@@ -82,12 +82,14 @@ export default {
     }
   },
   methods: {
-    async importValuesYaml () {
+    async importOverrideYaml () {
       const valueRepo = this.$refs.valueRepo
-      Promise.all([valueRepo.validate(), valueRepo.validateRoute()]).then(() => {
-        this.showGitImportDialog = false
-        console.log('导入文件')
-      })
+      Promise.all([valueRepo.validate(), valueRepo.validateRoute()]).then(
+        () => {
+          this.showGitImportDialog = false
+          console.log('导入文件')
+        }
+      )
     },
     closeValueEdit () {
       this.importRepoInfoUse.yamlSource = 'default'
@@ -98,9 +100,7 @@ export default {
     },
     resetValueRepoInfo () {
       this.$nextTick(() => {
-        if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
-          this.$refs.valueRepo.resetSource(this.importRepoInfoUse.gitRepoConfig)
-        }
+        this.$refs.valueRepo.resetSource(this.importRepoInfoUse.gitRepoConfig)
       })
     }
   },
