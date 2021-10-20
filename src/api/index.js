@@ -1213,6 +1213,10 @@ export function createTemplateServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
 }
 
+export function createTemplateMultiServiceAPI (productName, payload) {
+  return http.post(`/api/aslan/service/helm/bulk/services?productName=${productName}`, payload)
+}
+
 // helm env and service
 export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
   return http.put(`/api/aslan/environment/rendersets/renderset?productName=${productName}&envName=${envName}`, payload)
