@@ -6,25 +6,25 @@
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
           <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'var'}"
+               :class="{'selected': selected === 'var'}"
                @click="changeRoute('var')">
             <span class="step-name">镜像更新</span>
           </div>
           <div v-if="isCreate"
                class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'values'}"
+               :class="{'selected': selected === 'values'}"
                @click="changeRoute('values')">
             <span class="step-name">变量</span>
           </div>
           <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'help'}"
+               :class="{'selected': selected === 'help'}"
                @click="changeRoute('help')">
             <span class="step-name">帮助</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
-        <div v-if="$route.query.rightbar === 'var'"
+        <div v-if="selected === 'var'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">镜像更新</div>
@@ -84,8 +84,8 @@
                    ></build>
           </div> -->
         </div>
-        <values v-else-if="$route.query.rightbar === 'values'" :valuesYamlDeposit="valuesYamlDeposit"></values>
-        <div v-else-if="$route.query.rightbar === 'help'"
+        <values v-else-if="selected === 'values'" :valuesYamlDeposit="valuesYamlDeposit"></values>
+        <div v-else-if="selected === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">帮助</div>
@@ -175,6 +175,9 @@ export default {
     }),
     serviceType () {
       return this.service.type
+    },
+    selected () {
+      return this.$route.query.rightbar || 'var'
     }
   },
   components: {
