@@ -101,15 +101,15 @@ export default {
             element.leaf = true
           }
         })
-        this.$nextTick(() => {
-          if (node.checked) {
+        if (!this.checkOne && node.checked) {
+          this.$nextTick(() => {
             node.childNodes.forEach(child => {
               if (!child.isLeaf) {
                 this.defaultExpanded.push(child.data.full_path)
               }
             })
-          }
-        })
+          })
+        }
         return resolve(res)
       })
     }
