@@ -2,31 +2,20 @@
   <div class="values-outer">
     <h4>
       <span>values 文件</span>
+      <el-button type="text" class="title-btn" @click="showGitImportDialog = true">从 Git 导入</el-button>
       <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="closeValueEdit"></i>
     </h4>
     <el-divider></el-divider>
-    <div class="desc">
-      <template>
-        <div class="desc-title">文件来源</div>
-        <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40">
-          <el-option label="Git 仓库" value="gitRepo"></el-option>
-          <el-option label="手动输入" value="freeEdit"></el-option>
-        </el-select>
-      </template>
-      <template v-if="importRepoInfoUse.yamlSource !== 'default'">
-        <div class="desc-title">{{ importRepoInfoUse.yamlSource === 'gitRepo' ? '仓库信息' : '文件内容' }}</div>
-        <Resize
-          v-if="importRepoInfoUse.yamlSource === 'freeEdit'"
-          class="mirror"
-          :resize="setResize.direction"
-          :height="setResize.height"
-          @sizeChange="$refs.codemirror.refresh()"
-        >
-          <codemirror ref="codemirror" v-model="importRepoInfoUse.valuesYAML"></codemirror>
-        </Resize>
-        <ValueRepo v-if="importRepoInfoUse.yamlSource === 'gitRepo'" ref="valueRepo" :valueRepoInfo="importRepoInfoUse.gitRepoConfig"></ValueRepo>
-      </template>
-    </div>
+    <Resize class="desc mirror" :resize="setResize.direction" :height="setResize.height" @sizeChange="$refs.codemirror.refresh()">
+      <codemirror ref="codemirror" v-model="importRepoInfoUse.valuesYAML"></codemirror>
+    </Resize>
+    <el-dialog title="从 Git 仓库导入" :visible.sync="showGitImportDialog" append-to-body>
+      <ValueRepo ref="valueRepo" :valueRepoInfo="importRepoInfoUse.gitRepoConfig"></ValueRepo>
+      <div slot="footer">
+        <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="importValuesYaml" size="small">导 入</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -44,13 +33,15 @@ const valueInfo = {
     owner: '',
     repo: '',
     branch: '',
-    valuesPaths: ['']
+    valuesPaths: []
   }
 }
 
 export default {
   data () {
-    return {}
+    return {
+      showGitImportDialog: false
+    }
   },
   props: {
     showDelete: {
@@ -91,17 +82,19 @@ export default {
     }
   },
   methods: {
+    async importValuesYaml () {
+      const valueRepo = this.$refs.valueRepo
+      Promise.all([valueRepo.validate(), valueRepo.validateRoute()]).then(() => {
+        this.showGitImportDialog = false
+        console.log('导入文件')
+      })
+    },
     closeValueEdit () {
       this.importRepoInfoUse.yamlSource = 'default'
       this.$emit('closeValueEdit')
     },
     validate () {
-      if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
-        const valueRepo = this.$refs.valueRepo
-        return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
-      } else {
-        return Promise.all([Promise.resolve(true)])
-      }
+      return Promise.all([Promise.resolve(true)])
     },
     resetValueRepoInfo () {
       this.$nextTick(() => {
@@ -137,6 +130,12 @@ export default {
     color: #606266;
     font-size: 14px;
 
+    .title-btn {
+      margin-left: 10px;
+      padding: 0;
+      font-size: 12px;
+    }
+
     .icon-delete {
       float: right;
       color: #f56c6c;
@@ -164,5 +163,9 @@ export default {
   /deep/.el-select {
     width: 100%;
   }
+}
+
+/deep/.el-dialog__body {
+  padding: 10px 20px;
 }
 </style>

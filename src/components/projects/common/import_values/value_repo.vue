@@ -74,93 +74,94 @@
           <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item>
+        <template slot="label">
+          <el-tooltip v-if="!substantial" effect="dark" content="按照覆盖顺序依次选择 values 文件，后选的文件会覆盖先选的文件。" placement="top">
+            <span>文件路径</span>
+          </el-tooltip>
+          <span v-else>文件路径</span>
+        </template>
+        <div v-show="source.valuesPaths.length" class="overflow-auto">
+          <div v-for="(path, index) in source.valuesPaths" :key="index">
+            <span style="line-height: 18px;">{{path}}</span>
+            <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
+          </div>
+        </div>
+        <el-button :disabled="canSelectFile" type="primary" round plain size="mini" @click="showFileSelectDialog = true">选择 values 文件</el-button>
+        <span v-show="showErrorTip" class="error-tip">请选择 values 文件</span>
+      </el-form-item>
+      <el-dialog title="请选择服务的 values 文件" :visible.sync="showFileSelectDialog" append-to-body>
+        <Repertory :gitRepoConfig="source" @checkedPath="checkedPath" :checkOne="!substantial"></Repertory>
+      </el-dialog>
     </el-form>
-    <div v-if="showFilePath" class="file-route">
-      <div class="desc-title">文件路径</div>
-      <div v-for="(path, index) in valuesPaths" :key="index">
-        <el-input v-model="path.path" placeholder="values.yaml 文件路径" size="small"></el-input>
-        <!-- <el-button type="text" @click="review(index)">预览</el-button> -->
-        <el-button :disabled="valuesPaths.length < 2" type="text" @click="deletePath(index)">移除</el-button>
-      </div>
-      <el-button icon="el-icon-plus" type="text" size="small" @click="addPath">添加 values 文件</el-button>
-      <el-alert v-show="showTip" title="请先添加 value 文件" type="warning" :closable="false"></el-alert>
-    </div>
   </div>
 </template>
 <script>
 import RepoMixin from '../mixin/import_repo'
+import Repertory from './repertory.vue'
+import { uniq } from 'lodash'
 
 export default {
   props: {
     valueRepoInfo: Object,
-    showFilePath: {
-      default: true,
+    hiddenLabel: {
+      default: false,
       type: Boolean
     },
-    hiddenLabel: {
-      default: true,
+    substantial: {
+      default: false,
       type: Boolean
     }
   },
   mixins: [RepoMixin],
   data () {
     return {
-      showTip: false,
-      valuesPaths: []
+      showFileSelectDialog: false,
+      showErrorTip: false
+    }
+  },
+  computed: {
+    canSelectFile () {
+      const source = this.source
+      return !(
+        source.codehostID &&
+        source.owner &&
+        source.repo &&
+        source.branch
+      )
     }
   },
   watch: {
-    valuesPaths: {
-      handler (newV) {
-        this.source.valuesPaths = newV.map(val => val.path)
-      },
-      deep: true
-    },
     valueRepoInfo: {
-      handler () {
-        this.initData()
+      handler (nVal, oldV) {
+        this.source = nVal
       },
       immediate: true
     }
   },
   methods: {
-    review (index) {
-      console.log('review values.yaml: ', this.valuesPaths[index].yaml)
+    checkedPath (data) {
+      this.showFileSelectDialog = false
+      this.source.valuesPaths = uniq(this.source.valuesPaths.concat(data))
+      if (this.source.valuesPaths.length) {
+        this.showErrorTip = false
+      }
     },
     deletePath (index) {
-      if (this.valuesPaths.length < 2) return
-      this.valuesPaths.splice(index, 1)
-    },
-    addPath () {
-      if (!this.valuesPaths[this.valuesPaths.length - 1].path) {
-        this.showTip = true
-        return
-      }
-      this.showTip = false
-      this.valuesPaths.push({
-        path: '',
-        yaml: ''
-      })
+      this.source.valuesPaths.splice(index, 1)
     },
     validateRoute () {
-      const path = this.valuesPaths.find(path => path.path === '')
-      if (path) {
-        this.showTip = true
-        return Promise.reject()
-      } else {
-        this.showTip = false
+      if (this.source.valuesPaths.length) {
+        this.showErrorTip = false
         return Promise.resolve()
+      } else {
+        this.showErrorTip = true
+        return Promise.reject()
       }
-    },
-    initData () {
-      this.source = this.valueRepoInfo
-      this.valuesPaths = this.source.valuesPaths.map(val => {
-        return {
-          path: val,
-          yaml: ''
-        }
-      })
     }
+  },
+  components: {
+    Repertory
   }
 }
 </script>
@@ -189,18 +190,43 @@ export default {
         display: none;
       }
     }
+
+    &.el-form--label-right {
+      .el-form-item__label {
+        text-align: right;
+      }
+    }
   }
 
-  .file-route {
-    .desc-title {
-      padding: 5px 0;
+  .overflow-auto {
+    max-height: 90px;
+    margin: 9px 0;
+    overflow: auto;
+    line-height: 20px;
+
+    &::-webkit-scrollbar-track {
+      background-color: #f5f5f5;
+      border-radius: 6px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }
 
-    /deep/.el-input {
-      // width: calc(~'100% - 90px');
-      width: calc(~'100% - 45px');
-      margin-right: 10px;
+    &::-webkit-scrollbar {
+      width: 6px;
+      background-color: #f5f5f5;
     }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #b7b8b9;
+      border-radius: 6px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .error-tip {
+    margin-top: 10px;
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 1;
   }
 }
 

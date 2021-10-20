@@ -31,6 +31,13 @@
             :importRepoInfo="usedChartNameInfo"
           ></ImportValues>
           <KeyValue ref="keyValueRef" :keyValues="usedChartNameInfo.overrideValues"></KeyValue>
+          <section class="review-content">
+            <el-button type="text" @click="getReviewValuesFile">
+              预览最终 values 文件
+              <i style="margin-left: 8px;" :class="{'el-icon-arrow-down': showReview, 'el-icon-arrow-right': !showReview}"></i>
+            </el-button>
+            <Codemirror class="codemirror" ref="codemirror" v-if="showReview" :value="reviewResult" :cmOption="cmOption"></Codemirror>
+          </section>
         </div>
       </div>
       <div class="mask"></div>
@@ -41,6 +48,7 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import KeyValue from '@/components/projects/common/import_values/key_value.vue'
+import Codemirror from '@/components/projects/common/codemirror.vue'
 import { getChartValuesYamlAPI, getAllChartValuesYamlAPI } from '@api'
 import { cloneDeep, pick } from 'lodash'
 
@@ -91,11 +99,17 @@ export default {
     }
   },
   data () {
+    this.cmOption = {
+      readOnly: 'nocursor',
+      lineNumbers: false
+    }
     return {
       allChartNameInfo: {}, // key: serviceName value: Object{ key:envName }
       selectedChart: '',
       selectedEnv: 'DEFAULT',
-      disabledEnv: []
+      disabledEnv: [],
+      showReview: false,
+      reviewResult: ''
     }
   },
   computed: {
@@ -128,8 +142,13 @@ export default {
     }
   },
   methods: {
+    getReviewValuesFile () {
+      this.showReview = !this.showReview
+    },
     switchTabs () {
-      return this.$refs.importValuesRef && this.$refs.importValuesRef.validate()
+      const valid = this.$refs.importValuesRef && this.$refs.importValuesRef.validate()
+      if (valid) this.showReview = false
+      return valid
     },
     getAllChartNameInfo () {
       const chartValues = []
@@ -284,7 +303,8 @@ export default {
   },
   components: {
     ImportValues,
-    KeyValue
+    KeyValue,
+    Codemirror
   }
 }
 </script>
@@ -341,6 +361,8 @@ export default {
       z-index: 0;
 
       .v-content {
+        padding-bottom: 10px;
+
         .version-title {
           height: 40px;
           line-height: 40px;
@@ -348,6 +370,17 @@ export default {
 
         .default-values {
           margin-bottom: 14px;
+        }
+      }
+
+      .review-content {
+        margin-top: 20px;
+
+        .codemirror {
+          height: 200px;
+          padding: 5px;
+          border: 1px solid #dcdfe6;
+          border-radius: 5px;
         }
       }
     }
