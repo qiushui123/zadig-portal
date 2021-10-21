@@ -23,15 +23,11 @@ export default {
   },
   methods: {
     async getProducts () {
-      await this.$store.dispatch('getProductList')
-
       const availableProducts = this.currentProjectProductList
 
       this.loading = false
-
       if (availableProducts.length > 0) {
-        const useProduct = availableProducts.filter(product => !product.is_prod)[0] || availableProducts[0]
-        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${useProduct.env_name}`
+        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${availableProducts[0].envs[0]}`
       } else if (availableProducts.length === 0) {
         this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/create`
       }
@@ -48,7 +44,7 @@ export default {
     },
     currentProjectProductList () {
       return this.productList.filter(element => {
-        return element.product_name === this.projectName
+        return element.name === this.projectName
       })
     },
     ...mapGetters([

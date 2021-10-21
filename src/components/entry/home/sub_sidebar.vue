@@ -40,7 +40,6 @@
 </template>
 <script>
 import bus from '@utils/event_bus'
-import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -76,47 +75,14 @@ export default {
         }
         return false
       }
-    },
-    ...mapGetters([
-      'getTemplates'
-    ])
+    }
   },
   beforeDestroy () {
     bus.$emit('sub-sidebar-opened', false)
   },
   created () {
     bus.$on('set-sub-sidebar-title', async (params) => {
-      let isProjectList = false
-      if (params.routerList && params.routerList.length > 2 && params.routerList[1].name === '集成环境') {
-        isProjectList = true
-      }
-      if (isProjectList) {
-        let findPro = false
-
-        const findTem = this.getTemplates.filter(tem => {
-          return tem.product_name === params.title
-        })
-        if (findTem.length === 0) {
-          await this.$store.dispatch('refreshProjectTemplates')
-        }
-
-        for (const product of this.getTemplates) {
-          if (product.product_name === params.title) {
-            findPro = true
-            if (product.product_feature && product.product_feature.develop_habit === 'yaml') {
-              params.routerList.splice(2)
-              break
-            }
-          }
-        }
-        this.changeTitle(params)
-        if (!findPro) {
-          // eslint-disable-next-line no-throw-literal
-          throw ('Not find the product from getTemplates')
-        }
-      } else {
-        this.changeTitle(params)
-      }
+      this.changeTitle(params)
     })
   }
 }

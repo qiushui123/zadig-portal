@@ -54,6 +54,8 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
+  config.headers.Authorization = 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjI4NjZmNDE0M2Q1NTEzOTg2MTZiNTMyM2NmZmYyOTRhZDU0NGQ4MmUifQ.eyJpc3MiOiJodHRwOi8vZGV4LnRlc3QuOHNsYW4uY29tL2RleCIsInN1YiI6IkNpUXdPR0U0TmpnMFlpMWtZamc0TFRSaU56TXRPVEJoT1MwelkyUXhOall4WmpVME5qWVNCV3h2WTJGcyIsImF1ZCI6ImV4YW1wbGUtYXBwIiwiZXhwIjoxNjM0NzExODA5LCJpYXQiOjE2MzQ2MjU0MDksImF0X2hhc2giOiJNYmx0VGtSd3hUOGxNdHhlc2xKMjFBIiwiY19oYXNoIjoiM19ZNERKSVc2M3E2eTBibG1MWm9fQSIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6ImFkbWluIn0.Zz5jUYD1_RWF-49u7CCJTpXS62RVr7jTQNPX7rF2JxLaz-CFEwftLPMm72B9_u4TDvgsMHh_CyFwLHZKiy_WaxLQXLCoVHDxCzdgj_R5Ez1OyXNtE7JJJnXFfxO9g2qwGBy-d3YSt4Pv96hjxEfO_NdW32PHLH8ieTVYbMuBSMgKCqs5UWMDQyKqVj4WH8LAkA9EBYaGQRlG6-xxmvWNNEp87fpoHVNUo51X4sU3Ih10G1f7NeshDpeZ2DR5QoyoYEAudpR21ccHIjZb-XoBsZDU_fmwW1XXbokG3a_w5MURWUZ8j4Nf3LkKmrDEV5yboEHmXOQ9MMRN3z_sJasG7g'
+
   return config
 })
 
@@ -122,13 +124,13 @@ http.interceptors.response.use(
       if (document.title !== '登录' && document.title !== '系统初始化') {
         // unauthorized 401
         if (error.response.status === 401) {
-          const redirectPath = window.location.pathname + window.location.search
-          Element.Message.error('登录信息失效, 请返回重新登录')
-          if (redirectPath.includes('/setup/')) {
-            window.location.href = `/signin`
-          } else {
-            window.location.href = `/signin?redirect=${redirectPath}`
-          }
+          // const redirectPath = window.location.pathname + window.location.search
+          // Element.Message.error('登录信息失效, 请返回重新登录')
+          // if (redirectPath.includes('/setup/')) {
+          //   window.location.href = `/signin`
+          // } else {
+          //   window.location.href = `/signin?redirect=${redirectPath}`
+          // }
         } else if (error.response.status === 403) {
           Element.Message.error('暂无权限')
         } else if (error.response.data.code !== 6168) {
@@ -225,22 +227,8 @@ export function listProductAPI (envType = '', productName = '') {
   if (envType) {
     return http.get(`/api/aslan/environment/environments?envType=${envType}`)
   } else {
-    return http.get(`/api/aslan/environment/environments?productName=${productName}`)
+    return http.get(`/api/aslan/environment/environments?projectName=${productName}`)
   }
-}
-
-export function listProductSSEAPI (params) {
-  return makeEventSource('/api/aslan/environment/sse/products?envType=', {
-    params
-  })
-}
-
-export function getProductsAPI (projectName = '', production = '') {
-  return http.get(`/api/aslan/environment/environments?projectName=${projectName}&production=${production}`)
-}
-
-export function getDeployEnvByPipelineNameAPI (pipelineName) {
-  return http.get(`/api/aslan/workflow/v2/tasks/pipelines/${pipelineName}/products`)
 }
 
 export function getServicePipelineAPI (projectName, envName, serviceName, serviceType) {
@@ -269,7 +257,7 @@ export function productEnvInfoAPI (projectName, envName) {
 
 // Project
 export function productTemplatesAPI () {
-  return http.get('/api/aslan/project/products')
+  return http.get('/api/v1/picket/projects?verbosity=detailed')// verbosity=detailed<brief,minimal>
 }
 
 // Service
@@ -958,9 +946,6 @@ export function addArtifactActivitiesAPI (id, payload) {
 }
 
 // Project
-export function getProjectsAPI (productType = '') {
-  return http.get(`/api/aslan/project/products?productType=${productType}`)
-}
 
 export function getSingleProjectAPI (projectName) {
   return http.get(`/api/aslan/project/products/${projectName}/services`)
@@ -1005,10 +990,6 @@ export function updateServiceAPI (product, service, type, env, data, envType = '
       envName: env
     }
   })
-}
-
-export function getProjectWithEnvsAPI (ignoreNoEnvs = true, verbosity = 'brief') {
-  return http.get(`/api/aslan/project/projects?ignoreNoEnvs=${ignoreNoEnvs}&verbosity=${verbosity}`)
 }
 
 export function updateK8sEnvAPI (product_name, env_name, payload, envType = '', force = '') {

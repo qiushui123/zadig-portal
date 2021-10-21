@@ -15,14 +15,14 @@
                  type="card">
           <el-tab-pane v-for="(env,index) in envNameList"
                        :key="index"
-                       :label="`${env.name}`"
+                       :label="`${env.envName}`"
                        :name="env.envName">
             <span slot="label">
               <i v-if="env.source==='helm'"
                  class="iconfont iconhelmrepo"></i>
               <i v-else-if="env.source==='spock'"
                  class="el-icon-cloudy"></i>
-              {{`${env.name}`}}
+              {{`${env.envName}`}}
               <el-tag v-if="env.production"
                       effect="light"
                       size="mini"
@@ -528,7 +528,7 @@
 import { getProductStatus, serviceTypeMap } from '@utils/word_translate'
 import { mapGetters } from 'vuex'
 import {
-  envRevisionsAPI, productEnvInfoAPI, productServicesAPI, serviceTemplateAfterRenderAPI, getProductsAPI,
+  envRevisionsAPI, productEnvInfoAPI, productServicesAPI, serviceTemplateAfterRenderAPI, listProductAPI,
   updateServiceAPI, updateK8sEnvAPI, restartPmServiceAPI, restartServiceOriginAPI,
   getClusterListAPI, deleteProductEnvAPI, getSingleProjectAPI, getServicePipelineAPI, initSource, rmSource
 } from '@api'
@@ -864,12 +864,12 @@ export default {
     },
     async getEnvNameList () {
       const projectName = this.projectName
-      const envNameList = await getProductsAPI(projectName)
+      const envNameList = await listProductAPI('', projectName)
       envNameList.forEach(element => {
-        element.envName = element.name
+        element.envName = element.env_name
       })
-      if (envNameList) {
-        this.envNameList = _.sortBy(envNameList, (item) => { return item.production })
+      if (envNameList.length) {
+        this.envNameList = envNameList
       }
     },
     handleProductEnvServiceData (serviceGroup) {

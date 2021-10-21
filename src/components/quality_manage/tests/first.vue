@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getTemplates'
+      'productList'
     ]),
     projectName () {
       return this.$route.params.project_name
@@ -34,9 +34,8 @@ export default {
   },
   methods: {
     async getProjects () {
-      await this.$store.dispatch('refreshProjectTemplates')
-      const routerList = this.getTemplates.map(element => {
-        return { name: element.product_name, url: `/v1/tests/detail/${element.product_name}/test` }
+      const routerList = this.productList.map(element => {
+        return { name: element.name, url: `/v1/tests/detail/${element.name}/test` }
       })
       bus.$emit(`set-topbar-title`, { title: '测试管理', breadcrumb: [] })
       bus.$emit(`set-sub-sidebar-title`, {

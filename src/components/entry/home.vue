@@ -71,7 +71,7 @@ export default {
         if (result) {
           this.getAnnouncements()
           if (this.$utils.roleCheck() != null) {
-            this.$store.dispatch('getProjectTemplates')
+            // this.$store.dispatch('getProjectTemplates')
           }
         }
       })

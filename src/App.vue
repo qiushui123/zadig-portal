@@ -38,7 +38,7 @@ export default {
         this.checkLogin().then((result) => {
           if (result) {
             if (this.$utils.roleCheck() != null) {
-              this.$store.dispatch('getProjectTemplates')
+              this.$store.dispatch('getProductList')
             }
           }
         })
