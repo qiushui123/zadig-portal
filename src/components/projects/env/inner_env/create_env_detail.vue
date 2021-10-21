@@ -390,7 +390,6 @@ export default {
           }
         ]
       },
-      envNames: 'DEFAULT',
       chartNames: []
     }
   },
@@ -815,7 +814,7 @@ export default {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
             chartValues: valueInfo.chartInfo,
-            defaultValues: valueInfo.envInfo,
+            defaultValues: valueInfo.envInfo.DEFAULT || '',
             namespace: this.projectConfig.defaultNamespace
           }
           this.startDeployLoading = true

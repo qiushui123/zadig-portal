@@ -111,6 +111,11 @@ export default {
           defaultValues: ''
         }
       }
+    },
+    isOnboarding: {
+      // 判断是否onboarding状态，用于预览接口envName
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -192,7 +197,7 @@ export default {
       const res = await getCalculatedValuesYamlAPI(
         this.projectName,
         this.selectedChart,
-        envName === 'DEFAULT' ? '' : envName,
+        envName === 'DEFAULT' || this.isOnboarding ? '' : envName,
         format,
         payload
       ).catch(error => {

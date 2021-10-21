@@ -1,7 +1,12 @@
 <template>
   <el-collapse class="helm-env-template" v-model="activeName" @change="collapseChange" accordion>
     <el-collapse-item title="默认环境变量" name="env">
-      <EnvValues ref="envValuesRef" :envName="handledEnv" @envYaml="saveEnvYaml"></EnvValues>
+      <EnvValues
+        ref="envValuesRef"
+        :envName="handledEnv"
+        @envYaml="saveEnvYaml"
+        :overrideYaml="defaultEnvValue && defaultEnvValue.defaultValues"
+      ></EnvValues>
     </el-collapse-item>
     <el-collapse-item :title="`${serviceVariableTitle}变量`" name="service">
       <ChartValues
@@ -12,6 +17,7 @@
         :getEnvChart="getEnvChart"
         :showEnvTabs="showEnvTabs"
         :defaultEnvValue="defaultEnvValue"
+        :isOnboarding="isOnboarding"
       ></ChartValues>
     </el-collapse-item>
   </el-collapse>
@@ -60,6 +66,11 @@ export default {
       required: false,
       type: String,
       default: '服务'
+    },
+    isOnboarding: {
+      // 判断是否onboarding状态，用于预览接口envName
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -89,7 +100,7 @@ export default {
     },
     getAllInfo () {
       return {
-        envInfo: this.$refs.envValuesRef.getAllEnvVariableInfo(),
+        envInfo: this.defaultEnvsValues,
         chartInfo: this.$refs.chartValuesRef.getAllChartNameInfo()
       }
     }
@@ -97,6 +108,11 @@ export default {
   components: {
     EnvValues,
     ChartValues
+  },
+  created () {
+    this.envNames.forEach(env => {
+      this.$set(this.defaultEnvsValues, env, '')
+    })
   }
 }
 </script>

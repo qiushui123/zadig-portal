@@ -10,6 +10,7 @@
       ref="importValuesRef"
       :resize="{direction: 'vertical'}"
       :importRepoInfo="envVariable"
+      @closeValueEdit="envVariable.overrideYaml = ''"
     ></ImportValues>
   </div>
 </template>
@@ -24,6 +25,10 @@ export default {
     envName: {
       type: String,
       required: true
+    },
+    overrideYaml: {
+      type: String,
+      required: false
     }
   },
   data () {
@@ -40,15 +45,10 @@ export default {
     switchTabs () {
       return this.$refs.importValuesRef.validate()
     },
-    getAllEnvVariableInfo () {
-      return this.envVariable.yamlSource === 'default'
-        ? ''
-        : this.envVariable.overrideYaml
-    },
     initEnvVariableInfo (envName = '') {
       this.envVariable = {
-        yamlSource: 'default', // : String
-        overrideYaml: '', // : String
+        yamlSource: this.overrideYaml ? 'freeEdit' : 'default', // : String
+        overrideYaml: this.overrideYaml || '', // : String
         envName
       }
     },
@@ -78,7 +78,7 @@ export default {
   watch: {
     envName: {
       handler (newV, oldV) {
-        if (newV === '') {
+        if (newV === '' || this.overrideYaml) {
           this.initEnvVariableInfo()
         } else {
           this.getEnvVariablesYaml({ envName: newV })

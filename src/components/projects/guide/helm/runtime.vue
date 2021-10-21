@@ -29,9 +29,13 @@
               </span>
             </el-tab-pane>
           </el-tabs>
-          <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName"></HelmEnvTemplate>
+          <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName" isOnboarding></HelmEnvTemplate>
           <div class="ai-bottom">
-            <el-button type="primary" size="small" @click="createHelmProductEnv">创建环境</el-button>
+            <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating">创建环境</el-button>
+            <div v-for="(env, index) in createRes" :key="index" class="ai-status">
+              <span class="env-name">{{env.env_name}}:</span>
+              <span>{{getStatusDesc(env)}}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -39,8 +43,7 @@
     <div class="controls__wrap">
       <div class="controls__right">
         <router-link :to="`/v1/projects/create/${projectName}/helm/delivery`">
-          <button v-if="!getResult" type="primary" class="save-btn" disabled plain>下一步</button>
-          <button v-else-if="getResult" type="primary" class="save-btn" plain>下一步</button>
+          <button type="primary" class="save-btn" :disabled="cantNext" plain>下一步</button>
         </router-link>
         <div class="run-button"></div>
       </div>
@@ -51,7 +54,7 @@
 import HelmEnvTemplate from '@/components/projects/env/env_detail/components/updateHelmEnvTemp.vue'
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
-import { createHelmProductEnvAPI } from '@api'
+import { createHelmProductEnvAPI, getCreateHelmEnvStatusAPI } from '@api'
 export default {
   data () {
     return {
@@ -59,21 +62,91 @@ export default {
         { envName: 'dev', isEdit: false, initName: 'dev' },
         { envName: 'qa', isEdit: false, initName: 'qa' }
       ],
-      getResult: false,
+      cantNext: true,
       activeName: 'dev',
-      isConfig: true
+      isConfig: true,
+      isCreating: false,
+      createRes: []
     }
   },
   methods: {
-    createHelmProductEnv () {
-      const payload = {
-        envName: '',
-        clusterID: '',
-        chartValues: '',
-        defaultValues: '',
-        namespace: ''
+    getStatusDesc (envInfo) {
+      let res = ''
+      switch (envInfo.status) {
+        case 'creating':
+          res = '环境创建中...'
+          break
+        case 'success':
+          res = '环境创建成功'
+          break
+        case 'failed':
+          res = `环境创建失败：${envInfo.err_message}`
+          break
+        case 'Unstable':
+          res = '环境创建成功（运行不稳定）'
+          break
+        default:
+          res = status
       }
-      createHelmProductEnvAPI('', [payload])
+      return res
+    },
+    async createHelmProductEnv () {
+      const { envInfo, chartInfo } = this.$refs.helmEnvTemplateRef.getAllInfo()
+
+      const payloadObj = {}
+      const projectName = this.projectName
+
+      this.envInfos.forEach(info => {
+        payloadObj[info.initName] = {
+          envName: info.envName,
+          clusterID: '',
+          chartValues: [],
+          defaultValues: envInfo[info.initName] || '',
+          namespace: `${projectName}-env-${info.envName}`
+        }
+      })
+
+      chartInfo.forEach(chart => {
+        payloadObj[chart.envName].chartValues.push(chart)
+        chart.envName = payloadObj[chart.envName].envName
+      })
+
+      const payload = Object.values(payloadObj)
+      this.isCreating = true
+      const res = await createHelmProductEnvAPI(projectName, payload).catch(
+        err => {
+          console.log(err)
+          this.isCreating = false
+        }
+      )
+      if (res) {
+        this.checkEnvStatus()
+      }
+    },
+    checkEnvStatus () {
+      let sId = null
+      const fn = async () => {
+        const res = await getCreateHelmEnvStatusAPI(this.projectName).catch(
+          err => {
+            console.log(err)
+            this.isCreating && (sId = setTimeout(fn, 2000))
+          }
+        )
+        if (res) {
+          this.createRes = res
+          const valid = res.filter(
+            r => !['success', 'Unstable'].includes(r.status)
+          )
+          if (valid.length) {
+            this.isCreating && (sId = setTimeout(fn, 2000))
+          } else {
+            clearTimeout(sId)
+            this.isCreating = false
+            this.cantNext = false
+          }
+        }
+      }
+      sId = setTimeout(fn, 2000)
     },
     handleTabsEdit (targetName, action) {
       this.envLength = this.envLength + 1 || this.envInfos.length
@@ -115,6 +188,9 @@ export default {
       title: '',
       routerList: []
     })
+  },
+  beforeDestroy () {
+    this.isCreating = false
   },
   components: {
     step,
@@ -207,6 +283,17 @@ export default {
 
         .ai-bottom {
           margin-top: 10px;
+
+          .ai-status {
+            margin: 8px 0;
+            font-size: 13px;
+
+            .env-name {
+              display: inline-block;
+              margin-right: 8px;
+              color: #e6a23c;
+            }
+          }
         }
       }
 
