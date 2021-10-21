@@ -673,6 +673,7 @@ export default {
         clone.registry_id = this.pickedRegistry
         clone.artifact_args = []
         clone.targets.forEach(element => {
+          console.log(element)
           clone.artifact_args.push({
             service_name: element.service_name,
             name: element.name,
@@ -681,6 +682,7 @@ export default {
             task_id: element.task_id || 0,
             file_name: element.file_name || '',
             url: element.url || '',
+            storage_id: this.pickedStorage,
             deploy: element.deploy
           })
         })
