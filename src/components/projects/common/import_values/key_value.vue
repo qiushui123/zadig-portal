@@ -3,47 +3,50 @@
     <h5>指定需要覆盖的键值对</h5>
     <el-form ref="form" :model="keyValueForm">
       <el-table :data="keyValues">
-        <el-table-column header-align="center" align="left" prop="key" label="键">
-          <template slot-scope="{ row, $index }">
+        <el-table-column header-align="center" align="left" label="键">
+          <template slot-scope="{ $index }">
             <el-form-item
-              v-if="keyValueForm.keyValues[$index]"
               :prop="`keyValues[${$index}].key`"
               :rules="[{
                   required: true, message: '请输入 key 值', trigger: 'blur'
               }, {
-                  validator: validateKey, trigger: 'blur'
+                  validator: validateKey, trigger: 'change'
               }]"
             >
-              <el-input v-model="keyValueForm.keyValues[$index].key" placeholder="键" size="small"></el-input>
+              <el-select
+                v-model="keyValueForm.keyValues[$index].key"
+                filterable
+                allow-create
+                clearable
+                placeholder="键"
+                size="small"
+                @change="selectKey($event, $index)"
+              >
+                <el-option v-for="key in lastKeys" :key="key" :label="key" :value="key"></el-option>
+              </el-select>
             </el-form-item>
-            <span v-else>{{row.key}}</span>
           </template>
         </el-table-column>
-        <el-table-column header-align="center" align="left" prop="value" label="值">
-          <template slot-scope="{ row, $index }">
+        <el-table-column header-align="center" align="left" label="值">
+          <template slot-scope="{ $index }">
             <el-form-item
-              v-if="keyValueForm.keyValues[$index]"
               :prop="`keyValues[${$index}].value`"
               :rules="{
-                validator: validateValue, trigger: 'blur'
+                  required: true, message: '请输入 value 值', trigger: 'blur'
               }"
             >
               <el-input v-model="keyValueForm.keyValues[$index].value" placeholder="值" size="small"></el-input>
             </el-form-item>
-            <span v-else>{{row.value}}</span>
           </template>
         </el-table-column>
         <el-table-column header-align="center" align="left" label="操作" width="100px">
           <template slot-scope="{ $index }">
-            <el-button v-if="keyValueForm.keyValues[$index]" type="text" @click="keyValues[$index].edit = false">保存</el-button>
-            <el-button v-else type="text" @click="editKeyValue($index)">编辑</el-button>
             <el-button type="text" @click="keyValues.splice($index, 1)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-form>
     <el-button type="text" @click="addKeyValue" icon="el-icon-plus">添加需要覆盖的键值对</el-button>
-    <span class="valid">{{ validRes }}</span>
   </div>
 </template>
 
@@ -55,57 +58,47 @@ export default {
       if (value === '') {
         callback(new Error('请输入 key 值'))
       } else if (keys.indexOf(value) !== keys.lastIndexOf(value)) {
-        this.validRes = 'key 值重复'
         callback(new Error('key 值重复'))
       } else {
-        this.validRes = ''
         callback()
       }
     }
 
-    this.validateValue = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入 value 值'))
-      } else {
-        callback()
-      }
-    }
-
-    return {
-      validRes: ''
-    }
+    return {}
   },
   props: {
     keyValues: {
       default: () => [],
       type: Array
-    }
-  },
-  watch: {
-    keyValues (nVal, oVal) {
-      if (nVal !== oVal) {
-        this.removeEdit(oVal)
+    },
+    listKeyValues: {
+      type: Object,
+      default: () => {
+        return {}
       }
     }
   },
   computed: {
     keyValueForm () {
       return {
-        keyValues: this.keyValues.map(val => {
-          return val.edit ? val : null
-        })
+        keyValues: this.keyValues
       }
+    },
+    lastKeys () {
+      const keys = this.keyValues.map(kv => kv.key)
+      return Object.keys(this.listKeyValues).filter(key => !keys.includes(key))
     }
   },
   methods: {
-    editKeyValue (index) {
-      this.$set(this.keyValues[index], 'edit', true)
+    selectKey (key, index) {
+      this.keyValues[index].value = this.listKeyValues[key] || ''
     },
     addKeyValue () {
-      this.keyValues.push({
-        key: '',
-        value: '',
-        edit: true
+      this.validate().then(() => {
+        this.keyValues.push({
+          key: '',
+          value: ''
+        })
       })
     },
     validate () {
@@ -118,14 +111,6 @@ export default {
           console.log(err)
           return Promise.reject(false)
         })
-        .then(() => {
-          this.removeEdit()
-        })
-    },
-    removeEdit (kvs = this.keyValues) {
-      kvs.forEach(kv => {
-        delete kv.edit
-      })
     }
   }
 }
@@ -161,13 +146,6 @@ export default {
     .el-form-item {
       margin-bottom: 0;
     }
-  }
-
-  .valid {
-    display: inline-block;
-    padding-left: 5px;
-    color: #f56c6c;
-    font-size: 12px;
   }
 }
 </style>

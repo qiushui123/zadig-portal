@@ -1250,6 +1250,26 @@ export function getMatchRulesAPI (productName) {
   return http.get(`/api/aslan/project/products/${productName}/searching-rules`)
 }
 
+export function getCreateHelmEnvStatusAPI (productName) {
+  return http.get(`/api/aslan/environment/environments/${productName}/status`)
+}
+
+export function getCalculatedValuesYamlAPI (productName, serviceName, envName = '', format, payload) { // defaultValues, overrideYaml, overrideValues
+  return http.post(`/api/aslan/environment/environments/${productName}/estimated-values?format=${format}&envName=${envName}&serviceName=${serviceName}`, payload)
+}
+
+export function getValuesYamlFromGitAPI ({ codehostID, owner, repo, branch, valuesPaths }) {
+  return http.get(`/api/aslan/environment/rendersets/yamlContent`, {
+    params: {
+      codehostID,
+      owner,
+      repo,
+      branch,
+      valuesPaths: valuesPaths.join(',')
+    }
+  })
+}
+
 // exteranl
 export function queryWorkloads (clusterId, namespace, page) {
   return http.get(`/api/aslan/environment/kube/workloads?namespace=${namespace}&clusterId=${clusterId}&perPage=1200&page=${page}`)

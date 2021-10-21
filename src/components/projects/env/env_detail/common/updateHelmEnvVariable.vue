@@ -17,28 +17,18 @@
 <script>
 import ImportValues from '@/components/projects/common/import_values/index.vue'
 import { getEnvDefaultVariableAPI } from '@api'
-import { cloneDeep } from 'lodash'
-
-const envVariableTemp = {
-  yamlSource: 'default', // : String
-  overrideYaml: '' // : String
-}
 
 export default {
   name: 'EnvValues',
   props: {
-    envNames: {
-      /**
-       * Array: 展示环境 tab
-       * String: 不展示环境 tab
-       */
-      type: [Array, String],
+    envName: {
+      type: String,
       required: true
     }
   },
   data () {
     return {
-      envVariable: {} // envVariableTemp
+      envVariable: {}
     }
   },
   computed: {
@@ -51,15 +41,15 @@ export default {
       return this.$refs.importValuesRef.validate()
     },
     getAllEnvVariableInfo () {
-      return this.envVariable
+      return this.envVariable.yamlSource === 'default'
+        ? ''
+        : this.envVariable.overrideYaml
     },
-    resetallEnvVariableInfo () {
-      this.envVariable = {}
-    },
-    initEnvVariableInfo (envName = 'DEFAULT') {
+    initEnvVariableInfo (envName = '') {
       this.envVariable = {
-        ...cloneDeep(envVariableTemp),
-        envName: envName === 'DEFAULT' ? '' : envName
+        yamlSource: 'default', // : String
+        overrideYaml: '', // : String
+        envName
       }
     },
     validate () {
@@ -78,25 +68,29 @@ export default {
         this.initEnvVariableInfo(envName)
       })
       if (res) {
-        const envVar = {
-          ...cloneDeep(envVariableTemp),
+        this.envVariable = {
           yamlSource: res.defaultValues ? 'freeEdit' : 'default',
           overrideYaml: res.defaultValues
         }
-        this.envVariable = cloneDeep(envVar)
       }
     }
   },
   watch: {
-    envNames: {
+    envName: {
       handler (newV, oldV) {
-        if (newV === 'DEFAULT') {
+        if (newV === '') {
           this.initEnvVariableInfo()
         } else {
           this.getEnvVariablesYaml({ envName: newV })
         }
       },
       immediate: true
+    },
+    'envVariable.overrideYaml' (newV) {
+      this.$emit('envYaml', {
+        envName: this.envName,
+        defaultValues: newV
+      })
     }
   },
   components: {
