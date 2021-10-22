@@ -48,24 +48,20 @@
                 <template>
                   <el-col :span="12">
                     <!-- 绑定元数据 -->
+                    <!-- Todo Use virtual-item-list -->
                     <el-select v-if="tarFileMap[scope.row.name] && tarFileMap[scope.row.name].length > 0"
                                v-model="scope.row.file"
-                               @visible-change="changeVirtualData($event, scope.row, scope.$index)"
                                filterable
                                clearable
                                value-key="file_name"
                                size="small"
                                style="width: 100%;"
                                placeholder="请选择交付物">
-                      <virtual-scroll-list :ref="`scrollListRef${scope.$index}`"
-                                           style="height: 272px; overflow-y: auto;"
-                                           :size="virtualData.size"
-                                           :keeps="virtualData.keeps"
-                                           :start="startAll[scope.row.name]"
-                                           :dataKey="'file_name'"
-                                           :dataSources="tarFileMap[scope.row.name]"
-                                           :dataComponent="itemComponent">
-                      </virtual-scroll-list>
+                      <el-option v-for="(source,index) in tarFileMap[scope.row.name]" :key="index"
+                        :label="source.file_name"
+                        :value="source">
+                      </el-option>
+
                     </el-select>
                     <el-tooltip v-else
                                 content="请求交付物失败，请手动输入交付物信息"
@@ -101,7 +97,7 @@ export default {
       pickedStorage: '',
       virtualData: {
         keeps: 20,
-        size: 34,
+        size: 20,
         start: 0
       },
       startAll: {}
@@ -123,29 +119,16 @@ export default {
         })
       })
     },
-    changeVirtualData (event, row, index) {
-      const opt = event ? 0 : -1
-      if (row.file) {
-        const id = this.tarFileMap[row.name].map(item => item.file_name).indexOf(row.file.file_name) + opt
-        if (this.startAll[row.name]) {
-          this.startAll[row.name] = id
-        } else {
-          this.$set(this.startAll, row.name, id)
-        }
-        this.$refs[`scrollListRef${index}`].virtual.updateRange(id, id + this.virtualData.keeps)
-      }
-    },
     changeStorage (val) {
       if (val) {
         this.tarFileMap = []
-        const allClickableServeiceNames = this.allServices.map(service => service.name)
+        const allClickableServeiceNames = this.pickedTargetServices.map(service => service.name)
         const payload = { names: allClickableServeiceNames }
         getArtifactFileAPI(payload, val).then((files) => {
           files = files || []
           this.tarFileMap = this.$utils.makeMapOfArray(files, 'name')
           this.pickedTargetServices.forEach(item => {
             item.file = null
-            this.startAll[item.name] = 0
           })
         })
       }
@@ -178,11 +161,7 @@ export default {
           }
           return element
         }), 'service_name')
-        this.getArtifactFiles(this.forcedUserInput.artifact_args.map(r => r.name)).then(() => {
-          this.forcedUserInput.artifact_args.forEach((art, index) => {
-            this.changeVirtualData(false, art, index)
-          })
-        })
+        this.getArtifactFiles(this.forcedUserInput.artifact_args.map(r => r.name))
         return
       }
       if (res && res.length > 0) {

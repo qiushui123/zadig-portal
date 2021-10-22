@@ -591,7 +591,7 @@ export default {
       } else if (this.artifactDeployEnabled && this.isPm) {
         const invalidService = []
         this.pmArtifactDeployData.services.forEach(item => {
-          if (item.file.file_name === '') {
+          if (!item.file) {
             invalidService.push(item.name)
           }
         })
