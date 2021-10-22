@@ -1243,3 +1243,9 @@ export function postWorkloads (payload) {
 export function editWorkloads (payload) {
   return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
 }
+
+// role
+
+export function queryPolicyDefinitions () {
+  return http.get(`/api/v1/policy-definitions`)
+}
