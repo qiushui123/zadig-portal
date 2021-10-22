@@ -183,7 +183,6 @@ export default {
       runner: {
         workflow_name: '',
         product_tmpl_name: '',
-        description: '',
         namespace: '',
         targets: [],
         tests: []
@@ -370,6 +369,10 @@ export default {
           }
           const maybeNew = res.targets[i]
           maybeNew.picked = this.haveForcedInput && (`${maybeNew.service_name}/${maybeNew.name}` in this.forcedInputTargetMap)
+          // 只有一个服务时默认选中
+          if (res.targets.length === 1) {
+            maybeNew.picked = true
+          }
         }
         // prepare deploys for view
         for (const tar of res.targets) {
@@ -382,12 +385,11 @@ export default {
 
         if (this.haveForcedInput) {
           res.product_tmpl_name = this.forcedUserInput.product_tmpl_name
-          res.description = this.forcedUserInput.description
           res.tests = this.forcedUserInput.tests
         }
-
         this.runner = res
         this.precreateLoading = false
+      }).then(() => {
         getAllBranchInfoAPI({ infos: this.allReposForQuery }, this.distributeEnabled ? 'bt' : 'bp').then(res => {
           // make these repo info more friendly
           res.forEach(repo => {
