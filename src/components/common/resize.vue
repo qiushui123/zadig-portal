@@ -51,7 +51,8 @@ export default {
       observer.observe(this.$refs.resize)
     },
     handleWindowsResize (event) {
-      this.containerWidth = this.$refs.resize.parentNode.clientWidth + 'px'
+      const clientWidth = this.$refs.resize.parentNode.clientWidth
+      this.containerWidth = clientWidth ? `${clientWidth}px` : 'auto'
       this.$children[0].editor && this.$children[0].editor.resize()
       this.$emit('sizeChange', { width: this.containerWidth, height: this.height })
     }

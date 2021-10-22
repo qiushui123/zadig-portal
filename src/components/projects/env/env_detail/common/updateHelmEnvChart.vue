@@ -30,7 +30,12 @@
             :resize="{direction: 'vertical'}"
             :importRepoInfo="usedChartNameInfo"
           ></ImportValues>
-          <KeyValue ref="keyValueRef" :keyValues="usedChartNameInfo.overrideValues" :listKeyValues="listKeyValues"></KeyValue>
+          <KeyValue
+            ref="keyValueRef"
+            :keyValues="usedChartNameInfo.overrideValues"
+            :listKeyValues="listKeyValues"
+            @estimatedValues="getCalculatedValuesYaml"
+          ></KeyValue>
           <section class="review-content">
             <el-button type="text" @click="getReviewValuesFile">
               预览最终 values 文件

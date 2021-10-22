@@ -178,18 +178,24 @@ export default {
       this.taskDialogVisible = false
     },
     generatePipe () {
-      let pipeTimer = null
+      this.pipeTimer = null
       const fn = () => {
         if (this.pipeStatus && this.pipeStatus.status !== 'success') {
-          generatePipeAPI(this.projectName).then(res => {
-            this.$set(this, 'pipeStatus', res)
-          })
-          pipeTimer = setTimeout(fn, 1000)
+          generatePipeAPI(this.projectName)
+            .then(res => {
+              this.$set(this, 'pipeStatus', res)
+            })
+            .catch(err => {
+              console.log(err)
+            })
+            .then(() => {
+              if (this.pipeTimer) this.pipeTimer = setTimeout(fn, 1000)
+            })
         } else {
-          clearInterval(pipeTimer)
+          clearInterval(this.pipeTimer)
         }
       }
-      fn()
+      this.pipeTimer = setTimeout(fn, 1000)
     }
   },
   computed: {
@@ -211,6 +217,9 @@ export default {
       routerList: []
     })
     this.generatePipe()
+  },
+  beforeDestroy () {
+    this.pipeTimer = null
   },
   components: {
     step,

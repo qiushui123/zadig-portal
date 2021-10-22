@@ -99,6 +99,7 @@ export default {
           key: '',
           value: ''
         })
+        this.$emit('estimatedValues')
       })
     },
     validate () {

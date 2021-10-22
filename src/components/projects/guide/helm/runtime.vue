@@ -9,22 +9,22 @@
         </div>
         <div class="account-integrations cf-block__list">
           <div class="second">配置以下几套环境：</div>
-          <el-tabs v-model="activeName" type="card" :addable="isConfig" @edit="handleTabsEdit">
+          <el-tabs v-model="activeName" type="card" :addable="!isCreating" @edit="handleTabsEdit">
             <el-tab-pane
               v-for="env in envInfos"
               :key="env.envName"
               :label="env.envName"
               :name="env.initName"
-              :closable="!env.isEdit && isConfig"
+              :closable="!env.isEdit && !isCreating"
             >
               <span slot="label">
-                <span v-if="env.isEdit && isConfig" class="tab-label">
+                <span v-if="env.isEdit && !isCreating" class="tab-label">
                   <el-input v-model="env.envName" :placeholder="env.initName"></el-input>
-                  <i class="el-icon-finished" @click="env.isEdit = false" v-if="isConfig"></i>
+                  <i class="el-icon-finished" @click="env.isEdit = false" v-if="!isCreating"></i>
                 </span>
                 <span v-else class="tab-label">
                   {{env.envName}}
-                  <i class="el-icon-edit" @click="env.isEdit = true" v-if="isConfig"></i>
+                  <i class="el-icon-edit" @click="env.isEdit = true" v-if="!isCreating"></i>
                 </span>
               </span>
             </el-tab-pane>
@@ -64,7 +64,6 @@ export default {
       ],
       cantNext: true,
       activeName: 'dev',
-      isConfig: true,
       isCreating: false,
       createRes: [],
       sId: null
