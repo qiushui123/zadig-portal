@@ -943,6 +943,10 @@ export function deleteHostAPI (id) {
   return http.delete(`/api/aslan/system/privateKey/${id}`)
 }
 
+export function importHostAPI (payload) {
+  return http.post(`/api/aslan/system/privateKey/batch`, payload)
+}
+
 // Delivery Center
 
 export function getArtifactsAPI (per_page, page, name = '', type = '', image = '', repoName = '', branch = '') {
