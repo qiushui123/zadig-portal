@@ -386,7 +386,8 @@ export default {
   watch: {
     currentService: {
       handler (value) {
-        if (value) {
+        const update = value && (!value.source || value.source !== 'chartTemplate')
+        if (value && update) {
           if (value.source) {
             const createFrom = value.create_from
             if (value.source === 'publicRepo') {

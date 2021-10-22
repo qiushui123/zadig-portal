@@ -3,7 +3,7 @@
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <h4 class="flex-center" style="padding-left: 40px;">
         <span>Chart 模板</span>
-        <el-button type="text" @click="triggerSubstantial">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
+        <el-button type="text" @click="triggerSubstantial" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
       </h4>
       <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
@@ -16,8 +16,23 @@
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <h4 style="padding-left: 40px;">values 文件</h4>
-      <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
+      <!-- <CommonImportValues
+        v-if="!substantial"
+        ref="commonImportValues"
+        :importRepoInfo.sync="importRepoInfo"
+        :resize="{height: '188px'}"
+        style="padding-left: 40px;"
+      ></CommonImportValues>
+      <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo"></ImportValues>-->
+      <keep-alive>
+        <component
+          :is="isComp"
+          ref="importValues"
+          :importRepoInfo.sync="importRepoInfo"
+          :resize="{height: '188px'}"
+          :style="{'padding-left': substantial ? '0px':'40px'}"
+        ></component>
+      </keep-alive>
       <el-form-item>
         <el-button size="small" @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
@@ -27,6 +42,7 @@
 </template>
 
 <script>
+import CommonImportValues from '@/components/projects/common/import_values/index.vue'
 import ImportValues from './template_repo/import_values.vue'
 import {
   createTemplateServiceAPI,
@@ -45,7 +61,7 @@ const rules = {
 //   createFrom: {
 //     templateName: '',
 
-//     valuesYAML: '',
+//     valuesYAML: '',  // 后端传输字段，这里使用的是 overrideYaml
 
 //     valuesPaths: [],
 //     codehostID: null,
@@ -65,8 +81,8 @@ export default {
         moduleName: ''
       },
       importRepoInfo: {
-        yamlSource: 'gitRepo',
-        valuesYAML: '',
+        yamlSource: 'freeEdit',
+        overrideYaml: '',
         gitRepoConfig: null
       },
       substantial: false,
@@ -86,6 +102,9 @@ export default {
       set: function (value) {
         this.$emit('input', value)
       }
+    },
+    isComp () {
+      return this.substantial ? ImportValues : CommonImportValues
     }
   },
   watch: {
@@ -98,26 +117,10 @@ export default {
             moduleName: createFrom.template_name
           }
           if (createFrom.yaml_data) {
-            const yamlData = createFrom.yaml_data
-            if (yamlData.yaml_source === 'freeEdit') {
-              this.importRepoInfo = {
-                yamlSource: 'freeEdit',
-                valuesYAML: yamlData.yaml_content,
-                gitRepoConfig: null
-              }
-            } else if (yamlData.yaml_source === 'gitRepo') {
-              const gitConfig = yamlData.git_repo_config
-              this.importRepoInfo = {
-                yamlSource: 'gitRepo',
-                valuesYAML: '',
-                gitRepoConfig: {
-                  codehostID: gitConfig.codehost_id,
-                  owner: gitConfig.owner,
-                  repo: gitConfig.repo,
-                  branch: gitConfig.branch,
-                  valuesPaths: yamlData.values_paths
-                }
-              }
+            this.importRepoInfo = {
+              yamlSource: 'freeEdit',
+              overrideYaml: createFrom.yaml_data.yaml_content,
+              gitRepoConfig: null
             }
           }
           this.isUpdate = true
@@ -139,8 +142,8 @@ export default {
         moduleName: ''
       }
       this.importRepoInfo = {
-        yamlSource: 'gitRepo',
-        valuesYAML: '',
+        yamlSource: 'freeEdit',
+        overrideYaml: '',
         gitRepoConfig: null
       }
       this.$refs.tempForm.clearValidate()
@@ -154,27 +157,15 @@ export default {
     },
     async createTemplateService () {
       const projectName = this.$route.params.project_name
-      let payload = {
+      const payload = {
         source: 'chartTemplate',
-        name: this.tempData.serviceName
-      }
-      if (this.importRepoInfo.yamlSource === 'freeEdit') {
-        payload = {
-          ...payload,
-          createFrom: {
-            templateName: this.tempData.moduleName,
-            valuesYAML: this.importRepoInfo.valuesYAML
-          }
-        }
-      } else if (this.importRepoInfo.yamlSource === 'gitRepo') {
-        payload = {
-          ...payload,
-          createFrom: {
-            ...this.importRepoInfo.gitRepoConfig,
-            templateName: this.tempData.moduleName
-          }
+        name: this.tempData.serviceName,
+        createFrom: {
+          templateName: this.tempData.moduleName,
+          valuesYAML: this.importRepoInfo.overrideYaml
         }
       }
+
       const res = await createTemplateServiceAPI(projectName, payload).catch(
         err => {
           console.log(err)
@@ -188,7 +179,10 @@ export default {
           projectName: this.$route.params.project_name
         })
         this.$emit('canUpdateEnv', [
-          { serviceName: payload.name, type: this.isUpdate ? 'update' : 'create' }
+          {
+            serviceName: payload.name,
+            type: this.isUpdate ? 'update' : 'create'
+          }
         ])
       }
     },
@@ -198,7 +192,6 @@ export default {
         source: 'chartTemplate',
         createFrom: { templateName: this.tempData.moduleName },
         valuesData: {
-          yamlSource: 'gitRepo',
           gitRepoConfig: this.importRepoInfo.gitRepoConfig
         }
       }
@@ -261,6 +254,7 @@ export default {
     }
   },
   components: {
+    CommonImportValues,
     ImportValues
   },
   created () {

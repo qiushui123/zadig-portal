@@ -94,9 +94,13 @@ export default {
       return Promise.all(valid)
     },
     collapseChange (activeName) {
-      this.validate().catch(() => {
-        this.activeName = activeName === 'env' ? 'service' : 'env'
-      })
+      this.validate()
+        .catch(() => {
+          this.activeName = activeName === 'env' ? 'service' : 'env'
+        })
+        .then(() => {
+          this.$refs.chartValuesRef.closeReview()
+        })
     },
     getAllInfo () {
       return {

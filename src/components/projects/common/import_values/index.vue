@@ -108,9 +108,7 @@ export default {
       return Promise.all([Promise.resolve(true)])
     },
     resetValueRepoInfo () {
-      this.$nextTick(() => {
-        this.$refs.valueRepo.resetSource(this.importRepoInfoUse.gitRepoConfig)
-      })
+      this.$refs.valueRepo && this.$refs.valueRepo.resetSource()
     }
   },
   components: {

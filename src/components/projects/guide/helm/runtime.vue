@@ -66,7 +66,8 @@ export default {
       activeName: 'dev',
       isConfig: true,
       isCreating: false,
-      createRes: []
+      createRes: [],
+      sId: null
     }
   },
   methods: {
@@ -120,33 +121,30 @@ export default {
         }
       )
       if (res) {
-        this.checkEnvStatus()
+        this.sId = setTimeout(this.checkEnvStatus, 2000)
       }
     },
-    checkEnvStatus () {
-      let sId = null
-      const fn = async () => {
-        const res = await getCreateHelmEnvStatusAPI(this.projectName).catch(
-          err => {
-            console.log(err)
-            this.isCreating && (sId = setTimeout(fn, 2000))
-          }
+    async checkEnvStatus () {
+      const res = await getCreateHelmEnvStatusAPI(this.projectName).catch(
+        err => {
+          console.log(err)
+          if (this.sId) this.sId = setTimeout(this.checkEnvStatus, 2000)
+        }
+      )
+      if (res) {
+        this.createRes = res
+        const valid = res.filter(
+          r => !['success', 'Unstable'].includes(r.status)
         )
-        if (res) {
-          this.createRes = res
-          const valid = res.filter(
-            r => !['success', 'Unstable'].includes(r.status)
-          )
-          if (valid.length) {
-            this.isCreating && (sId = setTimeout(fn, 2000))
-          } else {
-            clearTimeout(sId)
-            this.isCreating = false
-            this.cantNext = false
-          }
+        if (valid.length && this.sId) {
+          this.sId = setTimeout(this.checkEnvStatus, 2000)
+        } else {
+          clearTimeout(this.sId)
+          this.sId = null
+          this.isCreating = false
+          this.cantNext = false
         }
       }
-      sId = setTimeout(fn, 2000)
     },
     handleTabsEdit (targetName, action) {
       this.envLength = this.envLength + 1 || this.envInfos.length
@@ -190,7 +188,7 @@ export default {
     })
   },
   beforeDestroy () {
-    this.isCreating = false
+    this.sId = null
   },
   components: {
     step,

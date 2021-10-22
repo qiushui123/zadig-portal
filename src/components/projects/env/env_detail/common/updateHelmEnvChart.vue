@@ -147,6 +147,7 @@ export default {
     },
     usedChartNameInfo () {
       const selectedEnv = this.handledEnv || this.selectedEnv
+      this.closeReview()
       return (
         (this.allChartNameInfo[this.selectedChart] &&
           this.allChartNameInfo[this.selectedChart][selectedEnv]) ||
@@ -163,6 +164,9 @@ export default {
     }
   },
   methods: {
+    closeReview () {
+      this.showReview = false
+    },
     async getEnvDefaultVariable (envName) {
       if (
         Object.prototype.hasOwnProperty.call(this.defaultEnvsValues, envName) ||
