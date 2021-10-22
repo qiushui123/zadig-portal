@@ -64,7 +64,7 @@
 
                     </el-select>
                     <el-tooltip v-else
-                                content="请求交付物失败，请手动输入交付物信息"
+                                content="交付物不存在，请手动输入交付物信息"
                                 placement="top"
                                 popper-class="gray-popper">
                       <el-input v-model="scope.row.file_name"
