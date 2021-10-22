@@ -37,10 +37,13 @@
             @estimatedValues="getCalculatedValuesYaml"
           ></KeyValue>
           <section class="review-content">
-            <el-button type="text" @click="getReviewValuesFile">
-              预览最终 values 文件
-              <i style="margin-left: 8px;" :class="{'el-icon-arrow-down': showReview, 'el-icon-arrow-right': !showReview}"></i>
-            </el-button>
+            <div class="review-title">
+              <el-button type="text" @click="getReviewValuesFile">
+                预览最终 values 文件
+                <i style="margin-left: 8px;" :class="{'el-icon-arrow-down': showReview, 'el-icon-arrow-right': !showReview}"></i>
+              </el-button>
+              <el-button type="text" v-show="showReview" @click="getCalculatedValuesYaml(false)">刷新</el-button>
+            </div>
             <Codemirror class="codemirror" ref="codemirror" v-if="showReview" :value="usedChartNameInfo.yamlContent" :cmOption="cmOption"></Codemirror>
           </section>
         </div>
@@ -454,6 +457,12 @@ export default {
 
       .review-content {
         margin-top: 20px;
+
+        .review-title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
 
         .codemirror {
           height: 200px;

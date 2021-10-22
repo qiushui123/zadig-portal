@@ -1,129 +1,239 @@
-
 <template>
-  <el-card class="repertory-container" v-loading="loading">
-    <el-alert type="warning" :closable="false" v-if="!checkOne">提示：一份 values 文件会被定义成一个服务，服务名称即为 values 文件名称。</el-alert>
-    <el-tree
-      ref="tree"
-      v-if="showTree"
-      :props="defaultProps"
-      :load="loadNode"
-      lazy
-      show-checkbox
-      highlight-current
-      node-key="full_path"
-      @check-change="handleCheckChange"
-      :default-expanded-keys="defaultExpanded"
-      :check-strictly="checkOne"
+  <div class="value-repo-container">
+    <el-form
+      :model="source"
+      :rules="sourceRules"
+      ref="repoForm"
+      :show-message="false"
+      status-icon
+      label-position="right"
+      :label-width="hiddenLabel ? '0px' : '140px'"
+      class="value-repo-form"
+      :class="{'hidden-label': hiddenLabel}"
     >
-      <span class="custom-tree-node" slot-scope="{node, data}">
-        <i v-if="data.is_dir" class="el-icon-folder"></i>
-        <span>{{node.label}}</span>
-      </span>
-    </el-tree>
-    <el-button style="margin-top: 0.5rem;" type="primary" plain size="mini" @click="emitCheckedPath">确定</el-button>
-  </el-card>
+      <el-form-item prop="codehostID" label="托管平台">
+        <el-select
+          v-model="source.codehostID"
+          size="small"
+          style="width: 100%;"
+          placeholder="请选择托管平台"
+          @change="queryRepoOwnerById(source.codehostID)"
+          filterable
+        >
+          <el-option
+            v-for="(host, index) in allCodeHosts"
+            :key="index"
+            :label="`${host.address} ${
+                  host.type === 'github' ? '(' + host.namespace + ')' : ''
+                }`"
+            :value="host.id"
+          >
+            {{
+            `${host.address}
+            ${host.type === 'github' ? '(' + host.namespace + ')' : ''}`
+            }}
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="owner" label="代码库拥有者">
+        <el-select
+          v-model="source.owner"
+          size="small"
+          style="width: 100%;"
+          @change="getRepoNameById(source.codehostID, source.owner)"
+          placeholder="请选择代码库拥有者"
+          filterable
+        >
+          <el-option v-for="(repo, index) in codeInfo['repoOwners']" :key="index" :label="repo.name" :value="repo.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="repo" label="代码库名称">
+        <el-select
+          @change="
+                  getBranchInfoById(
+                    source.codehostID,
+                    source.owner,
+                    source.repo
+                  )
+                "
+          v-model.trim="source.repo"
+          remote
+          :remote-method="searchProject"
+          style="width: 100%;"
+          allow-create
+          clearable
+          size="small"
+          placeholder="请选择代码库"
+          filterable
+        >
+          <el-option v-for="(repo, index) in codeInfo['repos']" :key="index" :label="repo.name" :value="repo.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="branch" label="分支">
+        <el-select v-model.trim="source.branch" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
+          <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <template slot="label">
+          <el-tooltip v-if="!substantial" effect="dark" content="按照覆盖顺序依次选择 values 文件，后选的文件会覆盖先选的文件。" placement="top">
+            <span>文件路径</span>
+          </el-tooltip>
+          <span v-else>文件路径</span>
+        </template>
+        <div v-show="source.valuesPaths.length" class="overflow-auto">
+          <div v-for="(path, index) in source.valuesPaths" :key="index">
+            <span style="line-height: 18px;">{{path}}</span>
+            <el-button v-if="!substantial" type="text" icon="el-icon-close" @click="deletePath(index)" style="padding: 1px 0 1px 0.5rem;"></el-button>
+          </div>
+        </div>
+        <el-button :disabled="canSelectFile" type="primary" round plain size="mini" @click="showFileSelectDialog = true">选择 values 文件</el-button>
+        <span v-show="showErrorTip" class="error-tip">请选择 values 文件</span>
+      </el-form-item>
+      <el-dialog title="请选择服务的 values 文件" :visible.sync="showFileSelectDialog" append-to-body>
+        <TreeFile :gitRepoConfig="source" @checkedPath="checkedPath" :checkOne="!substantial"></TreeFile>
+      </el-dialog>
+    </el-form>
+  </div>
 </template>
-
 <script>
-import { getRepoFilesAPI } from '@api'
+import RepoMixin from '../mixin/import_repo'
+import TreeFile from './tree_file.vue'
+import { uniq } from 'lodash'
+
 export default {
-  data () {
-    return {
-      defaultProps: {
-        children: 'children',
-        label: 'name',
-        isLeaf: 'leaf'
-      },
-      loading: true,
-      defaultExpanded: [],
-      showTree: true
-    }
-  },
   props: {
-    gitRepoConfig: {
-      require: true,
-      type: Object,
-      default () {
-        return {
-          codehostID: null,
-          owner: '',
-          repo: '',
-          branch: ''
-        }
-      }
+    repoSource: Object,
+    hiddenLabel: {
+      default: false,
+      type: Boolean
     },
-    checkOne: {
+    substantial: {
       default: false,
       type: Boolean
     }
   },
-  methods: {
-    handleCheckChange (data, checked) {
-      if (this.checkOne && checked) {
-        this.$refs.tree.setCheckedKeys([data.full_path])
-        return
-      }
-      if (checked && data.is_dir) {
-        this.defaultExpanded.push(data.full_path)
-      }
-    },
-    emitCheckedPath () {
-      const checkedKeys = this.$refs.tree
-        .getCheckedKeys()
-        .filter(key => key.endsWith('.yaml'))
-      this.$refs.tree.setCheckedKeys([])
-      this.$emit('checkedPath', checkedKeys)
-
-      this.defaultExpanded = []
-      this.showTree = false
-      this.$nextTick(() => {
-        this.showTree = true
-      })
-    },
-    loadNode (node, resolve) {
-      const path = (node.data && node.data.full_path) || ''
-      const params = {
-        codehostId: this.gitRepoConfig.codehostID,
-        repoOwner: this.gitRepoConfig.owner,
-        repoName: this.gitRepoConfig.repo,
-        branchName: this.gitRepoConfig.branch,
-        path,
-        type: 'helm'
-      }
-      getRepoFilesAPI(params).then(res => {
-        if (path === '') {
-          this.loading = false
-        }
-        res.forEach(element => {
-          if (element.is_dir) {
-            element.leaf = false
-          } else {
-            element.leaf = true
-          }
-        })
-        if (!this.checkOne && node.checked) {
-          this.$nextTick(() => {
-            node.childNodes.forEach(child => {
-              if (!child.isLeaf) {
-                this.defaultExpanded.push(child.data.full_path)
-              }
-            })
-          })
-        }
-        return resolve(res)
-      })
+  mixins: [RepoMixin],
+  data () {
+    return {
+      showFileSelectDialog: false,
+      showErrorTip: false
     }
+  },
+  computed: {
+    canSelectFile () {
+      const source = this.source
+      return !(
+        source.codehostID &&
+        source.owner &&
+        source.repo &&
+        source.branch
+      )
+    }
+  },
+  watch: {
+    repoSource: {
+      handler (nVal, oldV) {
+        this.source = nVal
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    checkedPath (data) {
+      this.showFileSelectDialog = false
+      this.source.valuesPaths = uniq(this.source.valuesPaths.concat(data))
+      if (this.source.valuesPaths.length) {
+        this.showErrorTip = false
+      }
+    },
+    deletePath (index) {
+      this.source.valuesPaths.splice(index, 1)
+    },
+    validate () {
+      const valid = []
+      if (this.source.valuesPaths.length) {
+        this.showErrorTip = false
+        valid.push(Promise.resolve())
+      } else {
+        this.showErrorTip = true
+        valid.push(Promise.reject())
+      }
+      valid.push(this.$refs.repoForm.validate())
+      return Promise.all(valid)
+    }
+  },
+  components: {
+    TreeFile
   }
 }
 </script>
-
 <style lang="less" scoped>
-.repertory-container {
-  margin-top: -25px;
+.value-repo-container {
+  .repo-attr {
+    span {
+      display: inline-block;
+      width: 128px;
+      margin-bottom: 20px;
+      padding-right: 12px;
+      line-height: 40px;
+      text-align: right;
+    }
+  }
+
+  /deep/.el-form {
+    &.value-repo-form {
+      .el-form-item {
+        margin-bottom: 0;
+      }
+    }
+
+    &.hidden-label {
+      .el-form-item__label {
+        display: none;
+      }
+    }
+
+    &.el-form--label-right {
+      .el-form-item__label {
+        text-align: right;
+      }
+    }
+  }
+
+  .overflow-auto {
+    max-height: 90px;
+    margin: 9px 0;
+    overflow: auto;
+    line-height: 20px;
+
+    &::-webkit-scrollbar-track {
+      background-color: #f5f5f5;
+      border-radius: 6px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      background-color: #f5f5f5;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #b7b8b9;
+      border-radius: 6px;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .error-tip {
+    margin-top: 10px;
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 1;
+  }
 }
 
-/deep/.el-alert {
-  margin-top: -5px;
-  margin-bottom: 10px;
+.submit-button {
+  text-align: center;
 }
 </style>

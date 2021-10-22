@@ -16,14 +16,6 @@
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <!-- <CommonImportValues
-        v-if="!substantial"
-        ref="commonImportValues"
-        :importRepoInfo.sync="importRepoInfo"
-        :resize="{height: '188px'}"
-        style="padding-left: 40px;"
-      ></CommonImportValues>
-      <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo"></ImportValues>-->
       <keep-alive>
         <component
           :is="isComp"
@@ -60,9 +52,7 @@ const rules = {
 //   name: '',
 //   createFrom: {
 //     templateName: '',
-
 //     valuesYAML: '',  // 后端传输字段，这里使用的是 overrideYaml
-
 //     valuesPaths: [],
 //     codehostID: null,
 //     owner: '',
@@ -74,6 +64,7 @@ const rules = {
 export default {
   name: 'TemplateRepo',
   data () {
+    this.rules = rules
     return {
       tempCharts: [],
       tempData: {
@@ -253,12 +244,7 @@ export default {
       }
     }
   },
-  components: {
-    CommonImportValues,
-    ImportValues
-  },
   created () {
-    this.rules = rules
     this.getTemplateCharts()
   }
 }

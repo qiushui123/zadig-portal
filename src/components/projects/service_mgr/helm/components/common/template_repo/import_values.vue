@@ -2,13 +2,13 @@
   <div class="values-outer">
     <h4 style="padding-left: 40px;">values 文件</h4>
     <el-form-item label-width="0px">
-      <ValueRepo ref="valueRepo" :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig" substantial></ValueRepo>
+      <Repertory ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" substantial></Repertory>
     </el-form-item>
   </div>
 </template>
 
 <script>
-import ValueRepo from '@/components/projects/common/import_values/value_repo.vue'
+import Repertory from '@/components/projects/common/import_values/repertory.vue'
 import { cloneDeep } from 'lodash'
 
 const valueInfo = {
@@ -22,38 +22,28 @@ const valueInfo = {
 }
 
 export default {
-  data () {
-    return {}
-  },
   props: {
     importRepoInfo: Object
   },
   computed: {
-    importRepoInfoUse: {
-      get () {
-        let gitRepoConfig = {}
-        if (!this.importRepoInfo.gitRepoConfig) {
-          gitRepoConfig = { gitRepoConfig: cloneDeep(valueInfo.gitRepoConfig) }
-        }
-        return Object.assign(this.importRepoInfo, gitRepoConfig)
-      },
-      set (val) {
-        this.$emit('update:importRepoInfo', val)
-        return val
+    importRepoInfoUse () {
+      let gitRepoConfig = {}
+      if (!this.importRepoInfo.gitRepoConfig) {
+        gitRepoConfig = { gitRepoConfig: cloneDeep(valueInfo.gitRepoConfig) }
       }
+      return Object.assign(this.importRepoInfo, gitRepoConfig)
     }
   },
   methods: {
     validate () {
-      const valueRepo = this.$refs.valueRepo
-      return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
+      return this.$refs.valueRepoRef.validate()
     },
     resetValueRepoInfo () {
-      this.$refs.valueRepo && this.$refs.valueRepo.resetSource()
+      this.$refs.valueRepoRef && this.$refs.valueRepoRef.resetSource()
     }
   },
   components: {
-    ValueRepo
+    Repertory
   }
 }
 </script>

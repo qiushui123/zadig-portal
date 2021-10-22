@@ -98,9 +98,6 @@ export default {
         this.codeInfo.repos = res
       }
     },
-    validate () {
-      return this.$refs.repoForm.validate()
-    },
     resetSource (val = null) {
       this.source = val || {
         codehostID: null,

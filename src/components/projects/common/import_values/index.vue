@@ -10,7 +10,7 @@
       <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml"></codemirror>
     </Resize>
     <el-dialog title="从 Git 仓库导入" :visible.sync="showGitImportDialog" append-to-body>
-      <ValueRepo ref="valueRepo" :valueRepoInfo="importRepoInfoUse.gitRepoConfig"></ValueRepo>
+      <Repertory ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig"></Repertory>
       <div slot="footer">
         <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
         <el-button type="primary" @click="importOverrideYaml" size="small" :loading="loadValueYamls">导 入</el-button>
@@ -22,7 +22,7 @@
 <script>
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
-import ValueRepo from './value_repo.vue'
+import Repertory from './repertory.vue'
 import { cloneDeep } from 'lodash'
 import { getValuesYamlFromGitAPI } from '@api'
 
@@ -85,8 +85,7 @@ export default {
   },
   methods: {
     importOverrideYaml () {
-      const valueRepo = this.$refs.valueRepo
-      Promise.all([valueRepo.validate(), valueRepo.validateRoute()]).then(
+      this.$refs.valueRepoRef.validate().then(
         async () => {
           this.loadValueYamls = true
           const res = await getValuesYamlFromGitAPI(this.importRepoInfoUse.gitRepoConfig).catch(error =>
@@ -108,13 +107,13 @@ export default {
       return Promise.all([Promise.resolve(true)])
     },
     resetValueRepoInfo () {
-      this.$refs.valueRepo && this.$refs.valueRepo.resetSource()
+      this.$refs.valueRepoRef && this.$refs.valueRepoRef.resetSource()
     }
   },
   components: {
     Codemirror,
     Resize,
-    ValueRepo
+    Repertory
   }
 }
 </script>
