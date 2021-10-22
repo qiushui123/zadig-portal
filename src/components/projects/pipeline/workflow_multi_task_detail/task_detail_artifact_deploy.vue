@@ -119,7 +119,6 @@ export default {
   },
   computed: {
     artifactDeployRunning () {
-      console.log(this.deploy && this.deploy.status === 'running')
       return this.deploy && this.deploy.status === 'running'
     },
     artifactDeployDone () {

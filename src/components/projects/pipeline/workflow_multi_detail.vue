@@ -274,7 +274,8 @@ export default {
         Object.assign(this.forcedUserInput, {
           artifactArgs: args.artifact_args,
           versionArgs: args.version_args,
-          registryId: args.registry_id
+          registryId: args.registry_id,
+          storageId: args.storage_id
         })
       }
     }
