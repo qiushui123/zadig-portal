@@ -213,18 +213,18 @@ export default {
     getRegistryWhenBuildAPI().then((res) => {
       this.allRegistry = res
       // 克隆任务数据
-      if (this.forcedUserInput.versionArgs && this.forcedUserInput.versionArgs.version) {
-        Object.assign(this.versionInfo, this.forcedUserInput.versionArgs)
+      if (this.forcedUserInput.version_args && this.forcedUserInput.version_args.version) {
+        Object.assign(this.versionInfo, this.forcedUserInput.version_args)
         this.versionInfo.labelStr = this.versionInfo.labels.join(';')
       }
-      if (this.forcedUserInput.registryId) {
-        this.pickedRegistry = this.forcedUserInput.registryId
-        this.pickedTargetServices = sortBy(this.forcedUserInput.artifactArgs.map(element => {
+      if (this.forcedUserInput.registry_id) {
+        this.pickedRegistry = this.forcedUserInput.registry_id
+        this.pickedTargetServices = sortBy(this.forcedUserInput.artifact_args.map(element => {
           element.key = element.name + '/' + element.service_name
           return element
         }), 'service_name')
-        this.getServiceImgs(this.forcedUserInput.artifactArgs.map(r => r.name)).then(() => {
-          this.forcedUserInput.artifactArgs.forEach((art, index) => {
+        this.getServiceImgs(this.forcedUserInput.artifact_args.map(r => r.name)).then(() => {
+          this.forcedUserInput.artifact_args.forEach((art, index) => {
             this.changeVirtualData(false, art, index)
           })
         })

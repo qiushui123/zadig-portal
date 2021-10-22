@@ -114,9 +114,9 @@ export default {
     },
     getArtifactFiles (val) {
       return new Promise((resolve, reject) => {
-        const objectStorageId = this.pickedStorage
+        const objectstorage_id = this.pickedStorage
         const payload = { names: val }
-        getArtifactFileAPI(payload, objectStorageId).then((files) => {
+        getArtifactFileAPI(payload, objectstorage_id).then((files) => {
           files = files || []
           this.tarFileMap = this.$utils.makeMapOfArray(files, 'name')
           resolve()
@@ -164,9 +164,9 @@ export default {
     getStorageListAPI().then((res) => {
       this.objectstorageList = res
       // 克隆任务数据
-      if (this.forcedUserInput.storageId) {
-        this.pickedStorage = this.forcedUserInput.storageId
-        this.pickedTargetServices = sortBy(this.forcedUserInput.artifactArgs.map(element => {
+      if (this.forcedUserInput.storage_id) {
+        this.pickedStorage = this.forcedUserInput.storage_id
+        this.pickedTargetServices = sortBy(this.forcedUserInput.artifact_args.map(element => {
           element.key = element.name + '/' + element.service_name
           element.file = {
             file_name: element.file_name,
@@ -178,8 +178,8 @@ export default {
           }
           return element
         }), 'service_name')
-        this.getArtifactFiles(this.forcedUserInput.artifactArgs.map(r => r.name)).then(() => {
-          this.forcedUserInput.artifactArgs.forEach((art, index) => {
+        this.getArtifactFiles(this.forcedUserInput.artifact_args.map(r => r.name)).then(() => {
+          this.forcedUserInput.artifact_args.forEach((art, index) => {
             this.changeVirtualData(false, art, index)
           })
         })

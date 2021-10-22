@@ -295,7 +295,7 @@ export default {
     forcedInputTargetMap () {
       if (this.haveForcedInput) {
         if (this.artifactDeployEnabled) {
-          return keyBy(this.forcedUserInput.artifactArgs, (i) => {
+          return keyBy(this.forcedUserInput.artifact_args, (i) => {
             return i.service_name + '/' + i.name
           })
         }

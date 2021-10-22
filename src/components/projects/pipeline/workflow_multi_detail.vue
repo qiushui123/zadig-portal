@@ -260,24 +260,7 @@ export default {
     },
     rerun (task) {
       this.taskDialogVisible = true
-
-      const args = task.workflow_args
-      this.forcedUserInput = {
-        workflow_name: args.workflow_name,
-        product_tmpl_name: args.product_tmpl_name,
-        description: args.description,
-        namespace: args.namespace,
-        targets: args.targets,
-        tests: args.tests
-      }
-      if (args.artifact_args && args.artifact_args.length > 0) {
-        Object.assign(this.forcedUserInput, {
-          artifactArgs: args.artifact_args,
-          versionArgs: args.version_args,
-          registryId: args.registry_id,
-          storageId: args.storage_id
-        })
-      }
+      this.forcedUserInput = task.workflow_args
     }
   },
   beforeDestroy () {
