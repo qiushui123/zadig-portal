@@ -322,6 +322,30 @@ const routes = [
         ]
       },
       {
+        path: 'projects/detail/:project_name/rbac',
+        component: () => import(/* webpackChunkName: "project-rbac" */ '@/components/projects/detail_ope/rbac/home.vue'),
+        meta: {
+          requiresAuth: true,
+          title: '权限管理'
+        }
+      },
+      {
+        path: 'projects/detail/:project_name/rbac/member',
+        component: () => import(/* webpackChunkName: "project-rbac" */ '@/components/projects/detail_ope/rbac/member.vue'),
+        meta: {
+          requiresAuth: true,
+          title: '成员管理'
+        }
+      },
+      {
+        path: 'projects/detail/:project_name/rbac/role',
+        component: () => import(/* webpackChunkName: "project-rbac" */ '@/components/projects/detail_ope/rbac/role.vue'),
+        meta: {
+          requiresAuth: true,
+          title: '角色管理'
+        }
+      },
+      {
         path: 'projects/detail/:project_name/pipelines/multi/:workflow_name',
         component: () => import(/* webpackChunkName: "project-pipeline" */ '@/components/projects/pipeline/workflow_multi_detail.vue'),
         meta: {

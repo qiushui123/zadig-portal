@@ -36,6 +36,14 @@
                   <i class="el-icon-delete"></i>
                   <span class="add-filter-value-title">删除</span>
                 </button>
+                <router-link v-if="isProjectAdmin"
+                             :to="`/v1/projects/detail/${projectName}/rbac`">
+                  <button type="button"
+                          class="display-btn">
+                    <i class="el-icon-lock"></i>
+                    <span class="add-filter-value-title">权限</span>
+                  </button>
+                </router-link>
               </div>
 
             </div>
