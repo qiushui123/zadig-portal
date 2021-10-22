@@ -98,7 +98,7 @@
       </el-form-item>
       <!-- Build -->
       <div v-if="pickedTargets.length > 0">
-        <workflow-build-rows :pickedTargets="pickedTargets"></workflow-build-rows>
+        <WorkflowBuildRows :pickedTargets="pickedTargets"></WorkflowBuildRows>
       </div>
     </div>
     <template  v-if="artifactDeployEnabled">
@@ -164,7 +164,7 @@
 
 <script>
 import { sortBy, keyBy, orderBy, cloneDeep } from 'lodash'
-import workflowBuildRows from '@/components/common/workflow_build_rows.vue'
+import WorkflowBuildRows from '@/components/common/workflow_build_rows.vue'
 import WorkflowTestRows from '@/components/common/workflow_test_rows.vue'
 import K8sArtifactDeploy from './k8sArtifactDeploy.vue'
 import PmArtifactDeploy from './pmArtifactDeploy.vue'
@@ -177,7 +177,6 @@ export default {
       activeNames: [],
       buildTargets: [],
       pickedBuildTarget: [],
-      pickedStorage: '',
       k8sArtifactDeployData: {},
       pmArtifactDeployData: {},
       specificEnv: true,
@@ -195,8 +194,7 @@ export default {
       startTaskLoading: false,
       fastSelect: false,
       isHelm: false,
-      isPm: false,
-      storageList: []
+      isPm: false
     }
   },
   computed: {
@@ -466,13 +464,13 @@ export default {
             deploy: element.deploy
           })
         })
-        // 处理版本信息
+        // 处理 K8s 交付物部署版本信息
         if (this.k8sArtifactDeployData.versionInfo.enabled) {
           if (this.k8sArtifactDeployData.versionInfo.labelStr !== '') {
             this.k8sArtifactDeployData.versionInfo.labels = this.k8sArtifactDeployData.versionInfo.labelStr.trim().split(';')
           }
           payload.version_args = cloneDeep(this.k8sArtifactDeployData.versionInfo)
-        }
+        }// 处理物理机交付物部署信息
       } else if (this.artifactDeployEnabled && this.isPm) {
         payload.storage_id = this.pmArtifactDeployData.pickedStorage
         payload.artifact_args = []
@@ -712,7 +710,7 @@ export default {
     }
   },
   components: {
-    workflowBuildRows,
+    WorkflowBuildRows,
     WorkflowTestRows,
     deployIcons,
     PmArtifactDeploy,
