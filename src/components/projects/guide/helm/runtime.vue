@@ -54,7 +54,11 @@
 import HelmEnvTemplate from '@/components/projects/env/env_detail/components/updateHelmEnvTemp.vue'
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
-import { createHelmProductEnvAPI, getCreateHelmEnvStatusAPI } from '@api'
+import {
+  createHelmProductEnvAPI,
+  getCreateHelmEnvStatusAPI,
+  getProductsAPI
+} from '@api'
 export default {
   data () {
     return {
@@ -70,6 +74,21 @@ export default {
     }
   },
   methods: {
+    async getProducts () {
+      const res = await getProductsAPI(this.projectName).catch(err => {
+        console.log(err)
+      })
+      if (res) {
+        this.envInfos = res.map(re => {
+          return {
+            envName: re.name,
+            isEdit: false,
+            initName: re.name
+          }
+        })
+        this.activeName = this.envInfos[0].initName
+      }
+    },
     getStatusDesc (envInfo) {
       let res = ''
       switch (envInfo.status) {
@@ -185,6 +204,7 @@ export default {
       title: '',
       routerList: []
     })
+    this.getProducts()
   },
   beforeDestroy () {
     this.sId = null
