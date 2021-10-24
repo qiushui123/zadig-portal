@@ -2,26 +2,25 @@
   <el-dialog class="form" title="添加角色" :visible.sync="dialogRoleAddFormVisible">
     <el-form ref="form" :model="form" :rules="formRules" >
       <el-form-item label="角色名称" prop="name" label-width="100px">
-        <el-input size="small"  placeholder="请输入角色名称"></el-input>
+        <el-input size="small" v-model="form.name"  placeholder="请输入角色名称"></el-input>
       </el-form-item>
-      <el-form-item label="权限列表" prop="rules" label-width="100px">
+      <el-form-item label="权限列表" prop="permissions" label-width="100px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
             :label="group.resource"
             :key="group.resource"
-            :value="calculatePermissionGroupsCheckedState(group.rules)"
-            @change="handlePermissionGroupChange(group.rules)"
-            :indeterminate="isIndeterminate(group.rules)"
+            :value="calculatePermissionGroupsCheckedState(group.resource)"
+             @change="handlePermissionGroupChange(group.resource)"
+            :indeterminate="isIndeterminate(group.resource)"
           >{{group.alias}}</el-checkbox>
           <div class="sub-permissions">
-            <el-checkbox-group v-model="form.rules">
+            <el-checkbox-group v-model="form.permissions[group.resource]">
               <div>
                 <el-checkbox
                   class="sub-permissions-checkbox"
                   v-for="(subPermission,sub_index) in   group.rules"
                   :key="sub_index"
                   :label="subPermission.action"
-
                 >{{subPermission.alias}}</el-checkbox>
               </div>
             </el-checkbox-group>
@@ -31,7 +30,7 @@
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button size="small" @click="dialogRoleAddFormVisible = false">取 消</el-button>
-      <el-button size="small" type="primary">确 定</el-button>
+      <el-button size="small" type="primary" @click="submit">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -42,69 +41,70 @@ import _ from 'lodash'
 export default {
   name: 'addrole',
   data () {
+    const permissionsValidator = (rule, value, callback) => {
+      const permissions = this.form.permissions
+      if (!permissions.Workflow.length && !permissions.Environment.length && !permissions.Service.length && !permissions.Test.length && !permissions.Delivery.length) {
+        callback(new Error('请选择至少一个权限'))
+      }
+      callback()
+    }
     return {
       dialogRoleAddFormVisible: false,
       permissionGroups: [],
       form: {
-        name: null,
-        rules: ['get_workflow']
+        name: '',
+        permissions: {
+          Workflow: [],
+          Environment: [],
+          Service: [],
+          Test: [],
+          Delivery: []
+        }
       },
       formRules: {
         name: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
         ],
-        rules: [
-          { type: 'array', required: true, message: '请选择至少一个权限', trigger: 'change' }
+        permissions: [
+          { validator: permissionsValidator, trigger: 'change' }
+
         ]
       }
     }
   },
   methods: {
-    handlePermissionGroupChange (groupName) {
-      const groupDetail = this.permissionGroups.find((item) => item.name === groupName)
-      const subPermissionUUIDs = groupDetail !== null
-        ? groupDetail.subPermissions.map((item) => {
-          return item.uuid
-        })
-        : null
-      const isSelecting = !!(groupDetail !== null && !this.calculatePermissionGroupsCheckedState(groupName))
-
-      if (subPermissionUUIDs) {
-        if (isSelecting) {
-          this.form.permissionUUIDs = _.uniq(this.form.permissionUUIDs.concat(subPermissionUUIDs))
-        } else {
-          this.form.permissionUUIDs = this.form.permissionUUIDs.filter((item) => {
-            return !subPermissionUUIDs.includes(item)
-          })
-        }
+    handlePermissionGroupChange (resource) {
+      const permissonItem = this.permissionGroups.find(item => item.resource === resource)
+      if (this.form.permissions[resource].length === permissonItem.rules.length) {
+        this.form.permissions[resource] = []
+      } else {
+        this.form.permissions[resource] = permissonItem.rules.map(item => (item.action))
       }
     },
-    calculatePermissionGroupsCheckedState (rules) {
-      const res1 = rules.map(item => (item.action))
-      const res2 = this.form.rules
-      if (res2.length) {
-        const permissionDiff = _.difference(res1, res2)
-        if (permissionDiff.length === 0) {
-          return true
-        }
+    calculatePermissionGroupsCheckedState (resource) {
+      const permissonItem = this.permissionGroups.find(item => item.resource === resource)
+      if (this.form.permissions[resource].length === permissonItem.rules.length) {
+        return true
       }
       return false
     },
-    isIndeterminate (rules) {
-      const res1 = rules.map(item => (item.action))
-      const res2 = this.form.rules
-      if (res2.length) {
-        const permissionDiff = _.difference(res1, res2)
-        if (permissionDiff.length > 0 && permissionDiff.length < res1.length) {
-          return true
-        }
+    isIndeterminate (resource) {
+      if (this.form.permissions[resource].length) {
+        return true
+      } else {
+        return false
       }
-      return false
     },
     async getPolicyDefinitions () {
       const res = await queryPolicyDefinitions().catch(error => console.log(error))
       if (res) {
         this.permissionGroups = res
+      }
+    },
+    async submit () {
+      const res = await this.$refs.form.validate()
+      if (res) {
+        console.log(this.form)
       }
     }
   },
