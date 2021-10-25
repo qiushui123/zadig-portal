@@ -106,7 +106,7 @@ export default {
           '是否生产机器(y/n)': ''
         }
       ],
-      host: { provider: '', option: 'override' },
+      host: { provider: '', option: 'increment' },
       rules: {
         provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }]
       },
