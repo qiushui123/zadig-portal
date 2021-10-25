@@ -69,12 +69,12 @@
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
           </el-radio>
-          <el-radio label="override">
+          <!-- <el-radio label="override">
             全量覆盖
             <el-tooltip effect="dark" content="已有主机管理列表中的条目不再保留，文件中的主机信息全量导入" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
-          </el-radio>
+          </el-radio> -->
         </el-radio-group>
       </el-form-item>
     </el-form>
