@@ -9,29 +9,29 @@
         </div>
         <div class="account-integrations cf-block__list">
           <div class="second">配置以下几套环境：</div>
-          <el-tabs v-model="activeName" type="card" :addable="!isCreating" @edit="handleTabsEdit">
+          <el-tabs v-model="activeName" type="card" :addable="canHandle" @edit="handleTabsEdit">
             <el-tab-pane
               v-for="env in envInfos"
               :key="env.envName"
               :label="env.envName"
               :name="env.initName"
-              :closable="!env.isEdit && !isCreating"
+              :closable="!env.isEdit && canHandle"
             >
               <span slot="label">
-                <span v-if="env.isEdit && !isCreating" class="tab-label">
-                  <el-input v-model="env.envName" :placeholder="env.initName"></el-input>
-                  <i class="el-icon-finished" @click="env.isEdit = false" v-if="!isCreating"></i>
+                <span v-if="env.isEdit && canHandle" class="tab-label">
+                  <el-input v-model="env.envName" :placeholder="env.initName" v-focus @keyup.enter.native="env.isEdit = false"></el-input>
+                  <i class="el-icon-finished" @click="env.isEdit = false" v-if="canHandle"></i>
                 </span>
                 <span v-else class="tab-label">
-                  {{env.envName}}
-                  <i class="el-icon-edit" @click="env.isEdit = true" v-if="!isCreating"></i>
+                  <span @dblclick="env.isEdit = true">{{env.envName}}</span>
+                  <i class="el-icon-edit" @click="env.isEdit = true" v-if="canHandle"></i>
                 </span>
               </span>
             </el-tab-pane>
           </el-tabs>
           <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName" isOnboarding></HelmEnvTemplate>
           <div class="ai-bottom">
-            <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating">创建环境</el-button>
+            <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating" :disabled="!cantNext">创建环境</el-button>
             <div v-for="(env, index) in createRes" :key="index" class="ai-status">
               <span class="env-name">{{env.env_name}}:</span>
               <span>{{getStatusDesc(env)}}</span>
@@ -78,7 +78,7 @@ export default {
       const res = await getProductsAPI(this.projectName).catch(err => {
         console.log(err)
       })
-      if (res) {
+      if (res && res.length > 0) {
         this.envInfos = res.map(re => {
           return {
             envName: re.name,
@@ -87,6 +87,9 @@ export default {
           }
         })
         this.activeName = this.envInfos[0].initName
+
+        this.isCreating = true
+        this.sId = setTimeout(this.checkEnvStatus, 0)
       }
     },
     getStatusDesc (envInfo) {
@@ -139,7 +142,7 @@ export default {
         }
       )
       if (res) {
-        this.sId = setTimeout(this.checkEnvStatus, 2000)
+        this.sId = setTimeout(this.checkEnvStatus, 0)
       }
     },
     async checkEnvStatus () {
@@ -170,7 +173,7 @@ export default {
         const newTabName = `env-${this.envLength}`
         this.envInfos.push({
           envName: newTabName,
-          isEdit: false,
+          isEdit: true,
           initName: newTabName
         })
         this.activeName = newTabName
@@ -189,6 +192,9 @@ export default {
     },
     envNames () {
       return this.envInfos.map(info => info.initName)
+    },
+    canHandle () {
+      return !this.isCreating && this.cantNext
     }
   },
   created () {
@@ -212,6 +218,13 @@ export default {
   components: {
     step,
     HelmEnvTemplate
+  },
+  directives: {
+    focus: {
+      inserted: function (el) {
+        el.querySelector('input').focus()
+      }
+    }
   },
   onboardingStatus: 3
 }
@@ -257,8 +270,8 @@ export default {
         }
 
         .el-tabs__new-tab {
-          color: #67c23a;
-          border-color: #67c23a;
+          color: #409eff;
+          border-color: #409eff;
         }
 
         .tab-label {
