@@ -1,5 +1,4 @@
 import storejs from '@node_modules/store/dist/store.legacy.js'
-import router from '../router/index.js'
 import { isEmpty } from 'lodash'
 
 const entitiesRegexp = /[&"'<>]/g
@@ -342,10 +341,6 @@ const utils = {
         superAdmin: userinfo.info.isSuperUser,
         teamLeader: userinfo.info.isTeamLeader
       }
-    } else {
-      router.replace({
-        path: '/signin'
-      })
     }
   },
   getUsername () {

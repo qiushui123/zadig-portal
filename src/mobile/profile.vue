@@ -42,7 +42,7 @@
 <script>
 import storejs from '@node_modules/store/dist/store.legacy.js'
 import { NavBar, Tag, Panel, Loading, Button, Notify } from 'vant'
-import { getCurrentUserInfoAPI, getJwtTokenAPI, userLogoutAPI } from '@api'
+import { getCurrentUserInfoAPI, getJwtTokenAPI } from '@api'
 export default {
   components: {
     [NavBar.name]: NavBar,
@@ -95,12 +95,11 @@ export default {
       })
     },
     logout () {
-      userLogoutAPI().then((res) => {
-        storejs.remove('ZADIG_LOGIN_INFO')
-        this.$store.dispatch('clearProjectTemplates')
-        this.$router.push('/signin')
-        Notify({ type: 'success', message: '账号退出成功' })
-      })
+      localStorage.removeItem('token')
+      storejs.remove('ZADIG_LOGIN_INFO')
+      this.$store.dispatch('clearProjectTemplates')
+      this.$router.push('/signin')
+      Notify({ type: 'success', message: '账号退出成功' })
     }
   },
   computed: {
@@ -108,7 +107,7 @@ export default {
       return this.$route.meta.title
     },
     username () {
-      return this.$store.state.login.userinfo.info.name
+      return this.$store.state.login.userinfo.name
     },
     userRole () {
       if (this.currentEditUserInfo.info.isSuperUser) {

@@ -391,7 +391,7 @@ export default {
       return this.$store.state.login.userinfo.organization.id
     },
     currentUserId () {
-      return this.$store.state.login.userinfo.info.id
+      return this.$store.state.login.userinfo.uid
     },
     isEdit () {
       return this.$route.path.includes('/projects/edit')

@@ -123,7 +123,7 @@
                     </div>
                     <ul class="content profile-list">
                       <li class="profile-list__item active">
-                        <span>{{$store.state.login.userinfo.info.name}}</span>
+                        <span>{{$store.state.login.userinfo.name}}</span>
                         <el-tag v-if="$utils.roleCheck().superAdmin"
                                 size="mini"
                                 type="info">管理员</el-tag>
@@ -173,7 +173,7 @@
                    class="menu-avatar"
                    alt="">
               <span class="username">
-                {{ $store.state.login.userinfo.info.name}}
+                {{ $store.state.login.userinfo.name}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
             </div>
@@ -184,7 +184,6 @@
   </div>
 </template>
 <script>
-import { userLogoutAPI } from '@api'
 import notification from './common/notification.vue'
 import storejs from '@node_modules/store/dist/store.legacy.js'
 import mixin from '@utils/topbar_mixin'
@@ -216,21 +215,18 @@ export default {
   },
   methods: {
     logOut () {
-      userLogoutAPI().then(
-        response => {
-          storejs.remove('ZADIG_LOGIN_INFO')
-          this.$message({
-            message: '登出成功',
-            type: 'success'
-          })
-          this.$store.dispatch('clearProjectTemplates')
-          if (this.showSSOBtn) {
-            window.location.href = this.redirectUrl
-          } else {
-            this.$router.push('/signin')
-          }
-        }
-      )
+      localStorage.removeItem('token')
+      storejs.remove('ZADIG_LOGIN_INFO')
+      this.$message({
+        message: '登出成功',
+        type: 'success'
+      })
+      this.$store.dispatch('clearProjectTemplates')
+      if (this.showSSOBtn) {
+        window.location.href = this.redirectUrl
+      } else {
+        this.$router.push('/signin')
+      }
     },
     handleCommand (command) {
       if (command === 'logOut') {

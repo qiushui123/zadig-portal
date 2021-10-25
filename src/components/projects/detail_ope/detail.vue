@@ -482,7 +482,7 @@ export default {
       if (this.$utils.roleCheck().superAdmin) {
         return true
       }
-      return this.currentProject.user_ids ? this.currentProject.user_ids.includes(this.$store.state.login.userinfo.info.id) : false
+      return this.currentProject.user_ids ? this.currentProject.user_ids.includes(this.$store.state.login.userinfo.uid) : false
     }
   },
   components: {

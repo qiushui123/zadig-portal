@@ -35,11 +35,15 @@
   </el-dialog>
 </template>
 <script>
-import { queryPolicyDefinitions } from '@/api'
-import _ from 'lodash'
+import { queryPolicyDefinitions, addrole } from '@/api'
+import * as permissionMap from '@/consts/permissionMap'
 
 export default {
   name: 'addrole',
+  props: {
+    projectName: String,
+    getrole: Function
+  },
   data () {
     const permissionsValidator = (rule, value, callback) => {
       const permissions = this.form.permissions
@@ -103,8 +107,27 @@ export default {
     },
     async submit () {
       const res = await this.$refs.form.validate()
+      let verbs = []
+      const resources = []
+      let rules = []
+      const frontResources = []
       if (res) {
-        console.log(this.form)
+        Object.keys(this.form.permissions).forEach(key => {
+          if (this.form.permissions[key].length) {
+            resources.push(key)
+            verbs = verbs.concat(this.form.permissions[key])
+            this.form.permissions[key].forEach(item => {
+              frontResources.push(permissionMap[item])
+            })
+          }
+        })
+        rules = [{ verbs: verbs, resources: resources, kind: 'resource' }, { verbs: ['VIEW'], resources: frontResources, kind: '' }]
+        const result = await addrole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+        if (result) {
+          this.$message.success('添加成功')
+          this.dialogRoleAddFormVisible = false
+          this.getrole()
+        }
       }
     }
   },
