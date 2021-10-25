@@ -81,7 +81,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div
+      <div v-if="showCreateVersion"
           class="create-version">
         <div class="create-checkbox">
           <el-checkbox v-model="versionInfo.enabled">创建版本</el-checkbox>
