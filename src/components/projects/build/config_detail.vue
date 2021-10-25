@@ -527,7 +527,7 @@
                 <span>ARG</span>
                 <span v-for="(item,index) in dockerfileTemplate.variable" :key="index">
                   <span v-if="item.value">{{`${item.key}=${item.value} `}}</span>
-                  <span v-else>{{`${item.key}`}}</span>
+                  <span v-else>{{`${item.key} `}}</span>
                 </span>
               </div>
               </template>
