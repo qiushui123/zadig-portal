@@ -525,7 +525,10 @@
               <el-button :disabled="!buildConfig.post_build.docker_build.template_id" style="margin-left: 5px;" type="text" @click="showDockerfile = true"> 预览</el-button>
               <div v-if="dockerfileTemplate.variable && dockerfileTemplate.variable.length > 0" class="dockerfile-args-container">
                 <span>ARG</span>
-                <span v-for="(item,index) in dockerfileTemplate.variable" :key="index">{{`${item.key}=${item.value}`}}</span>
+                <span v-for="(item,index) in dockerfileTemplate.variable" :key="index">
+                  <span v-if="item.value">{{`${item.key}=${item.value} `}}</span>
+                  <span v-else>{{`${item.key}`}}</span>
+                </span>
               </div>
               </template>
             </el-form-item>
