@@ -699,6 +699,9 @@ export default {
         },
         scripts: '#!/bin/bash\nset -e',
         post_build: {
+          docker_build: {
+            source: 'local'
+          }
         }
       },
       editorOption: {
@@ -836,7 +839,8 @@ export default {
         this.$set(this.buildConfig.post_build, 'docker_build', {
           work_dir: '',
           docker_file: '',
-          build_args: ''
+          build_args: '',
+          source: 'local'
         })
       }
       if (command === 'binary') {
