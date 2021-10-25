@@ -82,15 +82,12 @@
     </div>
 </template>
 <script>
-import virtualListItem from './fileItem'
-import virtualScrollList from 'vue-virtual-scroll-list'
 import { getArtifactFileAPI, getStorageListAPI } from '@api'
 import { sortBy } from 'lodash'
 export default {
   name: 'pmArtifactDeploy',
   data () {
     return {
-      itemComponent: virtualListItem,
       tarFileMap: {},
       objectstorageList: [],
       pickedTargetServices: [],
@@ -197,9 +194,6 @@ export default {
       },
       deep: true
     }
-  },
-  components: {
-    virtualScrollList
   }
 }
 </script>
