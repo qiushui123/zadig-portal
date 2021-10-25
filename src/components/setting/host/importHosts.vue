@@ -1,88 +1,84 @@
 <template>
-    <div class="import-hosts-container">
-    <el-alert type="warning"
-              class="tip"
-              :closable="false">
+  <div class="import-hosts-container">
+    <el-alert type="warning" class="tip" :closable="false">
       <template>
-        主机资源用于主机服务资源配置<br />
-        详细配置可参考
-        <el-link style="font-size: 14px; vertical-align: baseline;"
-                 type="primary"
-                 :href="`https://docs.koderover.com/zadig/settings/vm-management/`"
-                 :underline="false"
-                 target="_blank">帮助文档</el-link>
+        主机资源用于主机服务资源配置
+        <br />详细配置可参考
+        <el-link
+          style="font-size: 14px; vertical-align: baseline;"
+          type="primary"
+          :href="`https://docs.koderover.com/zadig/settings/vm-management/`"
+          :underline="false"
+          target="_blank"
+        >帮助文档</el-link>
       </template>
     </el-alert>
-        <el-form ref="importHosts"
-             :rules="rules"
-             label-width="100px"
-             label-position="left"
-             :model="host"
-             class="host-form">
-      <el-form-item label="主机提供商"
-                    prop="provider">
-        <el-select v-model="host.provider"
-                   style="width: 100%;"
-                   size="small"
-                   placeholder="请选择主机提供商">
-          <el-option :value="1"
-                     label="阿里云">
-            <i class="iconfont iconaliyun"></i> <span>阿里云</span>
+    <el-form ref="importHosts" :rules="rules" label-width="100px" label-position="left" :model="host" class="host-form">
+      <el-form-item label="主机提供商" prop="provider">
+        <el-select v-model="host.provider" style="width: 100%;" size="small" placeholder="请选择主机提供商">
+          <el-option :value="1" label="阿里云">
+            <i class="iconfont iconaliyun"></i>
+            <span>阿里云</span>
           </el-option>
 
-          <el-option :value="2"
-                     label="腾讯云">
-            <i class="iconfont icontengxunyun"></i> <span>腾讯云</span>
+          <el-option :value="2" label="腾讯云">
+            <i class="iconfont icontengxunyun"></i>
+            <span>腾讯云</span>
           </el-option>
-          <el-option :value="3"
-                     label="华为云">
-            <i class="iconfont iconhuawei"></i> <span>华为云</span>
+          <el-option :value="3" label="华为云">
+            <i class="iconfont iconhuawei"></i>
+            <span>华为云</span>
           </el-option>
-          <el-option :value="0"
-                     label="其它">
-            <i class="iconfont iconwuliji"></i> <span>其它</span>
+          <el-option :value="0" label="其它">
+            <i class="iconfont iconwuliji"></i>
+            <span>其它</span>
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="下载模板"
-                    prop="download">
+      <el-form-item label="下载模板" prop="download">
         <el-button style="width: 50%;" size="small" type="primary" @click="downloadTemplate" plain>下载模板</el-button>
       </el-form-item>
-      <el-form-item label="上传文件"
-                    prop="upload">
-        <el-upload ref="file-uploader" class="upload-file" accept=".xls,.xlsx" action="#" :limit="1" :auto-upload="false" :on-change="handleChange" :before-upload="beforeUpload" :file-list="fileList"  :on-remove="onRemoveFile">
+      <el-form-item label="上传文件" prop="upload">
+        <el-upload
+          ref="file-uploader"
+          class="upload-file"
+          accept=".xls, .xlsx"
+          action="#"
+          :limit="1"
+          :auto-upload="false"
+          :on-change="handleChange"
+          :before-upload="beforeUpload"
+          :file-list="fileList"
+          :on-remove="onRemoveFile"
+        >
           <el-button :disabled="uploadBtnDisabled" style="width: 50%;" size="small" type="primary" plain>上传文件</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传 xls/xlsx 文件</div>
-          </el-upload>
+          <div slot="tip" class="el-upload__tip">只能上传 xls/xlsx 文件</div>
+        </el-upload>
       </el-form-item>
-      <el-form-item label="导入选项"
-                    prop="option">
+      <el-form-item label="导入选项" prop="option">
         <el-radio-group v-model="host.option">
-          <el-radio label="override">全量覆盖
-            <el-tooltip effect="dark"
-                        content="主机列表中的数据不再保留，全部使用模板里面的数据"
-                        placement="top">
+          <el-radio label="increment">
+            增量
+            <el-tooltip effect="dark" content="已有主机管理列表中的条目不会重新导入，仅添加文件中新增的主机信息" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
           </el-radio>
-          <el-radio label="patch">覆盖已有
-            <el-tooltip effect="dark"
-                        content="只更新主机列表中存在的数据"
-                        placement="top">
-             <i class="pointer el-icon-question"></i>
-           </el-tooltip>
+          <el-radio label="patch">
+            覆盖已有主机
+            <el-tooltip effect="dark" content="已有主机管理列表中的条目重新导入且添加文件中新增的主机信息" placement="top">
+              <i class="pointer el-icon-question"></i>
+            </el-tooltip>
           </el-radio>
-          <el-radio label="increment">增量
-            <el-tooltip effect="dark"
-                        content="将模板中的数据添加到主机列表中，不会覆盖已有数据"
-                        placement="top">
+          <el-radio label="override">
+            全量覆盖
+            <el-tooltip effect="dark" content="已有主机管理列表中的条目不再保留，文件中的主机信息全量导入" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
           </el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
-    </div>
+  </div>
 </template>
 <script>
 import XLSX from 'xlsx'
@@ -100,14 +96,16 @@ export default {
   },
   data () {
     return {
-      template: [{
-        主机名称: '',
-        IP: '',
-        用户名: '',
-        标签: '',
-        'SSH 私钥': '',
-        '是否生产机器(y/n)': ''
-      }],
+      template: [
+        {
+          主机名称: '',
+          IP: '',
+          用户名: '',
+          标签: '',
+          'SSH 私钥': '',
+          '是否生产机器(y/n)': ''
+        }
+      ],
       host: { provider: '', option: 'override' },
       rules: {
         provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }]
@@ -132,7 +130,11 @@ export default {
       this.fileJson = []
     },
     beforeUpload (file) {
-      if (file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      if (
+        file.type === 'application/vnd.ms-excel' ||
+        file.type ===
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ) {
         return true
       } else {
         this.$message.error = '请上传 xls 或者 xlsx 类型文件'
@@ -146,68 +148,68 @@ export default {
       XLSX.writeFile(workbook, 'Zadig 主机模板.xlsx')
     },
     importHost () {
-      return this.$refs.importHosts.validate()
-        .then(async () => {
-          const fileJson = this.fileJson
-          const provider = this.host.provider
-          const option = this.host.option
-          const result = fileJson.map(item => {
-            return {
-              name: item['主机名称'],
-              provider: provider,
-              label: item['标签'],
-              ip: item.IP,
-              is_prod: item['是否生产机器(y/n)'] === 'y',
-              user_name: item['用户名'],
-              private_key: window.btoa(item['SSH 私钥'])
-            }
-          })
-          const payload = {
-            option: option,
-            data: result
-          }
-          const res = await importHostAPI(payload).catch((err) => { console.log(err) })
-          if (res) {
-            this.host = { provider: '', method: 'override' }
-            this.$message({
-              type: 'success',
-              message: '导入主机信息成功'
-            })
-            this.$refs['file-uploader'].clearFiles()
-          } else {
-            return Promise.reject()
+      return this.$refs.importHosts.validate().then(async () => {
+        const fileJson = this.fileJson
+        const provider = this.host.provider
+        const option = this.host.option
+        const result = fileJson.map(item => {
+          return {
+            name: item['主机名称'],
+            provider: provider,
+            label: item['标签'],
+            ip: item.IP,
+            is_prod: item['是否生产机器(y/n)'] === 'y',
+            user_name: item['用户名'],
+            private_key: window.btoa(item['SSH 私钥'])
           }
         })
+        const payload = {
+          option: option,
+          data: result
+        }
+        const res = await importHostAPI(payload).catch(err => {
+          console.log(err)
+        })
+        if (res) {
+          this.host = { provider: '', method: 'override' }
+          this.$message({
+            type: 'success',
+            message: '导入主机信息成功'
+          })
+          this.$refs['file-uploader'].clearFiles()
+        } else {
+          return Promise.reject()
+        }
+      })
     }
   }
-
 }
 </script>
 <style lang="less">
-  .import-hosts-container {
-    .tip {
-      margin: 15px 0;
+.import-hosts-container {
+  .tip {
+    margin: 15px 0;
+  }
+
+  .upload-file {
+    width: 100%;
+
+    .el-upload {
+      width: 100%;
+      text-align: left;
     }
 
-    .upload-file {
-      width: 100%;
+    .el-upload__tip {
+      line-height: 1;
+    }
 
-      .el-upload {
-        width: 100%;
-        text-align: left;
-      }
-
-      .el-upload__tip {
-        line-height: 1;
-      }
-
-      .el-upload-list {
-        .el-icon-close {
-          right: 50px;
-          display: inline-block;
-          color: #1989fa;
-        }
+    .el-upload-list {
+      .el-icon-close {
+        right: 50px;
+        display: inline-block;
+        color: #1989fa;
       }
     }
   }
+}
 </style>
