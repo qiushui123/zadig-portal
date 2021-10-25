@@ -1262,3 +1262,7 @@ export function postWorkloads (payload) {
 export function editWorkloads (payload) {
   return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
 }
+
+export function getArtifactFileAPI (payload, id) {
+  return http.post(`/api/aslan/system/s3storage/${id}/releases/search?kind=file`, payload)
+}
