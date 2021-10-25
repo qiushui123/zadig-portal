@@ -56,10 +56,29 @@
           </el-upload>
       </el-form-item>
       <el-form-item label="导入选项"
-                    prop="label">
-        <el-radio-group v-model="host.method">
-          <el-radio label="override">覆盖</el-radio>
-          <el-radio label="patch">增量</el-radio>
+                    prop="option">
+        <el-radio-group v-model="host.option">
+          <el-radio label="override">全量覆盖
+            <el-tooltip effect="dark"
+                        content="主机列表中的数据不再保留，全部使用模板里面的数据"
+                        placement="top">
+              <i class="pointer el-icon-question"></i>
+            </el-tooltip>
+          </el-radio>
+          <el-radio label="patch">覆盖已有
+            <el-tooltip effect="dark"
+                        content="只更新主机列表中存在的数据"
+                        placement="top">
+             <i class="pointer el-icon-question"></i>
+           </el-tooltip>
+          </el-radio>
+          <el-radio label="increment">增量
+            <el-tooltip effect="dark"
+                        content="将模板中的数据添加到主机列表中，不会覆盖已有数据"
+                        placement="top">
+              <i class="pointer el-icon-question"></i>
+            </el-tooltip>
+          </el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -68,7 +87,6 @@
 <script>
 import XLSX from 'xlsx'
 import { importHostAPI } from '@api'
-import { unionBy } from 'lodash'
 export default {
   name: 'ImportHosts',
   props: {
@@ -90,7 +108,7 @@ export default {
         'SSH 私钥': '',
         '是否生产机器(y/n)': ''
       }],
-      host: { provider: '', method: 'override' },
+      host: { provider: '', option: 'override' },
       rules: {
         provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }]
       },
@@ -132,10 +150,7 @@ export default {
         .then(async () => {
           const fileJson = this.fileJson
           const provider = this.host.provider
-          const originHosts = this.originHosts.map(item => {
-            item.private_key = window.btoa(item.private_key)
-            return item
-          })
+          const option = this.host.option
           const result = fileJson.map(item => {
             return {
               name: item['主机名称'],
@@ -147,7 +162,10 @@ export default {
               private_key: window.btoa(item['SSH 私钥'])
             }
           })
-          const payload = this.host.method === 'patch' ? unionBy(result, originHosts, 'name') : result
+          const payload = {
+            option: option,
+            data: result
+          }
           const res = await importHostAPI(payload).catch((err) => { console.log(err) })
           if (res) {
             this.host = { provider: '', method: 'override' }

@@ -459,15 +459,29 @@
                                @click="createHost"
                                type="text">创建主机</el-button>
                     <el-select v-else
-                               v-model="item.host_ids"
-                               size="small"
-                               multiple
-                               placeholder="请选择主机">
-                      <el-option v-for="(host,index) in  allHost"
-                                 :key="index"
-                                 :label="`${host.name}-${host.ip}`"
-                                 :value="host.id">
-                      </el-option>
+                              size="mini"
+                              multiple
+                              filterable
+                              v-model="item.host_ids"
+                              placeholder="请选择主机">
+                      <el-option-group
+                        label="主机标签">
+                        <el-option
+                          v-for="(item,index) in allHostLabels"
+                          :key="index"
+                          :label="`${item}`"
+                          :value="item">
+                        </el-option>
+                      </el-option-group>
+                      <el-option-group
+                        label="主机列表">
+                        <el-option
+                          v-for="item in allHost"
+                          :key="item.name"
+                           :label="`${item.name}-${item.ip}`"
+                          :value="item.id">
+                        </el-option>
+                      </el-option-group>
                     </el-select>
                   </el-form-item>
                 </div>
@@ -720,7 +734,7 @@
   </div>
 </template>
 <script>
-import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI } from '@api'
+import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI, getHostLabelListAPI } from '@api'
 import Editor from 'vue2-ace-bind'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
@@ -828,6 +842,7 @@ export default {
       allApps: [],
       allCodeHosts: [],
       allHost: [],
+      allHostLabels: ['dev'],
       envNameList: [],
       codeInfo: {},
       createRules: {
@@ -868,7 +883,7 @@ export default {
         docker_file: [
           {
             type: 'string',
-            message: '请填写Dockerfile路径',
+            message: '请填写 Dockerfile 路径',
             required: true,
             trigger: 'blur'
           }
@@ -1018,6 +1033,9 @@ export default {
     addHostOperation () {
       this.$refs['add-host'].saveHost()
         .then(() => {
+          getHostLabelListAPI().then((res) => {
+            this.allHostLabels = res
+          })
           getHostListAPI().then((res) => {
             this.dialogHostCreateFormVisible = false
             this.allHost = res
@@ -1275,6 +1293,7 @@ export default {
         buildConfigPayload.pre_build.image_from = image.image_from
         buildConfigPayload.pre_build.build_os = image.value
       }
+      // 处理主机标签
       const pmServicePayload =
       {
         product_name: this.projectName,
@@ -1285,6 +1304,18 @@ export default {
         health_checks: this.check_status_enabled ? this.pmService.health_checks : [],
         env_configs: this.pmService.env_configs
       }
+      const hostIds = this.allHost.map(item => {
+        return item.id
+      })
+      // 处理主机标签
+      pmServicePayload.env_configs.forEach(element => {
+        element.labels = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) < 0)
+        })
+        element.host_ids = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) >= 0)
+        })
+      })
       const combinePayload = {
         pm_service_tmpl: pmServicePayload,
         build: buildConfigPayload
@@ -1347,6 +1378,18 @@ export default {
         pm_service_tmpl: pmServicePayload,
         build: buildConfigPayload
       }
+      const hostIds = this.allHost.map(item => {
+        return item.id
+      })
+      // 处理主机标签
+      pmServicePayload.env_configs.forEach(element => {
+        element.labels = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) < 0)
+        })
+        element.host_ids = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) >= 0)
+        })
+      })
       const refs = [this.$refs.addConfigForm]
       if (this.check_status_enabled) {
         refs.push(this.$refs.healthCheck)
@@ -1452,6 +1495,9 @@ export default {
           this.buildConfig.pre_build.image_id = this.systems[0].id
         }
       })
+      getHostLabelListAPI().then((res) => {
+        this.allHostLabels = res
+      })
       getHostListAPI().then((res) => {
         this.allHost = res
       })
@@ -1506,6 +1552,7 @@ export default {
           }
           if (res.env_configs && res.env_configs.length > 0) {
             this.pmService.env_configs.forEach(confItem => {
+              confItem.host_ids = confItem.host_ids.concat(confItem.labels)
               if (envNameList.indexOf(confItem.env_name) === -1) {
                 this.$set(confItem, 'showDelete', true)
               }

@@ -931,6 +931,10 @@ export function getHostListAPI () {
   return http.get(`/api/aslan/system/privateKey`)
 }
 
+export function getHostLabelListAPI () {
+  return http.get(`/api/aslan/system/privateKey/labels`)
+}
+
 export function createHostAPI (payload) {
   return http.post(`/api/aslan/system/privateKey`, payload)
 }
