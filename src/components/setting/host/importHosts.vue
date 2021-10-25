@@ -50,7 +50,7 @@
       </el-form-item>
       <el-form-item label="上传文件"
                     prop="upload">
-        <el-upload class="upload-file" accept=".xls,.xlsx" action="#" :limit="1" :auto-upload="false" :on-change="handleChange" :before-upload="beforeUpload" :file-list="fileList"  :on-remove="onRemoveFile">
+        <el-upload ref="file-uploader" class="upload-file" accept=".xls,.xlsx" action="#" :limit="1" :auto-upload="false" :on-change="handleChange" :before-upload="beforeUpload" :file-list="fileList"  :on-remove="onRemoveFile">
           <el-button :disabled="uploadBtnDisabled" style="width: 50%;" size="small" type="primary" plain>上传文件</el-button>
             <div slot="tip" class="el-upload__tip">只能上传 xls/xlsx 文件</div>
           </el-upload>
@@ -173,6 +173,7 @@ export default {
               type: 'success',
               message: '导入主机信息成功'
             })
+            this.$refs['file-uploader'].clearFiles()
           } else {
             return Promise.reject()
           }
@@ -198,6 +199,14 @@ export default {
 
       .el-upload__tip {
         line-height: 1;
+      }
+
+      .el-upload-list {
+        .el-icon-close {
+          right: 50px;
+          display: inline-block;
+          color: #1989fa;
+        }
       }
     }
   }
