@@ -475,8 +475,8 @@ export function getWorkflowBindAPI (testName) {
   return http.get(`/api/aslan/workflow/workflow/testName/${testName}`)
 }
 
-export function listWorkflowAPI () {
-  return http.get('/api/aslan/workflow/workflow')
+export function listWorkflowAPI (productName = '') {
+  return http.get(`/api/aslan/workflow/workflow?productName=${productName}`)
 }
 
 export function setFavoriteAPI (payload) {

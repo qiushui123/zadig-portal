@@ -96,9 +96,7 @@
     </div>
     <div class="controls__wrap">
       <div class="controls__right">
-        <router-link :to="`/v1/projects/detail/${projectName}`">
-          <button type="primary" size="small" class="save-btn" :disabled="loading" plain>完成</button>
-        </router-link>
+        <button type="primary" size="small" class="save-btn" :disabled="loading" plain @click="onboardingFinish">完成</button>
       </div>
     </div>
     <el-dialog :visible.sync="taskDialogVisible" title="运行 产品-工作流" custom-class="run-workflow" width="60%" class="dialog">
@@ -116,7 +114,7 @@
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
 import runWorkflow from '../../pipeline/common/run_workflow.vue'
-import { getProjectIngressAPI, generatePipeAPI } from '@api'
+import { getProjectIngressAPI, generatePipeAPI, listWorkflowAPI } from '@api'
 export default {
   data () {
     return {
@@ -128,47 +126,32 @@ export default {
     }
   },
   methods: {
+    onboardingFinish () {
+      const projectName = this.projectName
+      this.saveOnboardingStatus(projectName, 0).then(() => {
+        this.$router.push(`/v1/projects/detail/${projectName}`)
+      })
+    },
     getWorkflows () {
-      this.loading = true
-      this.$store
-        .dispatch('refreshWorkflowList')
-        .then(() => {
-          this.loading = false
+      this.$store.dispatch('refreshWorkflowList')
+      listWorkflowAPI(this.projectName).then(res => {
+        this.loading = false
+        const projectName = this.projectName
+        const currentWorkflows = res.map(ele => {
+          if (ele.name === `${projectName}-ops-workflow`) ele.env_name = ''
+          return ele
         })
-        .then(() => {
-          const projectName = this.projectName
-          const w1 = 'workflow-qa'
-          const w2 = 'workflow-dev'
-          const w3 = 'workflow-ops'
-          const currentWorkflows = this.$store.getters.workflowList
-            .filter(element => {
-              return (
-                (element.name.includes(w1) &&
-                  element.product_tmpl_name === this.projectName) ||
-                (element.name.includes(w2) &&
-                  element.product_tmpl_name === this.projectName) ||
-                (element.name.includes(w3) &&
-                  element.product_tmpl_name === this.projectName)
-              )
+        getProjectIngressAPI(projectName).then(res => {
+          currentWorkflows.forEach(workflow => {
+            res.forEach(ingress => {
+              if (ingress.env_name === workflow.env_name) {
+                workflow.ingress_infos = ingress.ingress_infos
+              }
             })
-            .map(ele => {
-              const element = Object.assign({}, ele)
-              if (element.name.includes(w1)) element.env_name = 'qa'
-              if (element.name.includes(w2)) element.env_name = 'dev'
-              if (element.name.includes(w3)) element.env_name = ''
-              return element
-            })
-          getProjectIngressAPI(projectName).then(res => {
-            currentWorkflows.forEach(workflow => {
-              res.forEach(ingress => {
-                if (ingress.env_name === workflow.env_name) {
-                  workflow.ingress_infos = ingress.ingress_infos
-                }
-              })
-            })
-            this.mapWorkflows = currentWorkflows
           })
+          this.mapWorkflows = currentWorkflows
         })
+      })
     },
     runCurrentTask (scope) {
       this.workflow = scope
@@ -192,6 +175,7 @@ export default {
               if (this.pipeTimer) this.pipeTimer = setTimeout(fn, 1000)
             })
         } else {
+          this.getWorkflows()
           clearInterval(this.pipeTimer)
         }
       }
@@ -204,7 +188,6 @@ export default {
     }
   },
   created () {
-    this.getWorkflows()
     bus.$emit(`set-topbar-title`, {
       title: '',
       breadcrumb: [
@@ -225,7 +208,7 @@ export default {
     step,
     runWorkflow
   },
-  onboardingStatus: 0
+  onboardingStatus: 4
 }
 </script>
 
