@@ -1214,7 +1214,7 @@ export function createTemplateServiceAPI (productName, payload) {
 }
 
 export function createTemplateMultiServiceAPI (productName, payload) {
-  return http.post(`/api/aslan/service/helm/bulk/services?productName=${productName}`, payload)
+  return http.post(`/api/aslan/service/helm/service/bulk?productName=${productName}`, payload)
 }
 
 // helm env and service
