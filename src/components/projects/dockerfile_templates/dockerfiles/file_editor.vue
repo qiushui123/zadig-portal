@@ -117,7 +117,7 @@ export default {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
-            message: `模板 ${fileName}更新成功`
+            message: `模板 ${fileName} 更新成功`
           })
         }
       } else if (status === 'named') {
