@@ -34,7 +34,6 @@
           <div class="controls__right">
             <el-button type="primary"
                        size="small"
-                       :disabled="disabledSave"
                        @click="updateFile">保存</el-button>
           </div>
         </div>
@@ -56,7 +55,7 @@ import 'codemirror/addon/dialog/dialog.js'
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/addon/search/searchcursor.js'
 import 'codemirror/addon/search/search.js'
-import { validateKubernetesAPI, createKubernetesTemplateAPI, updateKubernetesTemplateAPI } from '@api'
+import { validateKubernetesAPI, createKubernetesTemplateAPI, updateKubernetesTemplateAPI, updateKubernetesTemplateVariablesAPI } from '@api'
 
 export default {
   props: {
@@ -67,6 +66,15 @@ export default {
     fileContentChange: {
       type: Boolean,
       required: true
+    },
+    variablesChanged: {
+      type: Boolean,
+      required: true
+    },
+    variables: {
+      required: false,
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -101,17 +109,19 @@ export default {
       const fileName = this.fileContent.name
       const fileId = this.fileContent.id
       const content = this.fileContent.content
+      const variable = this.variables
       const status = this.fileStatus
       const payload = {
         name: fileName,
         content: content
       }
+      const varPayload = {
+        variables: variable
+      }
       if (status === 'added') {
-        const res = await updateKubernetesTemplateAPI(
+        const res = await Promise.all([updateKubernetesTemplateAPI(
           fileId, payload
-        ).catch(err => {
-          console.log(err)
-        })
+        ), updateKubernetesTemplateVariablesAPI(fileId, varPayload)])
         if (res) {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
@@ -174,7 +184,7 @@ export default {
       return this.fileContent.status
     },
     disabledSave () {
-      return this.errors.length > 0 || !this.fileContentChange
+      return this.errors.length > 0 || !this.fileContentChange || this.variables.length === 0
     }
   },
   mounted () {

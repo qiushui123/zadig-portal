@@ -316,9 +316,6 @@ export default {
             this.$emit('onSelectFileChange', data)
           }
         })
-        this.$nextTick(() => {
-          this.listenResize()
-        })
       }
     }
   },

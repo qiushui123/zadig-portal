@@ -102,7 +102,7 @@ const routes = [
           },
           {
             path: 'k8s-yamls',
-            component: () => import(/* webpackChunkName: "k8s-template" */ '@/components/projects/k8s_templates/yamls/index.vue'),
+            component: () => import(/* webpackChunkName: "k8s-template" */ '@/components/projects/template_lib/k8s_templates/index.vue'),
             meta: {
               title: 'Kubernetes 模板库'
             }

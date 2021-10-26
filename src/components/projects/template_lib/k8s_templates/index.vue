@@ -19,14 +19,16 @@
                      :style="{ minWidth: '300px', width: '500px' }">
                   <FileEditor ref="FileEditor"
                                     :fileContent="fileContent"
+                                    :variables="variables"
                                     :fileContentChange="fileContentChange"
+                                    :variablesChanged="variablesChanged"
                                     @onRefreshFile="getFiles"
                                     @onUpdateFile="onUpdateFile"></FileEditor>
                 </div>
                 <multipane-resizer></multipane-resizer>
                 <aside class="pipelines__aside pipelines__aside_right"
                        :style="{ flexGrow: 1 }">
-                  <FileAside :fileContent="fileContent"></FileAside>
+                  <FileAside :fileContent="fileContent" :variables.sync="variables"></FileAside>
                 </aside>
 
               </template>
@@ -68,7 +70,9 @@ export default {
         content: ''
       },
       files: [],
-      initFileContent: ''
+      variables: [],
+      initFileContent: '',
+      variablesChanged: false
     }
   },
   methods: {
@@ -151,6 +155,11 @@ export default {
         }
       },
       immediate: false
+    },
+    variables: {
+      handler (val, old_val) {
+        this.variablesChanged = true
+      }
     }
   },
   mounted () {

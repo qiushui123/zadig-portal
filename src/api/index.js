@@ -1273,6 +1273,18 @@ export function getKubernetesTemplateBuildReferenceAPI (id) {
   return http.get(`/api/aslan/template/yaml/${id}/reference`)
 }
 
+export function loadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/load`, payload)
+}
+
+export function reloadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/reload`, payload)
+}
+
+export function updateKubernetesTemplateVariablesAPI (id, payload) {
+  return http.put(`/api/aslan/template/yaml/${id}/variables`, payload)
+}
+
 // helm env and service
 export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
   return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)

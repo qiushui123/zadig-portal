@@ -149,6 +149,14 @@ export default {
         }
       },
       immediate: false
+    },
+    'fileContent.variable': {
+      handler (val, old_val) {
+        if (val) {
+          this.$emit('update:variables', val)
+        }
+      },
+      immediate: false
     }
 
   }
