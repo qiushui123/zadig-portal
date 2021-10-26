@@ -154,11 +154,12 @@ export default {
       return this.$route.params.project_name
     },
     usedChartNameInfo () {
-      const selectedEnv = this.handledEnv || this.selectedEnv
+      // 每次切换环境或服务，预览收起、清空键值对
       this.closeReview()
+      this.listKeyValues = {}
       return (
         (this.allChartNameInfo[this.selectedChart] &&
-          this.allChartNameInfo[this.selectedChart][selectedEnv]) ||
+          this.allChartNameInfo[this.selectedChart][this.selectedEnv]) ||
         cloneDeep(chartInfoTemp)
       )
     },
@@ -191,7 +192,7 @@ export default {
       }
     },
     async getCalculatedValuesYaml (kvFlag = true) {
-      const envName = this.handledEnv || this.selectedEnv
+      const envName = this.selectedEnv
       const format = kvFlag ? 'flatMap' : 'yaml'
 
       await this.getEnvDefaultVariable(envName)
@@ -347,7 +348,8 @@ export default {
               return !oldV.includes(nv)
             })
             : newV
-          this.selectedEnv = newV[newV.length - 1] || 'DEFAULT'
+          this.selectedEnv =
+            this.handledEnv || newV[newV.length - 1] || 'DEFAULT'
           envNamesByGet.forEach(env => {
             if (env === 'DEFAULT' || !env) {
               return
@@ -360,6 +362,9 @@ export default {
     },
     handledEnv: {
       handler (newV, oldV) {
+        if (newV) {
+          this.selectedEnv = newV
+        }
         if (newV && !this.envNames.includes(newV)) {
           this.getChartValuesYaml({ envName: newV })
         }

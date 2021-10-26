@@ -21,6 +21,7 @@
                 placeholder="键"
                 size="small"
                 @change="selectKey($event, $index)"
+                @visible-change="firstEstimatedValues"
               >
                 <el-option v-for="key in lastKeys" :key="key" :label="key" :value="key"></el-option>
               </el-select>
@@ -92,6 +93,9 @@ export default {
   methods: {
     selectKey (key, index) {
       this.keyValues[index].value = this.listKeyValues[key] || ''
+    },
+    firstEstimatedValues (value) {
+      if (value && this.lastKeys.length === 0) this.$emit('estimatedValues')
     },
     addKeyValue () {
       this.validate().then(() => {
