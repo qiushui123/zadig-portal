@@ -122,7 +122,7 @@ export default {
   },
   data () {
     this.cmOption = {
-      readOnly: 'nocursor',
+      readOnly: true,
       lineNumbers: false
     }
     this.defaultEnvsValues = {} // 不需要响应式 { key: envName, value: defaultEnvValue }
