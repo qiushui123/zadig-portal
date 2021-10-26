@@ -50,7 +50,7 @@
               <h4>
                 <span><i class="iconfont iconfuwu"></i></span> 系统内置变量
               </h4>
-              <el-table :data="fileContent.system_variable"
+              <el-table :data="systemVariable"
                         stripe
                         style="width: 100%;">
                 <el-table-column prop="key"
@@ -107,7 +107,14 @@ import { getKubernetesTemplateBuildReferenceAPI } from '@api'
 export default {
   data () {
     return {
-      referenceList: []
+      referenceList: [],
+      systemVariable: [{
+        key: '$Product$',
+        value: ''
+      }, {
+        key: '$Service$',
+        value: ''
+      }]
     }
   },
   methods: {
