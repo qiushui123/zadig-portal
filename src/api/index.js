@@ -1254,8 +1254,8 @@ export function getCreateHelmEnvStatusAPI (productName) {
   return http.get(`/api/aslan/environment/environments/${productName}/status`)
 }
 
-export function getCalculatedValuesYamlAPI (productName, serviceName, envName = '', format, payload) { // defaultValues, overrideYaml, overrideValues
-  return http.post(`/api/aslan/environment/environments/${productName}/estimated-values?format=${format}&envName=${envName}&serviceName=${serviceName}`, payload)
+export function getCalculatedValuesYamlAPI ({ productName, serviceName, envName, format, scene }, payload) { // defaultValues, overrideYaml, overrideValues
+  return http.post(`/api/aslan/environment/environments/${productName}/estimated-values?format=${format}&envName=${envName}&serviceName=${serviceName}&scene=${scene}`, payload)
 }
 
 export function getValuesYamlFromGitAPI ({ codehostID, owner, repo, branch, valuesPaths }) {

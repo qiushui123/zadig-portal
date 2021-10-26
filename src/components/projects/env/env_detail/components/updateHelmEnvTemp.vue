@@ -14,10 +14,9 @@
         :chartNames="chartNames"
         :envNames="envNames"
         :handledEnv="handledEnv"
-        :getEnvChart="getEnvChart"
+        :envScene="envScene"
         :showEnvTabs="showEnvTabs"
         :defaultEnvValue="defaultEnvValue"
-        :isOnboarding="isOnboarding"
       ></ChartValues>
     </el-collapse-item>
   </el-collapse>
@@ -58,19 +57,14 @@ export default {
       default: false,
       type: Boolean
     },
-    getEnvChart: {
-      default: false,
-      type: Boolean
+    envScene: {
+      type: String,
+      required: true
     },
     serviceVariableTitle: {
       required: false,
       type: String,
       default: '服务'
-    },
-    isOnboarding: {
-      // 判断是否onboarding状态，用于预览接口envName
-      type: Boolean,
-      default: false
     }
   },
   computed: {

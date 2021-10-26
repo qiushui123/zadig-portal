@@ -29,7 +29,13 @@
               </span>
             </el-tab-pane>
           </el-tabs>
-          <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :envNames="envNames" :handledEnv="activeName" isOnboarding></HelmEnvTemplate>
+          <HelmEnvTemplate
+            class="chart-value"
+            ref="helmEnvTemplateRef"
+            :envNames="envNames"
+            :handledEnv="activeName"
+            :envScene="`createEnv`"
+          ></HelmEnvTemplate>
           <div class="ai-bottom">
             <el-button type="primary" size="small" @click="createHelmProductEnv" :loading="isCreating" :disabled="!cantNext">创建环境</el-button>
             <div v-for="(env, index) in createRes" :key="index" class="ai-status">

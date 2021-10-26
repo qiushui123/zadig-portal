@@ -1,14 +1,21 @@
 <template>
   <div>
     <el-dialog title="更新环境" :visible.sync="updateHelmEnvDialogVisible" width="60%" class="kr-container">
-      <ChartValues v-if="chartNames.length" class="chart-value" ref="chartValuesRef" :envNames="[productInfo.env_name]" :chartNames="chartNames"></ChartValues>
+      <ChartValues
+        v-if="chartNames.length"
+        class="chart-value"
+        ref="chartValuesRef"
+        :envNames="[productInfo.env_name]"
+        :chartNames="chartNames"
+        :envScene="`updateEnv`"
+      ></ChartValues>
       <!-- <div class="policy">
         <div class="title">更新策略</div>
         <el-radio-group v-model="replacePolicy">
           <el-radio label="update">使用环境中修改过的变量（包括镜像）覆盖新 Chart 中的变量</el-radio>
           <el-radio label="fixed">使用环境中修改过的变量（不包括镜像）覆盖新 Chart 中的变量</el-radio>
         </el-radio-group>
-      </div> -->
+      </div>-->
       <span slot="footer" class="dialog-footer">
         <el-button size="small" type="primary" :loading="updataHelmEnvLoading" @click="updateHelmEnv()">确 定</el-button>
         <el-button size="small" @click="updateHelmEnvDialogVisible = false">取 消</el-button>
@@ -78,17 +85,15 @@ export default {
             envNames: [this.productInfo.env_name],
             chartValues: this.$refs.chartValuesRef.getAllChartNameInfo()
           }
-          updateHelmProductEnvAPI(projectName, payload).then(
-            (response) => {
-              this.updateHelmEnvDialogVisible = false
-              this.updataHelmEnvLoading = false
-              this.fetchAllData()
-              this.$message({
-                message: '更新环境成功，请等待服务升级',
-                type: 'success'
-              })
-            }
-          )
+          updateHelmProductEnvAPI(projectName, payload).then(response => {
+            this.updateHelmEnvDialogVisible = false
+            this.updataHelmEnvLoading = false
+            this.fetchAllData()
+            this.$message({
+              message: '更新环境成功，请等待服务升级',
+              type: 'success'
+            })
+          })
         })
         .catch(() => {
           this.$message({
@@ -111,7 +116,7 @@ export default {
       const res = await getHelmEnvChartDiffAPI(
         projectName,
         envName
-      ).catch((error) => console.log(error))
+      ).catch(error => console.log(error))
       if (res) {
         const chartNames = []
         res.forEach(re => {

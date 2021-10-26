@@ -7,7 +7,7 @@
         ref="helmEnvTemplateRef"
         :envNames="[envName]"
         :handledEnv="envName"
-        getEnvChart
+        :envScene="`updateRenderSet`"
       ></HelmEnvTemplate>
     </div>
     <span slot="footer" class="dialog-footer">

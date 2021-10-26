@@ -60,8 +60,7 @@ import Codemirror from '@/components/projects/common/codemirror.vue'
 import {
   getChartValuesYamlAPI,
   getAllChartValuesYamlAPI,
-  getCalculatedValuesYamlAPI,
-  getEnvDefaultVariableAPI
+  getCalculatedValuesYamlAPI
 } from '@api'
 import { cloneDeep, pick } from 'lodash'
 
@@ -107,10 +106,6 @@ export default {
       type: Boolean,
       required: false
     },
-    getEnvChart: {
-      default: false,
-      type: Boolean
-    },
     defaultEnvValue: {
       type: Object,
       default: () => {
@@ -120,10 +115,9 @@ export default {
         }
       }
     },
-    isOnboarding: {
-      // 判断是否onboarding状态，用于预览接口envName
-      type: Boolean,
-      default: false
+    envScene: {
+      type: String,
+      required: true
     }
   },
   data () {
@@ -176,42 +170,30 @@ export default {
     closeReview () {
       this.showReview = false
     },
-    async getEnvDefaultVariable (envName) {
-      if (
-        Object.prototype.hasOwnProperty.call(this.defaultEnvsValues, envName) ||
-        envName === 'DEFAULT'
-      ) {
-        return
-      }
-      const res = await getEnvDefaultVariableAPI(
-        this.projectName,
-        envName
-      ).catch(error => console.log(error))
-      if (res) {
-        this.defaultEnvsValues[envName] = res.defaultValues
-      }
-    },
     async getCalculatedValuesYaml (kvFlag = true) {
       const envName = this.selectedEnv
-      const format = kvFlag ? 'flatMap' : 'yaml'
-
-      await this.getEnvDefaultVariable(envName)
 
       const payload = {
-        defaultValues: this.defaultEnvsValues[envName] || '',
         overrideYaml:
           this.usedChartNameInfo.yamlSource === 'default'
             ? ''
             : this.usedChartNameInfo.overrideYaml
       }
+      // 更新环境，不需要传环境默认value
+      if (this.envScene !== 'updateEnv') {
+        payload.defaultValues = this.defaultEnvsValues[envName] || ''
+      }
       if (!kvFlag) {
         payload.overrideValues = this.usedChartNameInfo.overrideValues
       }
       const res = await getCalculatedValuesYamlAPI(
-        this.projectName,
-        this.selectedChart,
-        envName === 'DEFAULT' || this.isOnboarding ? '' : envName,
-        format,
+        {
+          productName: this.projectName,
+          serviceName: this.selectedChart,
+          envName: envName === 'DEFAULT' ? '' : envName,
+          format: kvFlag ? 'flatMap' : 'yaml',
+          scene: this.envScene
+        },
         payload
       ).catch(error => {
         console.log(error)
@@ -296,9 +278,10 @@ export default {
       return Promise.all(valid)
     },
     async getChartValuesYaml ({ envName }) {
-      const fn = this.getEnvChart
-        ? getChartValuesYamlAPI
-        : getAllChartValuesYamlAPI
+      const fn =
+        this.envScene === 'updateRenderSet'
+          ? getChartValuesYamlAPI
+          : getAllChartValuesYamlAPI
       const serviceNames = this.chartNames
         ? this.chartNames.map(chart => chart.serviceName)
         : []
