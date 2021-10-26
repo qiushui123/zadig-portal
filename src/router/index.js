@@ -99,6 +99,13 @@ const routes = [
             meta: {
               title: 'Dockerfile 模板库'
             }
+          },
+          {
+            path: 'k8s-yamls',
+            component: () => import(/* webpackChunkName: "k8s-template" */ '@/components/projects/template_lib/k8s_templates/index.vue'),
+            meta: {
+              title: 'Kubernetes YAML 模板库'
+            }
           }]
       },
       {

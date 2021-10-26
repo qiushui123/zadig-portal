@@ -1251,6 +1251,48 @@ export function getDockerfileTemplateBuildReferenceAPI (id) {
   return http.get(`/api/aslan/template/dockerfile/${id}/reference`)
 }
 
+// Template Kubernetes
+
+export function getKubernetesTemplatesAPI () {
+  return http.get(`/api/aslan/template/yaml?page_num=1&page_size=9999`)
+}
+
+export function createKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/yaml`, payload)
+}
+
+export function updateKubernetesTemplateAPI (id, payload) {
+  return http.put(`/api/aslan/template/yaml/${id}`, payload)
+}
+
+export function validateKubernetesAPI (payload) {
+  return http.post(`/api/aslan/template/yaml/validation`, payload)
+}
+
+export function getKubernetesAPI (id) {
+  return http.get(`/api/aslan/template/yaml/${id}`)
+}
+
+export function deleteKubernetesTemplateAPI (id) {
+  return http.delete(`/api/aslan/template/yaml/${id}`)
+}
+
+export function getKubernetesTemplateBuildReferenceAPI (id) {
+  return http.get(`/api/aslan/template/yaml/${id}/reference`)
+}
+
+export function loadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/load`, payload)
+}
+
+export function reloadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/reload`, payload)
+}
+
+export function updateKubernetesTemplateVariablesAPI (id, payload) {
+  return http.put(`/api/aslan/template/yaml/${id}/variables`, payload)
+}
+
 // helm env and service
 export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
   return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)
