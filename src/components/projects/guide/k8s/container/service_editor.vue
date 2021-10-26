@@ -8,9 +8,9 @@
               <div class="shared-service-checkbox">
                 <el-checkbox
                   v-model="service.visibility"
-                  @change="updateTemplatePermission"
-                  :disabled="service.product_name !== projectName"
                   true-label="public"
+                  :disabled="service.product_name !== projectName"
+                  @change="updateTemplatePermission"
                   false-label="private"
                 >
                   共享服务
@@ -19,6 +19,7 @@
                     <i class="el-icon-question"></i>
                   </el-tooltip>
                 </el-checkbox>
+                <el-button size="mini" type="text" @click="openImportYamlDialog">从模板导入</el-button>
               </div>
               <div class="yaml-desc" v-show="!service.yaml">请输入 Kubernetes YAML 配置</div>
               <codemirror style="width: 100%; height: 100%;" ref="myCm" :value="service.yaml" :options="cmOptions" @input="onCmCodeChange"></codemirror>
@@ -55,6 +56,49 @@
         </div>
       </div>
     </div>
+    <el-dialog
+      title="从模板导入服务"
+      :close-on-click-modal="false"
+      append-to-body
+      custom-class="import-yaml-dialog"
+      :visible.sync="dialogImportYamlVisible"
+    >
+      <h3>YAML 模板</h3>
+      <el-form :model="importYaml" @submit.native.prevent ref="importYamlForm">
+        <el-form-item label="选择模板" label-width="80px" prop="id">
+          <el-select style="width: 85%;" size="small" v-model="importYaml.id" placeholder="请选择模板" @change="getKubernetesTemplate">
+            <el-option v-for="item in importYaml.yamls" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+          <el-button :disabled="!importYaml.id" style="margin-left: 5px;" type="text" @click="showYamlFile=!showYamlFile">{{showYamlFile?'关闭预览':'预览'}}</el-button>
+        </el-form-item>
+      </el-form>
+      <codemirror v-if="showYamlFile" v-model="importYaml.content" :option="templateOption" class="mirror"></codemirror>
+      <template v-if="importYaml.variables.length > 0">
+        <h3>变量</h3>
+        <el-table :data="importYaml.variables" style="width: 100%;">
+          <el-table-column label="Key">
+            <template slot-scope="scope">
+              <span>{{ scope.row.key }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="Value">
+            <template slot-scope="scope">
+              <el-input
+                size="small"
+                v-model="scope.row.value"
+                type="textarea"
+                :autosize="{ minRows: 1, maxRows: 4}"
+                placeholder="请输入 Value"
+              ></el-input>
+            </template>
+          </el-table-column>
+        </el-table>
+      </template>
+      <div slot="footer" class="dialog-footer">
+        <el-button plain native-type="submit" @click="dialogImportYamlVisible=false" size="small">取消</el-button>
+        <el-button type="primary" native-type="submit" size="small" class="start-create" @click="loadServiceFromKubernetesTemplate">确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -76,7 +120,12 @@ import 'codemirror/addon/search/search.js'
 import {
   validateYamlAPI,
   updateServicePermissionAPI,
-  serviceTemplateAPI
+  serviceTemplateAPI,
+  saveServiceTemplateAPI,
+  getKubernetesTemplatesAPI,
+  getKubernetesAPI,
+  loadServiceFromKubernetesTemplateAPI,
+  reloadServiceFromKubernetesTemplateAPI
 } from '@api'
 export default {
   props: {
@@ -87,6 +136,7 @@ export default {
   },
   data () {
     return {
+      // codemirror options
       cmOptions: {
         tabSize: 5,
         readOnly: false,
@@ -95,10 +145,31 @@ export default {
         line: true,
         collapseIdentical: true
       },
+      templateOption: {
+        tabSize: 2,
+        readOnly: true,
+        theme: 'neo',
+        mode: 'text/x-dockerfile',
+        lineNumbers: false,
+        line: true,
+        showGutter: false,
+        displayIndentGuides: false,
+        showPrintMargin: false,
+        collapseIdentical: true
+      },
       errors: [],
       info: { message: '' },
       service: {},
-      stagedYaml: {}
+      stagedYaml: {},
+      initYaml: '',
+      dialogImportYamlVisible: false,
+      showYamlFile: false,
+      importYaml: {
+        id: '',
+        yamls: [],
+        variables: [],
+        content: ''
+      }
     }
   },
   methods: {
@@ -107,12 +178,14 @@ export default {
       const projectName = val.product_name
       const serviceType = val.type
       this.service.yaml = ''
-      serviceTemplateAPI(serviceName, serviceType, projectName).then(res => {
-        this.service = res
-        if (this.$route.query.kind) {
-          this.jumpToWord(`kind: ${this.$route.query.kind}`)
-        }
-      })
+      if (val && serviceType) {
+        serviceTemplateAPI(serviceName, serviceType, projectName).then(res => {
+          this.service = res
+          if (this.$route.query.kind) {
+            this.jumpToWord(`kind: ${this.$route.query.kind}`)
+          }
+        })
+      }
     },
     updateTemplatePermission () {
       if (this.serviceInTree.status === 'added') {
@@ -193,6 +266,66 @@ export default {
     },
     editorFocus () {
       this.codemirror.focus()
+    },
+    async openImportYamlDialog () {
+      this.dialogImportYamlVisible = true
+      const res = await getKubernetesTemplatesAPI()
+      if (res) {
+        this.importYaml.yamls = res.yaml_template
+      }
+    },
+    async getKubernetesTemplate (id) {
+      if (id) {
+        this.showYamlFile = false
+        const res = await getKubernetesAPI(id).catch(err => {
+          console.log(err)
+        })
+        if (res) {
+          this.importYaml.content = res.content
+          this.importYaml.variables = res.variable
+        }
+      }
+    },
+    async loadServiceFromKubernetesTemplate () {
+      const serviceName = this.serviceName
+      const projectName = this.projectName
+      const templateId = this.importYaml.id
+      const variables = this.importYaml.variables
+      const status = this.serviceInTree.status
+      const payload = {
+        service_name: serviceName,
+        project_name: projectName,
+        template_id: templateId,
+        variables: variables
+      }
+      if (status === 'named') {
+        const res = await loadServiceFromKubernetesTemplateAPI(payload).catch(
+          err => {
+            console.log(err)
+          }
+        )
+        if (res) {
+          this.dialogImportYamlVisible = false
+          this.$message({
+            type: 'success',
+            message: `服务模板 ${payload.service_name} 导入成功`
+          })
+        }
+      } else if (status === 'added') {
+        const res = await reloadServiceFromKubernetesTemplateAPI(payload).catch(
+          err => {
+            console.log(err)
+          }
+        )
+        if (res) {
+          this.dialogImportYamlVisible = false
+          this.$message({
+            type: 'success',
+            message: `服务模板 ${payload.service_name} 更新成功`
+          })
+        }
+      }
+      this.$emit('onRefreshService')
     }
   },
   computed: {
@@ -240,7 +373,7 @@ export default {
         } else if (
           val.product_name === this.projectName &&
           val.source &&
-          val.source !== 'spock'
+          (val.source !== 'spock' && val.source !== 'template')
         ) {
           this.info = {
             message: '信息：当前服务为仓库管理服务，编辑器为只读模式'
