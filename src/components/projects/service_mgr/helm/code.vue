@@ -78,7 +78,7 @@
       </div>
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
-      <div :style="{ flexGrow: 1 }" class="right">
+      <div :style="{ flexGrow: 1, minWidth: '372px' }" class="right">
         <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate" />
         <!-- 右侧aside -->
       </div>
