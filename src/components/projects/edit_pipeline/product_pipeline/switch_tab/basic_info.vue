@@ -147,9 +147,6 @@ export default {
     }
   },
   computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     filteredEnvs () {
       const currentProject = this.pipelineInfo.product_tmpl_name
       if (currentProject !== '') {

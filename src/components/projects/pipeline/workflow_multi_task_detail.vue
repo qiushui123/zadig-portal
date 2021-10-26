@@ -581,9 +581,6 @@ export default {
     workflowName () {
       return this.$route.params.workflow_name
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     taskID () {
       return this.$route.params.task_id
     },
@@ -806,10 +803,9 @@ export default {
       })
     },
     checkDeliveryList () {
-      const orgId = this.currentOrganizationId
       const workflowName = this.workflowName
       const taskId = this.taskID
-      getVersionListAPI(orgId, workflowName, '', taskId).then((res) => {
+      getVersionListAPI(workflowName, '', taskId).then((res) => {
         this.versionList = res
       })
     },

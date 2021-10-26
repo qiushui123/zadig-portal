@@ -624,9 +624,6 @@ export default {
       const status = productInfo.status
       return (((status !== 'Disconnected' || status === 'NotFound') && productInfo.cluster_id !== '') && envSourceList.includes(this.envSource)) || status === 'Unknown'
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     isProd () {
       return this.productInfo.is_prod
     },

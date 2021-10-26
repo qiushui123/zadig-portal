@@ -277,10 +277,6 @@ export default {
     ...mapGetters([
       'productList'
     ]),
-
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     envNameList () {
       const envNameList = []
       this.productList.forEach(element => {

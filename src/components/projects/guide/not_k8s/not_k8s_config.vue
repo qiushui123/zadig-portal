@@ -86,11 +86,7 @@ export default {
   computed: {
     projectName () {
       return this.$route.params.project_name
-    },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
-
   },
   created () {
     bus.$emit(`show-sidebar`, true)

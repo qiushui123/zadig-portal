@@ -1419,7 +1419,6 @@ export default {
     },
     loadPage () {
       const projectName = this.projectName
-      const orgId = this.currentOrganizationId
       getBuildConfigsAPI(this.projectName).then((res) => {
         this.builds = res
       })
@@ -1442,7 +1441,7 @@ export default {
           return { name: app.name, version: app.version, id: app.name + app.version }
         })
       })
-      getCodeSourceAPI(orgId).then((response) => {
+      getCodeSourceAPI().then((response) => {
         this.allCodeHosts = response
       })
       getImgListAPI().then((response) => {
@@ -1535,9 +1534,6 @@ export default {
   computed: {
     projectName () {
       return this.$route.params.project_name
-    },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     },
     isOnboarding () {
       return (!!this.$route.path.includes(`/v1/projects/create/${this.projectName}/not_k8s/config`))

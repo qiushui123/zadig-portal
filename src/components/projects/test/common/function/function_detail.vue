@@ -579,9 +579,6 @@ export default {
         this.test.post_test.stcov.enable = val
       }
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     useWorkspaceCache: {
       get () {
         return !this.test.pre_test.clean_workspace
@@ -693,11 +690,10 @@ export default {
     }
   },
   created () {
-    const orgId = this.currentOrganizationId
     getAllAppsAPI().then(res => {
       this.allApps = this.makeMapOfArray(this.$utils.sortVersion(res, 'version', 'asc'), 'name')
     })
-    getCodeSourceAPI(orgId).then((response) => {
+    getCodeSourceAPI().then((response) => {
       this.allCodeHosts = response
     })
     getImgListAPI().then((response) => {

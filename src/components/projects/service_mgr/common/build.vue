@@ -927,7 +927,6 @@ export default {
     },
     loadPage () {
       const projectName = this.projectName
-      const orgId = this.currentOrganizationId
       if (this.isEdit) {
         getBuildConfigDetailAPI(this.buildConfigName, this.projectName).then((response) => {
           response.pre_build.installs.forEach(element => {
@@ -961,7 +960,7 @@ export default {
           return { name: app.name, version: app.version, id: app.name + app.version }
         })
       })
-      getCodeSourceAPI(orgId).then((response) => {
+      getCodeSourceAPI().then((response) => {
         this.allCodeHosts = response
       })
       getServiceTargetsAPI(projectName).then((response) => {
@@ -1006,9 +1005,6 @@ export default {
     },
     buildServiceName () {
       return this.$route.query.service_name
-    },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     },
     projectName () {
       return this.$route.query.service_project_name || this.$route.params.project_name

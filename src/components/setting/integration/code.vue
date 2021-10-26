@@ -561,11 +561,10 @@ export default {
     createCodeConfig () {
       this.$refs.codeForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.codeAdd
           const redirect_url = window.location.href.split('?')[0]
           const provider = this.codeAdd.type
-          createCodeSourceAPI(id, payload).then((res) => {
+          createCodeSourceAPI(payload).then((res) => {
             const code_source_id = res.id
             this.getCodeConfig()
             this.$message({
@@ -611,8 +610,7 @@ export default {
       })
     },
     getCodeConfig () {
-      const id = this.currentOrganizationId
-      getCodeSourceByAdminAPI(id).then((res) => {
+      getCodeSourceByAdminAPI().then((res) => {
         this.code = res
       })
     },
@@ -661,11 +659,6 @@ export default {
       }).catch(error => {
         this.$message.error(`获取代理配置失败：${error}`)
       })
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
   },
   watch: {

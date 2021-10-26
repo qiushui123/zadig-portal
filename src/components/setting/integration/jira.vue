@@ -220,7 +220,6 @@ export default {
       this.$refs[ref].clearValidate()
     },
     getJiraConfig () {
-      const id = this.currentOrganizationId
       getJiraAPI(id).then((res) => {
         if (!res.resultCode) {
           this.$set(this.jira, [0], res)
@@ -242,8 +241,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const id = this.currentOrganizationId
-        deleteJiraAPI(id).then((res) => {
+        deleteJiraAPI().then((res) => {
           this.getJiraConfig()
           this.$message({
             message: 'Jira 配置删除成功',
@@ -255,9 +253,8 @@ export default {
     createJiraConfig () {
       this.$refs.jiraAddForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.jiraAdd
-          createJiraAPI(id, payload).then((res) => {
+          createJiraAPI(payload).then((res) => {
             this.getJiraConfig()
             this.handleJiraCancel()
             this.$message({
@@ -273,9 +270,8 @@ export default {
     updateJiraConfig () {
       this.$refs.jiraEditForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.jiraEdit
-          updateJiraAPI(id, payload).then((res) => {
+          updateJiraAPI(payload).then((res) => {
             this.getJiraConfig()
             this.handleJiraCancel()
             this.$message({
@@ -297,11 +293,6 @@ export default {
         this.$refs.jiraEditForm.resetFields()
         this.dialogJiraEditFormVisible = false
       }
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
   },
   activated () {

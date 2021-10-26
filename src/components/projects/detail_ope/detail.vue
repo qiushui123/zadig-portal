@@ -437,8 +437,7 @@ export default {
       })
     },
     getUserList () {
-      const orgId = this.currentOrganizationId
-      usersAPI(orgId).then((res) => {
+      usersAPI().then((res) => {
         this.usersList = res.data
       })
     },
@@ -466,9 +465,6 @@ export default {
     ...mapGetters([
       'workflowList'
     ]),
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     projectAdminArray () {
       return this.usersList
         ? this.usersList.filter(userInfo => {

@@ -467,8 +467,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const id = this.currentOrganizationId
-        deleteAccountAPI(id).then((res) => {
+        deleteAccountAPI().then((res) => {
           this.getAccountConfig()
           this.$message({
             message: 'AD 配置删除成功',
@@ -487,8 +486,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const id = this.currentOrganizationId
-        deleteSSOAPI(id).then((res) => {
+        deleteSSOAPI().then((res) => {
           this.getAccountConfig()
           this.$message({
             message: 'SSO 配置删除成功',
@@ -498,15 +496,14 @@ export default {
       })
     },
     getAccountConfig () {
-      const id = this.currentOrganizationId
-      getAccountAPI(id).then((res) => {
+      getAccountAPI().then((res) => {
         if (!res.resultCode) {
           this.$set(this.accounts, [0], res)
         } else {
           this.$set(this, 'accounts', [])
         }
       })
-      getSSOAPI(id).then((res) => {
+      getSSOAPI().then((res) => {
         if (!res.resultCode) {
           this.$set(this.sso, [0], res)
         } else {
@@ -516,8 +513,7 @@ export default {
     },
     syncAccountUser () {
       this.syncAccountUserLoading = true
-      const id = this.currentOrganizationId
-      syncAccountAPI(id).then((res) => {
+      syncAccountAPI().then((res) => {
         this.syncAccountUserLoading = false
         this.$message({
           message: '用户数据同步成功',
@@ -528,10 +524,9 @@ export default {
     createAccountUser () {
       this.$refs.userAccountForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           if (this.userAccountAdd.type === 'ldap' || this.userAccountAdd.type === 'ad') {
             const payload = this.userAccountAdd
-            createAccountAPI(id, payload).then((res) => {
+            createAccountAPI(payload).then((res) => {
               this.getAccountConfig()
               this.handleUserAccountCancel()
               this.$message({
@@ -558,9 +553,8 @@ export default {
     updateAccountUser () {
       this.$refs.userAccountUpdateForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.userAccountEdit
-          updateAccountAPI(id, payload).then((res) => {
+          updateAccountAPI(payload).then((res) => {
             this.getAccountConfig()
             this.handleUserAccountCancel()
             this.$message({
@@ -576,9 +570,8 @@ export default {
     updateSSO () {
       this.$refs.userAccountUpdateForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.userAccountEdit
-          updateSSOAPI(id, payload).then((res) => {
+          updateSSOAPI(payload).then((res) => {
             this.getAccountConfig()
             this.dialogUserAccountEditFormVisible = false
             this.$message({
@@ -590,11 +583,6 @@ export default {
           return false
         }
       })
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
   },
   activated () {

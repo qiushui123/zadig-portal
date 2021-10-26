@@ -622,16 +622,16 @@ export function deleteUserAPI (user_id) {
 // ----- Syetem Setting-Integration -----
 
 // Code
-export function getCodeSourceAPI (organization_id = 1, page_size = 0, page_index = 0) {
-  return http.get(`/api/aslan/code/codehost?orgId=${organization_id}`)
+export function getCodeSourceAPI (page_size = 0, page_index = 0) {
+  return http.get(`/api/aslan/code/codehost`)
 }
 
-export function getCodeSourceByAdminAPI (organization_id, page_size = 0, page_index = 0) {
-  return http.get(`/api/directory/codehostss/search?orgId=${organization_id}&per_page=${page_size}&page=${page_index}`)
+export function getCodeSourceByAdminAPI (page_size = 0, page_index = 0) {
+  return http.get(`/api/directory/codehostss/search&per_page=${page_size}&page=${page_index}`)
 }
 
-export function createCodeSourceAPI (organization_id, payload) {
-  return http.post(`/api/directory/codehosts?orgId=${organization_id}`, payload)
+export function createCodeSourceAPI (payload) {
+  return http.post(`/api/directory/codehosts`, payload)
 }
 
 export function deleteCodeSourceAPI (code_source_id) {
@@ -666,16 +666,16 @@ export function getBranchInfoByIdAPI (id, repo_owner, repo_name, repo_uuid = '')
 }
 
 // GitHub App
-export function getGithubAppAPI (organization_id, payload) {
-  return http.get(`/api/aslan/system/githubApp?orgId=${organization_id}`, payload)
+export function getGithubAppAPI (payload) {
+  return http.get(`/api/aslan/system/githubApp`, payload)
 }
 
-export function createGithubAppAPI (organization_id, payload) {
-  return http.post(`/api/aslan/system/githubApp?orgId=${organization_id}`, payload)
+export function createGithubAppAPI (payload) {
+  return http.post(`/api/aslan/system/githubApp`, payload)
 }
 
-export function updateGithubAppAPI (organization_id, payload) {
-  return http.post(`/api/aslan/system/githubApp?orgId=${organization_id}`, payload)
+export function updateGithubAppAPI (payload) {
+  return http.post(`/api/aslan/system/githubApp`, payload)
 }
 
 export function deleteGithubAppAPI (id) {
@@ -687,54 +687,54 @@ export function registrationChangeAPI (payload) {
   return http.put(`/api/directory/isOpenRegistry`, { openRegistry: payload })
 }
 
-export function getSSOAPI (organization_id) {
-  return http.get(`/api/directory/sso?orgId=${organization_id}`)
+export function getSSOAPI () {
+  return http.get(`/api/directory/sso`)
 }
 
-export function updateSSOAPI (organization_id, payload) {
-  return http.post(`/api/directory/sso?orgId=${organization_id}`, payload)
+export function updateSSOAPI (payload) {
+  return http.post(`/api/directory/sso`, payload)
 }
 
-export function deleteSSOAPI (organization_id) {
-  return http.delete(`/api/directory/sso?orgId=${organization_id}`)
+export function deleteSSOAPI () {
+  return http.delete(`/api/directory/sso`)
 }
 
-export function createSSOAPI (organization_id, payload) {
-  return http.post(`/api/directory/sso?orgId=${organization_id}`, payload)
+export function createSSOAPI (payload) {
+  return http.post(`/api/directory/sso`, payload)
 }
 
-export function getAccountAPI (organization_id) {
-  return http.get(`/api/directory/ad/default?orgId=${organization_id}`)
+export function getAccountAPI () {
+  return http.get(`/api/directory/ad/default`)
 }
 
-export function deleteAccountAPI (organization_id) {
-  return http.delete(`/api/directory/ad/default?orgId=${organization_id}`)
+export function deleteAccountAPI () {
+  return http.delete(`/api/directory/ad/default`)
 }
 
-export function updateAccountAPI (organization_id, payload) {
-  return http.put(`/api/directory/ad/default?orgId=${organization_id}`, payload)
+export function updateAccountAPI (payload) {
+  return http.put(`/api/directory/ad/default`, payload)
 }
 
-export function createAccountAPI (organization_id, payload) {
-  return http.post(`/api/directory/ad?orgId=${organization_id}`, payload)
+export function createAccountAPI (payload) {
+  return http.post(`/api/directory/ad`, payload)
 }
 
-export function syncAccountAPI (organization_id) {
-  return http.post(`/api/directory/ads/sync?orgId=${organization_id}`)
+export function syncAccountAPI () {
+  return http.post(`/api/directory/ads/sync`)
 }
 
 // Jira
-export function getJiraAPI (organization_id) {
-  return http.get(`/api/directory/jira?orgId=${organization_id}`)
+export function getJiraAPI () {
+  return http.get(`/api/directory/jira`)
 }
-export function updateJiraAPI (organization_id, payload) {
-  return http.post(`/api/directory/jira?orgId=${organization_id}`, payload)
+export function updateJiraAPI (payload) {
+  return http.post(`/api/directory/jira`, payload)
 }
-export function deleteJiraAPI (organization_id) {
-  return http.delete(`/api/directory/jira?orgId=${organization_id}`)
+export function deleteJiraAPI () {
+  return http.delete(`/api/directory/jira`)
 }
-export function createJiraAPI (organization_id, payload) {
-  return http.post(`/api/directory/jira?orgId=${organization_id}`, payload)
+export function createJiraAPI (payload) {
+  return http.post(`/api/directory/jira`, payload)
 }
 
 // Jenkins
@@ -763,28 +763,28 @@ export function queryJenkinsParams (jobName) {
 }
 
 // Mail
-export function getEmailHostAPI (organization_id) {
-  return http.get(`/api/directory/emailHosts?orgId=${organization_id}`)
+export function getEmailHostAPI () {
+  return http.get(`/api/directory/emailHosts`)
 }
 
-export function deleteEmailHostAPI (organization_id) {
-  return http.delete(`/api/directory/emailHosts?orgId=${organization_id}`)
+export function deleteEmailHostAPI () {
+  return http.delete(`/api/directory/emailHosts`)
 }
 
-export function createEmailHostAPI (organization_id, payload) {
-  return http.post(`/api/directory/emailHosts?orgId=${organization_id}`, payload)
+export function createEmailHostAPI (payload) {
+  return http.post(`/api/directory/emailHosts`, payload)
 }
 
-export function getEmailServiceAPI (organization_id) {
-  return http.get(`/api/directory/emailServices?orgId=${organization_id}`)
+export function getEmailServiceAPI () {
+  return http.get(`/api/directory/emailServices`)
 }
 
-export function deleteEmailServiceAPI (organization_id) {
-  return http.delete(`/api/directory/emailServices?orgId=${organization_id}`)
+export function deleteEmailServiceAPI () {
+  return http.delete(`/api/directory/emailServices`)
 }
 
-export function createEmailServiceAPI (organization_id, payload) {
-  return http.post(`/api/directory/emailServices?orgId=${organization_id}`, payload)
+export function createEmailServiceAPI (payload) {
+  return http.post(`/api/directory/emailServices`, payload)
 }
 
 // ----- System Setting-Application -----
@@ -1137,20 +1137,20 @@ export function getProjectIngressAPI (projectName) {
 }
 
 // delivery
-export function getVersionListAPI (organization_id, workflow_name = '', product_name = '', task_id = '', service_name = '') {
-  return http.get(`/api/aslan/delivery/releases?orgId=${organization_id}&workflowName=${workflow_name}&productName=${product_name}&taskId=${task_id}&serviceName=${service_name}`)
+export function getVersionListAPI (workflow_name = '', product_name = '', task_id = '', service_name = '') {
+  return http.get(`/api/aslan/delivery/releases?workflowName=${workflow_name}&productName=${product_name}&taskId=${task_id}&serviceName=${service_name}`)
 }
 
-export function getVersionServiceListAPI (organizationId, projectName) {
-  return http.get(`/api/aslan/delivery/servicenames?orgId=${organizationId}&productName=${projectName}`)
+export function getVersionServiceListAPI (projectName) {
+  return http.get(`/api/aslan/delivery/servicenames?&productName=${projectName}`)
 }
 
 export function deleteVersionAPI (versionId) {
   return http.delete(`/api/aslan/delivery/releases/${versionId}`)
 }
 
-export function getVersionProductListAPI (organization_id) {
-  return http.get(`/api/aslan/delivery/products?orgId=${organization_id}`)
+export function getVersionProductListAPI () {
+  return http.get(`/api/aslan/delivery/products`)
 }
 
 export function productHostingNamespaceAPI (clusterId) {

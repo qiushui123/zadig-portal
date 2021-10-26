@@ -177,8 +177,7 @@ export default {
       this.$refs[ref].clearValidate()
     },
     getGithubApp () {
-      const id = this.currentOrganizationId
-      getGithubAppAPI(id).then((res) => {
+      getGithubAppAPI().then((res) => {
         if (!res.resultCode) {
           this.$set(this, 'githubApp', res)
         } else {
@@ -212,9 +211,8 @@ export default {
     createGithubApp () {
       this.$refs.githubAppAddForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.githubAppAdd
-          createGithubAppAPI(id, payload).then((res) => {
+          createGithubAppAPI(payload).then((res) => {
             this.getGithubApp()
             this.handleGithubAppCancel()
             this.$message({
@@ -230,9 +228,8 @@ export default {
     updateGithubApp () {
       this.$refs.githubAppEditForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.githubAppEdit
-          updateGithubAppAPI(id, payload).then((res) => {
+          updateGithubAppAPI(payload).then((res) => {
             this.getGithubApp()
             this.handleGithubAppCancel()
             this.$message({
@@ -256,11 +253,6 @@ export default {
       }
     }
 
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
   },
   activated () {
     this.getGithubApp()

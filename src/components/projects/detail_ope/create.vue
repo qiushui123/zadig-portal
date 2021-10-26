@@ -278,16 +278,14 @@ export default {
   },
   methods: {
     getUsers () {
-      const orgId = this.currentOrganizationId
-      usersAPI(orgId).then((res) => {
+      usersAPI().then((res) => {
         this.users = this.$utils.deepSortOn(res.data, 'name')
       })
     },
     remoteMethod (query) {
       if (query !== '') {
         this.loading = true
-        const orgId = this.currentOrganizationId
-        usersAPI(orgId, '', 0, 0, query).then((res) => {
+        usersAPI('', 0, 0, query).then((res) => {
           this.loading = false
           this.users = this.$utils.deepSortOn(res.data, 'name')
         })
@@ -387,9 +385,6 @@ export default {
     ...mapGetters([
       'signupStatus'
     ]),
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     currentUserId () {
       return this.$store.state.login.userinfo.uid
     },
