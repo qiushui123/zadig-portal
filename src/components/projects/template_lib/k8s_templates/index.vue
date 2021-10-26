@@ -163,7 +163,7 @@ export default {
     }
   },
   mounted () {
-    bus.$emit('set-topbar-title', { title: 'Kubernetes 模板库', breadcrumb: [] })
+    bus.$emit('set-topbar-title', { title: 'Kubernetes YAML 模板库', breadcrumb: [] })
     this.getFiles()
   },
   components: {

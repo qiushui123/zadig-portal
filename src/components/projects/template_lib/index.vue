@@ -18,12 +18,12 @@ export default {
           icon: 'iconfont iconhelmrepo'
         },
         {
-          name: 'Dockerfile',
+          name: 'Dockerfile 模板库',
           url: `/v1/projects/template/dockerfiles`,
           icon: 'iconfont icondocker'
         },
         {
-          name: 'Kubernetes',
+          name: 'K8s YAML 模板库',
           url: `/v1/projects/template/k8s-yamls`,
           icon: 'iconfont icondocker'
         }
