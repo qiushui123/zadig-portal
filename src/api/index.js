@@ -1075,6 +1075,9 @@ export function userLoginAPI (payload) {
   return http.post(`/login`, payload)
 }
 
+export function otherLoginAPI (payload) {
+  return http.get(`/login`, payload)
+}
 // Profile
 
 export function updateCurrentUserInfoAPI (id, payload) {
@@ -1264,4 +1267,12 @@ export function deleterole (name, projectName) {
 
 export function queryUserBindings (uid, projectName = '') {
   return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
+}
+// role system
+export function addSystemRoleBindings (payload) {
+  return http.post(`/api/v1/system-rolebindings`, payload)
+}
+
+export function deleteSystemRoleBindings (name) {
+  return http.delete(`/api/v1/system-rolebindings/${name}`)
 }

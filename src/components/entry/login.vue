@@ -46,6 +46,7 @@
                 </a>
               </section>
               <div class="bottom">
+                  <a  @click="otherLogin">第三方登录</a>
                   <a  @click="isLogin=false">找回密码</a>
               </div>
             </div>
@@ -83,7 +84,7 @@ import { mapGetters } from 'vuex'
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
 import ForgetPassword from './components/forgetPassword.vue'
-
+import { otherLoginAPI } from '@/api'
 export default {
   components: {
     ForgetPassword
@@ -118,6 +119,9 @@ export default {
     }
   },
   methods: {
+    otherLogin () {
+      otherLoginAPI()
+    },
     login () {
       this.$refs.loginForm.validate(async (valid) => {
         if (valid) {
