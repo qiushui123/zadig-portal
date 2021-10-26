@@ -18,14 +18,14 @@
         ></Folder>
       </div>
       <multipane-resizer></multipane-resizer>
-      <div class="pane center" :style="{minWidth: '200px', width: '500px'}">
+      <div class="pane center" :style="{minWidth: '300px', width: '500px'}">
         <div class="top">
           <PageNav :displayedFile="displayedFile" :currentTab="currentTab" @updateFile="showFile"></PageNav>
         </div>
         <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
-      <ModuleUse class="pane right" :style="{flexGrow: 1, width: '100px'}"></ModuleUse>
+      <ModuleUse class="pane right" :style="{flexGrow: 1, minWidth: '372px'}"></ModuleUse>
     </multipane>
   </div>
 </template>
@@ -232,6 +232,7 @@ export default {
     .multipane-resizer {
       position: relative;
       z-index: 2;
+      width: 10px;
 
       &::before {
         position: absolute;

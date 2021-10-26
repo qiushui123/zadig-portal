@@ -1221,8 +1221,11 @@ export function createTemplateServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
 }
 
-// Template Dockerfile
+export function createTemplateMultiServiceAPI (productName, payload) {
+  return http.post(`/api/aslan/service/helm/services/bulk?productName=${productName}`, payload)
+}
 
+// Template Dockerfile
 export function getDockerfileTemplatesAPI () {
   return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)
 }
