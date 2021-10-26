@@ -50,16 +50,16 @@
               <h4>
                 <span><i class="iconfont iconfuwu"></i></span> 系统内置变量
               </h4>
-              <el-table :data="systemVariable"
+              <el-table :data="systemVariables"
                         stripe
                         style="width: 100%;">
                 <el-table-column prop="key"
                                  label="Key">
                 </el-table-column>
-                <el-table-column prop="value"
-                                 label="Value">
+                <el-table-column prop="description"
+                                 label="描述">
                   <template slot-scope="scope">
-                    <span v-if="scope.row.value">{{scope.row.value}}</span>
+                    <span v-if="scope.row.description">{{scope.row.description}}</span>
                     <span v-else>空</span>
                   </template>
                 </el-table-column>
@@ -103,18 +103,10 @@
 </template>
 <script>
 import { getKubernetesTemplateBuildReferenceAPI } from '@api'
-
 export default {
   data () {
     return {
-      referenceList: [],
-      systemVariable: [{
-        key: '$Product$',
-        value: ''
-      }, {
-        key: '$Service$',
-        value: ''
-      }]
+      referenceList: []
     }
   },
   methods: {
@@ -143,8 +135,12 @@ export default {
   },
   props: {
     fileContent: {
-      required: false,
+      required: true,
       type: Object
+    },
+    systemVariables: {
+      required: true,
+      type: Array
     }
 
   },

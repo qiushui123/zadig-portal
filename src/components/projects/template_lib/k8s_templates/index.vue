@@ -28,7 +28,7 @@
                 <multipane-resizer></multipane-resizer>
                 <aside class="pipelines__aside pipelines__aside_right"
                        :style="{ flexGrow: 1 }">
-                  <FileAside :fileContent="fileContent" :variables.sync="variables"></FileAside>
+                  <FileAside :fileContent="fileContent" :variables.sync="variables" :systemVariables="systemVariables"></FileAside>
                 </aside>
 
               </template>
@@ -71,6 +71,7 @@ export default {
       },
       files: [],
       variables: [],
+      systemVariables: [],
       initFileContent: '',
       variablesChanged: false
     }
@@ -85,6 +86,7 @@ export default {
     getFiles () {
       this.$set(this, 'fileInTree', {})
       getKubernetesTemplatesAPI().then((res) => {
+        this.systemVariables = res.system_variables
         this.files = sortBy((res.yaml_template.map(file => {
           file.status = 'added'
           return file
