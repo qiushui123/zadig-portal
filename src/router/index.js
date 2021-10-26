@@ -77,8 +77,8 @@ const routes = [
         }
       },
       {
-        path: 'projects/chart',
-        component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/index.vue'),
+        path: 'projects/template',
+        component: () => import(/* webpackChunkName: "template-lib" */ '@/components/projects/template_lib/index.vue'),
         meta: {
           title: '模板库'
         },
@@ -89,9 +89,15 @@ const routes = [
           },
           {
             path: 'charts',
-            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/chart/index.vue'),
+            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/template_lib/chart_templates/index.vue'),
             meta: {
               title: 'Chart 模板库'
+            }
+          }, {
+            path: 'dockerfiles',
+            component: () => import(/* webpackChunkName: "dockerfile-template" */ '@/components/projects/template_lib/dockerfile_templates/index.vue'),
+            meta: {
+              title: 'Dockerfile 模板库'
             }
           }]
       },

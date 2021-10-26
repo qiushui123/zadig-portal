@@ -1,5 +1,21 @@
 <template>
   <div class="build-config-container">
+    <el-drawer title="Dockerfile 模板预览"
+               :visible.sync="showDockerfile"
+               direction="rtl">
+      <Codemirror v-model="dockerfileTemplate.content" :cmOption="{
+        tabSize: 2,
+        readOnly: true,
+        theme: 'neo',
+        mode: 'text/x-dockerfile',
+        lineNumbers: false,
+        line: true,
+        showGutter: false,
+        displayIndentGuides: false,
+        showPrintMargin: false,
+        collapseIdentical: true
+      }" class="mirror"></Codemirror>
+    </el-drawer>
     <div class="jenkins"
          v-show="source === 'jenkins'">
       <div class="section">
@@ -476,12 +492,45 @@
                 <template slot="prepend">$WORKSPACE/</template>
               </el-input>
             </el-form-item>
-            <el-form-item label="Dockerfile 文件的完整路径："
+            <el-form-item label="Dockerfile 来源："
+                          prop="source">
+              <el-select size="small" style="width: 100%;" v-model="buildConfig.post_build.docker_build.source" placeholder="请选择">
+                <el-option
+                  label="代码仓库"
+                  value="local">
+                </el-option>
+                <el-option
+                  label="模板库"
+                  value="template">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="buildConfig.post_build.docker_build.source === 'local'" label="Dockerfile 文件的完整路径："
                           prop="docker_file">
               <el-input v-model="buildConfig.post_build.docker_build.docker_file"
                         size="small">
                 <template slot="prepend">$WORKSPACE/</template>
               </el-input>
+            </el-form-item>
+            <el-form-item v-if="buildConfig.post_build.docker_build.source === 'template'"  label="选择模板："
+                          prop="template_name">
+              <el-select style="width: 95%;" size="small" filterable @change="getDockerfileTemplate" v-model="buildConfig.post_build.docker_build.template_id" placeholder="请选择">
+                <el-option v-for="(template,index) in dockerfileTemplates"
+                  :key="index"
+                  :label="template.name"
+                  :value="template.id">
+                </el-option>
+              </el-select>
+              <template >
+              <el-button :disabled="!buildConfig.post_build.docker_build.template_id" style="margin-left: 5px;" type="text" @click="showDockerfile = true"> 预览</el-button>
+              <div v-if="dockerfileTemplate.variable && dockerfileTemplate.variable.length > 0" class="dockerfile-args-container">
+                <span>ARG</span>
+                <span v-for="(item,index) in dockerfileTemplate.variable" :key="index">
+                  <span v-if="item.value">{{`${item.key}=${item.value} `}}</span>
+                  <span v-else>{{`${item.key} `}}</span>
+                </span>
+              </div>
+              </template>
             </el-form-item>
             <el-form-item label="镜像构建参数：">
               <el-tooltip effect="dark"
@@ -587,9 +636,10 @@
   </div>
 </template>
 <script>
-import { getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
+import { getBuildConfigDetailAPI, getAllAppsAPI, getDockerfileTemplatesAPI, getDockerfileAPI, getImgListAPI, getCodeSourceAPI, createBuildConfigAPI, updateBuildConfigAPI, getServiceTargetsAPI, getRegistryWhenBuildAPI, queryJenkinsJob, queryJenkinsParams } from '@api'
 import Editor from 'vue2-ace-bind'
 import bus from '@utils/event_bus'
+import Codemirror from '@/components/projects/common/codemirror.vue'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
@@ -607,6 +657,7 @@ export default {
   data () {
     return {
       source: 'zadig',
+      dockerfileTemplate: {},
       orginOptions: [{
         value: 'zadig',
         label: 'Zadig 构建'
@@ -647,8 +698,10 @@ export default {
           parameters: []
         },
         scripts: '#!/bin/bash\nset -e',
-        main_file: '',
         post_build: {
+          docker_build: {
+            source: 'local'
+          }
         }
       },
       editorOption: {
@@ -659,14 +712,15 @@ export default {
         displayIndentGuides: false,
         showPrintMargin: false
       },
-      stcov_enabled: false,
       docker_enabled: false,
       binary_enabled: false,
       post_script_enabled: false,
+      showDockerfile: false,
       allApps: [],
       allRegistry: [],
       serviceTargets: [],
       allCodeHosts: [],
+      dockerfileTemplates: [],
       showBuildAdvancedSetting: {},
       createRules: {
         name: [
@@ -691,16 +745,6 @@ export default {
           {
             type: 'string',
             message: '请填写Dockerfile路径',
-            required: true,
-            trigger: 'blur'
-          }
-        ]
-      },
-      stcov_rules: {
-        main_file: [
-          {
-            type: 'string',
-            message: '请填写main文件路径',
             required: true,
             trigger: 'blur'
           }
@@ -795,11 +839,9 @@ export default {
         this.$set(this.buildConfig.post_build, 'docker_build', {
           work_dir: '',
           docker_file: '',
-          build_args: ''
+          build_args: '',
+          source: 'local'
         })
-      }
-      if (command === 'stcov') {
-        this.stcov_enabled = true
       }
       if (command === 'binary') {
         this.binary_enabled = true
@@ -818,10 +860,6 @@ export default {
         this.$set(this.buildConfig.post_build, 'scripts', '#!/bin/bash\nset -e')
       }
       this.$nextTick(this.$utils.scrollToBottom)
-    },
-    removeStcov () {
-      this.stcov_enabled = false
-      delete this.buildConfig.main_file
     },
     removeDocker () {
       this.docker_enabled = false
@@ -938,6 +976,14 @@ export default {
         this.jenkinsBuild.jenkins_build.jenkins_build_params = res
       }
     },
+    async getDockerfileTemplate (id) {
+      const res = await getDockerfileAPI(id).catch(err => {
+        console.log(err)
+      })
+      if (res) {
+        this.dockerfileTemplate = res
+      }
+    },
     loadPage () {
       const projectName = this.projectName
       const orgId = this.currentOrganizationId
@@ -961,6 +1007,9 @@ export default {
           }
           if (this.buildConfig.post_build.docker_build) {
             this.docker_enabled = true
+            if (this.buildConfig.post_build.docker_build.template_id) {
+              this.getDockerfileTemplate(this.buildConfig.post_build.docker_build.template_id)
+            }
           }
           if (this.buildConfig.post_build.file_archive) {
             this.binary_enabled = true
@@ -975,6 +1024,9 @@ export default {
         this.allApps = apps.map((app, index) => {
           return { name: app.name, version: app.version, id: app.name + app.version }
         })
+      })
+      getDockerfileTemplatesAPI().then((res) => {
+        this.dockerfileTemplates = res.dockerfile_template
       })
       getCodeSourceAPI(orgId).then((response) => {
         this.allCodeHosts = response
@@ -1045,7 +1097,8 @@ export default {
   },
   components: {
     Editor,
-    Resize
+    Resize,
+    Codemirror
   }
 
 }
@@ -1166,6 +1219,15 @@ export default {
 
   .registry-alert {
     margin-bottom: 10px;
+  }
+
+  .dockerfile-args-container {
+    line-height: 1;
+
+    span {
+      color: #606266;
+      font-size: 14px;
+    }
   }
 
   .section {
