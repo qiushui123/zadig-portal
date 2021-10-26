@@ -4,7 +4,7 @@
        element-loading-spinner="iconfont iconfont-loading iconzhuji"
        class="setting-host-container">
 
-    <!--Host-create-edit-dialog-->
+    <!--Host-edit-dialog-->
     <el-dialog :title='title'
                :visible.sync="dialogHostFormVisible"
                custom-class="dialog-style"
@@ -22,9 +22,28 @@
                    @click="hostOperation">保存</el-button>
       </div>
     </el-dialog>
-    <!--Host-create-edit-dialog-->
-
     <!--Host-edit-dialog-->
+
+    <!--Host-import-dialog-->
+    <el-dialog :title='title'
+               :visible.sync="dialogImportHostVisible"
+               custom-class="dialog-style"
+               :close-on-click-modal="false"
+               width="35%">
+      <ImportHosts ref="import-hosts"
+               :originHosts="allHost"></ImportHosts>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button size="small"
+                   @click="dialogImportHostVisible = false">取 消</el-button>
+        <el-button :plain="true"
+                   size="small"
+                   type="success"
+                   @click="hostOperation">保存</el-button>
+      </div>
+    </el-dialog>
+    <!--Host-import-dialog-->
+
     <div class="section">
       <el-alert type="info"
                 :closable="false">
@@ -43,6 +62,10 @@
                    :plain="true"
                    @click="hostOperation('add')"
                    type="success">新建</el-button>
+        <el-button size="small"
+                   :plain="true"
+                   @click="hostOperation('import')"
+                   type="success">导入</el-button>
       </div>
       <div class="host-list">
         <template>
@@ -89,6 +112,7 @@
 
 <script>
 import AddHost from '@/components/projects/common/not_k8s/add_host.vue'
+import ImportHosts from './importHosts.vue'
 import { getHostListAPI, deleteHostAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
@@ -102,12 +126,13 @@ export default {
         provider: null,
         label: '',
         ip: '',
+        is_prod: false,
         user_name: '',
         private_key: ''
       },
       providerMap: {
         0: {
-          icon: 'iconfont logo iconqita',
+          icon: 'iconfont logo iconwuliji',
           name: '其它'
         },
 
@@ -125,6 +150,7 @@ export default {
         }
       },
       dialogHostFormVisible: false,
+      dialogImportHostVisible: false,
       operate: '',
       loading: false
     }
@@ -144,7 +170,7 @@ export default {
         operate === 'update' && (this.host = this.$utils.cloneObj(current_host))
       } else if (operate === 'delete') {
         const id = current_host.id
-        this.$confirm(`确定要删除 ${current_host.label} ?`, '确认', {
+        this.$confirm(`确定要删除 ${current_host.name} ?`, '确认', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -157,13 +183,26 @@ export default {
             })
           })
         })
+      } else if (operate === 'import') {
+        this.operate = operate
+        this.dialogImportHostVisible = true
       } else {
-        const fn = this.operate === 'add' ? 'saveHost' : 'updateHost'
-        this.$refs['add-host'][fn]()
-          .then(() => {
-            this.dialogHostFormVisible = false
-            this.getHost()
-          })
+        if (this.operate === 'add' || this.operate === 'update') {
+          const fn = this.operate === 'add' ? 'saveHost' : 'updateHost'
+          this.$refs['add-host'][fn]()
+            .then(() => {
+              this.dialogHostFormVisible = false
+              this.dialogImportHostVisible = false
+              this.getHost()
+            })
+        } else if (this.operate === 'import') {
+          const fn = 'importHost'
+          this.$refs['import-hosts'][fn]()
+            .then(() => {
+              this.dialogImportHostVisible = false
+              this.getHost()
+            })
+        }
       }
     },
     getHost () {
@@ -183,6 +222,8 @@ export default {
         return '创建主机资源'
       } else if (this.operate === 'update') {
         return '修改主机资源'
+      } else if (this.operate === 'import') {
+        return '导入主机资源'
       } else {
         return ''
       }
@@ -209,7 +250,8 @@ export default {
     this.addHostData = this.host = this.$utils.cloneObj(this.initHost)
   },
   components: {
-    AddHost
+    AddHost,
+    ImportHosts
   }
 }
 </script>

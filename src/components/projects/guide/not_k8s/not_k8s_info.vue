@@ -44,9 +44,9 @@
                              circle></el-button>
                 </div>
                 <div class="integration-card__info">
-                  <div class="integration-name cf-sub-title">2 条工作流</div>
+                  <div class="integration-name cf-sub-title">3 条工作流</div>
                   <div class="integration-details">
-                    {{projectName}}-workflow-dev , {{projectName}}-workflow-qa
+                    {{projectName}}-workflow-dev , {{projectName}}-workflow-qa, {{projectName}}-workflow-ops
                   </div>
                 </div>
               </div>

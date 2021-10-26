@@ -13,9 +13,14 @@ export default {
       title: '模板库',
       routerList: [
         {
-          name: 'Chart 模板',
-          url: `/v1/projects/chart/charts`,
+          name: 'Chart',
+          url: `/v1/projects/template/charts`,
           icon: 'iconfont iconhelmrepo'
+        },
+        {
+          name: 'Dockerfile',
+          url: `/v1/projects/template/dockerfiles`,
+          icon: 'iconfont icondocker'
         }
       ]
     })
@@ -27,5 +32,6 @@ export default {
 .template-container {
   display: flex;
   height: 100%;
+  overflow: hidden;
 }
 </style>

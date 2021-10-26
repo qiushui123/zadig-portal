@@ -931,6 +931,10 @@ export function getHostListAPI () {
   return http.get(`/api/aslan/system/privateKey`)
 }
 
+export function getHostLabelListAPI () {
+  return http.get(`/api/aslan/system/privateKey/labels`)
+}
+
 export function createHostAPI (payload) {
   return http.post(`/api/aslan/system/privateKey`, payload)
 }
@@ -941,6 +945,10 @@ export function updateHostAPI (id, payload) {
 
 export function deleteHostAPI (id) {
   return http.delete(`/api/aslan/system/privateKey/${id}`)
+}
+
+export function importHostAPI (payload) {
+  return http.post(`/api/aslan/system/privateKey/batch`, payload)
 }
 
 // Delivery Center
@@ -1184,7 +1192,7 @@ export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
 
-// module repo
+// Template Helm
 export function getChartTemplatesAPI () {
   return http.get(`/api/aslan/template/charts`)
 }
@@ -1215,6 +1223,35 @@ export function createTemplateServiceAPI (productName, payload) {
 
 export function createTemplateMultiServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services/bulk?productName=${productName}`, payload)
+}
+
+// Template Dockerfile
+export function getDockerfileTemplatesAPI () {
+  return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)
+}
+
+export function createDockerfileTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile`, payload)
+}
+
+export function updateDockerfileTemplateAPI (id, payload) {
+  return http.put(`/api/aslan/template/dockerfile/${id}`, payload)
+}
+
+export function validateDockerfileAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile/validation`, payload)
+}
+
+export function getDockerfileAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}`)
+}
+
+export function deleteDockerfileTemplateAPI (id) {
+  return http.delete(`/api/aslan/template/dockerfile/${id}`)
+}
+
+export function getDockerfileTemplateBuildReferenceAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}/reference`)
 }
 
 // helm env and service
@@ -1265,4 +1302,8 @@ export function postWorkloads (payload) {
 
 export function editWorkloads (payload) {
   return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
+}
+
+export function getArtifactFileAPI (payload, id) {
+  return http.post(`/api/aslan/system/s3storage/${id}/releases/search?kind=file`, payload)
 }
