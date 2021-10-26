@@ -25,7 +25,7 @@ export default {
         {
           name: 'K8s YAML 模板库',
           url: `/v1/projects/template/k8s-yamls`,
-          icon: 'iconfont icondocker'
+          icon: 'iconfont iconk8s'
         }
       ]
     })
