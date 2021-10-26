@@ -1,6 +1,7 @@
 import * as types from '../mutations'
 import { userLoginAPI, queryUserBindings } from '@api'
 import { Message } from 'element-ui'
+import { parseJwt } from '@/utilities/jwt'
 
 const state = {
   userinfo: {
@@ -16,7 +17,16 @@ const state = {
 const getters = {}
 
 const actions = {
-
+  OTHERLOGIN (context, token) { // 第三方登录
+    const info = parseJwt(token)
+    const res = { ...info, token: token }
+    localStorage.setItem('userInfo', JSON.stringify(res))
+    Message({
+      message: '登录成功，欢迎 ' + res.name,
+      type: 'success'
+    })
+    return Promise.resolve(true)
+  },
   async LOGIN (context, args) {
     const res = await userLoginAPI(args).catch(error => console.log(error))
     if (res) {

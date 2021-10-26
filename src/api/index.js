@@ -1075,9 +1075,6 @@ export function userLoginAPI (payload) {
   return http.post(`/login`, payload)
 }
 
-export function otherLoginAPI (payload) {
-  return http.get(`/login`, payload)
-}
 // Profile
 
 export function updateCurrentUserInfoAPI (id, payload) {
