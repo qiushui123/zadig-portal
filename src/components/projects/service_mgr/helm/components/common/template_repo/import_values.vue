@@ -30,7 +30,7 @@
         <span v-show="showErrorTip" class="error-tip">请选择 values 文件</span>
       </el-form-item>
       <el-dialog title="请选择服务的 values 文件" :visible.sync="showFileSelectDialog" append-to-body>
-        <Repertory :gitRepoConfig="importRepoInfoUse.gitRepoConfig" @checkedPath="checkedPath" :checkOne="!substantial"></Repertory>
+        <Repository :gitRepoConfig="importRepoInfoUse.gitRepoConfig" @checkedPath="checkedPath" :checkOne="!substantial"></Repository>
       </el-dialog>
     </div>
   </div>
@@ -40,7 +40,7 @@
 import Resize from '@/components/common/resize'
 import Codemirror from '@/components/projects/common/codemirror.vue'
 import ValueRepo from '@/components/projects/common/import_values/value_repo.vue'
-import Repertory from './repertory.vue'
+import Repository from './repository.vue'
 import { uniq } from 'lodash'
 
 const valueInfo = {
@@ -132,7 +132,7 @@ export default {
     Codemirror,
     Resize,
     ValueRepo,
-    Repertory
+    Repository
   }
 }
 </script>
