@@ -750,7 +750,7 @@ const validateServiceName = (rule, value, callback) => {
     }
   }
 }
-const pm_deploy_scripts = "#<------------------------------------------------------------------------------->\n## 构建脚本中的变量均可使用，其他内置可用变量如下\n## ENV_NAME               环境名称，用于区分不同的集成环境，系统内置集成环境：dev，qa\n## <AGENT_NAME>_PK        通过 SSH Agent 远程登录服务器使用的私钥 id_rsa，其中 AGENT_NAME 为 SSH AGENT 名称，使用时需要自己填写完整  \n## <AGENT_NAME>_USERNAME  通过 SSH Agent 远程登录到服务器的用户名称 \n## <AGENT_NAME>_IP        SSH Agent 目标服务器的 IP 地址\n## ARTIFACT               部署的交付物包，通过该变量可获取交付物包 \n## 远程部署时，可以通过使用命令 `ssh -i $<AGENT_NAME>_PK $<AGENT_NAME>_USERNAME@$<AGENT_NAME>_IP '自定义脚本'` 进行部署操作\n#<------------------------------------------------------------------------------->\n#!/bin/bash\nset -e"
+const pm_deploy_scripts = "#<------------------------------------------------------------------------------->\n## 构建脚本中的变量均可使用，其他内置可用变量如下\n## ENV_NAME               环境名称，用于区分不同的集成环境，系统内置集成环境：dev，qa\n## <AGENT_NAME>_PK        通过 SSH Agent 远程登录服务器使用的私钥 id_rsa，其中 AGENT_NAME 为 SSH AGENT 名称，使用时需要自己填写完整  \n## <AGENT_NAME>_USERNAME  通过 SSH Agent 远程登录到服务器的用户名称 \n## <AGENT_NAME>_IP        SSH Agent 目标服务器的 IP 地址\n## <ENV>_HOST_IPs         变量支持获取指定环境关联的所有主机 IP\n## ARTIFACT               部署的交付物包，通过该变量可获取交付物包 \n## 远程部署时，可以通过使用命令 `ssh -i $<AGENT_NAME>_PK $<AGENT_NAME>_USERNAME@$<AGENT_NAME>_IP '自定义脚本'` 进行部署操作\n#<------------------------------------------------------------------------------->\n#!/bin/bash\nset -e"
 export default {
   props: {
     isEdit: Boolean,
