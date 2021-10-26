@@ -94,14 +94,13 @@ export default {
       const payload = []
       uids.forEach(uid => {
         payload.push({
-          projectName: this.projectName,
           name: uid + name,
           uid: uid,
           role: name,
           public: role.isPublic ? role.isPublic : false
         })
       })
-      const res = await addRoleBindings(payload).catch(error => cosnole.log(error))
+      const res = await addRoleBindings(payload, projectName).catch(error => cosnole.log(error))
       if (res) {
         this.$message({
           message: '添加成员成功',

@@ -1264,8 +1264,8 @@ export function deleterole (name, projectName) { // 删除项目中的角色
   return http.delete(`/api/v1/roles/${name}?projectName=${projectName}`)
 }
 
-export function addRoleBindings (payload) { // 项目中用户添加角色
-  return http.post(`/api/v1/rolebindings?projectName=${payload.projectName}`, payload)
+export function addRoleBindings (payload, projectName) { // 项目中用户添加角色
+  return http.post(`/api/v1/rolebindings?projectName=${projectName}`, payload)
 }
 
 export function queryRoleBindings (projectName) { // 查询项目中的角色
