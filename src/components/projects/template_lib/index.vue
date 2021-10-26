@@ -32,5 +32,6 @@ export default {
 .template-container {
   display: flex;
   height: 100%;
+  overflow: hidden;
 }
 </style>

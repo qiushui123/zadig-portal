@@ -5,23 +5,23 @@
           <multipane class="vertical-panes"
                      layout="vertical">
             <div class="file-tree-container">
-              <fileTree :files="files"
+              <FileTree :files="files"
                            :fileContentChange="fileContentChange"
-                           ref="fileTree"
+                           ref="FileTree"
                            @onRefreshFile="getFiles"
                            @onSelectFileChange="onSelectFileChange"
-                           @updateFile="updateFile($event)"></fileTree>
+                           @updateFile="updateFile($event)"></FileTree>
             </div>
             <template v-if="files.length >0">
               <template>
                 <multipane-resizer></multipane-resizer>
                 <div class="file-editor-container"
                      :style="{ minWidth: '300px', width: '500px' }">
-                  <fileEditor ref="fileEditor"
+                  <FileEditor ref="FileEditor"
                                     :fileContent="fileContent"
                                     :fileContentChange="fileContentChange"
                                     @onRefreshFile="getFiles"
-                                    @onUpdateFile="onUpdateFile"></fileEditor>
+                                    @onUpdateFile="onUpdateFile"></FileEditor>
                 </div>
                 <multipane-resizer></multipane-resizer>
                 <aside class="pipelines__aside pipelines__aside_right"
@@ -52,8 +52,8 @@
 <script>
 import mixin from '@utils/service_module_mixin'
 import FileAside from './file_aside.vue'
-import fileEditor from './file_editor.vue'
-import fileTree from './file_tree.vue'
+import FileEditor from './file_editor.vue'
+import FileTree from './file_tree.vue'
 import { sortBy } from 'lodash'
 import bus from '@utils/event_bus'
 import {
@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     createFile () {
-      this.$refs.fileTree.createFile()
+      this.$refs.FileTree.createFile()
     },
     onSelectFileChange (file) {
       this.$set(this, 'fileInTree', file)
@@ -118,9 +118,9 @@ export default {
       }
     },
     updateFile (switchNode) {
-      this.$refs.fileEditor.updateFile().then(() => {
+      this.$refs.FileEditor.updateFile().then(() => {
         if (switchNode) {
-          this.$refs.fileTree.selectAndSwitchTreeNode()
+          this.$refs.FileTree.selectAndSwitchTreeNode()
         }
       })
     }
@@ -159,8 +159,8 @@ export default {
   },
   components: {
     FileAside,
-    fileEditor,
-    fileTree,
+    FileEditor,
+    FileTree,
     Multipane,
     MultipaneResizer
   },
