@@ -119,10 +119,11 @@ export default {
         variables: variable
       }
       if (status === 'added') {
-        const res = await Promise.all([updateKubernetesTemplateAPI(
+        const res = await updateKubernetesTemplateAPI(
           fileId, payload
-        ), updateKubernetesTemplateVariablesAPI(fileId, varPayload)])
-        if (res) {
+        )
+        const varRes = await updateKubernetesTemplateVariablesAPI(fileId, varPayload)
+        if (res && varRes) {
           this.$emit('onUpdateFile', { name: fileName, status: 'added', payload })
           this.$message({
             type: 'success',
