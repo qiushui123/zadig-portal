@@ -1,6 +1,6 @@
 <template>
   <div class="project-home">
-    <div class="tab-container">
+    <div class="tab-container" style="width: 100%;">
       <el-tabs  v-model="activeTab" :tab-position="tabPosition" type="card" style="height: 200px;">
         <el-tab-pane name="member" label="成员管理"><Member v-if="activeTab==='member'" :projectName="projectName" /></el-tab-pane>
         <el-tab-pane name="role" label="角色管理"><Role  v-if="activeTab==='role'" :projectName="projectName"/></el-tab-pane>

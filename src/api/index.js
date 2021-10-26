@@ -1250,19 +1250,29 @@ export function queryPolicyDefinitions () {
   return http.get(`/api/v1/policy-definitions`)
 }
 
-export function addrole (payload) {
+export function addrole (payload) { // 项目下添加角色
   return http.post(`/api/v1/roles?projectName=${payload.projectName}`, payload)
 }
 
-export function queryrole (projectName) {
+export function queryrole (projectName) { // 查询项目中的角色
   return http.get(`/api/v1/roles?projectName=${projectName}`)
 }
-
-export function deleterole (name, projectName) {
+export function queryPublicRole () { // 查询公共的角色
+  return http.get(`/api/v1/public-roles`)
+}
+export function deleterole (name, projectName) { // 删除项目中的角色
   return http.delete(`/api/v1/roles/${name}?projectName=${projectName}`)
 }
 
-export function queryUserBindings (uid, projectName = '') {
+export function addRoleBindings (payload) { // 项目中用户添加角色
+  return http.post(`/api/v1/rolebindings?projectName=${payload.projectName}`, payload)
+}
+
+export function queryRoleBindings (projectName) { // 查询项目中的角色
+  return http.get(`/api/v1/rolebindings?projectName=${projectName}`)
+}
+
+export function queryUserBindings (uid, projectName = '') { // 查询用户所有绑定的角色 传projectName是项目绑定，不传是系统绑定
   return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
 }
 // role system

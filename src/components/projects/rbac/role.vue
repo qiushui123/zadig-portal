@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-alert type="info" :closable="false" description="项目成员管理，主要用于定义项目成员的角色"></el-alert>
+    <el-alert type="info" :closable="false" description="项目角色管理，主要用于定义项目的角色"></el-alert>
     <div class="sync-container">
       <el-button plain size="small" @click="$refs['addrole'].dialogRoleAddFormVisible = true" type="primary">添加角色</el-button>
     </div>

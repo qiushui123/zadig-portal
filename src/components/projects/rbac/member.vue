@@ -2,7 +2,7 @@
   <div>
     <el-alert type="info" :closable="false" description="项目成员管理，主要用于定义项目成员的角色"></el-alert>
     <div class="sync-container">
-      <el-button plain size="small" type="primary">添加成员</el-button>
+      <el-button plain size="small" type="primary" @click="$refs.addRoleBind.addUserFormVisible = true" >添加成员</el-button>
     </div>
 
     <el-table v-loading="loading" row-key="id" :data="members" style="width: 100%;">
@@ -29,13 +29,19 @@
         </template>
       </el-table-column>
     </el-table>
+    <AddRoleBind :projectName="projectName" ref="addRoleBind" />
   </div>
 </template>
 <script>
 import bus from '@utils/event_bus'
+import AddRoleBind from './addroleBind.vue'
+import { queryRoleBindings } from '@/api'
 
 export default {
   name: 'member',
+  components: {
+    AddRoleBind
+  },
   props: {
     projectName: String
   },
@@ -45,7 +51,13 @@ export default {
       loading: false
     }
   },
+  methods: {
+    async getRoleBindings () {
+      const res = await queryRoleBindings(this.projectName).catch(error => console.log(error))
+    }
+  },
   created () {
+    this.getRoleBindings()
     bus.$emit(`set-topbar-title`, { title: '', breadcrumb: [{ title: '项目', url: '/v1/projects' }, { title: this.projectName, url: `/v1/projects/detail/${this.projectName}` }, { title: '成员管理', url: '' }] })
   }
 }
