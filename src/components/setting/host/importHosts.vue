@@ -52,7 +52,7 @@
           :on-remove="onRemoveFile"
         >
           <el-button :disabled="uploadBtnDisabled" style="width: 50%;" size="small" type="primary" plain>上传文件</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传 xls/xlsx 文件</div>
+          <div slot="tip" class="el-upload__tip">{{host.msg}}</div>
         </el-upload>
       </el-form-item>
       <el-form-item label="导入选项" prop="option">
@@ -74,7 +74,7 @@
             <el-tooltip effect="dark" content="已有主机管理列表中的条目不再保留，文件中的主机信息全量导入" placement="top">
               <i class="pointer el-icon-question"></i>
             </el-tooltip>
-          </el-radio> -->
+          </el-radio>-->
         </el-radio-group>
       </el-form-item>
     </el-form>
@@ -106,7 +106,7 @@ export default {
           '是否生产机器(y/n)': ''
         }
       ],
-      host: { provider: '', option: 'increment' },
+      host: { provider: '', option: 'increment', msg: '只能上传 xls/xlsx 文件' },
       rules: {
         provider: [{ required: true, message: '请选择提供商', trigger: 'blur' }]
       },
@@ -123,6 +123,21 @@ export default {
       const workbook = XLSX.read(data)
       const worksheet = workbook.Sheets[workbook.SheetNames[0]]
       const fileJson = XLSX.utils.sheet_to_json(worksheet)
+      if (fileJson.length > 1) {
+        const invalidItems = []
+        fileJson.forEach((element, index) => {
+          if (!element['主机名称'] || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(element['主机名称'])) {
+            invalidItems.push(index + 2)
+          }
+        })
+        if (invalidItems.length > 0) {
+          this.host.msg = `第 ${invalidItems.join(',')} 行主机名称不符合需求，请检查`
+        } else {
+          this.host.msg = '只能上传 xls/xlsx 文件'
+        }
+      } else {
+        this.host.msg = '模板文件不存在条目，请检查'
+      }
       this.fileJson = fileJson
     },
     onRemoveFile () {
@@ -171,12 +186,13 @@ export default {
           console.log(err)
         })
         if (res) {
-          this.host = { provider: '', method: 'override' }
+          this.host = { provider: '', option: 'increment', msg: '只能上传 xls/xlsx 文件' }
           this.$message({
             type: 'success',
             message: '导入主机信息成功'
           })
           this.$refs['file-uploader'].clearFiles()
+          this.uploadBtnDisabled = false
         } else {
           return Promise.reject()
         }
