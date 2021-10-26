@@ -52,7 +52,7 @@
           :on-remove="onRemoveFile"
         >
           <el-button :disabled="uploadBtnDisabled" style="width: 50%;" size="small" type="primary" plain>上传文件</el-button>
-          <div slot="tip" class="el-upload__tip">{{host.msg}}</div>
+          <div slot="tip" class="el-upload__tip" v-html="host.msg"></div>
         </el-upload>
       </el-form-item>
       <el-form-item label="导入选项" prop="option">
@@ -131,7 +131,7 @@ export default {
           }
         })
         if (invalidItems.length > 0) {
-          this.host.msg = `第 ${invalidItems.join(',')} 行主机名称不符合需求，请检查`
+          this.host.msg = `主机名称仅支持英文字母、数字、下划线且首个字符不以数字开头 <br> 第 ${invalidItems.join(',')} 行主机名称不符合需求，请检查`
         } else {
           this.host.msg = '只能上传 xls/xlsx 文件'
         }
@@ -216,7 +216,7 @@ export default {
     }
 
     .el-upload__tip {
-      line-height: 1;
+      line-height: 1.5;
     }
 
     .el-upload-list {
