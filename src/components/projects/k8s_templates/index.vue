@@ -1,5 +1,5 @@
 <template>
-  <div class="template-container">
+  <div class="dockerfile-template-container">
     <router-view></router-view>
   </div>
 </template>
@@ -13,19 +13,9 @@ export default {
       title: '模板库',
       routerList: [
         {
-          name: 'Chart',
-          url: `/v1/projects/template/charts`,
-          icon: 'iconfont iconhelmrepo'
-        },
-        {
-          name: 'Dockerfile',
+          name: 'Kubernetes 模板',
           url: `/v1/projects/template/dockerfiles`,
-          icon: 'iconfont icondocker'
-        },
-        {
-          name: 'Kubernetes',
-          url: `/v1/projects/template/k8s-yamls`,
-          icon: 'iconfont icondocker'
+          icon: 'iconfont iconhelmrepo'
         }
       ]
     })
@@ -34,7 +24,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.template-container {
+.dockerfile-template-container {
   display: flex;
   height: 100%;
   overflow: hidden;

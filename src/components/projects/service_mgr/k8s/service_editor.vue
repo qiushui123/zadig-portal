@@ -20,6 +20,7 @@
                       <i class="el-icon-question"></i>
                     </el-tooltip>
                   </el-checkbox>
+                  <el-button size="mini" type="text">从模板导入</el-button>
                 </div>
                 <div class="yaml-desc" v-show="!service.yaml">
                   请输入 Kubernetes YAML 配置
