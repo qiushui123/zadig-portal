@@ -54,6 +54,9 @@ export default {
   methods: {
     async getRoleBindings () {
       const res = await queryRoleBindings(this.projectName).catch(error => console.log(error))
+      if (res) {
+        this.members = res
+      }
     }
   },
   created () {

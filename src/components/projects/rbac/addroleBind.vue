@@ -7,6 +7,7 @@
           v-model="form.uids"
           filterable
           remote
+          multiple
           :remote-method="remoteMethod"
           :loading="getUsersLoading"
           size="small"
@@ -50,7 +51,7 @@ export default {
       },
       formRules: {
         uids: [
-          { type: 'string', required: true, message: '请选择用户', trigger: 'change' }
+          { type: 'array', required: true, message: '请选择用户', trigger: 'change' }
         ],
         name: [
           { type: 'string', required: true, message: '请选择角色', trigger: 'change' }
@@ -90,13 +91,16 @@ export default {
     async addMember () {
       const { uids, name } = this.form
       const role = this.rolesFiltered.find(item => item.name === name)
-      const payload = {
-        projectName: this.projectName,
-        name: uids + name,
-        uid: uids,
-        role: name,
-        public: role.isPublic ? role.isPublic : false
-      }
+      const payload = []
+      uids.forEach(uid => {
+        payload.push({
+          projectName: this.projectName,
+          name: uid + name,
+          uid: uid,
+          role: name,
+          public: role.isPublic ? role.isPublic : false
+        })
+      })
       const res = await addRoleBindings(payload).catch(error => cosnole.log(error))
       if (res) {
         this.$message({
