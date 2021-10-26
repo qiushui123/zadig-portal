@@ -61,7 +61,7 @@
     >
       <h3>YAML 模板</h3>
       <el-form :model="importYaml" @submit.native.prevent ref="importYamlForm">
-        <el-form-item :label="`${serviceInTree.status ==='added'? '新建服务':'更新服务'}`" label-width="80px" prop="port">
+        <el-form-item label="选择模板" label-width="80px" prop="id">
           <el-select style="width: 85%;" size="small" v-model="importYaml.id" placeholder="请选择模板" @change="getKubernetesTemplate">
             <el-option v-for="item in importYaml.yamls" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
