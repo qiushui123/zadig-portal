@@ -164,7 +164,9 @@ export default {
       )
       this.importLoading = false
       if (res) {
-        this.$message.success(`导入模板 ${payload.name} 成功`)
+        this.$message.success(
+          `${this.isUpdate ? '更新' : '新建'}服务 ${payload.name} 成功`
+        )
         this.dialogVisible = false
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
