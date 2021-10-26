@@ -11,21 +11,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getCurrentUserInfoAPI } from '@api'
 export default {
   methods: {
-    checkLogin () {
-      return new Promise((resolve, reject) => {
-        getCurrentUserInfoAPI().then(
-          response => {
-            resolve(true)
-          },
-          response => {
-            reject(false)
-          }
-        )
-      })
-    }
   },
   computed: {
     ...mapGetters([
@@ -34,15 +21,7 @@ export default {
   },
   created () {
     this.$store.dispatch('getSignupStatus').then(() => {
-      if (this.signupStatus.inited) {
-        this.checkLogin().then((result) => {
-          if (result) {
-            if (this.$utils.roleCheck() != null) {
-              this.$store.dispatch('getProductList')
-            }
-          }
-        })
-      } else {
+      if (!this.signupStatus.inited) {
         this.$router.push('/setup')
       }
     }).catch(() => {

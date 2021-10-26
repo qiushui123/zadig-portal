@@ -57,9 +57,6 @@
             <el-tag v-else
                     size="small"
                     type="primary">普通用户</el-tag>
-            <el-tag v-if="currentEditUserInfo.info.isTeamLeader"
-                    size="small"
-                    type="primary">团队管理员</el-tag>
 
           </div>
 
@@ -150,7 +147,7 @@
 <script>
 import bus from '@utils/event_bus'
 import supportDoc from './common/support_doc.vue'
-import { getCurrentUserInfoAPI, updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
+import { updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
 export default {
   data () {
     const validateNewPass = (rule, value, callback) => {
@@ -217,13 +214,6 @@ export default {
     }
   },
   methods: {
-    getUserInfo () {
-      this.loading = true
-      getCurrentUserInfoAPI().then((res) => {
-        this.loading = false
-        this.currentEditUserInfo = res
-      })
-    },
     getJwtToken () {
       getJwtTokenAPI().then((res) => {
         this.jwtToken = res.token
@@ -333,7 +323,6 @@ export default {
       title: '',
       routerList: []
     })
-    this.getUserInfo()
     this.getJwtToken()
     this.getSubscribe()
   },

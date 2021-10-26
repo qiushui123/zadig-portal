@@ -408,7 +408,6 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('getSignupStatus')
     if (this.isEdit) {
       this.getUsers()
       this.getProject(this.projectName)

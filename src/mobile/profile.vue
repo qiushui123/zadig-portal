@@ -40,9 +40,8 @@
 
 </template>
 <script>
-import storejs from '@node_modules/store/dist/store.legacy.js'
 import { NavBar, Tag, Panel, Loading, Button, Notify } from 'vant'
-import { getCurrentUserInfoAPI, getJwtTokenAPI } from '@api'
+import { getJwtTokenAPI } from '@api'
 export default {
   components: {
     [NavBar.name]: NavBar,
@@ -65,7 +64,6 @@ export default {
           phone: '',
           isAdmin: true,
           isSuperUser: false,
-          isTeamLeader: false,
           organization_id: 0,
           directory: 'system',
           teams: []
@@ -82,13 +80,6 @@ export default {
     }
   },
   methods: {
-    getUserInfo () {
-      this.loading = true
-      getCurrentUserInfoAPI().then((res) => {
-        this.loading = false
-        this.currentEditUserInfo = res
-      })
-    },
     getJwtToken () {
       getJwtTokenAPI().then((res) => {
         this.jwtToken = res.token
@@ -121,8 +112,6 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit('INJECT_PROFILE', storejs.get('ZADIG_LOGIN_INFO'))
-    this.getUserInfo()
     this.getJwtToken()
   }
 }

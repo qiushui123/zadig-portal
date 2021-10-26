@@ -1,5 +1,6 @@
 import storejs from '@node_modules/store/dist/store.legacy.js'
 import { isEmpty } from 'lodash'
+import store from '../store'
 
 const entitiesRegexp = /[&"'<>]/g
 const entityMap = {
@@ -332,15 +333,11 @@ const utils = {
    * @returns { admin:boolean,superAdmin:boolean}
    */
   roleCheck () {
-    const userinfo = storejs.get('ZADIG_LOGIN_INFO')
-    if (userinfo && userinfo.info) {
-      return {
-        /* DONOT USE ADMIN ROLE!!
+    return {
+      /* DONOT USE ADMIN ROLE!!
            admin role in system is deprecated now
            admin: userinfo.info.isAdmin, */
-        superAdmin: userinfo.info.isSuperUser,
-        teamLeader: userinfo.info.isTeamLeader
-      }
+      superAdmin: !!store.state.login.role.includes('admin')
     }
   },
   getUsername () {

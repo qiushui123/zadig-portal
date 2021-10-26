@@ -80,7 +80,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { userLoginAPI, getCurrentUserInfoAPI } from '@api'
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
 import ForgetPassword from './components/forgetPassword.vue'
@@ -120,36 +119,22 @@ export default {
   },
   methods: {
     login () {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(async (valid) => {
         if (valid) {
           this.loading = true
           const payload = {
             email: this.loginForm.username,
             password: this.loginForm.password
           }
-          const org_id = 1
-          userLoginAPI(org_id, payload).then((res) => {
-            this.$store.commit('INJECT_PROFILE', res)
-            this.$message({
-              message: '登录成功，欢迎 ' + this.$store.state.login.userinfo.info.name,
-              type: 'success'
-            })
-            this.redirectByDevice()
-          }, () => {
+          const res = await this.$store.dispatch('LOGIN', payload)
+          if (res) {
             this.loading = false
-          })
+            this.redirectByDevice()
+          }
         } else {
           return false
         }
       })
-    },
-    checkLogin () {
-      getCurrentUserInfoAPI().then(
-        response => {
-          this.$store.commit('INJECT_PROFILE', response)
-          this.redirectByDevice()
-        }
-      )
     },
     redirectByDevice () {
       if (isMobile) {
@@ -185,7 +170,7 @@ export default {
     }
   },
   mounted () {
-    this.checkLogin()
+    // this.checkLogin()
     if (this.signupStatus) {
       if (this.signupStatus.ssoInfo) {
         this.showSSOBtn = true

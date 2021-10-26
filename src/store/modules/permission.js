@@ -23,9 +23,7 @@ const actions = {
 }
 
 const mutations = {
-  [types.INJECT_PROFILE] (state, profile) {
 
-  }
 }
 
 export default {

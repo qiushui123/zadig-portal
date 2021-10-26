@@ -54,8 +54,9 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
-  config.headers.Authorization = 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjI4NjZmNDE0M2Q1NTEzOTg2MTZiNTMyM2NmZmYyOTRhZDU0NGQ4MmUifQ.eyJpc3MiOiJodHRwOi8vZGV4LnRlc3QuOHNsYW4uY29tL2RleCIsInN1YiI6IkNpUXdPR0U0TmpnMFlpMWtZamc0TFRSaU56TXRPVEJoT1MwelkyUXhOall4WmpVME5qWVNCV3h2WTJGcyIsImF1ZCI6ImV4YW1wbGUtYXBwIiwiZXhwIjoxNjM0NzExODA5LCJpYXQiOjE2MzQ2MjU0MDksImF0X2hhc2giOiJNYmx0VGtSd3hUOGxNdHhlc2xKMjFBIiwiY19oYXNoIjoiM19ZNERKSVc2M3E2eTBibG1MWm9fQSIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6ImFkbWluIn0.Zz5jUYD1_RWF-49u7CCJTpXS62RVr7jTQNPX7rF2JxLaz-CFEwftLPMm72B9_u4TDvgsMHh_CyFwLHZKiy_WaxLQXLCoVHDxCzdgj_R5Ez1OyXNtE7JJJnXFfxO9g2qwGBy-d3YSt4Pv96hjxEfO_NdW32PHLH8ieTVYbMuBSMgKCqs5UWMDQyKqVj4WH8LAkA9EBYaGQRlG6-xxmvWNNEp87fpoHVNUo51X4sU3Ih10G1f7NeshDpeZ2DR5QoyoYEAudpR21ccHIjZb-XoBsZDU_fmwW1XXbokG3a_w5MURWUZ8j4Nf3LkKmrDEV5yboEHmXOQ9MMRN3z_sJasG7g'
-
+  if (localStorage.getItem('userInfo')) {
+    config.headers.Authorization = 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
+  }
   return config
 })
 
@@ -596,13 +597,18 @@ export function createOrganizationInfoAPI (payload) {
   return http.post('/api/directory/organization', payload)
 }
 
-export function usersAPI (organization_id, team_id = '', page_size = 0, page_index = 0, keyword = '') {
-  return http.get(`/api/directory/userss/search?orgId=${organization_id}&teamId=${team_id}&per_page=${page_size}&page=${page_index}&keyword=${keyword}`)
+// User Management
+
+export function usersAPI (per_page, page, name = '') {
+  return http.get(`/api/v1/users?page=${page}&per_page=${per_page}&name=${name}`)
 }
 
-// User Management
-export function addUserAPI (organization_id, payload) {
-  return http.post(`/api/directory/user?orgId=${organization_id}`, payload)
+export function queryUserAPI (uid) {
+  return http.get(`/api/v1/users/${uid}`)
+}
+
+export function addUserAPI (payload) {
+  return http.post(`/api/v1/users`, payload)
 }
 
 export function editUserRoleAPI (payload) {
@@ -1065,20 +1071,14 @@ export function autoUpgradeEnvAPI (projectName, payload, force = '') {
 }
 
 // Login
-export function userLoginAPI (organization_id, payload) {
-  return http.post(`/api/directory/user/login?orgId=${organization_id}`, payload)
-}
-export function userLogoutAPI () {
-  return http.post('/api/directory/user/logout')
+export function userLoginAPI (payload) {
+  return http.post(`/login`, payload)
 }
 
 // Profile
-export function getCurrentUserInfoAPI () {
-  return http.get('/api/directory/user/detail')
-}
 
 export function updateCurrentUserInfoAPI (id, payload) {
-  return http.put(`/api/directory/user/${id}`, payload)
+  return http.put(`/api/v1/users/${id}/password`, payload)
 }
 
 export function getJwtTokenAPI () {
@@ -1248,4 +1248,20 @@ export function editWorkloads (payload) {
 
 export function queryPolicyDefinitions () {
   return http.get(`/api/v1/policy-definitions`)
+}
+
+export function addrole (payload) {
+  return http.post(`/api/v1/roles?projectName=${payload.projectName}`, payload)
+}
+
+export function queryrole (projectName) {
+  return http.get(`/api/v1/roles?projectName=${projectName}`)
+}
+
+export function deleterole (name, projectName) {
+  return http.delete(`/api/v1/roles/${name}?projectName=${projectName}`)
+}
+
+export function queryUserBindings (uid, projectName = '') {
+  return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
 }
