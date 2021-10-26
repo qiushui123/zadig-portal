@@ -282,14 +282,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.fileTree.setCurrentKey(key)
       })
-    },
-    listenResize () {
-      window.screenHeight = document.body.clientHeight
-      const fileTree = this.$refs.fileTree
-      const screenHeight = window.screenHeight - 400
-      this.$nextTick(() => {
-        fileTree.$el.style.maxHeight = screenHeight + 180 + 'px'
-      })
     }
   },
   computed: {
@@ -324,17 +316,8 @@ export default {
             this.$emit('onSelectFileChange', data)
           }
         })
-        this.$nextTick(() => {
-          this.listenResize()
-        })
       }
     }
-  },
-  mounted () {
-    window.addEventListener('resize', this.listenResize)
-  },
-  beforeDestroy () {
-    window.removeEventListener('resize', this.listenResize)
   },
   components: {
 
