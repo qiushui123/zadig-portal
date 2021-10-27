@@ -1250,9 +1250,18 @@ export function addrole (payload) { // 项目下添加角色
   return http.post(`/api/v1/roles?projectName=${payload.projectName}`, payload)
 }
 
+export function updaterole (payload) { // 项目下添加角色
+  return http.put(`/api/v1/roles/${payload.name}?projectName=${payload.projectName}`, payload)
+}
+
 export function queryrole (projectName) { // 查询项目中的角色
   return http.get(`/api/v1/roles?projectName=${projectName}`)
 }
+
+export function queryroleDetail (name, projectName) { // 查询项目中的某个角色详情
+  return http.get(`/api/v1/roles/${name}?projectName=${projectName}`)
+}
+
 export function queryPublicRole () { // 查询公共的角色
   return http.get(`/api/v1/public-roles`)
 }

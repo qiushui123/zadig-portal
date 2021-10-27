@@ -2,19 +2,19 @@
   <el-dialog class="form" title="添加角色" :visible.sync="dialogRoleAddFormVisible">
     <el-form ref="form" :model="form" :rules="formRules" >
       <el-form-item label="角色名称" prop="name" label-width="100px">
-        <el-input size="small" v-model="form.name"  placeholder="请输入角色名称"></el-input>
+        <el-input size="small" :disabled="isEdit" v-model="form.name"  placeholder="请输入角色名称"></el-input>
       </el-form-item>
       <el-form-item label="权限列表" prop="permissions" label-width="100px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
             :label="group.resource"
             :key="group.resource"
-            :value="calculatePermissionGroupsCheckedState(group.resource)"
-             @change="handlePermissionGroupChange(group.resource)"
-            :indeterminate="isIndeterminate(group.resource)"
+            :value="calculatePermissionGroupsCheckedState(group.rules)"
+             @change="handlePermissionGroupChange(group.rules)"
+            :indeterminate="isIndeterminate(group.resource,group.rules)"
           >{{group.alias}}</el-checkbox>
           <div class="sub-permissions">
-            <el-checkbox-group v-model="form.permissions[group.resource]">
+            <el-checkbox-group v-model="form.permissions">
               <div>
                 <el-checkbox
                   class="sub-permissions-checkbox"
@@ -35,69 +35,92 @@
   </el-dialog>
 </template>
 <script>
-import { queryPolicyDefinitions, addrole } from '@/api'
+import { queryPolicyDefinitions, addrole, queryroleDetail, updaterole } from '@/api'
 import * as permissionMap from '@/consts/permissionMap'
+import _ from 'lodash'
+
+const initFormData = {
+  name: '',
+  permissions: []
+}
+
+const resources = {
+  Workflow: false,
+  Environment: false,
+  Service: false,
+  Test: false,
+  Delivery: false
+}
 
 export default {
   name: 'addrole',
   props: {
     projectName: String,
+    currentRole: Object,
     getrole: Function
   },
   data () {
-    const permissionsValidator = (rule, value, callback) => {
-      const permissions = this.form.permissions
-      if (!permissions.Workflow.length && !permissions.Environment.length && !permissions.Service.length && !permissions.Test.length && !permissions.Delivery.length) {
-        callback(new Error('请选择至少一个权限'))
-      }
-      callback()
-    }
     return {
+      isEdit: false,
       dialogRoleAddFormVisible: false,
       permissionGroups: [],
       form: {
         name: '',
-        permissions: {
-          Workflow: [],
-          Environment: [],
-          Service: [],
-          Test: [],
-          Delivery: []
-        }
+        permissions: []
       },
       formRules: {
         name: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
         ],
         permissions: [
-          { validator: permissionsValidator, trigger: 'change' }
+          { type: 'array', required: true, message: '请选择至少一个权限', trigger: 'change' }
 
         ]
       }
     }
   },
   methods: {
-    handlePermissionGroupChange (resource) {
-      const permissonItem = this.permissionGroups.find(item => item.resource === resource)
-      if (this.form.permissions[resource].length === permissonItem.rules.length) {
-        this.form.permissions[resource] = []
-      } else {
-        this.form.permissions[resource] = permissonItem.rules.map(item => (item.action))
+    initNewForm () {
+      this.form = _.cloneDeep(initFormData)
+    },
+    async getroleDetail (role) {
+      const res = await queryroleDetail(role.name, this.projectName).catch(error => console.log(error))
+      res.rules.forEach(item => {
+        if (item.kind === 'resource') {
+          this.form.permissions = item.verbs
+        }
+      })
+    },
+    handlePermissionGroupChange (rules) {
+      for (let i = 0; i < rules.length; i++) {
+        if (this.form.permissions.includes(rules[i].action)) {
+          const index = this.form.permissions.indexOf(rules[i].action)
+          this.form.permissions.splice(index, 1)
+        } else {
+          const res = rules.map(item => (item.action))
+          this.form.permissions = _.uniq(this.form.permissions.concat(res))
+          return
+        }
       }
     },
-    calculatePermissionGroupsCheckedState (resource) {
-      const permissonItem = this.permissionGroups.find(item => item.resource === resource)
-      if (this.form.permissions[resource].length === permissonItem.rules.length) {
-        return true
+    calculatePermissionGroupsCheckedState (rules) {
+      for (const rule of rules) {
+        if (!this.form.permissions.includes(rule.action)) {
+          return false
+        }
       }
+      return true
+    },
+    isIndeterminate (resource, rules) {
+      for (const rule of rules) {
+        if (this.form.permissions.includes(rule.action)) {
+          resources[resource] = true
+          return true
+        }
+      }
+      resources[resource] = false
+
       return false
-    },
-    isIndeterminate (resource) {
-      if (this.form.permissions[resource].length) {
-        return true
-      } else {
-        return false
-      }
     },
     async getPolicyDefinitions () {
       const res = await queryPolicyDefinitions().catch(error => console.log(error))
@@ -107,27 +130,49 @@ export default {
     },
     async submit () {
       const res = await this.$refs.form.validate()
-      let verbs = []
-      const resources = []
+      const resource = []
+
+      Object.keys(resources).forEach(i => {
+        if (resources[i]) {
+          resource.push(i)
+        }
+      })
+
       let rules = []
       const frontResources = []
       if (res) {
-        Object.keys(this.form.permissions).forEach(key => {
-          if (this.form.permissions[key].length) {
-            resources.push(key)
-            verbs = verbs.concat(this.form.permissions[key])
-            this.form.permissions[key].forEach(item => {
-              frontResources.push(permissionMap[item])
-            })
-          }
+        this.form.permissions.forEach(key => {
+          frontResources.push(permissionMap[key])
         })
-        rules = [{ verbs: verbs, resources: resources, kind: 'resource' }, { verbs: ['VIEW'], resources: frontResources, kind: '' }]
-        const result = await addrole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
-        if (result) {
-          this.$message.success('添加成功')
-          this.dialogRoleAddFormVisible = false
-          this.getrole()
+        rules = [{ verbs: this.form.permissions, resources: resource, kind: 'resource' }, { verbs: ['VIEW'], resources: frontResources, kind: '' }]
+        if (this.isEdit) {
+          const result = await updaterole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          if (result) {
+            this.$message.success('修改成功')
+            this.dialogRoleAddFormVisible = false
+            this.getrole()
+          }
+        } else {
+          const result = await addrole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          if (result) {
+            this.$message.success('添加成功')
+            this.dialogRoleAddFormVisible = false
+            this.getrole()
+          }
         }
+      }
+    }
+  },
+  watch: {
+    dialogRoleAddFormVisible (value) {
+      if (value && this.currentRole) {
+        this.isEdit = true
+        this.getroleDetail(this.currentRole)
+        this.form.name = this.currentRole.name
+      } else {
+        this.isEdit = false
+
+        this.initNewForm()
       }
     }
   },

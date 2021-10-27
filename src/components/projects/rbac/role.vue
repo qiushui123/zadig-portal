@@ -2,7 +2,7 @@
   <div>
     <el-alert type="info" :closable="false" description="项目角色管理，主要用于定义项目的角色"></el-alert>
     <div class="sync-container">
-      <el-button plain size="small" @click="$refs['addrole'].dialogRoleAddFormVisible = true" type="primary">添加角色</el-button>
+      <el-button plain size="small" @click="addrole" type="primary">添加角色</el-button>
     </div>
 
     <el-table v-loading="loading" row-key="id" :data="roles" style="width: 100%;">
@@ -25,11 +25,12 @@
       </el-table-column> -->
       <el-table-column label="操作">
         <template slot-scope="scope">
+          <el-button @click="editrole(scope.row)"  size="mini" type="primary">编辑</el-button>
           <el-button @click="deleterole(scope.row.name)"  size="mini" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <Addrole :projectName="projectName" :getrole="getrole" ref="addrole" />
+    <Addrole :projectName="projectName" :currentRole="currentRole" :getrole="getrole" ref="addrole" />
   </div>
 </template>
 <script>
@@ -48,10 +49,19 @@ export default {
   data () {
     return {
       roles: [],
-      loading: false
+      loading: false,
+      currentRole: null
     }
   },
   methods: {
+    editrole (role) {
+      this.currentRole = role
+      this.$refs.addrole.dialogRoleAddFormVisible = true
+    },
+    addrole (role) {
+      this.currentRole = null
+      this.$refs.addrole.dialogRoleAddFormVisible = true
+    },
     async getrole () {
       this.loading = true
       const res = await queryrole(this.projectName).catch(error => console.log(error))
