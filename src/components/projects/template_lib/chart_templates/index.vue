@@ -86,7 +86,6 @@ export default {
       displayedFile: [],
       yamlSet: {},
       expandedKeys: [],
-      customVariables: [],
       systemVariables: []
     }
   },
@@ -96,6 +95,10 @@ export default {
     },
     serviceName () {
       return this.$route.query.service_name || ''
+    },
+    customVariables () {
+      const data = this.fileDataObj[this.serviceName]
+      return data ? data.variables : []
     }
   },
   methods: {
@@ -149,16 +152,21 @@ export default {
     },
     chartTemplateUpdate ({ deleteFlag, update, create, name }) {
       console.log('3: ', deleteFlag, update, create, name)
+
+      const fn = data => {
+        this.showFile({ data: data.children[0] })
+        this.updateSelectedService(data.name, data.fullPath)
+      }
+
       if (deleteFlag) {
         const id = this.fileData.findIndex(file => file.name === name)
         this.fileData.splice(id, 1)
         if (name === this.serviceName) {
-          const data = this.fileData[0]
-          this.showFile({ data: data.children[0] })
-          this.updateSelectedService(data.name, data.fullPath)
+          fn(this.fileData[0])
         }
         return
       }
+
       this.getChartTemplates().then(res => {
         if (update) {
           const id = this.fileData.findIndex(file => {
@@ -173,10 +181,9 @@ export default {
           const file = res.find(file => file.name === name)
           this.fileData.push(file)
         }
+
         this.getChartTemplateByName(name).then(() => {
-          const data = this.fileDataObj[name]
-          this.showFile({ data: data.children[0] })
-          this.updateSelectedService(data.name, data.fullPath)
+          fn(this.fileDataObj[name])
         })
       })
     },
@@ -204,7 +211,6 @@ export default {
           chartName: name,
           files: res.files
         })
-        this.customVariables = res.variables
         this.expandedKeys = [name]
       })
     },
