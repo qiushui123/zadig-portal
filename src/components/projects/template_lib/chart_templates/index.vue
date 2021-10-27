@@ -4,7 +4,7 @@
       <ImportChart v-model="chartDialogVisible" :chartCurrentService="currentService" @importChart="chartTemplateUpdate($event)"></ImportChart>
     </el-dialog>
     <multipane>
-      <div class="pane left" :style="{minWidth: '200px', width: '230px', maxWidth: '400px'}">
+      <div class="pane left" :style="{width: '200px', maxWidth: '400px'}">
         <div class="top">
           <el-button icon="el-icon-plus" circle size="mini" @click="chartDialogVisible = !chartDialogVisible"></el-button>
         </div>
@@ -25,7 +25,7 @@
         <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
-      <ModuleUse class="pane right" :style="{flexGrow: 1, minWidth: '372px'}"></ModuleUse>
+      <Aside class="pane right" :style="{flexGrow: 1, minWidth: '372px'}"></Aside>
     </multipane>
   </div>
 </template>
@@ -33,10 +33,12 @@
 <script>
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 import Codemirror from '@/components/projects/common/codemirror.vue'
-import ModuleUse from './module_use.vue'
+
 import Folder from './folder.vue'
 import ImportChart from './import_chart.vue'
 import PageNav from './page_nav.vue'
+import Aside from './aside.vue'
+
 import {
   getChartTemplatesAPI,
   getChartTemplateByNameAPI,
@@ -77,7 +79,9 @@ export default {
       fileData: [],
       displayedFile: [],
       yamlSet: {},
-      expandedKeys: []
+      expandedKeys: [],
+      variables: [],
+      systemVariables: []
     }
   },
   computed: {
@@ -152,7 +156,7 @@ export default {
     },
     getChartTemplates () {
       return getChartTemplatesAPI().then(res => {
-        const list = res.map(re => {
+        const list = res.chartTemplates.map(re => {
           return {
             ...re,
             is_chart: true,
@@ -161,6 +165,7 @@ export default {
             children: []
           }
         })
+        this.systemVariables = res.systemVariables
         return list
       })
     },
@@ -173,6 +178,7 @@ export default {
           chartName: name,
           files: res.files
         })
+        this.variables = res.variables
         this.expandedKeys = [name]
       })
     },
@@ -212,10 +218,10 @@ export default {
     Multipane,
     MultipaneResizer,
     Codemirror,
-    ModuleUse,
     Folder,
     ImportChart,
-    PageNav
+    PageNav,
+    Aside
   }
 }
 </script>
@@ -224,6 +230,7 @@ export default {
 .chart-template-container {
   width: 100%;
   height: 100%;
+  background-color: #f5f7f7;
 
   /deep/.multipane {
     width: 100%;
@@ -237,7 +244,7 @@ export default {
       &::before {
         position: absolute;
         top: 50%;
-        left: 50%;
+        left: 0;
         width: 8px;
         height: 56px;
         margin-top: -28px;
@@ -256,6 +263,9 @@ export default {
       }
 
       &.left {
+        margin-right: 10px;
+        background-color: #fff;
+
         .top {
           padding: 0 10px;
           text-align: right;
@@ -264,19 +274,12 @@ export default {
       }
 
       &.center {
-        background-color: #f5f7fa;
-        border-right: 1px solid #ebedef;
-        border-left: 1px solid #ebedef;
+        margin-right: 10px;
 
         .mirror {
           height: calc(~'100% - 50px');
           padding: 5px;
         }
-      }
-
-      &.right {
-        box-sizing: border-box;
-        padding: 10px 20px 20px;
       }
     }
   }
