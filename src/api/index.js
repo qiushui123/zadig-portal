@@ -1081,10 +1081,6 @@ export function updateCurrentUserInfoAPI (id, payload) {
   return http.put(`/api/v1/users/${id}/password`, payload)
 }
 
-export function getJwtTokenAPI () {
-  return http.get('/api/aslan/token')
-}
-
 export function getSubscribeAPI () {
   return http.get('/api/aslan/system/notification/subscribe')
 }
@@ -1266,6 +1262,10 @@ export function deleterole (name, projectName) { // 删除项目中的角色
 
 export function addRoleBindings (payload, projectName) { // 项目中用户添加角色
   return http.post(`/api/v1/rolebindings?projectName=${projectName}&bulk=true`, payload)
+}
+
+export function deleteroleBindings (name, projectName) { // 删除项目中的角色绑带
+  return http.delete(`/api/v1/rolebindings/${name}?projectName=${projectName}`)
 }
 
 export function queryRoleBindings (projectName) { // 查询项目中的角色

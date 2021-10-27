@@ -31,17 +31,18 @@
   </el-dialog>
 </template>
 <script>
-import { queryrole, usersAPI, addRoleBindings, queryPublicRole } from '@/api'
+import { usersAPI, addRoleBindings } from '@/api'
 
 export default {
   name: 'addroleBind',
   props: {
-    projectName: String
+    projectName: String,
+    rolesFiltered: Array,
+    getMembers: Function
   },
   data () {
     return {
       addUserFormVisible: false,
-      rolesFiltered: [],
       users: [],
       getUsersLoading: false,
 
@@ -60,16 +61,6 @@ export default {
     }
   },
   methods: {
-    async getrole () {
-      const res = await queryrole(this.projectName).catch(error => console.log(error))
-      const res1 = await queryPublicRole().catch(error => console.log(error))
-      if (res && res1) {
-        this.rolesFiltered = res
-        res1.forEach(item => {
-          this.rolesFiltered.push({ name: item.name, isPublic: true })
-        })
-      }
-    },
     submit () {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -107,14 +98,11 @@ export default {
           type: 'success'
         })
 
-        // await this.getMembers()
+        await this.getMembers()
 
         this.addUserFormVisible = false
       }
     }
-  },
-  mounted () {
-    this.getrole()
   }
 }
 </script>

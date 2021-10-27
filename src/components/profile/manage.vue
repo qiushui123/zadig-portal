@@ -147,7 +147,7 @@
 <script>
 import bus from '@utils/event_bus'
 import supportDoc from './common/support_doc.vue'
-import { updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
+import { updateCurrentUserInfoAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
 export default {
   data () {
     const validateNewPass = (rule, value, callback) => {
@@ -198,7 +198,7 @@ export default {
         confirmPassword: ''
       },
       jwtToken: null,
-      loading: true,
+      loading: false,
       modifiedPwdDialogVisible: false,
       sysNoti: {},
       pipelineNoti: {},
@@ -215,9 +215,7 @@ export default {
   },
   methods: {
     getJwtToken () {
-      getJwtTokenAPI().then((res) => {
-        this.jwtToken = res.token
-      })
+      this.jwtToken = JSON.parse(localStorage.getItem('userInfo')).token
     },
     copySuccess (event) {
       this.$message({

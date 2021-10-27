@@ -41,7 +41,6 @@
 </template>
 <script>
 import { NavBar, Tag, Panel, Loading, Button, Notify } from 'vant'
-import { getJwtTokenAPI } from '@api'
 export default {
   components: {
     [NavBar.name]: NavBar,
@@ -53,7 +52,7 @@ export default {
   },
   data () {
     return {
-      loading: true,
+      loading: false,
       jwtToken: null,
       currentEditUserInfo: {
         info: {
@@ -81,9 +80,7 @@ export default {
   },
   methods: {
     getJwtToken () {
-      getJwtTokenAPI().then((res) => {
-        this.jwtToken = res.token
-      })
+      this.jwtToken = JSON.parse(localStorage.getItem('userInfo')).token
     },
     logout () {
       localStorage.removeItem('token')
