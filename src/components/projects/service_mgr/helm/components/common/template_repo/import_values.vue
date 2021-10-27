@@ -2,13 +2,13 @@
   <div class="values-outer">
     <h4 style="padding-left: 40px;">values 文件</h4>
     <el-form-item label-width="0px">
-      <Repertory ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" substantial></Repertory>
+      <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig" substantial></Repository>
     </el-form-item>
   </div>
 </template>
 
 <script>
-import Repertory from '@/components/projects/common/import_values/repertory.vue'
+import Repository from '@/components/projects/common/import_values/repository.vue'
 import { cloneDeep } from 'lodash'
 
 const valueInfo = {
@@ -43,7 +43,7 @@ export default {
     }
   },
   components: {
-    Repertory
+    Repository
   }
 }
 </script>

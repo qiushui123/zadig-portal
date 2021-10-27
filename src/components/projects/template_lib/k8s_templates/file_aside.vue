@@ -1,180 +1,172 @@
 <template>
-  <div class="helm-aside-container">
-    <div class="pipelines__aside-right--resizable">
-    </div>
+  <div class="aside__wrap">
     <div class="aside__inner">
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
           <div class="tabs__item"
-               :class="{'selected': selected === 'var'}"
+               :class="{'selected': $route.query.rightbar === 'var'}"
                @click="changeRoute('var')">
-            <span class="step-name">镜像更新</span>
+            <span class="step-name">变量</span>
           </div>
           <div class="tabs__item"
-               :class="{'selected': selected === 'help'}"
-               @click="changeRoute('help')">
-            <span class="step-name">帮助</span>
+               :class="{'selected': $route.query.rightbar === 'reference'}"
+               @click="changeRoute('reference')">
+            <span class="step-name">引用列表</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
-        <div v-if="selected === 'var'"
+        <div v-if="$route.query.rightbar === 'reference'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
-            <div class="pipeline-workflow-box__title">镜像更新</div>
+            <div class="pipeline-workflow-box__title">引用列表</div>
           </header>
-         <div class="pipeline-workflow-box__content">
-          <section>
-              <h4>
-                <span><i class="iconfont iconfuwu"></i></span> 检测到的服务组件
-                <el-tooltip effect="dark"
-                            placement="top">
-                  <div slot="content">values.yaml 中可被更新的镜像</div>
-                  <span><i class="el-icon-question"></i></span>
-                </el-tooltip>
-                <el-button type="text" size="small" @click="updateMatchRuleFlag = true">更新匹配规则</el-button>
-              </h4>
-              <!-- <div v-if="allRegistry.length === 0"
-                   class="registry-alert">
-                <el-alert title="私有镜像仓库未集成，请联系系统管理员前往「系统设置 -> 镜像仓库」进行集成"
-                          type="warning">
-                </el-alert>
-              </div> -->
-              <el-table :data="serviceModules"
+          <div class="pipeline-workflow-box__content">
+            <section>
+              <el-table :data="referenceList"
                         stripe
                         style="width: 100%;">
-                <el-table-column prop="name"
-                                 label="服务组件">
+                <el-table-column prop="project_name"
+                                 label="项目">
                 </el-table-column>
-                <el-table-column prop="image"
-                                 label="当前镜像版本">
-                </el-table-column>
-                <el-table-column label="构建信息/操作">
+                <el-table-column prop="value"
+                                 label="服务名称">
                   <template slot-scope="scope">
-                    <!-- <router-link v-if="scope.row.build_name"
-                                 :to="`${buildBaseUrl}?rightbar=build&service_name=${scope.row.name}&build_name=${scope.row.build_name}`"> -->
-                      <el-button size="small"  v-if="scope.row.build_name"  @click="editBuild(scope.row.name, scope.row.build_name)"
-                                 type="text">{{scope.row.build_name}}</el-button>
-                    <!-- </router-link> -->
-                    <!-- <router-link v-else
-                                 :to="`${buildBaseUrl}?rightbar=build&service_name=${scope.row.name}&build_add=true`"> -->
-                      <el-button size="small"  v-else
-                                 type="text" @click="addBuild(scope.row.name)">添加构建</el-button>
-                    <!-- </router-link> -->
-
+                    <router-link v-if="scope.row.service_name" :to="`/v1/projects/detail/${scope.row.project_name}/services?service_name=${scope.row.service_name}&rightbar=var`">{{scope.row.service_name}}</router-link>
+                    <span v-else>空</span>
                   </template>
-
                 </el-table-column>
               </el-table>
             </section>
          </div>
-          <!-- <div class="pipeline-workflow-box__content" v-if="showBuild">
-            <build ref="buildRef"
-                   :serviceName="serviceName"
-                   :name="name"
-                   :buildName="buildName"
-                   :isEdit="isEdit"
-                   :getServiceModules="getServiceModules"
-                   ></build>
-          </div> -->
         </div>
-        <div v-else-if="selected === 'help'"
+        <div v-if="$route.query.rightbar === 'var'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
-            <div class="pipeline-workflow-box__title">帮助</div>
+            <div class="pipeline-workflow-box__title">变量列表</div>
           </header>
-          <div class="pipelines-aside-help__content">
-            <help></help>
+          <div class="pipeline-workflow-box__content">
+            <section>
+              <h4>
+                <span><i class="iconfont iconfuwu"></i></span> 系统内置变量
+              </h4>
+              <el-table :data="systemVariables"
+                        stripe
+                        style="width: 100%;">
+                <el-table-column prop="key"
+                                 label="Key">
+                </el-table-column>
+                <el-table-column prop="description"
+                                 label="描述">
+                  <template slot-scope="scope">
+                    <span v-if="scope.row.description">{{scope.row.description}}</span>
+                    <span v-else>空</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </section>
+            <section>
+              <h4>
+                <span><i class="iconfont icontanhao"></i></span> 自定义变量
+                <el-tooltip effect="dark"
+                            :content="'自定义变量通过'+' {{'+'.key}} ' +' 声明'"
+                            placement="top">
+                  <span><i class="el-icon-question"></i></span>
+                </el-tooltip>
+              </h4>
+              <div class="kv-container">
+                <el-table :data="fileContent.variable"
+                          style="width: 100%;">
+                  <el-table-column label="Key">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.key }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="Value">
+                    <template slot-scope="scope">
+                      <el-input size="small"
+                                v-model="scope.row.value"
+                                type="textarea"
+                                :autosize="{ minRows: 1, maxRows: 4}"
+                                placeholder="请输入 Value"></el-input>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </section>
+
           </div>
         </div>
       </div>
     </div>
-    <MatchRule :value.sync="updateMatchRuleFlag"></MatchRule>
   </div>
 </template>
 <script>
-import qs from 'qs'
-import bus from '@utils/event_bus'
-import { mapState } from 'vuex'
-import help from './help.vue'
-import MatchRule from './match_rule.vue'
+import { getKubernetesTemplateBuildReferenceAPI } from '@api'
 export default {
-  props: {
-    changeExpandFileList: Function
-  },
   data () {
     return {
-      allRegistry: [],
-      chartValues: [],
-      detectedServices: [],
-      showBuild: false,
-      serviceName: null,
-      name: null,
-      buildName: null,
-      isEdit: false,
-      updateMatchRuleFlag: false
+      referenceList: []
     }
   },
   methods: {
-    addBuild (name) {
-      const item = {
-        id: name,
-        type: 'components',
-        componentsName: 'Build',
-        label: '新增构建',
-        name: name,
-        isEdit: false
+    async getBuildReference () {
+      if (this.fileContent && this.fileContent.status === 'added') {
+        const res = await getKubernetesTemplateBuildReferenceAPI(
+          this.fileContent.id
+        ).catch(err => {
+          console.log(err)
+        })
+        if (res) {
+          this.referenceList = res
+        }
       }
-      this.changeExpandFileList('add', item)
-    },
-    editBuild (name, buildName) {
-      const item = {
-        id: name,
-        type: 'components',
-        componentsName: 'Build',
-        label: '修改构建',
-        name: name,
-        isEdit: true,
-        buildName: buildName
-      }
-      this.changeExpandFileList('add', item)
     },
     changeRoute (step) {
       this.$router.replace({
         query: Object.assign(
           {},
-          qs.parse(window.location.search, { ignoreQueryPrefix: true }),
+          this.$route.query,
           {
             rightbar: step
           })
       })
     }
   },
-  beforeDestroy () {
-    bus.$off('save-var')
-  },
-  computed: {
-    projectName () {
-      return this.$route.params.project_name
+  props: {
+    fileContent: {
+      required: true,
+      type: Object
     },
-    ...mapState({
-      serviceModules: (state) => state.service_manage.serviceModules
-    }),
-    serviceType () {
-      return this.service.type
-    },
-    selected () {
-      return this.$route.query.rightbar || 'var'
+    systemVariables: {
+      required: true,
+      type: Array
     }
+
   },
-  components: {
-    help,
-    MatchRule
+  watch: {
+    fileContent: {
+      handler (val, old_val) {
+        if (val) {
+          this.getBuildReference(val.id)
+        }
+      },
+      immediate: false
+    },
+    'fileContent.variable': {
+      handler (val, old_val) {
+        if (val) {
+          this.$emit('update:variables', val)
+        }
+      },
+      immediate: false
+    }
+
   }
 }
 </script>
 <style lang="less">
-.helm-aside-container {
+.aside__wrap {
   position: relative;
   display: flex;
   -webkit-box-flex: 1;
@@ -331,6 +323,8 @@ export default {
 
         .pipeline-workflow-box__content {
           flex-grow: 1;
+          overflow-x: hidden;
+          overflow-y: auto;
           -webkit-box-flex: 1;
           -ms-flex-positive: 1;
 
@@ -353,32 +347,25 @@ export default {
         }
 
         .pipelines-aside-help__content {
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
           -ms-flex: 1;
           flex: 1;
+          -ms-flex-direction: column;
           flex-direction: column;
           height: 100%;
           padding: 0 20px 10px 20px;
           overflow-y: auto;
           -webkit-box-flex: 1;
+          -webkit-box-orient: vertical;
+          -webkit-box-direction: normal;
         }
       }
 
       .btn-container {
         padding: 0 10px 10px 10px;
         box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.05);
-
-        .save-btn {
-          padding: 10px 17px;
-          color: #fff;
-          font-weight: bold;
-          font-size: 13px;
-          text-decoration: none;
-          background-color: #1989fa;
-          border: 1px solid #1989fa;
-          cursor: pointer;
-          transition: background-color 300ms, color 300ms, border 300ms;
-        }
       }
     }
 
@@ -400,14 +387,11 @@ export default {
           display: flex;
           align-items: center;
           margin-bottom: -1px;
-          padding: 17px 30px;
           padding: 20px 17px;
-          color: #4c4c4c;
           color: #000;
           font-size: 13px;
           text-transform: uppercase;
           text-orientation: mixed;
-          background-color: transparent;
           background-color: #f5f5f5;
           border: none;
           border-top: 1px solid transparent;

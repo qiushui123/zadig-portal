@@ -10,7 +10,7 @@
       <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml"></codemirror>
     </Resize>
     <el-dialog title="从 Git 仓库导入" :visible.sync="showGitImportDialog" append-to-body>
-      <Repertory ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig"></Repertory>
+      <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig"></Repository>
       <div slot="footer">
         <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
         <el-button type="primary" @click="importOverrideYaml" size="small" :loading="loadValueYamls">导 入</el-button>
@@ -22,7 +22,7 @@
 <script>
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
-import Repertory from './repertory.vue'
+import Repository from './repository.vue'
 import { cloneDeep } from 'lodash'
 import { getValuesYamlFromGitAPI } from '@api'
 
@@ -113,7 +113,7 @@ export default {
   components: {
     Codemirror,
     Resize,
-    Repertory
+    Repository
   }
 }
 </script>

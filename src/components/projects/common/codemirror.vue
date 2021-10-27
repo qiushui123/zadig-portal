@@ -8,6 +8,7 @@
 import { codemirror } from 'vue-codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/mode/yaml/yaml'
+import 'codemirror/mode/dockerfile/dockerfile'
 import 'codemirror/theme/neo.css'
 import { debounce } from 'lodash'
 const options = {

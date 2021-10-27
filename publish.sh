@@ -13,7 +13,7 @@ yarn install --ignore-engines
 
 yarn run build
 
-docker build --rm=true -t ccr.ccs.tencentyun.com/koderover-rc/zadig-portal:$version -f Dockerfile .
+docker build --rm=true -t ccr.ccs.tencentyun.com/koderover-rc/zadig-portal:$version -f amd64.Dockerfile .
 
 docker push ccr.ccs.tencentyun.com/koderover-rc/zadig-portal:$version
 

@@ -1,6 +1,6 @@
 
 <template>
-  <el-card class="repertory-container" v-loading="loading">
+  <el-card class="repository-container" v-loading="loading">
     <el-alert type="warning" :closable="false" v-if="!checkOne">提示：一份 values 文件会被定义成一个服务，服务名称即为 values 文件名称。</el-alert>
     <el-tree
       ref="tree"
@@ -118,7 +118,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.repertory-container {
+.repository-container {
   margin-top: -25px;
 }
 
