@@ -9,6 +9,7 @@
           <el-button icon="el-icon-plus" circle size="mini" @click="chartDialogVisible = !chartDialogVisible"></el-button>
         </div>
         <Folder
+          ref="folderRef"
           v-if="fileData.length"
           :fileData="fileData"
           :expandedKeys="expandedKeys"
@@ -25,7 +26,12 @@
         <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
-      <Aside class="pane right" :style="{flexGrow: 1, minWidth: '372px'}"></Aside>
+      <Aside
+        class="pane right"
+        :style="{flexGrow: 1, minWidth: '372px'}"
+        :systemVariables="systemVariables"
+        :customVariables="customVariables"
+      ></Aside>
     </multipane>
   </div>
 </template>
@@ -80,17 +86,29 @@ export default {
       displayedFile: [],
       yamlSet: {},
       expandedKeys: [],
-      variables: [],
+      customVariables: [],
       systemVariables: []
     }
   },
   computed: {
     fileDataObj () {
       return keyBy(this.fileData, 'name')
+    },
+    serviceName () {
+      return this.$route.query.service_name || ''
     }
   },
   methods: {
+    updateSelectedService (serviceName, nodeKey = '') {
+      this.$router.replace({
+        query: {
+          service_name: serviceName
+        }
+      })
+      if (nodeKey) this.$refs.folderRef.setFileSelected(nodeKey)
+    },
     handleFileClick (data) {
+      this.updateSelectedService(data.chartName || data.name)
       if (data.is_chart) {
         // 请求 chart 目录文件
         this.getChartTemplateByName(data.name)
@@ -130,9 +148,15 @@ export default {
       }
     },
     chartTemplateUpdate ({ deleteFlag, update, create, name }) {
+      console.log('3: ', deleteFlag, update, create, name)
       if (deleteFlag) {
         const id = this.fileData.findIndex(file => file.name === name)
         this.fileData.splice(id, 1)
+        if (name === this.serviceName) {
+          const data = this.fileData[0]
+          this.showFile({ data: data.children[0] })
+          this.updateSelectedService(data.name, data.fullPath)
+        }
         return
       }
       this.getChartTemplates().then(res => {
@@ -150,7 +174,9 @@ export default {
           this.fileData.push(file)
         }
         this.getChartTemplateByName(name).then(() => {
-          this.showFile({ data: this.fileDataObj[name].children[0] })
+          const data = this.fileDataObj[name]
+          this.showFile({ data: data.children[0] })
+          this.updateSelectedService(data.name, data.fullPath)
         })
       })
     },
@@ -178,7 +204,7 @@ export default {
           chartName: name,
           files: res.files
         })
-        this.variables = res.variables
+        this.customVariables = res.variables
         this.expandedKeys = [name]
       })
     },
@@ -210,6 +236,9 @@ export default {
         const name = res[0].name
         this.getChartTemplateByName(name).then(() => {
           this.showFile({ data: this.fileDataObj[name].children[0] })
+        })
+        this.$nextTick(() => {
+          this.updateSelectedService(name, res[0].fullPath)
         })
       }
     })

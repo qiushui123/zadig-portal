@@ -6,7 +6,7 @@
     </div>
     <div class="aside-content">
       <ModuleUse v-if="selected === 'quote'"></ModuleUse>
-      <VariableList v-if="selected === 'var'"></VariableList>
+      <VariableList v-if="selected === 'var'" :systemVariables="systemVariables" :customVariables="customVariables"></VariableList>
     </div>
   </div>
 </template>
@@ -18,6 +18,16 @@ export default {
   data () {
     return {
       selected: 'var'
+    }
+  },
+  props: {
+    systemVariables: {
+      require: true,
+      type: Array
+    },
+    customVariables: {
+      require: true,
+      type: Array
     }
   },
   components: {

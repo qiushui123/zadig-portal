@@ -1,6 +1,14 @@
 <template>
   <div class="folder-container">
-    <el-tree :data="fileData" :props="defaultProps" @node-click="handleNodeClick" :default-expanded-keys="expandedKeys" node-key="fullPath">
+    <el-tree
+      ref="treeRef"
+      :data="fileData"
+      :props="defaultProps"
+      @node-click="handleNodeClick"
+      :default-expanded-keys="expandedKeys"
+      node-key="fullPath"
+      highlight-current
+    >
       <span slot-scope="{data}">
         <i class="icon el-icon-document" v-if="!data.is_dir"></i>
         <i class="icon el-icon-folder" v-else></i>
@@ -42,7 +50,17 @@ export default {
       }
     }
   },
+  computed: {
+    serviceName () {
+      return this.$route.query.service_name || ''
+    }
+  },
   methods: {
+    setFileSelected (key) {
+      this.$nextTick(() => {
+        this.$refs.treeRef.setCurrentKey(key)
+      })
+    },
     handleNodeClick (data) {
       this.$emit('clickFile', data)
     },
@@ -103,6 +121,10 @@ export default {
         }
       }
     }
+  }
+
+  /deep/.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #1989fa33;
   }
 }
 </style>
