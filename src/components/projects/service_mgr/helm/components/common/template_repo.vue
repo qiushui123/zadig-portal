@@ -3,7 +3,7 @@
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <h4 class="flex-center" style="padding-left: 40px;">
         <span>Chart 模板</span>
-        <el-button type="text" @click="triggerSubstantial" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
+        <el-button type="text" @click="triggerSubstantial(substantial)" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
       </h4>
       <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
@@ -85,12 +85,7 @@ export default {
       substantial: false,
       importLoading: false,
       isUpdate: false,
-      variables: [
-        {
-          key: 'test',
-          value: 'test1'
-        }
-      ]
+      variables: []
     }
   },
   props: {
@@ -145,9 +140,9 @@ export default {
           this.variables = []
         })
     },
-    triggerSubstantial () {
-      this.substantial = !this.substantial
+    triggerSubstantial (substantial) {
       this.closeSelectRepo()
+      this.substantial = !substantial
     },
     closeSelectRepo () {
       this.tempData = {
@@ -160,6 +155,7 @@ export default {
         overrideYaml: '',
         gitRepoConfig: null
       }
+      this.substantial = false
       this.$refs.tempForm.clearValidate()
       this.$refs.importValues && this.$refs.importValues.resetValueRepoInfo()
     },
@@ -255,9 +251,12 @@ export default {
       }
     },
     async importTempRepo () {
-      const valid1 = await this.$refs.importValues
-        .validate()
-        .catch(err => console.log(err))
+      let valid1 = true
+      if (this.$refs.importValues) {
+        valid1 = await this.$refs.importValues
+          .validate()
+          .catch(err => console.log(err))
+      }
       const valid2 = await this.$refs.tempForm.validate().catch(err => {
         console.log(err)
       })
@@ -317,6 +316,7 @@ export default {
     .variable-row {
       display: flex;
       align-items: center;
+      padding: 5px 0;
 
       .row-left {
         width: 78px;

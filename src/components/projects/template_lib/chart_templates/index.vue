@@ -98,7 +98,7 @@ export default {
     },
     customVariables () {
       const data = this.fileDataObj[this.serviceName]
-      return data ? data.variables : []
+      return data ? data.variables || [] : []
     }
   },
   methods: {
@@ -151,8 +151,6 @@ export default {
       }
     },
     chartTemplateUpdate ({ deleteFlag, update, create, name }) {
-      console.log('3: ', deleteFlag, update, create, name)
-
       const fn = data => {
         this.showFile({ data: data.children[0] })
         this.updateSelectedService(data.name, data.fullPath)
@@ -211,6 +209,7 @@ export default {
           chartName: name,
           files: res.files
         })
+        this.$set(this.fileDataObj[name], 'variables', res.variables || [])
         this.expandedKeys = [name]
       })
     },
