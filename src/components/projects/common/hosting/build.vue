@@ -535,7 +535,8 @@
                 true，表示在 Zadig 系统上执行脚本<br>
                 &lt;REPONAME&gt;_PR 构建过程中指定代码仓库使用的 Pull Request 信息<br>
                 &lt;REPONAME&gt;_BRANCH 构建过程中指定代码仓库使用的分支信息<br>
-                &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用 Tag 信息
+                &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用 Tag 信息<br>
+                &lt;REPONAME&gt;_COMMIT_ID 构建过程中指定代码的 commit 信息
               </div>
               <span class="variable">变量</span>
             </el-tooltip>
@@ -543,13 +544,12 @@
             <el-row>
               <el-col class="deploy-script" :span="24">
                 <Resize :height="'150px'">
-                  <editor
+                  <Editor
                     v-model="buildConfig.scripts"
                     lang="sh"
                     theme="xcode"
-                    :options="editorOption"
                     width="100%"
-                    height="100%"></editor>
+                    height="100%"></Editor>
                 </Resize>
               </el-col>
             </el-row>
@@ -652,14 +652,13 @@
               <div class="divider item"></div>
               <el-row>
                 <el-col :span="24">
-                  <editor
+                  <Editor
                     v-model="buildConfig.post_build.scripts"
                     lang="sh"
                     theme="xcode"
-                    :options="editorOption"
                     width="100%"
                     height="300px"
-                  ></editor>
+                  ></Editor>
                 </el-col>
               </el-row>
             </div>
@@ -822,7 +821,7 @@ import {
   getServiceTargetsAPI,
   queryJenkinsJob, queryJenkinsParams
 } from '@api'
-import aceEditor from 'vue2-ace-bind'
+import Editor from 'vue2-ace-bind'
 import Resize from '@/components/common/resize.vue'
 const validateBuildConfigName = (rule, value, callback) => {
   if (value === '') {
@@ -855,7 +854,6 @@ export default {
       }],
       jenkinsJobList: [],
       jenkinsBuild: {
-        version: 'stable',
         name: '',
         desc: '',
         targets: [],
@@ -871,7 +869,6 @@ export default {
       },
       buildConfig: {
         timeout: 60,
-        version: 'stable',
         name: '',
         desc: '',
         repos: [],
@@ -891,14 +888,6 @@ export default {
         main_file: '',
         post_build: {}
       },
-      editorOption: {
-        enableEmmet: true,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-        showGutter: false,
-        displayIndentGuides: false,
-        showPrintMargin: false
-      },
       stcov_enabled: false,
       docker_enabled: false,
       binary_enabled: false,
@@ -907,10 +896,6 @@ export default {
       allApps: [],
       serviceTargets: [],
       allCodeHosts: [],
-      syncConfig: {
-        name: this.buildConfigName,
-        version: ''
-      },
       showBuildAdvancedSetting: {},
       createRules: {
         name: [
@@ -980,9 +965,6 @@ export default {
       return services.filter(element => {
         return (!(flattenDeep(existServices).includes(element.service_name)))
       })
-    },
-    clearSelectVersion (index) {
-      this.buildConfig.pre_build.installs[index].version = ''
     },
     addFirstCacheDir () {
       if (!this.buildConfig.caches || this.buildConfig.caches.length === 0) {
@@ -1252,7 +1234,6 @@ export default {
       if (this.isEdit) {
         getBuildConfigDetailAPI(
           this.buildName,
-          this.buildConfigVersion,
           this.projectName
         ).then((response) => {
           response.pre_build.installs.forEach((element) => {
@@ -1318,9 +1299,6 @@ export default {
     buildAdd () {
       return this.$route.query.build_add ? this.$route.query.build_add : false
     },
-    buildConfigVersion () {
-      return 'stable'
-    },
     currentOrganizationId () {
       return this.$store.state.login.userinfo.organization.id
     },
@@ -1353,7 +1331,7 @@ export default {
     }
   },
   components: {
-    editor: aceEditor,
+    Editor,
     Resize
   }
 }

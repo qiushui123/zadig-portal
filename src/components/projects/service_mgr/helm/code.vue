@@ -78,13 +78,13 @@
       </div>
       <multipane-resizer class="resizer2" v-if="service && service.length"></multipane-resizer>
 
-      <div :style="{ flexGrow: 1 }" class="right">
+      <div :style="{ flexGrow: 1, minWidth: '372px' }" class="right">
         <ServiceAside :changeExpandFileList="changeExpandFileList" ref="aside" slot="aside" :isCreate="isCreate" />
         <!-- 右侧aside -->
       </div>
     </multipane>
     <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
-    <el-dialog title="新建服务" :visible.sync="dialogVisible" center @close="closeSelectRepo">
+    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible.sync="dialogVisible" center @close="closeSelectRepo">
       <Repo
         ref="repo"
         @triggleAction="changeExpandFileList('clear');clearCommitCache()"
@@ -278,7 +278,9 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
-        this.handleChartNames([{ serviceName: currentData.service_name, type: 'delete' }])
+        this.handleChartNames([
+          { serviceName: currentData.service_name, type: 'delete' }
+        ])
         deleteServiceTemplateAPI(
           currentData.service_name,
           'helm',
@@ -434,7 +436,7 @@ export default {
     },
     envNameList () {
       const envNameList = []
-      this.productList.forEach((element) => {
+      this.productList.forEach(element => {
         if (element.product_name === this.projectName) {
           envNameList.push({
             envName: element.env_name

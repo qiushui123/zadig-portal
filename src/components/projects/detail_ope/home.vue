@@ -19,13 +19,13 @@
                 <i class="el-icon-s-fold"></i>
                 <span class="add-filter-value-title">列表模式</span>
               </button>
-              <!-- <button type="button"
-                      @click="$router.push(`/v1/projects/chart/charts`)"
+              <button type="button"
+                      @click="$router.push(`/v1/projects/template/charts`)"
                       style="margin-left: 10px; border-radius: 20px;"
                       class="display-btn">
                 <i class="iconfont iconicon-repertory" style="font-size: 13px;"></i>
                 <span class="add-filter-value-title">模板库</span>
-              </button> -->
+              </button>
             </div>
           </div>
         </div>
@@ -178,16 +178,14 @@
 </template>
 <script>
 import bus from '@utils/event_bus'
-import { getProjectsAPI, getBuildConfigsAPI, getSingleProjectAPI, deleteProjectAPI } from '@api'
-import _ from 'lodash'
-import { mapGetters } from 'vuex'
+import { getProjectsAPI, listWorkflowAPI, getProductsAPI, getBuildConfigsAPI, getSingleProjectAPI, deleteProjectAPI } from '@api'
+import { flattenDeep } from 'lodash'
 export default {
   data () {
     return {
       projects: [],
       loading: false,
-      currentTab: 'grid',
-      currentProjectName: ''
+      currentTab: 'grid'
     }
   },
   methods: {
@@ -203,9 +201,6 @@ export default {
     toProject (project) {
       this.$router.push(`/v1/projects/detail/${project.product_name}`)
     },
-    exitGuideModal () {
-      this.$intro().exit()
-    },
     handleCommand (command) {
       if (command.action === 'delete') {
         this.deleteProject(command.project_name)
@@ -213,71 +208,54 @@ export default {
         this.$router.push(`/v1/projects/edit/${command.project_name}`)
       }
     },
-    deleteProject (projectName) {
-      let services; let buildConfigs; let allWorkflows = []
-      const workflows = (this.workflowList.filter(w => w.product_tmpl_name === projectName)).map((element) => { return element.name })
-      const envNames = (this.productList.filter(p => p.product_name === projectName)).map((element) => { return element.env_name })
-      allWorkflows = workflows
-      getSingleProjectAPI(projectName).then((res) => {
-        services = _.flattenDeep(res.services)
-      }).then(() => {
-        getBuildConfigsAPI(projectName).then((res) => {
-          buildConfigs = res.map((element) => { return element.name })
-          const htmlTemplate = `
-      <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
-      <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
-      <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
-      <span><b>工作流：</b>${allWorkflows.length > 0 ? allWorkflows.join(', ') : '无'}</span>
-      `
-          this.$prompt(`该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br> ${htmlTemplate}`, `请输入项目名 ${projectName} 确认删除`, {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            dangerouslyUseHTMLString: true,
-            customClass: 'product-prompt',
-            confirmButtonClass: 'el-button el-button--danger',
-            inputValidator: project_name => {
-              if (project_name === projectName) {
-                return true
-              } else if (project_name === '') {
-                return '请输入项目名'
-              } else {
-                return '项目名不相符'
-              }
-            }
-          })
-            .then(({ value }) => {
-              deleteProjectAPI(projectName).then(
-                response => {
-                  this.$message({
-
-                    type: 'success',
-                    message: '项目删除成功'
-                  })
-                  this.getProjects()
-                }
-              )
-            })
-            .catch(() => {
-              this.$message({
-                type: 'info',
-                message: '取消删除'
-              })
-            })
-        })
+    async deleteProject (projectName) {
+      const result = await Promise.all([listWorkflowAPI(), getProductsAPI(projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
+      const workflows = result[0].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
+      const envNames = result[1].map((element) => { return element.name })
+      const services = flattenDeep(result[2].services)
+      const buildConfigs = result[3].map((element) => { return element.name })
+      const htmlTemplate = `
+        <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
+        <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
+        <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
+        <span><b>工作流：</b>${workflows.length > 0 ? workflows.join(', ') : '无'}</span>
+        `
+      this.$prompt(`该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br> ${htmlTemplate}`, `请输入项目名 ${projectName} 确认删除`, {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        dangerouslyUseHTMLString: true,
+        customClass: 'product-prompt',
+        confirmButtonClass: 'el-button el-button--danger',
+        inputValidator: project_name => {
+          if (project_name === projectName) {
+            return true
+          } else if (project_name === '') {
+            return '请输入项目名'
+          } else {
+            return '项目名不相符'
+          }
+        }
       })
+        .then(({ value }) => {
+          deleteProjectAPI(projectName).then(
+            response => {
+              this.$message({
+                type: 'success',
+                message: '项目删除成功'
+              })
+              this.getProjects()
+            }
+          )
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消删除'
+          })
+        })
     }
   },
-  computed: {
-    ...mapGetters([
-      'productList', 'workflowList'
-    ])
-  },
-  beforeDestroy () {
-    this.exitGuideModal()
-  },
   mounted () {
-    this.$store.dispatch('getProductList')
-    this.$store.dispatch('getWorkflowList')
     this.getProjects()
     bus.$emit('show-sidebar', true)
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })

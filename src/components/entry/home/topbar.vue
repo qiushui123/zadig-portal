@@ -529,8 +529,8 @@ export default {
         margin-left: 80px;
 
         .menu-avatar {
-          width: 40px;
-          height: 40px;
+          width: 30px;
+          height: 30px;
           border-radius: 50%;
         }
       }
