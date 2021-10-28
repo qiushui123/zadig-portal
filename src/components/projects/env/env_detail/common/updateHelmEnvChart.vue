@@ -1,6 +1,6 @@
 <template>
   <div class="helm-chart-yaml-content">
-    <el-tabs tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
+    <el-tabs class="service-list" tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
       <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.type==='delete'">
         <span slot="label">
           <i
@@ -384,9 +384,17 @@ export default {
   display: flex;
   box-sizing: border-box;
   width: 100%;
+  max-height: 540px;
 
   /deep/.el-tabs {
     flex-shrink: 0;
+
+    &.service-list {
+      .el-tabs__nav {
+        max-height: 100%;
+        overflow: auto;
+      }
+    }
 
     .el-tabs__header {
       margin-right: 0;
@@ -419,7 +427,9 @@ export default {
     position: relative;
     box-sizing: border-box;
     width: calc(~'100% - 160px');
+    max-height: 100%;
     padding: 0 20px;
+    overflow: auto;
     border: 1px solid #dcdfe6;
     border-left-width: 0;
     border-top-right-radius: 4px;
