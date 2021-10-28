@@ -24,11 +24,10 @@ export default {
   methods: {
     async getProducts () {
       const availableProducts = this.currentProjectProductList
-
       this.loading = false
-      if (availableProducts.length > 0) {
-        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${availableProducts[0].envs[0]}`
-      } else if (availableProducts.length === 0) {
+      if (availableProducts.envs.length > 0) {
+        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${availableProducts.envs[0]}`
+      } else if (availableProducts.envs.length === 0) {
         this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/create`
       }
 
@@ -43,7 +42,7 @@ export default {
       return this.$route.params.project_name
     },
     currentProjectProductList () {
-      return this.productList.filter(element => {
+      return this.productList.find(element => {
         return element.name === this.projectName
       })
     },

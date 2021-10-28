@@ -27,13 +27,13 @@
           <el-input size="small"
                     v-model="addUser.password"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="角色"
+        <el-form-item label="角色"
                       prop="isSuperUser">
           <el-radio-group v-model="addUser.isSuperUser">
             <el-radio :label="true">管理员</el-radio>
             <el-radio :label="false">普通用户</el-radio>
           </el-radio-group>
-        </el-form-item> -->
+        </el-form-item>
       </el-form>
       <div slot="footer"
            class="dialog-footer">
@@ -134,7 +134,7 @@
 
 <script>
 
-import { addUserAPI, usersAPI, deleteUserAPI } from '@api'
+import { addUserAPI, usersAPI, deleteUserAPI, addSystemRoleBindings } from '@api'
 import bus from '@utils/event_bus'
 import EditUserRole from './editUserRole.vue'
 export default {
@@ -203,6 +203,12 @@ export default {
     }
   },
   methods: {
+    async addBindings () {
+      if (res) {
+        this.$message.success('创建管理员权限成功')
+        this.dialogEditRoleVisible = false
+      }
+    },
     editUserRole (user) {
       this.editUser = user
       this.$refs.editUserRole.dialogEditRoleVisible = true
@@ -216,7 +222,12 @@ export default {
     },
     async getUsers (page_size = 0, page_index = 0, keyword = '') {
       this.loading = true
-      const res = await usersAPI(page_size, page_index, keyword).catch(error => console.log(error))
+      const payload = {
+        page: page_index,
+        per_page: page_size,
+        name: keyword
+      }
+      const res = await usersAPI(payload).catch(error => console.log(error))
       if (res) {
         this.totalUser = res.totalCount
         this.usersTableData = res.users
@@ -247,17 +258,22 @@ export default {
       this.$refs.addUserForm.validate((valid) => {
         if (valid) {
           const payload = this.addUser
-          addUserAPI(payload).then((res) => {
+          addUserAPI(payload).then(async (res) => {
             this.dialogAddUserVisible = false
+            if (payload.isSuperUser) {
+              const paload = {
+                name: res.email + '-' + 'admin',
+                role: 'admin',
+                uid: res.uid
+              }
+              await addSystemRoleBindings(paload).catch(error => console.log(error))
+            }
+            this.$refs.addUserForm.resetFields()
+            this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
             this.$message({
               type: 'success',
               message: '新建用户成功'
             })
-            // if(payload.isSuperUser) {
-
-            // }
-            this.$refs.addUserForm.resetFields()
-            this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
           })
         } else {
           return false

@@ -71,7 +71,10 @@ export default {
     remoteMethod (query) {
       if (query !== '') {
         this.loading = true
-        usersAPI(0, 0, query).then((res) => {
+        const payload = {
+          name: query
+        }
+        usersAPI(payload).then((res) => {
           this.loading = false
           this.users = (_.uniqBy(res.users, 'uid'))
         })

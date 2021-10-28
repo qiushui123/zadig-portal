@@ -54,7 +54,7 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
-  if (localStorage.getItem('userInfo')) {
+  if (localStorage.getItem('userInfo') && localStorage.getItem('userInfo') !== 'undefined') {
     config.headers.Authorization = 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
   }
   return config
@@ -242,7 +242,7 @@ export function getServicePipelineAPI (projectName, envName, serviceName, servic
 }
 
 export function envRevisionsAPI (projectName, envName) {
-  return http.get(`/api/aslan/environment/revision/products?productName=${projectName}&envName=${envName}`)
+  return http.get(`/api/aslan/environment/revision/products?projectName=${projectName}&envName=${envName}`)
 }
 
 export function productServicesAPI (projectName, envName, envSource, searchName = '', perPage = 20, page = 1) {
@@ -272,15 +272,15 @@ export function templatesAPI () {
 }
 
 export function getServiceTemplatesAPI (projectName = '', envName = '') {
-  return http.get(`/api/aslan/service/services?productName=${projectName}&envName=${envName}`)
+  return http.get(`/api/aslan/service/services?projectName=${projectName}&envName=${envName}`)
 }
 
 export function serviceTemplateWithConfigAPI (name, projectName) {
-  return http.get(`/api/aslan/service/services/${name}?productName=${projectName}`)
+  return http.get(`/api/aslan/service/services/${name}?projectName=${projectName}`)
 }
 
 export function serviceTemplateAPI (name, type, projectName) {
-  return http.get(`/api/aslan/service/services/${name}/${type}?productName=${projectName}`)
+  return http.get(`/api/aslan/service/services/${name}/${type}?projectName=${projectName}`)
 }
 
 export function serviceTemplateAfterRenderAPI (product_name, service_name, env_name) {
@@ -296,7 +296,7 @@ export function updateServicePermissionAPI (data) {
 }
 
 export function deleteServiceTemplateAPI (name, type, projectName, visibility) {
-  return http.delete(`/api/aslan/service/services/${name}/${type}?productName=${projectName}&visibility=${visibility}`)
+  return http.delete(`/api/aslan/service/services/${name}/${type}?projectName=${projectName}&visibility=${visibility}`)
 }
 
 export function createPmServiceAPI (projectName, payload) {
@@ -308,7 +308,7 @@ export function updatePmServiceAPI (projectName, payload) {
 }
 
 export function getHelmChartProjectChartsAPI (project, projectName = '') {
-  return http.get(`/api/aslan/service/harbor/project/${project}/charts?productName=${projectName}`)
+  return http.get(`/api/aslan/service/harbor/project/${project}/charts?projectName=${projectName}`)
 }
 
 export function getHelmChartProjectAPI (projectName = '') {
@@ -357,7 +357,7 @@ export function getImgListAPI (from = '') {
 }
 
 export function deleteBuildConfigAPI (name, version, projectName) {
-  return http.delete(`/api/aslan/build/build?name=${name}&version=${version}&productName=${projectName}`)
+  return http.delete(`/api/aslan/build/build?name=${name}&version=${version}&projectName=${projectName}`)
 }
 
 export function createBuildConfigAPI (payload) {
@@ -369,11 +369,11 @@ export function updateBuildConfigAPI (payload) {
 }
 
 export function saveBuildConfigTargetsAPI (projectName = '', payload) {
-  return http.post(`/api/aslan/build/build/targets?productName=${projectName}`, payload)
+  return http.post(`/api/aslan/build/build/targets?projectName=${projectName}`, payload)
 }
 
 export function getBuildConfigDetailAPI (name, projectName = '') {
-  return http.get(`/api/aslan/build/build/${name}?productName=${projectName}`)
+  return http.get(`/api/aslan/build/build/${name}?projectName=${projectName}`)
 }
 
 export function getRepoFilesAPI ({ codehostId = '', repoOwner = '', repoName = '', branchName = '', path = '', type = '', repoLink = '', remoteName = 'origin' }) {
@@ -429,15 +429,15 @@ export function validPreloadService (codehostId, repoOwner, repoName, branchName
 }
 
 export function getServiceTargetsAPI (projectName = '') {
-  return http.get(`/api/aslan/build/targets?productName=${projectName}`)
+  return http.get(`/api/aslan/build/targets?projectName=${projectName}`)
 }
 
 export function getTargetBuildConfigsAPI (target, project_name) {
-  return http.get(`/api/aslan/build/build?targets=${target}&productName=${project_name}`)
+  return http.get(`/api/aslan/build/build?targets=${target}&projectName=${project_name}`)
 }
 
 export function getBuildConfigsAPI (projectName = '') {
-  return http.get(`/api/aslan/build/build?productName=${projectName}`)
+  return http.get(`/api/aslan/build/build?projectName=${projectName}`)
 }
 
 // Workflow
@@ -550,10 +550,10 @@ export function workflowTaskDetailSSEAPI (workflowName, taskID, workflowType = '
 // Test
 
 export function testsAPI (projectName = '', testType = '') {
-  return http.get(`/api/aslan/testing/test?productName=${projectName}&testType=${testType}`)
+  return http.get(`/api/aslan/testing/test?projectName=${projectName}&testType=${testType}`)
 }
 export function testDetailAPI (productName = '') {
-  return http.get(`/api/aslan/testing/testdetail?productName=${productName}`)
+  return http.get(`/api/aslan/testing/testdetail?projectName=${productName}`)
 }
 
 export function runTestsAPI (payload) {
@@ -569,11 +569,11 @@ export function cancelTestTaskAPI (productName, testName, taskID) {
 }
 
 export function singleTestAPI (name, projectName = '') {
-  return http.get(`/api/aslan/testing/test/${name}?productName=${projectName}`)
+  return http.get(`/api/aslan/testing/test/${name}?projectName=${projectName}`)
 }
 
 export function deleteTestAPI (name, projectName = '') {
-  return http.delete(`/api/aslan/testing/test/${name}?productName=${projectName}`)
+  return http.delete(`/api/aslan/testing/test/${name}?projectName=${projectName}`)
 }
 
 export function createTestAPI (data) {
@@ -604,8 +604,8 @@ export function createOrganizationInfoAPI (payload) {
 
 // User Management
 
-export function usersAPI (per_page, page, name = '') {
-  return http.get(`/api/v1/users?page=${page}&per_page=${per_page}&name=${name}`)
+export function usersAPI (payload) {
+  return http.post(`/api/v1/users/search`, payload)
 }
 
 export function queryUserAPI (uid) {
@@ -632,7 +632,7 @@ export function getCodeSourceAPI (page_size = 0, page_index = 0) {
 }
 
 export function getCodeSourceByAdminAPI (page_size = 0, page_index = 0) {
-  return http.get(`/api/directory/codehostss/search&per_page=${page_size}&page=${page_index}`)
+  return http.get(`/api/directory/codehostss/search?per_page=${page_size}&page=${page_index}`)
 }
 
 export function createCodeSourceAPI (payload) {
@@ -967,7 +967,7 @@ export function getProjectInfoAPI (projectName) {
 }
 
 export function updateSingleProjectAPI (projectName, payload) {
-  return http.put(`/api/aslan/project/products?productName=${projectName}`, payload)
+  return http.put(`/api/aslan/project/products?projectName=${projectName}`, payload)
 }
 
 export function createProjectAPI (payload) {
@@ -983,7 +983,7 @@ export function downloadDevelopCLIAPI (os) {
 }
 
 export function getServicesTemplateWithSharedAPI (projectName) {
-  return http.get(`/api/aslan/service/name?productName=${projectName}`)
+  return http.get(`/api/aslan/service/name?projectName=${projectName}`)
 }
 
 export function updateEnvTemplateAPI (projectName, payload) {
@@ -1032,7 +1032,7 @@ export function deleteProductEnvAPI (productName, envName, envType = '') {
 }
 
 export function restartPodAPI (podName, productName, envType = '') {
-  return http.delete(`/api/aslan/environment/kube/pods/${podName}?productName=${productName}&envType=${envType}`)
+  return http.delete(`/api/aslan/environment/kube/pods/${podName}?projectName=${productName}&envType=${envType}`)
 }
 
 export function restartServiceOriginAPI (productName, serviceName, envName = '', envType = '') {
@@ -1054,13 +1054,13 @@ export function scaleServiceAPI (productName, serviceName, envName = '', scaleNa
 }
 
 export function scaleEventAPI (productName, scaleName, envName = '', type, envType = '') {
-  return http.get(`/api/aslan/environment/kube/events?productName=${productName}&envName=${envName}&type=${type}&name=${scaleName}&envType=${envType}`)
+  return http.get(`/api/aslan/environment/kube/events?projectName=${productName}&envName=${envName}&type=${type}&name=${scaleName}&envType=${envType}`)
 }
 export function podEventAPI (productName, podName, envName = '', envType = '') {
-  return http.get(`/api/aslan/environment/kube/pods/${podName}/events?productName=${productName}&envName=${envName}&envType=${envType}`)
+  return http.get(`/api/aslan/environment/kube/pods/${podName}/events?projectName=${productName}&envName=${envName}&envType=${envType}`)
 }
 export function exportYamlAPI (productName, serviceName, envName = '', envType = '') {
-  return http.get(`/api/aslan/environment/export/service?serviceName=${serviceName}&envName=${envName}&productName=${productName}&envType=${envType}`)
+  return http.get(`/api/aslan/environment/export/service?serviceName=${serviceName}&envName=${envName}&projectName=${productName}&envType=${envType}`)
 }
 
 export function getProductInfo (productName, envName = '') {
@@ -1139,11 +1139,11 @@ export function getProjectIngressAPI (projectName) {
 
 // delivery
 export function getVersionListAPI (workflow_name = '', product_name = '', task_id = '', service_name = '') {
-  return http.get(`/api/aslan/delivery/releases?workflowName=${workflow_name}&productName=${product_name}&taskId=${task_id}&serviceName=${service_name}`)
+  return http.get(`/api/aslan/delivery/releases?workflowName=${workflow_name}&projectName=${product_name}&taskId=${task_id}&serviceName=${service_name}`)
 }
 
 export function getVersionServiceListAPI (projectName) {
-  return http.get(`/api/aslan/delivery/servicenames?&productName=${projectName}`)
+  return http.get(`/api/aslan/delivery/servicenames?&projectName=${projectName}`)
 }
 
 export function deleteVersionAPI (versionId) {
@@ -1192,20 +1192,20 @@ export function deleteChartTemplateAPI (name) {
 }
 
 export function createTemplateServiceAPI (productName, payload) {
-  return http.post(`/api/aslan/service/helm/services?productName=${productName}`, payload)
+  return http.post(`/api/aslan/service/helm/services?projectName=${productName}`, payload)
 }
 
 // helm env and service
 export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)
+  return http.put(`/api/aslan/environment/rendersets/renderchart?projectName=${productName}&envName=${envName}`, payload)
 }
 
 export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
-  return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+  return http.get(`/api/aslan/environment/rendersets/renderchart?projectName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
 export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
-  return http.get(`/api/aslan/environment/environments/estimated-renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+  return http.get(`/api/aslan/environment/environments/estimated-renderchart?projectName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
 export function createHelmProductEnvAPI (productName, payload) {
@@ -1234,7 +1234,7 @@ export function queryWorkloads (clusterId, namespace, page) {
 }
 
 export function queryServiceWorkloads (projectName, envName) {
-  return http.get(`/api/aslan/service/workloads?productName=${projectName}&env=${envName}`)
+  return http.get(`/api/aslan/service/workloads?projectName=${projectName}&env=${envName}`)
 }
 
 export function postWorkloads (payload) {
@@ -1242,7 +1242,7 @@ export function postWorkloads (payload) {
 }
 
 export function editWorkloads (payload) {
-  return http.put(`/api/aslan/service/workloads?productName=${payload.product_name}&env=${payload.env_name}`, payload)
+  return http.put(`/api/aslan/service/workloads?projectName=${payload.product_name}&env=${payload.env_name}`, payload)
 }
 
 // role

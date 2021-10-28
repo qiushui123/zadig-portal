@@ -29,10 +29,9 @@ const actions = {
   },
   async LOGIN (context, args) {
     const res = await userLoginAPI(args).catch(error => console.log(error))
+    localStorage.setItem('userInfo', JSON.stringify(res)) // 存储用户信息
     const res1 = await queryUserBindings(res.uid).catch(error => console.log(error))
-
     if (res && res1) {
-      localStorage.setItem('userInfo', JSON.stringify(res)) // 存储用户信息
       localStorage.setItem('role', JSON.stringify(res1)) // 存储用户角色信息
       Message({
         message: '登录成功，欢迎 ' + res.name,

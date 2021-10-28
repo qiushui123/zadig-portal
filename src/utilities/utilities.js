@@ -1,6 +1,5 @@
 import storejs from '@node_modules/store/dist/store.legacy.js'
 import { isEmpty } from 'lodash'
-import store from '../store'
 
 const entitiesRegexp = /[&"'<>]/g
 const entityMap = {

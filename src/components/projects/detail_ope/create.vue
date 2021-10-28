@@ -174,7 +174,7 @@
                         <el-option v-for="(user,index) in users"
                                    :key="index"
                                    :label="user.name"
-                                   :value="user.id">
+                                   :value="user.uid">
                         </el-option>
                       </el-select>
                     </el-form-item>
@@ -273,15 +273,21 @@ export default {
     }
   },
   methods: {
-    getUsers () {
-      usersAPI().then((res) => {
-        this.users = this.$utils.deepSortOn(res.data, 'name')
+    getUsers (user_ids) {
+      const paload = {
+        uids: user_ids
+      }
+      usersAPI(paload).then((res) => {
+        this.users = this.$utils.deepSortOn(res.users, 'name')
       })
     },
     remoteMethod (query) {
       if (query !== '') {
         this.loading = true
-        usersAPI('', 0, 0, query).then((res) => {
+        const paload = {
+          name: query
+        }
+        usersAPI(paload).then((res) => {
           this.loading = false
           this.users = this.$utils.deepSortOn(res.data, 'name')
         })
@@ -332,6 +338,7 @@ export default {
     getProject (projectName) {
       getSingleProjectAPI(projectName).then((res) => {
         this.projectForm = res
+        this.getUsers(res.user_ids)
         if (res.team_id === 0) {
           this.projectForm.team_id = null
         }
@@ -400,7 +407,6 @@ export default {
   },
   mounted () {
     if (this.isEdit) {
-      this.getUsers()
       this.getProject(this.projectName)
     }
   }
