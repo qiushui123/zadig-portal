@@ -519,7 +519,6 @@ const routes = [
     component: onboarding_home,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: false,
       title: '交付中心'
     },
     children: [
@@ -602,7 +601,6 @@ const routes = [
     component: onboarding_home,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: true,
       title: '用户管理'
     },
     children: [
@@ -650,8 +648,7 @@ const routes = [
     path: '/v1/system',
     component: onboarding_home,
     meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: false
+      requiresAuth: true
     },
     children: [
       {

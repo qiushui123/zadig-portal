@@ -337,7 +337,7 @@ const utils = {
       /* DONOT USE ADMIN ROLE!!
            admin role in system is deprecated now
            admin: userinfo.info.isAdmin, */
-      superAdmin: !!store.state.login.role.includes('admin')
+      superAdmin: !!JSON.parse(localStorage.getItem('role')).map(item => (item.role)).includes('admin')
     }
   },
   getUsername () {
