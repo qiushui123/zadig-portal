@@ -160,10 +160,10 @@ export default {
       )
       if (res) {
         this.createRes = res
-        const valid = res.filter(
-          r => !['success', 'Unstable'].includes(r.status)
+        const notValid = res.filter(
+          r => r.status === 'creating'
         )
-        if (valid.length && this.sId) {
+        if (notValid.length && this.sId) {
           this.sId = setTimeout(this.checkEnvStatus, 2000)
         } else {
           clearTimeout(this.sId)
