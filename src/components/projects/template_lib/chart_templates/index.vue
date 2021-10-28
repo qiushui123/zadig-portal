@@ -77,6 +77,7 @@ function tree ({ chartName, files }) {
 
 export default {
   data () {
+    this.yamlSet = {}
     return {
       yaml: '',
       chartDialogVisible: false,
@@ -84,7 +85,6 @@ export default {
       currentService: null,
       fileData: [],
       displayedFile: [],
-      yamlSet: {},
       expandedKeys: [],
       systemVariables: []
     }
@@ -151,8 +151,13 @@ export default {
       }
     },
     chartTemplateUpdate ({ deleteFlag, update, create, name }) {
+      this.clearUselessCache(name)
+
       const fn = data => {
-        this.showFile({ data: data.children[0] })
+        const valuesYaml =
+          data.children.find(data => data.name === 'values.yaml') ||
+          data.children[0]
+        this.showFile({ data: valuesYaml })
         this.updateSelectedService(data.name, data.fullPath)
       }
 
@@ -187,6 +192,16 @@ export default {
         this.getChartTemplateByName(name).then(() => {
           fn(this.fileDataObj[name])
         })
+      })
+    },
+    clearUselessCache (serviceName) {
+      Object.keys(this.yamlSet).forEach(key => {
+        if (key.split('/')[0] === serviceName) {
+          delete this.yamlSet[key]
+        }
+      })
+      this.displayedFile = this.displayedFile.filter(data => {
+        return data.fullPath.split('/')[0] !== serviceName
       })
     },
     getChartTemplates () {
@@ -226,7 +241,7 @@ export default {
         console.log(err)
       })
       if (res) {
-        this.$set(this.yamlSet, `${charName}/${fileName}`, res)
+        this.yamlSet[`${charName}/${fileName}`] = res
       }
     }
   },
@@ -244,7 +259,11 @@ export default {
       if (res.length) {
         const name = res[0].name
         this.getChartTemplateByName(name).then(() => {
-          this.showFile({ data: this.fileDataObj[name].children[0] })
+          const valuesYaml =
+            this.fileDataObj[name].children.find(
+              data => data.name === 'values.yaml'
+            ) || this.fileDataObj[name].children[0]
+          this.showFile({ data: valuesYaml })
         })
         this.$nextTick(() => {
           this.updateSelectedService(name, res[0].fullPath)

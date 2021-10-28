@@ -95,8 +95,10 @@ export default {
 
 <style lang="less" scoped>
 .folder-container {
+  height: calc(~'100% - 65px');
   padding: 5px;
   padding-top: 10px;
+  overflow: auto;
   font-size: 13px;
 
   /deep/ .el-tree {
