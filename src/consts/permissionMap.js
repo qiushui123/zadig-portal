@@ -27,3 +27,98 @@ export const create_test = 'test/createTest'
 
 export const get_delivery = 'delivery/getDelivery'
 export const delete_delivery = 'delivery/deleteDelivery'
+
+export const permissionParams = [
+  {
+    endpoint: get_workflow,
+    method: 'VIEW'
+  },
+  {
+    endpoint: edit_workflow,
+    method: 'VIEW'
+  },
+  {
+    endpoint: create_workflow,
+    method: 'VIEW'
+  },
+  {
+    endpoint: delete_workflow,
+    method: 'VIEW'
+  },
+  {
+    endpoint: run_workflow,
+    method: 'VIEW'
+  },
+  {
+    endpoint: get_environment,
+    method: 'VIEW'
+  },
+  {
+    endpoint: create_environment,
+    method: 'VIEW'
+  },
+  {
+    endpoint: config_environment,
+    method: 'VIEW'
+  },
+  {
+    endpoint: manage_environment,
+    method: 'VIEW'
+  },
+  {
+    endpoint: delete_environment,
+    method: 'VIEW'
+  },
+  {
+    endpoint: get_service,
+    method: 'VIEW'
+  },
+  {
+    endpoint: edit_service,
+    method: 'VIEW'
+  },
+  {
+    endpoint: create_service,
+    method: 'VIEW'
+  },
+  {
+    endpoint: delete_service,
+    method: 'VIEW'
+  },
+  {
+    endpoint: get_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: create_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: edit_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: delete_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: get_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: create_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: edit_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: delete_build,
+    method: 'VIEW'
+  },
+  {
+    endpoint: get_build,
+    method: 'VIEW'
+  }
+]
