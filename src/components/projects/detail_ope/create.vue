@@ -47,7 +47,14 @@
                   <el-input :disabled="!showProductName"
                             v-model="projectForm.product_name"></el-input>
                 </el-form-item>
-
+                <el-form-item label="项目权限"
+                              v-show="activeName !=='advance'"
+                              prop="public">
+                  <el-radio-group v-model="projectForm.public">
+                    <el-radio :label="true">公开</el-radio>
+                    <el-radio :label="false">私有</el-radio>
+                  </el-radio-group>
+                </el-form-item>
                 <el-form-item v-if="isEdit"
                               v-show="activeName==='advance'"
                               label="服务部署超时（分钟）"
@@ -247,6 +254,7 @@ export default {
         timeout: null,
         desc: '',
         enabled: true,
+        public: true,
         product_feature: {
           basic_facility: 'kubernetes',
           deploy_type: 'k8s',
@@ -268,6 +276,9 @@ export default {
         ],
         timeout: [
           { required: true, trigger: 'change', validator: validateDeployTimeout }
+        ],
+        public: [
+          { required: true, message: '项目权限不能为空', trigger: 'blur' }
         ]
       }
     }
