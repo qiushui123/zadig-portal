@@ -246,7 +246,6 @@ export default {
         team_id: null,
         timeout: null,
         desc: '',
-        visibility: 'public',
         enabled: true,
         product_feature: {
           basic_facility: 'kubernetes',
@@ -263,9 +262,6 @@ export default {
         ],
         user_ids: [
           { type: 'array', required: true, message: '请选择项目管理员', trigger: 'change' }
-        ],
-        visibility: [
-          { type: 'string', required: true, message: '请选择项目可见范围', trigger: 'change' }
         ],
         enabled: [
           { type: 'boolean', required: true, message: '请选择项目是否启用项目', trigger: 'change' }

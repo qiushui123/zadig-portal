@@ -159,7 +159,12 @@ function makeEventSource (basePath, config) {
     path = basePath + '?' + params
   }
 
-  const evtSource = new EventSource(path)
+  const evtSource = new EventSource(path, {
+    headers: {
+      Authorization: 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
+    }
+  })
+  console.log('123', evtSource)
   evtSource.userCount = 0
 
   const normalHandlers = []

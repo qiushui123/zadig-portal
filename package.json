@@ -19,7 +19,7 @@
     "echarts": "4.4.0",
     "element-ui": "2.15.1",
     "epic-spinners": "^1.1.0",
-    "eventsource-polyfill": "0.9.6",
+    "event-source-polyfill": "^1.0.25",
     "intro.js": "2.9.3",
     "js-yaml": "4.1.0",
     "jsencrypt": "3.0.0-rc.1",
