@@ -27,6 +27,13 @@
           <el-input size="small"
                     v-model="addUser.password"></el-input>
         </el-form-item>
+        <!-- <el-form-item label="角色"
+                      prop="isSuperUser">
+          <el-radio-group v-model="addUser.isSuperUser">
+            <el-radio :label="true">管理员</el-radio>
+            <el-radio :label="false">普通用户</el-radio>
+          </el-radio-group>
+        </el-form-item> -->
       </el-form>
       <div slot="footer"
            class="dialog-footer">
@@ -246,6 +253,9 @@ export default {
               type: 'success',
               message: '新建用户成功'
             })
+            // if(payload.isSuperUser) {
+
+            // }
             this.$refs.addUserForm.resetFields()
             this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
           })

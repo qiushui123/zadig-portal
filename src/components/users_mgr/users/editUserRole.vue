@@ -53,7 +53,7 @@ export default {
     },
     async addBindings () {
       const paload = {
-        name: this.editUser.uid + 'admin',
+        name: this.editUser.uid + '-' + 'admin',
         role: 'admin',
         uid: this.editUser.uid
       }

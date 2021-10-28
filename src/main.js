@@ -20,7 +20,7 @@ import 'intro.js/introjs.css'
 import { analyticsRequestAPI } from '@api'
 import { JSEncrypt } from 'jsencrypt'
 import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill'
-sglobal.EventSource = EventSourcePolyfill || NativeEventSource
+global.EventSource = EventSourcePolyfill || NativeEventSource
 
 Vue.use(VueIntro)
 

@@ -4,6 +4,13 @@
       <el-form-item label="角色名称" prop="name" label-width="100px">
         <el-input size="small" :disabled="isEdit" v-model="form.name"  placeholder="请输入角色名称"></el-input>
       </el-form-item>
+      <el-form-item label="角色类型" label-width="100px"
+                      prop="isPublic">
+          <el-radio-group v-model="form.isPublic">
+            <el-radio :label="true">公共角色</el-radio>
+            <el-radio :label="false">私有角色</el-radio>
+          </el-radio-group>
+       </el-form-item>
       <el-form-item label="权限列表" prop="permissions" label-width="100px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
@@ -35,13 +42,15 @@
   </el-dialog>
 </template>
 <script>
-import { queryPolicyDefinitions, addrole, queryroleDetail, updaterole } from '@/api'
+import { queryPolicyDefinitions, addrole, queryroleDetail, queryPublicRoleDetail, updaterole, updatePublicRole, addPublicRole } from '@/api'
 import * as permissionMap from '@/consts/permissionMap'
 import _ from 'lodash'
 
 const initFormData = {
   name: '',
-  permissions: []
+  permissions: [],
+  isPublic: false
+
 }
 
 const resources = {
@@ -66,11 +75,15 @@ export default {
       permissionGroups: [],
       form: {
         name: '',
-        permissions: []
+        permissions: [],
+        isPublic: false
       },
       formRules: {
         name: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
+        ],
+        isPublic: [
+          { required: true, message: '请选择项目类型', trigger: 'blur' }
         ],
         permissions: [
           { type: 'array', required: true, message: '请选择至少一个权限', trigger: 'change' }
@@ -84,10 +97,15 @@ export default {
       this.form = _.cloneDeep(initFormData)
     },
     async getroleDetail (role) {
-      const res = await queryroleDetail(role.name, this.projectName).catch(error => console.log(error))
+      let res = null
+      if (role.isPublic) {
+        res = await queryPublicRoleDetail(role.name, this.projectName).catch(error => console.log(error))
+      } else {
+        res = await queryroleDetail(role.name, this.projectName).catch(error => console.log(error))
+      }
       res.rules.forEach(item => {
         if (item.kind === 'resource') {
-          this.form.permissions = item.verbs
+          this.form.permissions = this.form.permissions.concat(item.verbs)
         }
       })
     },
@@ -146,14 +164,24 @@ export default {
         })
         rules = [{ verbs: this.form.permissions, resources: resource, kind: 'resource' }, { verbs: ['VIEW'], resources: frontResources, kind: '' }]
         if (this.isEdit) {
-          const result = await updaterole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          let result = null
+          if (this.form.isPublic) {
+            result = await updatePublicRole({ name: this.form.name, rules: rules }).catch(error => console.log(error))
+          } else {
+            result = await updaterole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          }
           if (result) {
             this.$message.success('修改成功')
             this.dialogRoleAddFormVisible = false
             this.getrole()
           }
         } else {
-          const result = await addrole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          let result = null
+          if (this.form.isPublic) {
+            result = await addPublicRole({ name: this.form.name, rules: rules }).catch(error => console.log(error))
+          } else {
+            result = await addrole({ name: this.form.name, rules: rules, projectName: this.projectName }).catch(error => console.log(error))
+          }
           if (result) {
             this.$message.success('添加成功')
             this.dialogRoleAddFormVisible = false
@@ -169,6 +197,7 @@ export default {
         this.isEdit = true
         this.getroleDetail(this.currentRole)
         this.form.name = this.currentRole.name
+        this.form.isPublic = !!this.currentRole.isPublic
       } else {
         this.isEdit = false
 

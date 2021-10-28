@@ -1267,9 +1267,26 @@ export function queryroleDetail (name, projectName) { // 查询项目中的某�
   return http.get(`/api/v1/roles/${name}?projectName=${projectName}`)
 }
 
+export function addPublicRole (payload) { // 添加公共角色
+  return http.post(`/api/v1/public-roles`, payload)
+}
+
+export function deletePublicRole (name) { // 删除公共角色
+  return http.delete(`/api/v1/public-roles/${name}`)
+}
+
 export function queryPublicRole () { // 查询公共的角色
   return http.get(`/api/v1/public-roles`)
 }
+
+export function queryPublicRoleDetail (name) { // 查询某个公共的角色
+  return http.get(`/api/v1/public-roles/${name}`)
+}
+
+export function updatePublicRole (paload) { // 修改某个公共的角色
+  return http.put(`/api/v1/public-roles/${paload.name}`, paload)
+}
+
 export function deleterole (name, projectName) { // 删除项目中的角色
   return http.delete(`/api/v1/roles/${name}?projectName=${projectName}`)
 }

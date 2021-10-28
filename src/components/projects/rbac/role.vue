@@ -11,22 +11,15 @@
           <span>{{scope.row.name}}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="修改人">
+      <el-table-column label="角色类型">
         <template slot-scope="scope">
-          <span>{{scope.row.email}}</span>
+          <span>{{scope.row.isPublic ? '公共角色': '私有角色'}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="最后修改时间">
-        <template slot-scope="scope">
-          <el-select v-model="scope.row.roleId" filterable size="small" placeholder="请输入角色名称进行搜索">
-            <el-option v-for="item in rolesFiltered" :key="item.id" :label="item.role.name" :value="item.role.id"></el-option>
-          </el-select>
-        </template>
-      </el-table-column> -->
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="editrole(scope.row)"  size="mini" type="primary">编辑</el-button>
-          <el-button @click="deleterole(scope.row.name)"  size="mini" type="danger">删除</el-button>
+          <el-button @click="editrole(scope.row)" v-if="scope.row.name !== 'admin'"  size="mini" type="primary">编辑</el-button>
+          <el-button @click="deleterole(scope.row)"  v-if="scope.row.name !== 'admin'"  size="mini" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -36,7 +29,7 @@
 <script>
 import bus from '@utils/event_bus'
 import Addrole from './addrole.vue'
-import { queryrole, deleterole } from '@/api'
+import { queryrole, deleterole, queryPublicRole, deletePublicRole } from '@/api'
 
 export default {
   name: 'member',
@@ -65,23 +58,32 @@ export default {
     async getrole () {
       this.loading = true
       const res = await queryrole(this.projectName).catch(error => console.log(error))
-      if (res) {
+      const res1 = await queryPublicRole().catch(error => console.log(error))
+      if (res && res1) {
         this.roles = res
+        res1.forEach(item => {
+          this.roles.push({ name: item.name, isPublic: true })
+        })
       }
       this.loading = false
     },
-    async deleterole (name) {
-      const res = await deleterole(name, this.projectName).catch(error => console.log(error))
-      if (res) {
-        this.$confirm('确认删除此角色？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+    async deleterole (row) {
+      this.$confirm('谨慎操作删除角色', '确认删除此角色?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let res = null
+        if (row.isPublic) {
+          res = await deletePublicRole(row.name).catch(error => console.log(error))
+        } else {
+          res = await deleterole(row.name, this.projectName).catch(error => console.log(error))
+        }
+        if (res) {
           this.$message.success('删除成功')
           this.getrole()
-        })
-      }
+        }
+      })
     }
   },
   created () {
