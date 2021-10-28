@@ -107,7 +107,7 @@ export default {
       return Promise.all([Promise.resolve(true)])
     },
     resetValueRepoInfo () {
-      this.$refs.valueRepoRef && this.$refs.valueRepoRef.resetSource()
+      this.$refs.valueRepoRef.resetSource()
     }
   },
   components: {

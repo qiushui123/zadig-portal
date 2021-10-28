@@ -157,7 +157,6 @@ export default {
       }
       this.substantial = false
       this.$refs.tempForm.clearValidate()
-      this.$refs.importValues && this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {

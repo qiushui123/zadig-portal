@@ -102,7 +102,7 @@ export default {
     }
   },
   methods: {
-    updateSelectedService (serviceName, nodeKey = '') {
+    updateSelectedService (serviceName = '', nodeKey = '') {
       this.$router.replace({
         query: {
           service_name: serviceName
@@ -160,7 +160,11 @@ export default {
         const id = this.fileData.findIndex(file => file.name === name)
         this.fileData.splice(id, 1)
         if (name === this.serviceName) {
-          fn(this.fileData[0])
+          if (this.fileData.length) {
+            fn(this.fileData[0])
+          } else {
+            this.updateSelectedService()
+          }
         }
         return
       }
