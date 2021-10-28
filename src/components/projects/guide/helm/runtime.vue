@@ -9,7 +9,7 @@
         </div>
         <div class="account-integrations cf-block__list">
           <div class="second">配置以下几套环境：</div>
-          <el-tabs v-model="activeName" type="card" :addable="canHandle" @edit="handleTabsEdit">
+          <el-tabs v-model="activeName" type="card" @edit="handleTabsEdit">
             <el-tab-pane
               v-for="env in envInfos"
               :key="env.envName"
@@ -27,6 +27,9 @@
                   <i class="el-icon-edit" @click="env.isEdit = true" v-if="canHandle"></i>
                 </span>
               </span>
+            </el-tab-pane>
+            <el-tab-pane name="addNew" v-if="canHandle">
+              <span slot="label" @click="handleTabsEdit('', 'add')">新建服务</span>
             </el-tab-pane>
           </el-tabs>
           <HelmEnvTemplate
@@ -160,9 +163,7 @@ export default {
       )
       if (res) {
         this.createRes = res
-        const notValid = res.filter(
-          r => r.status === 'creating'
-        )
+        const notValid = res.filter(r => r.status === 'creating')
         if (notValid.length && this.sId) {
           this.sId = setTimeout(this.checkEnvStatus, 2000)
         } else {
@@ -182,7 +183,9 @@ export default {
           isEdit: true,
           initName: newTabName
         })
-        this.activeName = newTabName
+        setTimeout(() => {
+          this.activeName = newTabName
+        })
       }
       if (action === 'remove') {
         this.envInfos = this.envInfos.filter(env => env.initName !== targetName)
