@@ -218,7 +218,7 @@ export default {
       })
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     async checkProjectFeature () {
       const projectName = this.projectName

@@ -319,7 +319,7 @@ export default {
           type: 'success',
           message: '新建项目成功'
         })
-        this.$store.dispatch('refreshProductList')
+        this.$store.dispatch('getProjectList')
         if (payload.product_feature.basic_facility === 'kubernetes') {
           if (payload.product_feature.create_env_type === 'external') {
             this.$router.push(`/v1/projects/create/${payload.product_name}/host/config?step=1`)
@@ -342,7 +342,7 @@ export default {
           type: 'success',
           message: '更新项目成功'
         })
-        this.$store.dispatch('refreshProductList')
+        this.$store.dispatch('getProjectList')
         this.$router.push('/v1/projects')
       })
     },

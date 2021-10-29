@@ -16,7 +16,7 @@ export default {
             reject(err)
           })
           .then(() => {
-            this.$store.dispatch('refreshProductList')
+            this.$store.dispatch('getProjectList')
           })
       })
     }

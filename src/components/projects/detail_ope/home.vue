@@ -178,8 +178,10 @@
 </template>
 <script>
 import bus from '@utils/event_bus'
-import { listWorkflowAPI, getProductsAPI, getBuildConfigsAPI, getSingleProjectAPI, deleteProjectAPI } from '@api'
+import { listWorkflowAPI, listProductAPI, getBuildConfigsAPI, getSingleProjectAPI, deleteProjectAPI } from '@api'
 import { flattenDeep } from 'lodash'
+import { mapGetters } from 'vuex'
+
 export default {
   data () {
     return {
@@ -199,9 +201,9 @@ export default {
       }
     },
     async deleteProject (projectName) {
-      const result = await Promise.all([listWorkflowAPI(), getProductsAPI(projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
+      const result = await Promise.all([listWorkflowAPI(), listProductAPI('', projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
       const workflows = result[0].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
-      const envNames = result[1].map((element) => { return element.name })
+      const envNames = result[1].map((element) => { return element.env_name })
       const services = flattenDeep(result[2].services)
       const buildConfigs = result[3].map((element) => { return element.name })
       const htmlTemplate = `
@@ -233,7 +235,7 @@ export default {
                 type: 'success',
                 message: '项目删除成功'
               })
-              this.getProjects()
+              this.$store.dispatch('getProjectList')
             }
           )
         })
@@ -244,6 +246,11 @@ export default {
           })
         })
     }
+  },
+  computed: {
+    ...mapGetters([
+      'productList'
+    ])
   },
   mounted () {
     this.$store.dispatch('getWorkflowList')

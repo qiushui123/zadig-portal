@@ -203,7 +203,7 @@ export default {
       )
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     fetchGroupsData (name, env_name = '') {
       return new Promise((resolve, reject) => {

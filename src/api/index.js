@@ -231,7 +231,7 @@ export function taskPendingSSEAPI () {
 // Env
 export function listProductAPI (envType = '', productName = '') {
   if (envType) {
-    return http.get(`/api/aslan/environment/environments?envType=${envType}`)
+    return http.get(`/api/aslan/environment/environments?projectName=${productName}&envType=${envType}`)
   } else {
     return http.get(`/api/aslan/environment/environments?projectName=${productName}`)
   }
@@ -262,7 +262,7 @@ export function productEnvInfoAPI (projectName, envName) {
 }
 
 // Project
-export function productTemplatesAPI () {
+export function getProductsAPI () {
   return http.get('/api/v1/picket/projects?verbosity=detailed')// verbosity=detailed<brief,minimal>
 }
 

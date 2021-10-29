@@ -13,7 +13,7 @@
 </template>
 <script>
 import bus from '@utils/event_bus'
-import { getProductsAPI } from '@api'
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {

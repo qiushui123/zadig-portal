@@ -437,7 +437,7 @@ export default {
       })
     },
     getUserList () {
-      usersAPI().then((res) => {
+      usersAPI({}).then((res) => {
         this.usersList = res.data
       })
     },

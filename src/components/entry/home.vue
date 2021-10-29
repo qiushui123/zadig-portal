@@ -55,7 +55,7 @@ export default {
   },
   created () {
     this.$store.dispatch('GETUSERINFO')
-    this.$store.dispatch('getProductList')
+    this.$store.dispatch('getProjectList')
   }
 }
 </script>

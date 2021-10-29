@@ -121,7 +121,7 @@ import {
   validateYamlAPI,
   updateServicePermissionAPI,
   serviceTemplateAPI,
-  saveServiceTemplateAPI,
+  // saveServiceTemplateAPI,
   getKubernetesTemplatesAPI,
   getKubernetesAPI,
   loadServiceFromKubernetesTemplateAPI,

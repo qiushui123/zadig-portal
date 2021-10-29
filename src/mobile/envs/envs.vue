@@ -45,7 +45,7 @@ export default {
     async getProducts () {
       const availableProjectNames = []
 
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
       for (const product of this.productList) {
         availableProjectNames.push(product.product_name)
       }
