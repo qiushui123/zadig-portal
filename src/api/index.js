@@ -413,10 +413,10 @@ export function getCodehubRepoFileServiceAPI (codehostId, repoUUID, repoName, br
   return http.get(`/api/aslan/service/loader/preload/${codehostId}/${branchName}?repoUUID=${repoUUID}&repoName=${repoName}&path=${path}&isDir=${isDir}`)
 }
 
-export function loadRepoServiceAPI (codehostId, repoOwner, repoName, branchName, remoteName = '', repoUUID = '', payload) {
+export function loadRepoServiceAPI (projectName, codehostId, repoOwner, repoName, branchName, remoteName = '', repoUUID = '', payload) {
   const encodeRepoName = repoName.includes('/') ? encodeURIComponent(encodeURIComponent(repoName)) : repoName
   return http.post(
-    `/api/aslan/service/loader/load/${codehostId}/${branchName}?repoOwner=${repoOwner}&repoName=${encodeRepoName}&remoteName=${remoteName}&repoUUID=${repoUUID}`,
+    `/api/aslan/service/loader/load/${codehostId}/${branchName}?projectName=${projectName}&repoOwner=${repoOwner}&repoName=${encodeRepoName}&remoteName=${remoteName}&repoUUID=${repoUUID}`,
     payload
   )
 }
@@ -967,11 +967,11 @@ export function addArtifactActivitiesAPI (id, payload) {
 // Project
 
 export function getSingleProjectAPI (projectName) {
-  return http.get(`/api/aslan/project/products/${projectName}/services`)
+  return http.get(`/api/aslan/project/products/${projectName}/services?projectName=${projectName}`)
 }
 
 export function getProjectInfoAPI (projectName) {
-  return http.get(`/api/aslan/project/products/${projectName}`)
+  return http.get(`/api/aslan/project/products/${projectName}?projectName=${projectName}`)
 }
 
 export function updateSingleProjectAPI (projectName, payload) {
@@ -983,7 +983,7 @@ export function createProjectAPI (payload) {
 }
 
 export function deleteProjectAPI (projectName) {
-  return http.delete(`/api/aslan/project/products/${projectName}`)
+  return http.delete(`/api/aslan/project/products/${projectName}?projectName=${projectName}`)
 }
 
 export function downloadDevelopCLIAPI (os) {
@@ -995,7 +995,7 @@ export function getServicesTemplateWithSharedAPI (projectName) {
 }
 
 export function updateEnvTemplateAPI (projectName, payload) {
-  return http.put(`/api/aslan/project/products/${projectName}`, payload)
+  return http.put(`/api/aslan/project/products/${projectName}?projectName=${projectName}`, payload)
 }
 
 // Env and Service
