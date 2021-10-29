@@ -979,7 +979,7 @@ export function updateSingleProjectAPI (projectName, payload) {
 }
 
 export function createProjectAPI (payload) {
-  return http.post('/api/aslan/project/products', payload)
+  return http.post('/api/v1/picket/projects', payload)
 }
 
 export function deleteProjectAPI (projectName) {

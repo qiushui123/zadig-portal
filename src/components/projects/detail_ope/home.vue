@@ -253,6 +253,8 @@ export default {
     ])
   },
   mounted () {
+    this.$store.dispatch('getProjectList')
+
     this.$store.dispatch('getWorkflowList')
     bus.$emit('show-sidebar', true)
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })

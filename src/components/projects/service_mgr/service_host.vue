@@ -26,7 +26,7 @@ export default {
       return this.$route.params.project_name
     },
     envNameList () {
-      return this.productList.filter(element => (element.product_name === this.projectName))
+      return this.productList.filter(element => (element.name === this.projectName))
     },
     ...mapGetters([
       'productList', 'signupStatus'
