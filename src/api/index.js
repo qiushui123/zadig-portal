@@ -288,11 +288,11 @@ export function serviceTemplateAfterRenderAPI (product_name, service_name, env_n
 }
 
 export function saveServiceTemplateAPI (payload) {
-  return http.post('/api/aslan/service/services', payload)
+  return http.post(`/api/aslan/service/services?projectName=${payload.product_name}`, payload)
 }
 
-export function updateServicePermissionAPI (data) {
-  return http.put('/api/aslan/service/services', data)
+export function updateServicePermissionAPI (projectName, data) {
+  return http.put(`/api/aslan/service/services?projectName=${projectName}`, data)
 }
 
 export function deleteServiceTemplateAPI (name, type, projectName, visibility) {
@@ -300,11 +300,11 @@ export function deleteServiceTemplateAPI (name, type, projectName, visibility) {
 }
 
 export function createPmServiceAPI (projectName, payload) {
-  return http.post(`/api/aslan/service/pm/${projectName}`, payload)
+  return http.post(`/api/aslan/service/pm/${projectName}?projectName=${projectName}`, payload)
 }
 
 export function updatePmServiceAPI (projectName, payload) {
-  return http.put(`/api/aslan/service/pm/${projectName}`, payload)
+  return http.put(`/api/aslan/service/pm/${projectName}?projectName=${projectName}`, payload)
 }
 
 export function getHelmChartProjectChartsAPI (project, projectName = '') {
@@ -316,31 +316,31 @@ export function getHelmChartProjectAPI (projectName = '') {
 }
 
 export function updateHelmChartAPI (projectName = '', payload) {
-  return http.put(`/api/aslan/service/helm/${projectName}`, payload)
+  return http.put(`/api/aslan/service/helm/${projectName}?projectName=${projectName}`, payload)
 }
 
 export function getHelmChartVersionAPI (project, chart) {
-  return http.get(`/api/aslan/service/harbor/project/${project}/chart/${chart}/versions`)
+  return http.get(`/api/aslan/service/harbor/project/${project}/chart/${chart}/versions?projectName=${project}`)
 }
 
 export function helmChartWithConfigAPI (serviceName, projectName) {
-  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}`)
+  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}?projectName=${projectName}`)
 }
 
 export function getHelmChartService (projectName) {
-  return http.get(`/api/aslan/service/helm/${projectName}`)
+  return http.get(`/api/aslan/service/helm/${projectName}?projectName=${projectName}`)
 }
 
 export function getHelmChartServiceFilePath (projectName, serviceName, path) {
-  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/filePath?dir=${path}`)
+  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/filePath?dir=${path}&projectName=${projectName}`)
 }
 
 export function getHelmChartServiceFileContent (projectName, serviceName, path, fileName) {
-  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/fileContent?filePath=${path}&fileName=${fileName}`)
+  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/fileContent?projectName=${projectName}&filePath=${path}&fileName=${fileName}`)
 }
 
 export function getHelmChartServiceModule (projectName, serviceName) {
-  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/serviceModule`)
+  return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/serviceModule?projectName=${projectName}`)
 }
 
 export function imagesAPI (payload, registry = '') {
@@ -348,7 +348,7 @@ export function imagesAPI (payload, registry = '') {
 }
 
 export function initProductAPI (templateName, isStcov) {
-  return http.get(`/api/aslan/environment/init_info/${templateName}${isStcov ? '?stcov=true' : ''}`)
+  return http.get(`/api/aslan/environment/init_info/${templateName}${isStcov ? '?stcov=true' : '?'}&projectName=${templateName}`)
 }
 
 // Build
@@ -361,11 +361,11 @@ export function deleteBuildConfigAPI (name, version, projectName) {
 }
 
 export function createBuildConfigAPI (payload) {
-  return http.post('/api/aslan/build/build', payload)
+  return http.post(`/api/aslan/build/build?projectName=${payload.product_name}`, payload)
 }
 
 export function updateBuildConfigAPI (payload) {
-  return http.put('/api/aslan/build/build', payload)
+  return http.put(`/api/aslan/build/build?projectName=${payload.product_name}`, payload)
 }
 
 export function saveBuildConfigTargetsAPI (projectName = '', payload) {
@@ -441,12 +441,12 @@ export function getBuildConfigsAPI (projectName = '') {
 }
 
 // Workflow
-export function getWorkflowHistoryBuildLogAPI (workflowName, taskID, serviceName, type) {
-  return http.get(`/api/aslan/logs/log/workflow/${workflowName}/tasks/${taskID}/service/${serviceName}?type=${type}`)
+export function getWorkflowHistoryBuildLogAPI (projectName, workflowName, taskID, serviceName, type) {
+  return http.get(`/api/aslan/logs/log/workflow/${workflowName}/tasks/${taskID}/service/${serviceName}?type=${type}&projectName=${projectName}`)
 }
 
-export function getWorkflowHistoryTestLogAPI (workflowName, taskID, testName, serviceName, workflowType = '') {
-  return http.get(`/api/aslan/logs/log/workflow/${workflowName}/tasks/${taskID}/tests/${testName}/service/${serviceName}?workflowType=${workflowType}`)
+export function getWorkflowHistoryTestLogAPI (projectName, workflowName, taskID, testName, serviceName, workflowType = '') {
+  return http.get(`/api/aslan/logs/log/workflow/${workflowName}/tasks/${taskID}/tests/${testName}/service/${serviceName}?workflowType=${workflowType}&projectName=${projectName}`)
 }
 
 export function imageReposAPI () {
@@ -478,30 +478,30 @@ export function setFavoriteAPI (payload) {
 }
 
 export function deleteFavoriteAPI (productName, workflowName, type) {
-  return http.delete(`/api/aslan/workflow/favorite/${productName}/${workflowName}/${type}`)
+  return http.delete(`/api/aslan/workflow/favorite/${productName}/${workflowName}/${type}?projectName=${productName}`)
 }
 export function workflowAPI (name) {
   return http.get(`/api/aslan/workflow/workflow/find/${name}`)
 }
 
 export function workflowPresetAPI (productName) {
-  return http.get(`/api/aslan/workflow/workflow/preset/${productName}`)
+  return http.get(`/api/aslan/workflow/workflow/preset/${productName}?projectName=${productName}`)
 }
 
 export function createWorkflowAPI (data) {
-  return http.post('/api/aslan/workflow/workflow', data)
+  return http.post(`/api/aslan/workflow/workflow?projectName=${data.product_tmpl_name}`, data)
 }
 
 export function updateWorkflowAPI (data) {
-  return http.put('/api/aslan/workflow/workflow', data)
+  return http.put(`/api/aslan/workflow/workflow?projectName=${data.product_tmpl_name}`, data)
 }
 
-export function deleteWorkflowAPI (name) {
-  return http.delete(`/api/aslan/workflow/workflow/${name}`)
+export function deleteWorkflowAPI (projectName, name) {
+  return http.delete(`/api/aslan/workflow/workflow/${name}?projectName=${projectName}`)
 }
 
-export function copyWorkflowAPI (oldName, newName) {
-  return http.put(`/api/aslan/workflow/workflow/old/${oldName}/new/${newName}`)
+export function copyWorkflowAPI (projectName, oldName, newName) {
+  return http.put(`/api/aslan/workflow/workflow/old/${oldName}/new/${newName}?projectName=${projectName}`)
 }
 
 export function precreateWorkflowTaskAPI (workflowName, envName) {
@@ -511,24 +511,24 @@ export function createWorkflowTaskAPI (productName, envName) {
   return http.get(`/api/aslan/workflow/workflowtask/targets/${productName}/${envName}`)
 }
 
-export function getRegistryWhenBuildAPI () {
-  return http.get('/api/aslan/system/registry')
+export function getRegistryWhenBuildAPI (projectName) {
+  return http.get(`/api/aslan/system/registry?projectName=${projectName}`)
 }
 
 export function getBuildTargetsAPI (productName) {
-  return http.get(`/api/aslan/build/targets/${productName}`)
+  return http.get(`/api/aslan/build/targets/${productName}?projectName=${productName}`)
 }
 
-export function runWorkflowAPI (data, isArtifact = false) {
+export function runWorkflowAPI (projectName, data, isArtifact = false) {
   if (isArtifact) {
-    return http.put('/api/aslan/workflow/workflowtask', data)
+    return http.put(`/api/aslan/workflow/workflowtask?projectName=${projectName}`, data)
   } else {
-    return http.post('/api/aslan/workflow/workflowtask', data)
+    return http.post(`/api/aslan/workflow/workflowtask?projectName=${projectName}`, data)
   }
 }
 
-export function restartWorkflowAPI (workflowName, taskID) {
-  return http.post(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}/restart`)
+export function restartWorkflowAPI (projectName, workflowName, taskID) {
+  return http.post(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}/restart?projectName=${projectName}`)
 }
 
 export function cancelWorkflowAPI (workflowName, taskID) {

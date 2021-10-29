@@ -201,7 +201,7 @@ export default {
       }
     },
     async deleteProject (projectName) {
-      const result = await Promise.all([listWorkflowAPI(), listProductAPI('', projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
+      const result = await Promise.all([listWorkflowAPI(projectName), listProductAPI('', projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
       const workflows = result[0].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
       const envNames = result[1].map((element) => { return element.env_name })
       const services = flattenDeep(result[2].services)
@@ -254,8 +254,6 @@ export default {
   },
   mounted () {
     this.$store.dispatch('getProjectList')
-
-    this.$store.dispatch('getWorkflowList')
     bus.$emit('show-sidebar', true)
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })
     bus.$emit('set-sub-sidebar-title', {

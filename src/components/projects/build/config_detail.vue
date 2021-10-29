@@ -1043,7 +1043,7 @@ export default {
           this.buildConfig.pre_build.image_id = this.systems[0].id
         }
       })
-      getRegistryWhenBuildAPI().then((res) => {
+      getRegistryWhenBuildAPI(projectName).then((res) => {
         this.allRegistry = res
       })
     }

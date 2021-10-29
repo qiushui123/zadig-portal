@@ -167,7 +167,7 @@ export default {
     },
     onSelectAction (action) {
       if (action.name === '失败重试') {
-        restartWorkflowAPI(this.workflowName, this.taskID).then(res => {
+        restartWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
           Notify({ type: 'success', message: '任务已重新启动' })
           this.$router.push('/mobile/status')
         })

@@ -280,7 +280,7 @@ export default {
       if (this.buildv2.type === 'jenkins_build') {
         type = 'jenkins_build'
       }
-      return getWorkflowHistoryBuildLogAPI(this.pipelineName, this.taskID, this.serviceName, type).then(
+      return getWorkflowHistoryBuildLogAPI(this.projectName, this.pipelineName, this.taskID, this.serviceName, type).then(
         response => {
           this.buildv2AnyLog = (response.split('\n')).map(element => {
             return element + '\n'

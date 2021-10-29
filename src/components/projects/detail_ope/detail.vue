@@ -487,7 +487,7 @@ export default {
     this.getProject(this.projectName)
   },
   mounted () {
-    this.$store.dispatch('getWorkflowList')
+    this.$store.dispatch('getWorkflowList', this.projectName)
     this.getEnvList()
     this.getCluster()
     this.getBuildConfig()

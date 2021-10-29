@@ -353,9 +353,9 @@ export default {
   },
   created () {
     this.runner.tests = this.testInfos
-    listProductAPI().then(res => {
+    const product = this.forcedUserInput.product_tmpl_name
+    listProductAPI('', product).then(res => {
       this.products = res
-      const product = this.forcedUserInput.product_tmpl_name
       const namespace = this.forcedUserInput.namespace
       if (this.haveForcedInput &&
         this.products.find(p => p.product_name === product)) {

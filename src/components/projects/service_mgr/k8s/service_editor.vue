@@ -192,7 +192,7 @@ export default {
     },
     updateTemplatePermission () {
       if (this.serviceInTree.status === 'added') {
-        updateServicePermissionAPI(this.service).then(response => {
+        updateServicePermissionAPI(this.projectName, this.service).then(response => {
           this.$emit('onRefreshService')
           this.$emit('onRefreshSharedService')
           if (this.service.visibility === 'public') {

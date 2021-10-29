@@ -141,7 +141,7 @@ export default {
   methods: {
     getWorkflows () {
       this.loading = true
-      this.$store.dispatch('refreshWorkflowList').then(() => {
+      this.$store.dispatch('refreshWorkflowList', this.projectName).then(() => {
         this.loading = false
       }).then(() => {
         const projectName = this.projectName
