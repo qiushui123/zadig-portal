@@ -660,7 +660,7 @@ export default {
             }
           })
         });
-        (this.isEdit ? updateTestAPI : createTestAPI)(this.test).then(res => {
+        (this.isEdit ? updateTestAPI : createTestAPI)(this.projectName, this.test).then(res => {
           this.$message({
             message: '保存成功',
             type: 'success'

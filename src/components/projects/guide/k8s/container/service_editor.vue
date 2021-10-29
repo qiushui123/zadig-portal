@@ -229,7 +229,7 @@ export default {
     }, 100),
     validateYaml (code) {
       const payload = this.service
-      validateYamlAPI(payload).then(res => {
+      validateYamlAPI(this.projectName, payload).then(res => {
         if (res && res.length > 0) {
           this.errors = res
         } else if (res && res.length === 0) {
