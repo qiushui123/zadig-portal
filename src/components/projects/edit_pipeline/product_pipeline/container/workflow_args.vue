@@ -128,7 +128,7 @@ export default {
     forcedInputTargetMap () {
       if (this.haveForcedInput) {
         if (this.artifactDeployEnabled) {
-          return _.keyBy(this.forcedUserInput.artifactArgs, (i) => {
+          return _.keyBy(this.forcedUserInput.artifact_args, (i) => {
             return i.service_name + '/' + i.name
           })
         }
@@ -141,7 +141,7 @@ export default {
     forcedInputTarget () {
       if (this.haveForcedInput) {
         if (this.artifactDeployEnabled) {
-          return this.forcedUserInput.artifactArgs
+          return this.forcedUserInput.artifact_args
         }
         return this.forcedUserInput.targets
       }

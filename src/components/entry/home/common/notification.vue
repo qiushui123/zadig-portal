@@ -4,7 +4,8 @@
                 placement="bottom"
                 width="300"
                 popper-class="notify-container"
-                trigger="click">
+                trigger="click"
+                v-model="showPopover">
       <div class="notify-header">
         <span class="msg">通知</span>
         <el-tooltip class="item"
@@ -136,7 +137,8 @@ export default {
   data: function () {
     return {
       notifications: [],
-      unreadMsgs: []
+      unreadMsgs: [],
+      showPopover: false
     }
   },
   methods: {
@@ -149,6 +151,7 @@ export default {
             this.unreadMsgs.push(element)
           }
         })
+        this.showPopover = !!this.unreadMsgs.length
       })
     },
 

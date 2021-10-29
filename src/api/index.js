@@ -930,6 +930,10 @@ export function getHostListAPI () {
   return http.get(`/api/aslan/system/privateKey`)
 }
 
+export function getHostLabelListAPI () {
+  return http.get(`/api/aslan/system/privateKey/labels`)
+}
+
 export function createHostAPI (payload) {
   return http.post(`/api/aslan/system/privateKey`, payload)
 }
@@ -940,6 +944,10 @@ export function updateHostAPI (id, payload) {
 
 export function deleteHostAPI (id) {
   return http.delete(`/api/aslan/system/privateKey/${id}`)
+}
+
+export function importHostAPI (payload) {
+  return http.post(`/api/aslan/system/privateKey/batch`, payload)
 }
 
 // Delivery Center
@@ -1166,7 +1174,7 @@ export function changePassword (payload) {
   return http.put('/api/directory/changePassword', payload)
 }
 
-// module repo
+// Template Helm
 export function getChartTemplatesAPI () {
   return http.get(`/api/aslan/template/charts`)
 }
@@ -1193,6 +1201,81 @@ export function deleteChartTemplateAPI (name) {
 
 export function createTemplateServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services?projectName=${productName}`, payload)
+}
+
+export function createTemplateMultiServiceAPI (productName, payload) {
+  return http.post(`/api/aslan/service/helm/services/bulk?productName=${productName}`, payload)
+}
+
+// Template Dockerfile
+export function getDockerfileTemplatesAPI () {
+  return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)
+}
+
+export function createDockerfileTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile`, payload)
+}
+
+export function updateDockerfileTemplateAPI (id, payload) {
+  return http.put(`/api/aslan/template/dockerfile/${id}`, payload)
+}
+
+export function validateDockerfileAPI (payload) {
+  return http.post(`/api/aslan/template/dockerfile/validation`, payload)
+}
+
+export function getDockerfileAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}`)
+}
+
+export function deleteDockerfileTemplateAPI (id) {
+  return http.delete(`/api/aslan/template/dockerfile/${id}`)
+}
+
+export function getDockerfileTemplateBuildReferenceAPI (id) {
+  return http.get(`/api/aslan/template/dockerfile/${id}/reference`)
+}
+
+// Template Kubernetes
+
+export function getKubernetesTemplatesAPI () {
+  return http.get(`/api/aslan/template/yaml?page_num=1&page_size=9999`)
+}
+
+export function createKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/yaml`, payload)
+}
+
+export function updateKubernetesTemplateAPI (id, payload) {
+  return http.put(`/api/aslan/template/yaml/${id}`, payload)
+}
+
+export function validateKubernetesAPI (payload) {
+  return http.post(`/api/aslan/template/yaml/validation`, payload)
+}
+
+export function getKubernetesAPI (id) {
+  return http.get(`/api/aslan/template/yaml/${id}`)
+}
+
+export function deleteKubernetesTemplateAPI (id) {
+  return http.delete(`/api/aslan/template/yaml/${id}`)
+}
+
+export function getKubernetesTemplateBuildReferenceAPI (id) {
+  return http.get(`/api/aslan/template/yaml/${id}/reference`)
+}
+
+export function loadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/load`, payload)
+}
+
+export function reloadServiceFromKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/service/template/reload`, payload)
+}
+
+export function updateKubernetesTemplateVariablesAPI (id, payload) {
+  return http.put(`/api/aslan/template/yaml/${id}/variables`, payload)
 }
 
 // helm env and service
@@ -1313,4 +1396,8 @@ export function addSystemRoleBindings (payload) {
 
 export function deleteSystemRoleBindings (name) {
   return http.delete(`/api/v1/system-rolebindings/${name}`)
+}
+
+export function getArtifactFileAPI (payload, id) {
+  return http.post(`/api/aslan/system/s3storage/${id}/releases/search?kind=file`, payload)
 }

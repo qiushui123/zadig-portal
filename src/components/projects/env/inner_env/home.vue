@@ -12,8 +12,8 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import bus from '@utils/event_bus'
+import { getProductsAPI } from '@api'
 export default {
   data () {
     return {
@@ -30,7 +30,6 @@ export default {
       } else if (availableProducts.envs.length === 0) {
         this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/create`
       }
-
       if (this.$route.params.service_name || this.$route.query.envName) {
         return
       }
