@@ -66,7 +66,7 @@
                 <template>
                   <tr>
                     <td>最近登录</td>
-                    <td class="">{{$utils.convertTimestamp(currentEditUserInfo.lastLogin)}}
+                    <td class="">{{$utils.convertTimestamp(currentEditUserInfo.lastLoginTime)}}
                     </td>
                   </tr>
                 </template>

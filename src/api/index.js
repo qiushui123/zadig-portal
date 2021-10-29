@@ -466,7 +466,7 @@ export function getAllBranchInfoAPI (data, param = '') {
 }
 
 export function getWorkflowBindAPI (testName) {
-  return http.get(`/api/aslan/workflow/workflow/testName/${testName}`)
+  return http.get(`/api/picket/workflow/workflow/testName/${testName}`)
 }
 
 export function listWorkflowAPI () {
