@@ -683,8 +683,7 @@ export default {
       }
     },
     getProducts () {
-      const projectName = this.productTmlName
-      listProductAPI('test', projectName).then(res => {
+      listProductAPI('test', this.this.$route.query.projectName).then(res => {
         this.products = res
       })
     },
