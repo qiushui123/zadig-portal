@@ -465,8 +465,8 @@ export function getAllBranchInfoAPI (data, param = '') {
   return http.put(`/api/aslan/code/codehost/infos?param=${param}`, data)
 }
 
-export function getWorkflowBindAPI (testName) {
-  return http.get(`/api/picket/workflow/workflow/testName/${testName}`)
+export function getWorkflowBindAPI (projectName, testName) {
+  return http.get(`/api/picket/workflow/testName/${testName}?projectName=${projectName}`)
 }
 
 export function listWorkflowAPI (projectName) {
@@ -959,7 +959,7 @@ export function getProjectInfoAPI (projectName) {
 }
 
 export function updateSingleProjectAPI (projectName, payload) {
-  return http.put(`/api/v1/picket/projects?projectName=${projectName}`, payload)
+  return http.put(`/api/v1/picket/projects/${projectName}?projectName=${projectName}`, payload)
 }
 
 export function createProjectAPI (payload) {
