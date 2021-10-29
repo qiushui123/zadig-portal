@@ -8,8 +8,7 @@
 </template>
 <script>
 import ServiceBuild from '@/components/projects/common/hosting/serviceBuild'
-import { mapGetters } from 'vuex'
-
+import { listProductAPI } from '@/api'
 export default {
   name: 'service_host',
   components: {
@@ -18,28 +17,30 @@ export default {
   data () {
     return {
       envName: '',
-      serviceName: null
+      serviceName: null,
+      envNameList: []
     }
   },
   computed: {
     projectName () {
       return this.$route.params.project_name
-    },
-    envNameList () {
-      return this.productList.filter(element => (element.name === this.projectName))
-    },
-    ...mapGetters([
-      'productList', 'signupStatus'
-    ])
+    }
   },
   methods: {
     tabChange (tab) {
       this.envName = tab.name
+    },
+    async getEnvNameList () {
+      const envNameList = await listProductAPI('', this.projectName)
+      envNameList.forEach(element => {
+        element.envName = element.env_name
+      })
+      this.envNameList = envNameList
     }
   },
   async created () {
     this.serviceName = this.$route.query.serviceName
-    await this.$store.dispatch('getProjectList')
+    await this.getEnvNameList()
     if (this.$route.query.envName) {
       this.envName = this.$route.query.envName
     } else if (this.envNameList.length) {
