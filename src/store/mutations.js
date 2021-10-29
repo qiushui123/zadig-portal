@@ -1,8 +1,10 @@
 // Profile
 export const INJECT_PROFILE = 'INJECT_PROFILE'
 
+export const INJECT_ROLE = 'INJECT_ROLE'
+
 // Env List
-export const SET_PRODUCT_LIST = 'SET_PRODUCT_LIST'
+export const SET_PROJECT_LIST = 'SET_PROJECT_LIST'
 
 // Install Status
 export const SET_SIGNUP_STATUS = 'SET_SIGNUP_STATUS'

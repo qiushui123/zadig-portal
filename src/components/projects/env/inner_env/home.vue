@@ -12,8 +12,8 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import bus from '@utils/event_bus'
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -23,19 +23,13 @@ export default {
   },
   methods: {
     async getProducts () {
-      await this.$store.dispatch('getProductList')
-
       const availableProducts = this.currentProjectProductList
-
       this.loading = false
-
-      if (availableProducts.length > 0) {
-        const useProduct = availableProducts.filter(product => !product.is_prod)[0] || availableProducts[0]
-        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${useProduct.env_name}`
-      } else if (availableProducts.length === 0) {
+      if (availableProducts.envs.length > 0) {
+        this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/detail?envName=${availableProducts.envs[0]}`
+      } else if (availableProducts.envs.length === 0) {
         this.jumpPath = `/v1/projects/detail/${this.projectName}/envs/create`
       }
-
       if (this.$route.params.service_name || this.$route.query.envName) {
         return
       }
@@ -47,8 +41,8 @@ export default {
       return this.$route.params.project_name
     },
     currentProjectProductList () {
-      return this.productList.filter(element => {
-        return element.product_name === this.projectName
+      return this.productList.find(element => {
+        return element.name === this.projectName
       })
     },
     ...mapGetters([

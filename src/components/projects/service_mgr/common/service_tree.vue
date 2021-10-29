@@ -599,7 +599,7 @@ export default {
       })
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     getServiceGroup () {
       this.serviceGroup = []

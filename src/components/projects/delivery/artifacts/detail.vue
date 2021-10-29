@@ -260,7 +260,7 @@ export default {
       const payload = {
         type: 'comment',
         content: this.commentContent,
-        created_by: this.$store.state.login.userinfo.info.name
+        created_by: this.$store.state.login.userinfo.name
       }
       addArtifactActivitiesAPI(id, payload).then((res) => {
         this.getArtifactsDetail(id)

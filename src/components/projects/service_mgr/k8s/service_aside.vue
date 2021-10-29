@@ -14,24 +14,24 @@
       <div class="aside-bar">
         <div class="tabs__wrap tabs__wrap_vertical">
           <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'build'}"
+               :class="{'selected': selected === 'build'}"
                @click="changeRoute('build')">
             <span class="step-name">构建</span>
           </div>
           <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'var'}"
+               :class="{'selected': selected === 'var'}"
                @click="changeRoute('var')">
             <span class="step-name">变量</span>
           </div>
           <div class="tabs__item"
-               :class="{'selected': $route.query.rightbar === 'help'}"
+               :class="{'selected': selected === 'help'}"
                @click="changeRoute('help')">
             <span class="step-name">帮助</span>
           </div>
         </div>
       </div>
       <div class="aside__content">
-        <div v-if="$route.query.rightbar === 'build'"
+        <div v-if="selected === 'build'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">构建</div>
@@ -49,7 +49,7 @@
               </el-button>
             </div>
         </div>
-        <div v-if="$route.query.rightbar === 'var'"
+        <div v-if="selected === 'var'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">变量</div>
@@ -247,7 +247,7 @@
             </section>
           </div>
         </div>
-        <div v-if="$route.query.rightbar === 'help'"
+        <div v-if="selected === 'help'"
              class="pipelines__aside--variables">
           <header class="pipeline-workflow-box__header">
             <div class="pipeline-workflow-box__title">帮助</div>
@@ -514,6 +514,10 @@ export default {
     },
     serviceType () {
       return 'k8s'
+    },
+    selected () {
+      const defaultAside = this.service.status === 'named' ? 'help' : 'var'
+      return this.$route.query.rightbar || defaultAside
     }
   },
   components: {

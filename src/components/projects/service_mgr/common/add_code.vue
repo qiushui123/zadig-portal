@@ -263,11 +263,10 @@ export default {
     createCodeConfig () {
       this.$refs.codeForm.validate((valid) => {
         if (valid) {
-          const id = this.currentOrganizationId
           const payload = this.codeAdd
           const redirect_url = window.location.href.split('?')[0]
           const provider = this.codeAdd.type
-          createCodeSourceAPI(id, payload).then((res) => {
+          createCodeSourceAPI(payload).then((res) => {
             const code_source_id = res.id
             this.$message({
               message: '代码源添加成功',
@@ -297,11 +296,6 @@ export default {
         message: '地址复制失败',
         type: 'error'
       })
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
   },
   watch: {

@@ -191,9 +191,6 @@ export default {
     }
   },
   computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     projectName () {
       return this.$route.params.project_name
     },

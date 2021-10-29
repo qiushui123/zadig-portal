@@ -1,338 +1,162 @@
 <template>
   <div class="integration-account-container">
-    <!--start of edit account dialog-->
-    <el-dialog title="用户管理-编辑"
-               custom-class="edit-form-dialog"
-               :close-on-click-modal="false"
-               :visible.sync="dialogUserAccountEditFormVisible">
-      <el-form :model="userAccountEdit"
-               @submit.native.prevent
-               :rules="userAccountRules"
-               status-icon
-               ref="userAccountUpdateForm">
-        <template v-if="userAccountEdit.type==='ad'||userAccountEdit.type==='ldap'">
-          <el-form-item label="主机名"
-                        prop="address">
-            <el-input v-model="userAccountEdit.address"
-                      placeholder="主机名"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="端口"
-                        prop="port">
-            <el-input-number v-model="userAccountEdit.port"
-                             size="medium"
-                             label="port"
-                             :min="0"
-                             :max="65535"></el-input-number>
-          </el-form-item>
-          <el-form-item label="用户名"
-                        prop="username">
-            <el-input v-model="userAccountEdit.username"
-                      placeholder="用户名"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="密码"
-                        prop="password">
-            <el-input v-model="userAccountEdit.password"
-                      placeholder="密码"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="DN"
-                        prop="dn">
-            <el-input v-model="userAccountEdit.dn"
-                      placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="userFilter"
-                        prop="userFilter">
-            <el-input v-model="userAccountEdit.userFilter"
-                      placeholder="userFilter"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="groupFilter"
-                        prop="groupFilter">
-            <el-input v-model="userAccountEdit.groupFilter"
-                      placeholder="groupFilter"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="TLS"
-                        prop="isTLS">
-            <el-checkbox v-model="userAccountEdit.isTLS">启用</el-checkbox>
-          </el-form-item>
-        </template>
-        <template v-else>
-          <el-form-item label="Client Id"
-                        prop="clientId">
-            <el-input v-model="userAccountEdit.clientId"
-                      placeholder="Client Id"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="Secret"
-                        prop="secret">
-            <el-input v-model="userAccountEdit.secret"
-                      placeholder="Secret"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="Redirect"
-                        prop="redirect">
-            <el-input v-model="userAccountEdit.redirect"
-                      placeholder="Redirect"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-        </template>
-      </el-form>
-      <div slot="footer"
-           class="dialog-footer">
-        <el-button v-if="userAccountEdit.type==='ad'||userAccountEdit.type==='ldap'"
-                   type="primary"
-                   native-type="submit"
-                   size="small"
-                   @click="updateAccountUser()"
-                   class="start-create">测试并保存</el-button>
-        <el-button v-else
-                   type="primary"
-                   native-type="submit"
-                   size="small"
-                   @click="updateSSO()"
-                   class="start-create">保存</el-button>
-        <el-button plain
-                   native-type="submit"
-                   size="small"
-                   @click="dialogUserAccountEditFormVisible = false">取消</el-button>
-      </div>
-    </el-dialog>
-    <!--end of edit account dialog-->
-
-    <!--start of add account dialog-->
-    <el-dialog title="用户管理-添加"
-               :close-on-click-modal="false"
-               custom-class="edit-form-dialog"
-               :visible.sync="dialogUserAccountAddFormVisible">
-      <el-form :model="userAccountAdd"
-               @submit.native.prevent
-               :rules="userAccountRules"
-               status-icon
-               ref="userAccountForm">
-        <el-form-item label="目录类型"
-                      prop="type">
-          <el-select v-model="userAccountAdd.type"
-                     @change="clearValidate('userAccountForm')">
-            <el-option label="Microsoft Active Directory"
-                       value="ad"></el-option>
-            <el-option label="OpenLDAP"
-                       value="ldap"></el-option>
-            <el-option label="SSO"
-                       value="sso"></el-option>
+    <el-dialog title="用户账户管理-添加" :close-on-click-modal="false" custom-class="edit-form-dialog" :visible.sync="dialogUserAccountFormVisible">
+      <el-form :model="userAccount" @submit.native.prevent :rules="userAccountRules" status-icon ref="userAccountForm">
+        <el-form-item label="账户类型" prop="type">
+          <el-select v-model="userAccount.type" @change="clearValidate('userAccountForm')" :disabled="userAccount.mode ==='edit'">
+            <!-- <el-option label="Microsoft Active Directory" value="ad"></el-option> -->
+            <el-option label="OpenLDAP" value="ldap"></el-option>
+            <el-option label="GitHub" value="github"></el-option>
+            <!-- <el-option label="SSO" value="sso"></el-option> -->
           </el-select>
         </el-form-item>
-        <template v-if="userAccountAdd.type==='ad'||userAccountAdd.type==='ldap'">
-          <el-form-item label="主机名"
-                        prop="address">
-            <el-input v-model="userAccountAdd.address"
-                      placeholder="主机名"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="端口"
-                        prop="port">
-            <el-input-number v-model="userAccountAdd.port"
-                             size="medium"
-                             label="port"
-                             :min="0"
-                             :max="65535"></el-input-number>
-          </el-form-item>
-          <el-form-item label="用户名"
-                        prop="username">
-            <el-input v-model="userAccountAdd.username"
-                      placeholder="登录到 LDAP 的用户。示例：cn=user,dc=domain,dc=name"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="密码"
-                        prop="password">
-            <el-input v-model="userAccountAdd.password"
-                      placeholder="密码"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="基础 DN"
-                        prop="dn">
-            <el-input v-model="userAccountAdd.dn"
-                      placeholder="从根节点搜索用户和用户组，例如：cn=users,dc=example.com,dc=com"
-                      autofocus
-                      clearable
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="userFilter"
-                        prop="userFilter">
-            <el-input v-model="userAccountAdd.userFilter"
-                      placeholder="userFilter"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="groupFilter"
-                        prop="groupFilter">
-            <el-input v-model="userAccountAdd.groupFilter"
-                      placeholder="groupFilter"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="TLS"
-                        prop="isTLS">
-            <el-checkbox v-model="userAccountAdd.isTLS">启用</el-checkbox>
-          </el-form-item>
-        </template>
-        <template v-if="userAccountAdd.type==='sso'">
-          <el-form-item label="Client Id"
-                        prop="clientId">
-            <el-input v-model="userAccountAdd.clientId"
-                      placeholder="Client Id"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="Secret"
-                        prop="secret">
-            <el-input v-model="userAccountAdd.secret"
-                      placeholder="Secret"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="Redirect"
-                        prop="redirect">
-            <el-input v-model="userAccountAdd.redirect"
-                      placeholder="Redirect"
-                      autofocus
-                      auto-complete="off"></el-input>
-          </el-form-item>
-        </template>
       </el-form>
-      <div slot="footer"
-           class="dialog-footer">
-        <el-button v-if="userAccountAdd.type!==''"
-                   type="primary"
-                   native-type="submit"
-                   size="small"
-                   @click="createAccountUser()"
-                   class="start-create">{{userAccountAdd.type==='sso'?'保存':'测试并保存'}}</el-button>
-        <el-button plain
-                   native-type="submit"
-                   size="small"
-                   @click="handleUserAccountCancel">取消</el-button>
+      <template v-if="userAccount.type ==='github'">
+        <el-form
+          :model="userAccountGitHub.config"
+          @submit.native.prevent
+          :rules="userAccountGitHubRules"
+          status-icon
+          ref="userAccountGitHubForm"
+        >
+          <el-form-item label="clientID" prop="clientID">
+            <el-input v-model="userAccountGitHub.config.clientID" placeholder="clientID" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="clientSecret" prop="clientSecret">
+            <el-input v-model="userAccountGitHub.config.clientSecret" placeholder="clientSecret" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="redirectURI" prop="redirectURI">
+            <el-input v-model="userAccountGitHub.config.redirectURI" placeholder="redirectURI" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="teamNameField" prop="teamNameField">
+            <el-input v-model="userAccountGitHub.config.teamNameField" placeholder="teamNameField" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="其它">
+            <el-checkbox v-model="userAccountGitHub.config.loadAllGroups">loadAllGroups</el-checkbox>
+            <el-checkbox v-model="userAccountGitHub.config.useLoginAsID">useLoginAsID</el-checkbox>
+          </el-form-item>
+        </el-form>
+      </template>
+      <template v-if="userAccount.type ==='ldap'">
+        <el-form :model="userAccountLDAP" @submit.native.prevent :rules="userAccountLDAPRules" status-icon ref="userAccountLDAPForm">
+          <el-form-item label="主机名:端口" prop="config.host">
+            <el-input v-model="userAccountLDAP.config.host" placeholder="主机名:端口" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="bindDN" prop="config.bindDN">
+            <el-input v-model="userAccountLDAP.config.bindDN" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="bindPW" prop="config.bindPW">
+            <el-input v-model="userAccountLDAP.config.bindPW" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="usernamePrompt" prop="config.usernamePrompt">
+            <el-input v-model="userAccountLDAP.config.usernamePrompt" autofocus clearable auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.baseDN" prop="config.userSearch.baseDN">
+            <el-input v-model="userAccountLDAP.config.userSearch.baseDN" placeholder="userSearch.baseDN" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.filter" prop="config.userSearch.filter">
+            <el-input v-model="userAccountLDAP.config.userSearch.filter" placeholder="userSearch.filter" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.username" prop="config.userSearch.username">
+            <el-input v-model="userAccountLDAP.config.userSearch.username" placeholder="userSearch.username" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.idAttr" prop="config.userSearch.idAttr">
+            <el-input v-model="userAccountLDAP.config.userSearch.idAttr" placeholder="userSearch.idAttr" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.emailAttr" prop="config.userSearch.emailAttr">
+            <el-input
+              v-model="userAccountLDAP.config.userSearch.emailAttr"
+              placeholder="userSearch.emailAttr"
+              autofocus
+              auto-complete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="userSearch.nameAttr" prop="config.userSearch.nameAttr">
+            <el-input v-model="userAccountLDAP.config.userSearch.nameAttr" placeholder="userSearch.nameAttr" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="groupSearch.baseDN" prop="config.groupSearch.baseDN">
+            <el-input v-model="userAccountLDAP.config.groupSearch.baseDN" placeholder="groupSearch.baseDN" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="groupSearch.filter" prop="config.groupSearch.filter">
+            <el-input v-model="userAccountLDAP.config.groupSearch.filter" placeholder="groupSearch.filter" autofocus auto-complete="off"></el-input>
+          </el-form-item>
+          <!-- todo userMatchers: -->
+          <el-form-item label="groupSearch.nameAttr" prop="config.groupSearch.nameAttr">
+            <el-input
+              v-model="userAccountLDAP.config.groupSearch.nameAttr"
+              placeholder="groupSearch.nameAttr"
+              autofocus
+              auto-complete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="其它">
+            <el-checkbox v-model="userAccountLDAP.config.startTLS">startTLS</el-checkbox>
+            <el-checkbox v-model="userAccountLDAP.config.insecureNoSSL">insecureNoSSL</el-checkbox>
+            <el-checkbox v-model="userAccountLDAP.config.insecureSkipVerify">insecureSkipVerify</el-checkbox>
+          </el-form-item>
+        </el-form>
+      </template>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button
+          v-if="userAccount.mode==='add'"
+          :disabled="userAccount.type === ''"
+          type="primary"
+          native-type="submit"
+          size="small"
+          @click="createAccountUser()"
+          class="start-create"
+        >保存</el-button>
+        <el-button
+          v-else-if="userAccount.mode==='edit'"
+          :disabled="userAccount.type === ''"
+          type="primary"
+          native-type="submit"
+          size="small"
+          @click="updateAccountUser()"
+          class="start-create"
+        >保存</el-button>
+        <el-button plain native-type="submit" size="small" @click="handleUserAccountCancel">取消</el-button>
       </div>
     </el-dialog>
     <!--end of add account dialog-->
     <div class="tab-container">
       <template>
-        <el-alert type="info"
-                  :closable="false">
+        <el-alert type="info" :closable="false">
           <template>
             为系统定义用户来源，默认支持 LDAP、AD、以及 SSO 集成，详情可参考
-            <el-link style="font-size: 14px; vertical-align: baseline;"
-                     type="primary"
-                     :href="`https://docs.koderover.com/zadig/settings/account/`"
-                     :underline="false"
-                     target="_blank">帮助文档</el-link> 。
+            <el-link
+              style="font-size: 14px; vertical-align: baseline;"
+              type="primary"
+              :href="`https://docs.koderover.com/zadig/settings/account/`"
+              :underline="false"
+              target="_blank"
+            >帮助文档</el-link>。
           </template>
         </el-alert>
       </template>
       <div class="sync-container">
-        <el-button v-if="(accounts.length+sso.length) < 2"
-                   size="small"
-                   type="primary"
-                   plain
-                   @click="handleUserAccountAdd()">添加</el-button>
+        <el-button size="small" type="primary" plain @click="addAccount()">添加</el-button>
       </div>
-      <el-table v-if="accounts.length>0"
-                :data="accounts"
-                style="width: 100%;">
-        <el-table-column label="目录类型">
-          <template slot-scope="scope">
-            {{scope.row.type}}
-          </template>
+      <el-table v-if="accounts.length>0" :data="accounts" style="width: 100%;">
+        <el-table-column label="名称">
+          <template slot-scope="scope">{{scope.row.name}}</template>
         </el-table-column>
-        <el-table-column label="主机名">
-          <template slot-scope="scope">
-            {{scope.row.address}}
-          </template>
+        <el-table-column label="账户类型">
+          <template slot-scope="scope">{{scope.row.type}}</template>
         </el-table-column>
-        <el-table-column label="端口">
+        <el-table-column label="操作" width="300">
           <template slot-scope="scope">
-            {{scope.row.port}}
-          </template>
-        </el-table-column>
-        <el-table-column label="基础 DN">
-          <template slot-scope="scope">
-            {{scope.row.dn}}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作"
-                         width="300">
-          <template slot-scope="scope">
-            <el-button type="primary"
-                       size="mini"
-                       :loading="syncAccountUserLoading"
-                       @click="syncAccountUser()"
-                       plain>同步用户数据</el-button>
-            <el-button type="primary"
-                       size="mini"
-                       plain
-                       @click="handleUserAccountEdit(scope.row)">编辑</el-button>
-            <el-button type="danger"
-                       size="mini"
-                       @click="handleUserAccountDelete()"
-                       plain>删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-table v-if="sso.length>0"
-                :data="sso"
-                style="width: 100%;">
-        <el-table-column label="账号系统">
-          <template>
-            <span>SSO</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Client Id">
-          <template slot-scope="scope">
-            {{scope.row.clientId}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Redirect">
-          <template slot-scope="scope">
-            {{scope.row.redirect}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Secret">
-          <template slot-scope="scope">
-            {{scope.row.secret}}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作"
-                         width="300">
-          <template slot-scope="scope">
-            <el-button type="primary"
-                       size="mini"
-                       plain
-                       @click="handleSSOEdit(scope.row)">编辑</el-button>
-            <el-button type="danger"
-                       size="mini"
-                       @click="handleSSODelete()"
-                       plain>删除</el-button>
+            <el-button type="primary" size="mini" plain @click="handleUserAccountEdit(scope.row)">编辑</el-button>
+            <el-button type="danger" size="mini" @click="handleUserAccountDelete(scope.row)" plain>删除</el-button>
+            <el-button
+              v-if="scope.row.type === 'ldap'"
+              type="primary"
+              size="mini"
+              :loading="syncAccountUserLoading"
+              @click="syncAccountUser(scope.row)"
+              plain
+            >同步</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -341,197 +165,202 @@
 </template>
 <script>
 import {
-  getAccountAPI, deleteAccountAPI, updateAccountAPI, createAccountAPI, syncAccountAPI,
-  getSSOAPI, updateSSOAPI, deleteSSOAPI, createSSOAPI
+  getConnectorsAPI,
+  deleteConnectorAPI,
+  updateConnectorAPI,
+  createConnectorAPI,
+  syncLDAPAPI
 } from '@api'
+import { cloneDeep } from 'lodash'
 export default {
   data () {
     return {
-      tabPosition: 'top',
-      activeTab: '',
       accounts: [],
-      sso: [],
-      dialogUserAccountAddFormVisible: false,
-      dialogUserAccountEditFormVisible: false,
+      dialogUserAccountFormVisible: false,
       syncAccountUserLoading: false,
-      userAccountAdd: {
+      userAccount: {
         type: '',
-        clientId: '',
-        userFilter: '(cn=%s)',
-        groupFilter: '(cn=*)',
-        secret: '',
-        redirect: '',
-        address: '',
-        port: 389,
-        isTLS: false,
-        dn: '',
-        username: '',
-        password: ''
+        mode: 'add'
       },
-      userAccountEdit: {
-        type: '',
-        clientId: '',
-        secret: '',
-        redirect: '',
-        address: '',
-        port: 389,
-        isTLS: false,
-        dn: '',
-        username: '',
-        password: ''
-      },
-      userAccountRules: {
-        type: {
-          required: true,
-          message: '请选择账号类型',
-          trigger: ['blur', 'change']
-        },
-        clientId: {
-          required: true,
-          message: '请填写 Client Id',
-          trigger: ['blur', 'change']
-        },
-        secret: {
-          required: true,
-          message: '请填写 Secret',
-          trigger: ['blur', 'change']
-        },
-        redirect: {
-          required: true,
-          message: '请填写 Redirect 地址',
-          trigger: ['blur', 'change']
-        },
-        address: {
-          required: true,
-          message: '请填写主机名',
-          trigger: ['blur', 'change']
-        },
-        port: {
-          required: true,
-          message: '请填写端口',
-          trigger: ['blur', 'change']
-        },
-        username: {
-          required: true,
-          message: '请填写用户名',
-          trigger: ['blur', 'change']
-        },
-        password: {
-          required: true,
-          message: '请填写密码',
-          trigger: ['blur', 'change']
-        },
-        dn: {
-          required: true,
-          message: '请填写 DN',
-          trigger: ['blur', 'change']
-        },
-        userFilter: {
-          required: true,
-          message: '请填写 userFilter',
-          trigger: ['blur', 'change']
-        },
-        groupFilter: {
-          required: true,
-          message: '请填写 groupFilter',
-          trigger: ['blur', 'change']
+      userAccountLDAP: {
+        type: 'ldap',
+        id: 'ldap',
+        name: 'LDAP',
+        config: {
+          host: '',
+          insecureNoSSL: false,
+          insecureSkipVerify: false,
+          startTLS: true,
+          // rootCA: '/etc/dex/ldap.ca',
+          // rootCAData:'',
+          bindDN: '',
+          bindPW: '',
+          usernamePrompt: 'SSO Username',
+          userSearch: {
+            baseDN: '',
+            filter: '(objectClass=person)',
+            username: '',
+            idAttr: '',
+            emailAttr: '',
+            nameAttr: ''
+          },
+          groupSearch: {
+            baseDN: '',
+            filter: '',
+            // userMatchers: [
+            //   {
+            //     userAttr: 'uid',
+            //     groupAttr: 'member'
+            //   }
+            // ],
+            nameAttr: 'name'
+          }
         }
-      }
+      },
+      userAccountGitHub: {
+        type: 'github',
+        id: 'github',
+        name: 'GitHub',
+        config: {
+          clientID: '',
+          clientSecret: '',
+          redirectURI: '',
+          // orgs: [
+          //   {
+          //     name: 'my-organization'
+          //   },
+          //   {
+          //     name: 'my-organization-with-teams',
+          //     teams: ['red-team', 'blue-team']
+          //   }
+          // ],
+          loadAllGroups: false,
+          teamNameField: 'slug',
+          useLoginAsID: false
+        }
+      },
+      userAccountRules: {},
+      userAccountLDAPRules: {},
+      userAccountGitHubRules: {}
+    }
+  },
+  computed: {
+    type () {
+      return this.userAccount.type
     }
   },
   methods: {
     clearValidate (ref) {
       this.$refs[ref].clearValidate()
     },
-    handleUserAccountAdd () {
-      this.dialogUserAccountAddFormVisible = true
+    addAccount () {
+      this.dialogUserAccountFormVisible = true
+      this.userAccount = {
+        type: '',
+        mode: 'add'
+      }
     },
     handleUserAccountEdit (row) {
-      this.dialogUserAccountEditFormVisible = true
-      this.userAccountEdit = this.$utils.cloneObj(row)
-      this.userAccountEdit.password = ''
+      const type = row.type
+      this.userAccount = {
+        type: type,
+        mode: 'edit'
+      }
+      this.dialogUserAccountFormVisible = true
+      if (type === 'ldap') {
+        this.userAccountLDAP = cloneDeep(row)
+      } else if (type === 'github') {
+        this.userAccountGitHub = cloneDeep(row)
+      }
     },
     handleUserAccountCancel () {
-      if (this.$refs.userAccountForm) {
-        this.$refs.userAccountForm.resetFields()
-        this.dialogUserAccountAddFormVisible = false
+      if (this.$refs.userAccountGitHubForm) {
+        console.log(this.$refs.userAccountGitHubForm)
+        // this.$refs.userAccountGitHubForm.resetFields()
+        this.userAccountGitHub = {
+          type: 'github',
+          id: 'github',
+          name: 'GitHub',
+          config: {
+            clientID: '',
+            clientSecret: '',
+            redirectURI: '',
+            loadAllGroups: false,
+            teamNameField: 'slug',
+            useLoginAsID: false
+          }
+        }
       }
-      if (this.$refs.userAccountUpdateForm) {
-        this.$refs.userAccountUpdateForm.resetFields()
-        this.dialogUserAccountEditFormVisible = false
+      if (this.$refs.userAccountLDAPForm) {
+        console.log(this.$refs.userAccountLDAPForm)
+        // this.$refs.userAccountLDAPForm.resetFields()
+        this.userAccountLDAP = {
+          type: 'ldap',
+          id: 'ldap',
+          name: 'LDAP',
+          config: {
+            host: '',
+            insecureNoSSL: false,
+            insecureSkipVerify: false,
+            startTLS: true,
+            bindDN: '',
+            bindPW: '',
+            usernamePrompt: 'SSO Username',
+            userSearch: {
+              baseDN: '',
+              filter: '(objectClass=person)',
+              username: '',
+              idAttr: '',
+              emailAttr: '',
+              nameAttr: ''
+            },
+            groupSearch: {
+              baseDN: '',
+              filter: '',
+              nameAttr: 'name'
+            }
+          }
+        }
       }
+      this.dialogUserAccountFormVisible = false
     },
-    handleUserAccountDelete () {
-      this.$confirm(`确定要删除这个 AD 配置吗？`, '确认', {
+    handleUserAccountDelete (row) {
+      this.$confirm(`确定要删除 ${row.name} 这个账户类型吗？`, '确认', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const id = this.currentOrganizationId
-        deleteAccountAPI(id).then((res) => {
+        deleteConnectorAPI(row.id).then(res => {
           this.getAccountConfig()
           this.$message({
-            message: 'AD 配置删除成功',
-            type: 'success'
-          })
-        })
-      })
-    },
-    handleSSOEdit (row) {
-      this.dialogUserAccountEditFormVisible = true
-      this.userAccountEdit = this.$utils.cloneObj(row)
-    },
-    handleSSODelete (row) {
-      this.$confirm(`确定要删除这个 SSO 配置吗？`, '确认', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        const id = this.currentOrganizationId
-        deleteSSOAPI(id).then((res) => {
-          this.getAccountConfig()
-          this.$message({
-            message: 'SSO 配置删除成功',
+            message: '删除成功',
             type: 'success'
           })
         })
       })
     },
     getAccountConfig () {
-      const id = this.currentOrganizationId
-      getAccountAPI(id).then((res) => {
-        if (!res.resultCode) {
-          this.$set(this.accounts, [0], res)
-        } else {
-          this.$set(this, 'accounts', [])
-        }
-      })
-      getSSOAPI(id).then((res) => {
-        if (!res.resultCode) {
-          this.$set(this.sso, [0], res)
-        } else {
-          this.$set(this, 'sso', [])
-        }
+      getConnectorsAPI().then(res => {
+        this.$set(this, 'accounts', res)
       })
     },
-    syncAccountUser () {
+    syncAccountUser (row) {
+      const id = row.id
       this.syncAccountUserLoading = true
-      const id = this.currentOrganizationId
-      syncAccountAPI(id).then((res) => {
+      syncLDAPAPI(id).then(res => {
         this.syncAccountUserLoading = false
         this.$message({
-          message: '用户数据同步成功',
+          message: '同步 LDAP 数据成功',
           type: 'success'
         })
       })
     },
     createAccountUser () {
-      this.$refs.userAccountForm.validate((valid) => {
-        if (valid) {
-          const id = this.currentOrganizationId
-          if (this.userAccountAdd.type === 'ldap' || this.userAccountAdd.type === 'ad') {
-            const payload = this.userAccountAdd
-            createAccountAPI(id, payload).then((res) => {
+      if (this.type === 'ldap') {
+        this.$refs.userAccountLDAPForm.validate(valid => {
+          if (valid) {
+            const payload = this.userAccountLDAP
+            createConnectorAPI(payload).then(res => {
               this.getAccountConfig()
               this.handleUserAccountCancel()
               this.$message({
@@ -539,65 +368,65 @@ export default {
                 type: 'success'
               })
             })
-          } else if (this.userAccountAdd.type === 'sso') {
-            const payload = this.userAccountAdd
-            createSSOAPI(id, payload).then((res) => {
-              this.getAccountConfig()
-              this.handleUserAccountCancel()
-              this.$message({
-                message: '用户数据添加成功',
-                type: 'success'
-              })
-            })
+          } else {
+            return false
           }
-        } else {
-          return false
-        }
-      })
+        })
+      } else if (this.type === 'github') {
+        this.$refs.userAccountGitHubForm.validate(valid => {
+          if (valid) {
+            const payload = this.userAccountGitHub
+            createConnectorAPI(payload).then(res => {
+              this.getAccountConfig()
+              this.handleUserAccountCancel()
+              this.$message({
+                message: '用户数据添加成功',
+                type: 'success'
+              })
+            })
+          } else {
+            return false
+          }
+        })
+      }
     },
     updateAccountUser () {
-      this.$refs.userAccountUpdateForm.validate((valid) => {
-        if (valid) {
-          const id = this.currentOrganizationId
-          const payload = this.userAccountEdit
-          updateAccountAPI(id, payload).then((res) => {
-            this.getAccountConfig()
-            this.handleUserAccountCancel()
-            this.$message({
-              message: '用户数据修改成功',
-              type: 'success'
+      if (this.type === 'ldap') {
+        this.$refs.userAccountLDAPForm.validate(valid => {
+          if (valid) {
+            const payload = this.userAccountLDAP
+            updateConnectorAPI(payload.id, payload).then(res => {
+              this.getAccountConfig()
+              this.handleUserAccountCancel()
+              this.$message({
+                message: '用户数据修改成功',
+                type: 'success'
+              })
             })
-          })
-        } else {
-          return false
-        }
-      })
-    },
-    updateSSO () {
-      this.$refs.userAccountUpdateForm.validate((valid) => {
-        if (valid) {
-          const id = this.currentOrganizationId
-          const payload = this.userAccountEdit
-          updateSSOAPI(id, payload).then((res) => {
-            this.getAccountConfig()
-            this.dialogUserAccountEditFormVisible = false
-            this.$message({
-              message: '用户数据修改成功',
-              type: 'success'
+          } else {
+            return false
+          }
+        })
+      } else if (this.type === 'github') {
+        this.$refs.userAccountGitHubForm.validate(valid => {
+          if (valid) {
+            const payload = this.userAccountGitHub
+            updateConnectorAPI(payload.id, payload).then(res => {
+              this.getAccountConfig()
+              this.handleUserAccountCancel()
+              this.$message({
+                message: '用户数据修改成功',
+                type: 'success'
+              })
             })
-          })
-        } else {
-          return false
-        }
-      })
+          } else {
+            return false
+          }
+        })
+      }
     }
   },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
-  },
-  activated () {
+  mounted () {
     this.getAccountConfig()
   }
 }

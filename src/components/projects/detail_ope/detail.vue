@@ -36,6 +36,14 @@
                   <i class="el-icon-delete"></i>
                   <span class="add-filter-value-title">删除</span>
                 </button>
+                <router-link v-if="isProjectAdmin"
+                             :to="`/v1/projects/detail/${projectName}/rbac`">
+                  <button type="button"
+                          class="display-btn">
+                    <i class="el-icon-lock"></i>
+                    <span class="add-filter-value-title">权限</span>
+                  </button>
+                </router-link>
               </div>
 
             </div>
@@ -429,8 +437,7 @@ export default {
       })
     },
     getUserList () {
-      const orgId = this.currentOrganizationId
-      usersAPI(orgId).then((res) => {
+      usersAPI({}).then((res) => {
         this.usersList = res.data
       })
     },
@@ -458,9 +465,6 @@ export default {
     ...mapGetters([
       'workflowList'
     ]),
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     projectAdminArray () {
       return this.usersList
         ? this.usersList.filter(userInfo => {
@@ -474,7 +478,7 @@ export default {
       if (this.$utils.roleCheck().superAdmin) {
         return true
       }
-      return this.currentProject.user_ids ? this.currentProject.user_ids.includes(this.$store.state.login.userinfo.info.id) : false
+      return this.currentProject.user_ids ? this.currentProject.user_ids.includes(this.$store.state.login.userinfo.uid) : false
     }
   },
   components: {

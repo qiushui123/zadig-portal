@@ -1,5 +1,4 @@
 // Polyfill EventSource if browser does not support it
-import 'eventsource-polyfill'
 
 const formatters = {
   plain: e => e.data,
@@ -19,7 +18,11 @@ export default {
       )
 
       const source = new EventSource(url, {
-        withCredentials: config.withCredentials
+        withCredentials: config.withCredentials,
+        headers: {
+          Authorization: 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
+
+        }
       })
 
       return new Promise((resolve, reject) => {

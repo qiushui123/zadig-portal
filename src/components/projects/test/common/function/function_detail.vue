@@ -397,7 +397,7 @@ import bus from '@utils/event_bus'
 import ValidateSubmit from '@utils/validate_async'
 import Editor from 'vue2-ace-bind'
 import {
-  getAllAppsAPI, getImgListAPI, productTemplatesAPI, getCodeSourceAPI, createTestAPI, updateTestAPI, singleTestAPI
+  getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createTestAPI, updateTestAPI, singleTestAPI
 } from '@api'
 const validateTestName = (rule, value, callback) => {
   if (value === '') {
@@ -579,9 +579,6 @@ export default {
         this.test.post_test.stcov.enable = val
       }
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     useWorkspaceCache: {
       get () {
         return !this.test.pre_test.clean_workspace
@@ -693,14 +690,10 @@ export default {
     }
   },
   created () {
-    const orgId = this.currentOrganizationId
-    productTemplatesAPI().then(res => {
-      this.productTemplates = res
-    })
     getAllAppsAPI().then(res => {
       this.allApps = this.makeMapOfArray(this.$utils.sortVersion(res, 'version', 'asc'), 'name')
     })
-    getCodeSourceAPI(orgId).then((response) => {
+    getCodeSourceAPI().then((response) => {
       this.allCodeHosts = response
     })
     getImgListAPI().then((response) => {

@@ -364,7 +364,6 @@ export default {
         this.$refs.registry.validate(valid => {
           if (valid) {
             const payload = this.registry
-            payload.org_id = this.currentOrganizationId
             this.dialogRegistryCreateFormVisible = false
             this.addRegistry(payload)
           } else {
@@ -424,16 +423,10 @@ export default {
     },
     getRegistry () {
       this.loading = true
-      const organizationId = this.currentOrganizationId
-      getRegistryListAPI(organizationId).then((res) => {
+      getRegistryListAPI().then((res) => {
         this.loading = false
         this.allRegistry = res
       })
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     }
   },
   watch: {

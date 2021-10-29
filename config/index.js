@@ -3,7 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path');
-const backEndAddr = '';
+const backEndAddr = 'http://test.nga-qa.8slan.com';
 
 module.exports = {
   dev: {
@@ -19,6 +19,14 @@ module.exports = {
           '^/api': '/api',
         },
       },
+      '/login': {
+          target: backEndAddr,
+          changeOrigin: true,
+          ws: true,
+          pathRewrite: {
+            '^/login': '/login',
+          }
+        }
     },
 
     // Various Dev Server settings

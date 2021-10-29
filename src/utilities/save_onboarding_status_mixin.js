@@ -16,7 +16,7 @@ export default {
             reject(err)
           })
           .then(() => {
-            this.$store.dispatch('refreshProjectTemplates')
+            this.$store.dispatch('getProjectList')
           })
       })
     }

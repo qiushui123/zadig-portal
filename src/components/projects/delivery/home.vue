@@ -22,15 +22,9 @@ export default {
       productNames: []
     }
   },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
-  },
   methods: {
     getVersionProductList () {
-      const orgId = this.currentOrganizationId
-      getVersionProductListAPI(orgId).then((res) => {
+      getVersionProductListAPI().then((res) => {
         this.loading = false
         this.productNames = res
         if (res.length === 0) {

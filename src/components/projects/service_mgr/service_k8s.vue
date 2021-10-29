@@ -218,7 +218,7 @@ export default {
       })
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     async checkProjectFeature () {
       const projectName = this.projectName
@@ -277,10 +277,6 @@ export default {
     ...mapGetters([
       'productList'
     ]),
-
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     envNameList () {
       const envNameList = []
       this.productList.forEach(element => {

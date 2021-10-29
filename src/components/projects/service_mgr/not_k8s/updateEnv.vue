@@ -42,7 +42,7 @@ export default {
       this.updateEnvDialogVisible = true
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     autoUpgradeEnv () {
       const payload = {

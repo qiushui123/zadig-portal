@@ -47,7 +47,14 @@
                   <el-input :disabled="!showProductName"
                             v-model="projectForm.product_name"></el-input>
                 </el-form-item>
-
+                <el-form-item label="项目权限"
+                              v-show="activeName !=='advance'"
+                              prop="public">
+                  <el-radio-group v-model="projectForm.public">
+                    <el-radio :label="true">公开</el-radio>
+                    <el-radio :label="false">私有</el-radio>
+                  </el-radio-group>
+                </el-form-item>
                 <el-form-item v-if="isEdit"
                               v-show="activeName==='advance'"
                               label="服务部署超时（分钟）"
@@ -174,7 +181,7 @@
                         <el-option v-for="(user,index) in users"
                                    :key="index"
                                    :label="user.name"
-                                   :value="user.id">
+                                   :value="user.uid">
                         </el-option>
                       </el-select>
                     </el-form-item>
@@ -246,8 +253,8 @@ export default {
         team_id: null,
         timeout: null,
         desc: '',
-        visibility: 'public',
         enabled: true,
+        public: true,
         product_feature: {
           basic_facility: 'kubernetes',
           deploy_type: 'k8s',
@@ -264,30 +271,34 @@ export default {
         user_ids: [
           { type: 'array', required: true, message: '请选择项目管理员', trigger: 'change' }
         ],
-        visibility: [
-          { type: 'string', required: true, message: '请选择项目可见范围', trigger: 'change' }
-        ],
         enabled: [
           { type: 'boolean', required: true, message: '请选择项目是否启用项目', trigger: 'change' }
         ],
         timeout: [
           { required: true, trigger: 'change', validator: validateDeployTimeout }
+        ],
+        public: [
+          { required: true, message: '项目权限不能为空', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
-    getUsers () {
-      const orgId = this.currentOrganizationId
-      usersAPI(orgId).then((res) => {
-        this.users = this.$utils.deepSortOn(res.data, 'name')
+    getUsers (user_ids) {
+      const paload = {
+        uids: user_ids
+      }
+      usersAPI(paload).then((res) => {
+        this.users = this.$utils.deepSortOn(res.users, 'name')
       })
     },
     remoteMethod (query) {
       if (query !== '') {
         this.loading = true
-        const orgId = this.currentOrganizationId
-        usersAPI(orgId, '', 0, 0, query).then((res) => {
+        const paload = {
+          name: query
+        }
+        usersAPI(paload).then((res) => {
           this.loading = false
           this.users = this.$utils.deepSortOn(res.data, 'name')
         })
@@ -308,7 +319,7 @@ export default {
           type: 'success',
           message: '新建项目成功'
         })
-        this.$store.dispatch('refreshProjectTemplates')
+        this.$store.dispatch('getProjectList')
         if (payload.product_feature.basic_facility === 'kubernetes') {
           if (payload.product_feature.create_env_type === 'external') {
             this.$router.push(`/v1/projects/create/${payload.product_name}/host/config?step=1`)
@@ -331,13 +342,14 @@ export default {
           type: 'success',
           message: '更新项目成功'
         })
-        this.$store.dispatch('refreshProjectTemplates')
+        this.$store.dispatch('getProjectList')
         this.$router.push('/v1/projects')
       })
     },
     getProject (projectName) {
       getSingleProjectAPI(projectName).then((res) => {
         this.projectForm = res
+        this.getUsers(res.user_ids)
         if (res.team_id === 0) {
           this.projectForm.team_id = null
         }
@@ -387,11 +399,8 @@ export default {
     ...mapGetters([
       'signupStatus'
     ]),
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     currentUserId () {
-      return this.$store.state.login.userinfo.info.id
+      return this.$store.state.login.userinfo.uid
     },
     isEdit () {
       return this.$route.path.includes('/projects/edit')
@@ -408,9 +417,7 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('getSignupStatus')
     if (this.isEdit) {
-      this.getUsers()
       this.getProject(this.projectName)
     }
   }

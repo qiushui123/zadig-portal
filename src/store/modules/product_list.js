@@ -1,6 +1,6 @@
 import * as types from '../mutations'
 import { getProductsAPI } from '../../api'
-
+import { orderBy } from 'lodash'
 const state = {
   productList: []
 }
@@ -8,26 +8,29 @@ const state = {
 const getters = {
   productList: (state) => {
     return state.productList
+  },
+  getOnboardingTemplates: (state) => {
+    return state.productList
+      .filter((temp) => {
+        return temp.onboarding_status
+      })
   }
 }
 
 const mutations = {
-  [types.SET_PRODUCT_LIST] (state, payload) {
+  [types.SET_PROJECT_LIST] (state, payload) {
     state.productList = payload
   }
 }
 
 const actions = {
-  async getProductList ({ commit, state, rootGetters }) {
+  async getProjectList ({ commit, state, rootGetters }) {
     return await getProductsAPI().then(
       (res) => {
-        commit(types.SET_PRODUCT_LIST, res)
+        const result = orderBy(res, 'name')
+        commit(types.SET_PROJECT_LIST, result)
       }
     )
-  },
-  refreshProductList ({ commit, state, rootGetters, dispatch }) {
-    commit(types.SET_PRODUCT_LIST, [])
-    return dispatch('getProductList')
   }
 }
 

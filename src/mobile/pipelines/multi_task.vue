@@ -263,9 +263,6 @@ export default {
     workflowName () {
       return this.$route.params.workflow_name
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     taskID () {
       return this.$route.params.task_id
     },

@@ -39,7 +39,7 @@ export default {
   },
   async created () {
     this.serviceName = this.$route.query.serviceName
-    await this.$store.dispatch('getProductList')
+    await this.$store.dispatch('getProjectList')
     if (this.$route.query.envName) {
       this.envName = this.$route.query.envName
     } else if (this.envNameList.length) {

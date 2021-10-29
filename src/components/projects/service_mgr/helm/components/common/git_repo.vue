@@ -2,8 +2,10 @@
   <div class="git-repo-container">
     <div v-if="!controlParam.hiddenRepoSelect" class="repo-attr">
       <span>仓库属性</span>
-      <el-radio v-model="gitName" label="private">私有库</el-radio>
-      <el-radio v-model="gitName" label="public">公开库</el-radio>
+      <el-radio-group v-model="gitName" :disabled="isUpdate">
+        <el-radio label="private">私有库</el-radio>
+        <el-radio label="public">公开库</el-radio>
+      </el-radio-group>
     </div>
     <el-form v-if="gitName === 'private'" :model="source" :rules="sourceRules" ref="sourceForm" label-width="140px">
       <el-form-item
@@ -22,6 +24,7 @@
           placeholder="请选择托管平台"
           @change="queryRepoOwnerById(source.codehostId)"
           filterable
+          :disabled="isUpdate"
         >
           <el-option
             v-for="(host, index) in allCodeHosts"
@@ -46,7 +49,7 @@
               message: '代码库拥有者不能为空',
               trigger: 'change',
             }"
-      >
+        >
         <el-select
           v-model="source.repoOwner"
           size="small"
@@ -54,6 +57,7 @@
           @change="getRepoNameById(source.codehostId, source.repoOwner)"
           placeholder="请选择代码库拥有者"
           filterable
+          :disabled="isUpdate"
         >
           <el-option v-for="(repo, index) in codeInfo['repoOwners']" :key="index" :label="repo.name" :value="repo.name"></el-option>
         </el-select>
@@ -86,6 +90,7 @@
             size="small"
             placeholder="请选择代码库"
             filterable
+            :disabled="isUpdate"
           >
             <el-option v-for="(repo, index) in codeInfo['repos']" :key="index" :label="repo.name" :value="repo.name"></el-option>
           </el-select>
@@ -99,7 +104,7 @@
                 trigger: 'change',
               }"
         >
-          <el-select v-model.trim="source.branchName" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable>
+          <el-select v-model.trim="source.branchName" placeholder="请选择分支" style="width: 100%;" size="small" filterable allow-create clearable :disabled="isUpdate">
             <el-option v-for="(branch, branch_index) in codeInfo['branches']" :key="branch_index" :label="branch.name" :value="branch.name"></el-option>
           </el-select>
         </el-form-item>
@@ -112,7 +117,7 @@
               }"
         >
           <span :key="item" v-for="item in selectPath">[{{ item }}]&nbsp;</span>
-          <el-button @click="openFileTree" :disabled="!showSelectFileBtn" type="primary" plain size="mini" round>选择文件目录</el-button>
+          <el-button @click="openFileTree" :disabled="!showSelectFileBtn || isUpdate" type="primary" plain size="mini" round>选择文件目录</el-button>
         </el-form-item>
       </template>
       <el-form-item v-if="!controlParam.hiddenCreateButton">
@@ -121,11 +126,11 @@
     </el-form>
     <el-form v-if="gitName === 'public'" :model="source" :rules="sourceRules" ref="sourceForm" label-width="140px">
       <el-form-item prop="url" label="仓库地址">
-        <el-input v-model="source.url" placeholder="https://github.com/owner/repo" size="small"></el-input>
+        <el-input v-model="source.url" placeholder="https://github.com/owner/repo" size="small" :disabled="isUpdate"></el-input>
       </el-form-item>
       <el-form-item prop="path" label="文件目录：">
         <span :key="item" v-for="item in selectPath">[{{ item }}]&nbsp;</span>
-        <el-button @click="openFileTree" :disabled="!source.url" type="primary" plain size="mini" round>选择文件目录</el-button>
+        <el-button @click="openFileTree" :disabled="!source.url || isUpdate" type="primary" plain size="mini" round>选择文件目录</el-button>
       </el-form-item>
       <el-form-item>
         <el-button size="small" :loading="loading" plain @click="submit">加载</el-button>
@@ -216,7 +221,8 @@ export default {
         repoOwners: [],
         repos: [],
         branches: []
-      }
+      },
+      isUpdate: false
     }
   },
   methods: {
@@ -378,21 +384,36 @@ export default {
     }
   },
   watch: {
-    value: {
+    currentService: {
       handler (value) {
-        const currentService = this.currentService
-        if (value && currentService) {
-          if (currentService.src_path) {
-            this.gitName = 'public'
-          } else {
-            this.gitName = 'private'
+        if (value) {
+          if (value.source) {
+            const createFrom = value.create_from
+            if (value.source === 'publicRepo') {
+              this.gitName = 'public'
+              this.source.url = createFrom.repo_link
+            } else {
+              this.gitName = 'private'
+              const gitRepoConfig = createFrom.git_repo_config
+              this.source.codehostId = gitRepoConfig.codehost_id
+              this.source.branchName = gitRepoConfig.branch
+              this.source.repoName = gitRepoConfig.repo
+              this.source.repoOwner = gitRepoConfig.owner
+            }
+            this.selectPath = [createFrom.load_path]
+          } else { // 老数据
+            if (value.src_path) {
+              this.gitName = 'public'
+            } else {
+              this.gitName = 'private'
+            }
+            this.source.codehostId = value.codehost_id
+            this.source.branchName = value.branch_name
+            this.source.repoName = value.repo_name
+            this.source.repoOwner = value.repo_owner
+            this.source.url = value.src_path
+            this.selectPath = [value.load_path]
           }
-          this.source.codehostId = currentService.codehost_id
-          this.source.branchName = currentService.branch_name
-          this.source.repoName = currentService.repo_name
-          this.source.repoOwner = currentService.repo_owner
-          this.source.url = currentService.src_path
-          this.selectPath = [currentService.load_path]
           this.isUpdate = true
         } else {
           this.isUpdate = false

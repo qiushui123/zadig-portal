@@ -380,6 +380,48 @@
           </el-table-column>
         </el-table>
       </template>
+      <template v-if="artifact_deployArray.length > 0">
+        <div class="section-head">
+          环境更新
+        </div>
+
+        <el-table :data="artifact_deployArray"
+                  row-key="_target"
+                  :expand-row-keys="expandedArtifactDeploys"
+                  @expand-change="updateArtifactDeployExpanded"
+                  row-class-name="my-table-row"
+                  empty-text="无"
+                  class="build-deploy-table">
+          <el-table-column type="expand">
+            <template slot-scope="scope">
+              <task-detail-artifact-deploy :deploy="scope.row.artifact_deploySubTask" :workflowName="workflowName" :taskID="taskID">
+              </task-detail-artifact-deploy>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="_target"
+                           label="服务"
+                           width="200px"></el-table-column>
+
+          <el-table-column>
+            <template slot="header">
+              交付物部署
+            </template>
+            <template slot-scope="scope">
+              <span :class="scope.row.buildOverallColor">
+                {{ scope.row.buildOverallStatusZh }}
+              </span>
+              {{ scope.row.buildOverallTimeZh }}
+              <el-tooltip v-if="scope.row.buildOverallTimeZhSec<0"
+                          content="本地系统时间和服务端可能存在不一致，请同步。"
+                          placement="top">
+                <i class="el-icon-warning"
+                   style="color: red;"></i>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+        </el-table>
+      </template>
       <div v-if="testArray.length > 0"
            class="section-head">
         产品测试
@@ -581,9 +623,6 @@ export default {
     workflowName () {
       return this.$route.params.workflow_name
     },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     taskID () {
       return this.$route.params.task_id
     },
@@ -604,12 +643,30 @@ export default {
       }
       return map
     },
+    artifact_deployMap () {
+      const map = {}
+      const stage = this.taskDetail.stages.find(stage => stage.type === 'artifact_deploy')
+      if (stage) {
+        this.collectSubTask(map, 'artifact_deploy')
+      }
+      return map
+    },
     artifactDeployArray () {
       const arr = this.$utils.mapToArray(this.artifactDeployMap, '_target')
       for (const target of arr) {
         target.buildOverallStatusZh = this.myTranslate(target.deploySubTask.status)
         target.buildOverallColor = this.colorTranslation(target.deploySubTask.status, 'pipeline', 'task')
         target.buildOverallTimeZhSec = this.calcElapsedTimeNum(target.deploySubTask)
+        target.buildOverallTimeZh = this.$utils.timeFormat(target.buildOverallTimeZhSec)
+      }
+      return arr
+    },
+    artifact_deployArray () {
+      const arr = this.$utils.mapToArray(this.artifact_deployMap, '_target')
+      for (const target of arr) {
+        target.buildOverallStatusZh = this.myTranslate(target.artifact_deploySubTask.status)
+        target.buildOverallColor = this.colorTranslation(target.artifact_deploySubTask.status, 'pipeline', 'task')
+        target.buildOverallTimeZhSec = this.calcElapsedTimeNum(target.artifact_deploySubTask)
         target.buildOverallTimeZh = this.$utils.timeFormat(target.buildOverallTimeZhSec)
       }
       return arr
@@ -806,10 +863,9 @@ export default {
       })
     },
     checkDeliveryList () {
-      const orgId = this.currentOrganizationId
       const workflowName = this.workflowName
       const taskId = this.taskID
-      getVersionListAPI(orgId, workflowName, '', taskId).then((res) => {
+      getVersionListAPI(workflowName, '', taskId).then((res) => {
         this.versionList = res
       })
     },

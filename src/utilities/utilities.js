@@ -1,5 +1,4 @@
 import storejs from '@node_modules/store/dist/store.legacy.js'
-import router from '../router/index.js'
 import { isEmpty } from 'lodash'
 
 const entitiesRegexp = /[&"'<>]/g
@@ -333,19 +332,11 @@ const utils = {
    * @returns { admin:boolean,superAdmin:boolean}
    */
   roleCheck () {
-    const userinfo = storejs.get('ZADIG_LOGIN_INFO')
-    if (userinfo && userinfo.info) {
-      return {
-        /* DONOT USE ADMIN ROLE!!
+    return {
+      /* DONOT USE ADMIN ROLE!!
            admin role in system is deprecated now
            admin: userinfo.info.isAdmin, */
-        superAdmin: userinfo.info.isSuperUser,
-        teamLeader: userinfo.info.isTeamLeader
-      }
-    } else {
-      router.replace({
-        path: '/signin'
-      })
+      superAdmin: !!JSON.parse(localStorage.getItem('role')).map(item => (item.role)).includes('admin')
     }
   },
   getUsername () {

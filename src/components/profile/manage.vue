@@ -50,16 +50,13 @@
             </div>
           </div>
           <div class="info-tag">
-            <span class="username"> {{currentEditUserInfo.info.name}} </span>
-            <el-tag v-if="currentEditUserInfo.info.isSuperUser"
+            <span class="username"> {{currentEditUserInfo.name}} </span>
+            <el-tag  v-if="role.includes('admin')"
                     size="small"
                     type="warning">管理员</el-tag>
             <el-tag v-else
                     size="small"
                     type="primary">普通用户</el-tag>
-            <el-tag v-if="currentEditUserInfo.info.isTeamLeader"
-                    size="small"
-                    type="primary">团队管理员</el-tag>
 
           </div>
 
@@ -69,7 +66,7 @@
                 <template>
                   <tr>
                     <td>最近登录</td>
-                    <td class="">{{$utils.convertTimestamp(currentEditUserInfo.info.lastLogin)}}
+                    <td class="">{{$utils.convertTimestamp(currentEditUserInfo.lastLoginTime)}}
                     </td>
                   </tr>
                 </template>
@@ -84,7 +81,7 @@
                                type="text">点击下载</el-button>
                   </td>
                 </tr>
-                <tr v-if="currentEditUserInfo.info.directory ==='system'">
+                <tr v-if="currentEditUserInfo.identityType ==='system'">
                   <td>
                     <span>修改密码
                     </span>
@@ -150,7 +147,9 @@
 <script>
 import bus from '@utils/event_bus'
 import supportDoc from './common/support_doc.vue'
-import { getCurrentUserInfoAPI, updateCurrentUserInfoAPI, getJwtTokenAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
+import { updateCurrentUserInfoAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI, queryUserAPI } from '@api'
+import { mapState } from 'vuex'
+
 export default {
   data () {
     const validateNewPass = (rule, value, callback) => {
@@ -173,35 +172,14 @@ export default {
       }
     }
     return {
-      currentEditUserInfo: {
-        info: {
-          id: 5,
-          name: '',
-          email: '',
-          password: '',
-          phone: '',
-          isAdmin: true,
-          isSuperUser: false,
-          isTeamLeader: false,
-          organization_id: 0,
-          directory: 'system',
-          teams: []
-        },
-        teams: [],
-        organization: {
-          id: 1,
-          name: '',
-          token: '',
-          website: ''
-        }
-      },
+      currentEditUserInfo: null,
       pwd: {
         oldPassword: '',
         newPassword: '',
         confirmPassword: ''
       },
       jwtToken: null,
-      loading: true,
+      loading: false,
       modifiedPwdDialogVisible: false,
       sysNoti: {},
       pipelineNoti: {},
@@ -217,17 +195,14 @@ export default {
     }
   },
   methods: {
-    getUserInfo () {
-      this.loading = true
-      getCurrentUserInfoAPI().then((res) => {
-        this.loading = false
+    async getUserInfo () {
+      const res = await queryUserAPI(this.userinfo.uid).catch(error => console.log(error))
+      if (res) {
         this.currentEditUserInfo = res
-      })
+      }
     },
     getJwtToken () {
-      getJwtTokenAPI().then((res) => {
-        this.jwtToken = res.token
-      })
+      this.jwtToken = JSON.parse(localStorage.getItem('userInfo')).token
     },
     copySuccess (event) {
       this.$message({
@@ -247,7 +222,7 @@ export default {
     updateUserInfo () {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          const id = this.currentEditUserInfo.info.id
+          const id = this.currentEditUserInfo.uid
           const payload = {
             oldPassword: this.pwd.oldPassword,
             newPassword: this.pwd.newPassword
@@ -325,7 +300,11 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      userinfo: (state) => state.login.userinfo,
+      role: (state) => state.login.role
 
+    })
   },
   created () {
     bus.$emit('set-topbar-title', { title: '账号设置', breadcrumb: [] })
@@ -333,9 +312,9 @@ export default {
       title: '',
       routerList: []
     })
-    this.getUserInfo()
     this.getJwtToken()
     this.getSubscribe()
+    this.getUserInfo()
   },
   components: {
     supportDoc

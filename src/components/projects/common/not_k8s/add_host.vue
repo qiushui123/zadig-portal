@@ -45,7 +45,7 @@
           </el-option>
           <el-option :value="0"
                      label="其它">
-            <i class="iconfont iconqita"></i> <span>其它</span>
+            <i class="iconfont iconwuliji"></i> <span>其它</span>
           </el-option>
         </el-select>
       </el-form-item>
@@ -106,6 +106,7 @@ export default {
           provider: null,
           label: '',
           ip: '',
+          is_prod: false,
           user_name: '',
           private_key: ''
         }

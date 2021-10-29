@@ -164,11 +164,6 @@ export default {
       }
     }
   },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
-  },
   watch: {
     'registry.reg_provider': {
       deep: true,
@@ -192,7 +187,6 @@ export default {
       this.$refs.registry.validate(valid => {
         if (valid) {
           const payload = this.registry
-          payload.org_id = this.currentOrganizationId
           createRegistryAPI(payload).then((res) => {
             this.$message({
               type: 'success',

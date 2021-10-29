@@ -15,8 +15,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { orderBy } from 'lodash'
-import { getProjectWithEnvsAPI } from '@api'
 import bus from '@utils/event_bus'
 export default {
   data () {
@@ -28,7 +26,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getOnboardingTemplates'
+      'productList'
     ]),
     isInProject () {
       return this.$route.path.includes('/projects/detail/')
@@ -36,10 +34,10 @@ export default {
   },
   methods: {
     async getProducts () {
-      const projectsWithEnvs = await getProjectWithEnvsAPI()
-      const routerList = orderBy(projectsWithEnvs, ['name']).filter(product => {
-        return !this.getOnboardingTemplates.includes(product.name)
-      }).map(element => {
+      const projectList = this.productList.filter(product => {
+        return !product.onboard && product.envs.length
+      })
+      const routerList = projectList.map(element => {
         return { name: element.name, url: `/v1/envs/detail/${element.name}?envName=${element.envs[0]}` }
       })
       bus.$emit('set-sub-sidebar-title', {
@@ -48,11 +46,11 @@ export default {
       })
 
       this.loading = false
-      if (projectsWithEnvs.length === 0) {
+      if (this.productList.length === 0) {
         this.emptyEnvs = true
         return
       }
-      this.firstJumpPath = `/v1/envs/detail/${projectsWithEnvs[0].name}?envName=${projectsWithEnvs[0].envs[0]}`
+      this.firstJumpPath = `/v1/envs/detail/${projectList[0].name}?envName=${projectList[0].envs[0]}`
       if (!this.$route.params.project_name) {
         this.$router.push(this.firstJumpPath)
       }
@@ -69,6 +67,7 @@ export default {
   },
   mounted () {
     this.getProducts()
+
     bus.$emit('set-topbar-title', { title: '集成环境', breadcrumb: [] })
   }
 }

@@ -452,8 +452,7 @@ export default {
     },
     getVersionDetail () {
       const versionId = this.versionId
-      const orgId = this.currentOrganizationId
-      getVersionListAPI(orgId).then((res) => {
+      getVersionListAPI().then((res) => {
         const currentVersionDetail = res.find(item => item.versionInfo.id === versionId)
         this.transformData(currentVersionDetail)
         this.$set(this, 'currentVersionDetail', currentVersionDetail)
@@ -579,9 +578,6 @@ export default {
     }
   },
   computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
     versionId () {
       return this.$route.params.id
     },

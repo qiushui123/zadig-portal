@@ -480,14 +480,8 @@ export default {
       })
     }
   },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
-  },
   mounted () {
-    const orgId = this.currentOrganizationId
-    getCodeSourceAPI(orgId).then((response) => {
+    getCodeSourceAPI().then((response) => {
       this.allCodeHosts = response
     });
     (this.showFirstLine && this.config.repos.length === 0) && this.addFirstBuildRepo()

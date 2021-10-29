@@ -17,7 +17,7 @@
                    target="_blank">文档</a></li>
               <li><a href="/v1/profile/info"
                    class="btn-request"
-                   target="_blank"> {{ $store.state.login.userinfo.info.name}}</a></li>
+                   target="_blank"> {{ $store.state.login.userinfo.name}}</a></li>
             </ul>
           </div>
         </div>
@@ -62,7 +62,6 @@
 
 </template>
 <script>
-import storejs from '@node_modules/store/dist/store.legacy.js'
 export default {
   methods: {
     goBack () {
@@ -70,7 +69,7 @@ export default {
     }
   },
   mounted () {
-    this.$store.commit('INJECT_PROFILE', storejs.get('ZADIG_LOGIN_INFO'))
+    this.$store.dispatch('GETUSERINFO')
   }
 }
 </script>

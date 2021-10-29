@@ -27,6 +27,13 @@
           <el-input size="small"
                     v-model="addUser.password"></el-input>
         </el-form-item>
+        <el-form-item label="角色"
+                      prop="isSuperUser">
+          <el-radio-group v-model="addUser.isSuperUser">
+            <el-radio :label="true">管理员</el-radio>
+            <el-radio :label="false">普通用户</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <div slot="footer"
            class="dialog-footer">
@@ -88,34 +95,21 @@
             {{ scope.row.email}}
           </template>
         </el-table-column>
-        <el-table-column prop="lastLogin"
+        <el-table-column prop="lastLoginTime"
                          label="登录信息">
           <template slot-scope="scope">
-            <span v-if="scope.row.lastLogin">{{$utils.convertTimestamp(scope.row.lastLogin)}}</span>
+            <span v-if="scope.row.lastLoginTime">{{$utils.convertTimestamp(scope.row.lastLoginTime)}}</span>
             <span v-else>{{'尚未登录'}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="directory"
-                         label="来源">
-          <template slot-scope="scope">
-            <span>{{scope.row.directory}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="leaders"
-                         label="系统角色">
-          <template slot-scope="scope">
-            <el-tag type="info"
-                    size="small">{{scope.row.isSuperUser?'管理员':'普通用户'}}</el-tag>
-          </template>
-        </el-table-column>
+
         <el-table-column label="操作"
                          width="280">
-          <template slot-scope="scope">
-            <el-button v-show="usersTableData.length > 1 && scope.row.directory === 'system'"
-                       @click="deleteUser(scope.row)"
-                       type="danger"
+           <template slot-scope="scope">
+            <el-button @click="editUserRole(scope.row)"
+                       type="primary"
                        size="mini"
-                       plain>删除</el-button>
+                       plain>更改角色</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -134,16 +128,19 @@
       <!--page divide-->
 
     </div>
-
+  <EditUserRole ref="editUserRole" :editUser="editUser" />
   </div>
 </template>
 
 <script>
 
-import { addUserAPI, usersAPI, deleteUserAPI } from '@api'
+import { addUserAPI, usersAPI, deleteUserAPI, addSystemRoleBindings } from '@api'
 import bus from '@utils/event_bus'
-
+import EditUserRole from './editUserRole.vue'
 export default {
+  components: {
+    EditUserRole
+  },
   data () {
     return {
       users: [],
@@ -155,8 +152,7 @@ export default {
         name: '',
         phone: ''
       },
-      editUser: {
-      },
+      editUser: null,
       searchUser: '',
       totalUser: 0,
       userPageSize: 10,
@@ -207,6 +203,16 @@ export default {
     }
   },
   methods: {
+    async addBindings () {
+      if (res) {
+        this.$message.success('创建管理员权限成功')
+        this.dialogEditRoleVisible = false
+      }
+    },
+    editUserRole (user) {
+      this.editUser = user
+      this.$refs.editUserRole.dialogEditRoleVisible = true
+    },
     submit () {
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -214,28 +220,19 @@ export default {
         }
       })
     },
-    handleUserRoleUpdate () {
-      const payload = {
-        userId: this.editUser.id,
-        isSuperUser: this.editUser.isSuperUser
-      }
-      editUserRoleAPI(payload).then((res) => {
-        this.dialogEditRoleVisible = false
-        this.$message({
-          type: 'success',
-          message: '更改角色成功'
-        })
-        this.getUsers(this.searchId, this.userPageSize, this.currentPageList, this.searchUser)
-      })
-    },
-    getUsers (team_id, page_size = 0, page_index = 0, keyword = '') {
-      const orgId = this.currentOrganizationId
+    async getUsers (page_size = 0, page_index = 0, keyword = '') {
       this.loading = true
-      usersAPI(orgId, team_id, page_size, page_index, keyword).then((res) => {
-        this.loading = false
-        this.totalUser = Number(res.headers['x-total'])
-        this.usersTableData = res.data
-      })
+      const payload = {
+        page: page_index,
+        per_page: page_size,
+        name: keyword
+      }
+      const res = await usersAPI(payload).catch(error => console.log(error))
+      if (res) {
+        this.totalUser = res.totalCount
+        this.usersTableData = res.users
+      }
+      this.loading = false
     },
     deleteUser (row) {
       this.$confirm(`确定删除系统用户 ${row.name}`, '提示', {
@@ -248,7 +245,7 @@ export default {
             type: 'success',
             message: '删除用户成功'
           })
-          this.getUsers(this.searchId, this.userPageSize, this.currentPageList, this.searchUser)
+          this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
         })
       }).catch(() => {
         this.$message({
@@ -261,15 +258,22 @@ export default {
       this.$refs.addUserForm.validate((valid) => {
         if (valid) {
           const payload = this.addUser
-          const orgId = this.currentOrganizationId
-          addUserAPI(orgId, payload).then((res) => {
+          addUserAPI(payload).then(async (res) => {
             this.dialogAddUserVisible = false
+            if (payload.isSuperUser) {
+              const paload = {
+                name: res.email + '-' + 'admin',
+                role: 'admin',
+                uid: res.uid
+              }
+              await addSystemRoleBindings(paload).catch(error => console.log(error))
+            }
+            this.$refs.addUserForm.resetFields()
+            this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
             this.$message({
               type: 'success',
               message: '新建用户成功'
             })
-            this.$refs.addUserForm.resetFields()
-            this.getUsers(this.searchId, this.userPageSize, this.currentPageList, this.searchUser)
           })
         } else {
           return false
@@ -278,24 +282,16 @@ export default {
     },
     handleSizeChange (val) {
       this.userPageSize = val
-      this.getUsers(this.searchId, this.userPageSize, this.currentPageList, this.searchUser)
+      this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
     },
     handleCurrentChange (val) {
       this.currentPageList = val
-      this.getUsers(this.searchId, this.userPageSize, this.currentPageList, this.searchUser)
-    }
-  },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    },
-    searchId () {
-      return ''
+      this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
     }
   },
   watch: {
     searchUser: function (val, oldVal) {
-      this.getUsers('', this.userPageSize, this.currentPageList, val)
+      this.getUsers(this.userPageSize, this.currentPageList, val)
     }
   },
   created () {
@@ -304,7 +300,7 @@ export default {
       title: '',
       routerList: []
     })
-    this.getUsers('', this.userPageSize, this.currentPageList, this.searchUser)
+    this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
   }
 }
 </script>

@@ -123,13 +123,10 @@
                     </div>
                     <ul class="content profile-list">
                       <li class="profile-list__item active">
-                        <span>{{$store.state.login.userinfo.info.name}}</span>
-                        <el-tag v-if="$utils.roleCheck().superAdmin"
+                        <span>{{userInfo.name}}</span>
+                        <el-tag v-if="role.includes('admin')"
                                 size="mini"
                                 type="info">管理员</el-tag>
-                        <el-tag v-else-if="$utils.roleCheck().teamLeader"
-                                size="mini"
-                                type="info">团队管理员</el-tag>
                         <el-tag v-else
                                 size="mini"
                                 type="info">普通用户</el-tag>
@@ -137,7 +134,7 @@
                     </ul>
                   </li>
                 </ul>
-                <ul v-if="$utils.roleCheck().superAdmin"
+                <ul v-if="role.includes('admin')"
                     class="profile-list profile-list__with-icon user-settings">
                   <router-link to="/v1/users/account/manage">
                     <li class="profile-list__item">
@@ -173,7 +170,7 @@
                    class="menu-avatar"
                    alt="">
               <span class="username">
-                {{ $store.state.login.userinfo.info.name}}
+                {{ userInfo.name}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
             </div>
@@ -184,12 +181,10 @@
   </div>
 </template>
 <script>
-import { userLogoutAPI } from '@api'
 import notification from './common/notification.vue'
-import storejs from '@node_modules/store/dist/store.legacy.js'
 import mixin from '@utils/topbar_mixin'
 import bus from '@utils/event_bus'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -204,6 +199,10 @@ export default {
     ...mapGetters([
       'k8sProductSelected'
     ]),
+    ...mapState({
+      role: (state) => state.login.role,
+      userInfo: (state) => state.login.userinfo
+    }),
     selectedProduct: {
       get () {
         return this.k8sProductSelected
@@ -215,22 +214,13 @@ export default {
     }
   },
   methods: {
-    logOut () {
-      userLogoutAPI().then(
-        response => {
-          storejs.remove('ZADIG_LOGIN_INFO')
-          this.$message({
-            message: '登出成功',
-            type: 'success'
-          })
-          this.$store.dispatch('clearProjectTemplates')
-          if (this.showSSOBtn) {
-            window.location.href = this.redirectUrl
-          } else {
-            this.$router.push('/signin')
-          }
-        }
-      )
+    async logOut () {
+      await this.$store.dispatch('LOGINOUT')
+      if (this.showSSOBtn) {
+        window.location.href = this.redirectUrl
+      } else {
+        this.$router.push('/signin')
+      }
     },
     handleCommand (command) {
       if (command === 'logOut') {
@@ -259,7 +249,6 @@ export default {
     }
   },
   created () {
-    this.$store.commit('INJECT_PROFILE', storejs.get('ZADIG_LOGIN_INFO'))
     bus.$on('set-topbar-title', (params) => {
       this.changeTitle(params)
     })

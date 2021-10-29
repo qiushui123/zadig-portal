@@ -77,8 +77,8 @@ const routes = [
         }
       },
       {
-        path: 'projects/chart',
-        component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/index.vue'),
+        path: 'projects/template',
+        component: () => import(/* webpackChunkName: "template-lib" */ '@/components/projects/template_lib/index.vue'),
         meta: {
           title: '模板库'
         },
@@ -89,9 +89,22 @@ const routes = [
           },
           {
             path: 'charts',
-            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/chart_temp/chart/index.vue'),
+            component: () => import(/* webpackChunkName: "chart-template" */ '@/components/projects/template_lib/chart_templates/index.vue'),
             meta: {
               title: 'Chart 模板库'
+            }
+          }, {
+            path: 'dockerfiles',
+            component: () => import(/* webpackChunkName: "dockerfile-template" */ '@/components/projects/template_lib/dockerfile_templates/index.vue'),
+            meta: {
+              title: 'Dockerfile 模板库'
+            }
+          },
+          {
+            path: 'k8s-yamls',
+            component: () => import(/* webpackChunkName: "k8s-template" */ '@/components/projects/template_lib/k8s_templates/index.vue'),
+            meta: {
+              title: 'Kubernetes YAML 模板库'
             }
           }]
       },
@@ -322,6 +335,14 @@ const routes = [
         ]
       },
       {
+        path: 'projects/detail/:project_name/rbac',
+        component: () => import(/* webpackChunkName: "project-rbac" */ '@/components/projects/rbac/home.vue'),
+        meta: {
+          requiresAuth: true,
+          title: '权限管理'
+        }
+      },
+      {
         path: 'projects/detail/:project_name/pipelines/multi/:workflow_name',
         component: () => import(/* webpackChunkName: "project-pipeline" */ '@/components/projects/pipeline/workflow_multi_detail.vue'),
         meta: {
@@ -511,7 +532,6 @@ const routes = [
     component: onboarding_home,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: false,
       title: '交付中心'
     },
     children: [
@@ -594,7 +614,6 @@ const routes = [
     component: onboarding_home,
     meta: {
       requiresAuth: true,
-      requiresSuperAdmin: true,
       title: '用户管理'
     },
     children: [
@@ -642,8 +661,7 @@ const routes = [
     path: '/v1/system',
     component: onboarding_home,
     meta: {
-      requiresAuth: true,
-      requiresSuperAdmin: false
+      requiresAuth: true
     },
     children: [
       {

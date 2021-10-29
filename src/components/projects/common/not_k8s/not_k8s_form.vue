@@ -334,7 +334,8 @@
                 true，表示在 Zadig 系统上执行脚本<br>
                 &lt;REPONAME&gt;_PR 构建过程中指定代码仓库使用的 Pull Request 信息<br>
                 &lt;REPONAME&gt;_BRANCH 构建过程中指定代码仓库使用的分支信息<br>
-                &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用 Tag 信息
+                &lt;REPONAME&gt;_TAG 构建过程中指定代码仓库使用 Tag 信息<br>
+                &lt;REPONAME&gt;_COMMIT_ID 构建过程中指定代码的 commit 信息
               </div>
           <span class="variable">变量</span>
         </el-tooltip>
@@ -459,15 +460,29 @@
                                @click="createHost"
                                type="text">创建主机</el-button>
                     <el-select v-else
-                               v-model="item.host_ids"
-                               size="small"
-                               multiple
-                               placeholder="请选择主机">
-                      <el-option v-for="(host,index) in  allHost"
-                                 :key="index"
-                                 :label="`${host.name}-${host.ip}`"
-                                 :value="host.id">
-                      </el-option>
+                              size="mini"
+                              multiple
+                              filterable
+                              v-model="item.host_ids"
+                              placeholder="请选择主机">
+                      <el-option-group
+                        label="主机标签">
+                        <el-option
+                          v-for="(item,index) in allHostLabels"
+                          :key="index"
+                          :label="`${item}`"
+                          :value="item">
+                        </el-option>
+                      </el-option-group>
+                      <el-option-group
+                        label="主机列表">
+                        <el-option
+                          v-for="item in allHost"
+                          :key="item.name"
+                           :label="`${item.name}-${item.ip}`"
+                          :value="item.id">
+                        </el-option>
+                      </el-option-group>
                     </el-select>
                   </el-form-item>
                 </div>
@@ -720,7 +735,7 @@
   </div>
 </template>
 <script>
-import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI } from '@api'
+import { listProductAPI, serviceTemplateAPI, getBuildConfigsAPI, getBuildConfigDetailAPI, getAllAppsAPI, getImgListAPI, getCodeSourceAPI, createPmServiceAPI, updatePmServiceAPI, getHostListAPI, getHostLabelListAPI } from '@api'
 import Editor from 'vue2-ace-bind'
 import ValidateSubmit from '@utils/validate_async'
 import Resize from '@/components/common/resize.vue'
@@ -736,6 +751,7 @@ const validateServiceName = (rule, value, callback) => {
     }
   }
 }
+const pm_deploy_scripts = "#<------------------------------------------------------------------------------->\n## 构建脚本中的变量均可使用，其他内置可用变量如下\n## ENV_NAME               环境名称，用于区分不同的集成环境，系统内置集成环境：dev，qa\n## <AGENT_NAME>_PK        通过 SSH Agent 远程登录服务器使用的私钥 id_rsa，其中 AGENT_NAME 为 SSH AGENT 名称，使用时需要自己填写完整  \n## <AGENT_NAME>_USERNAME  通过 SSH Agent 远程登录到服务器的用户名称 \n## <AGENT_NAME>_IP        SSH Agent 目标服务器的 IP 地址\n## <ENV>_HOST_IPs         变量支持获取指定环境关联的所有主机 IP\n## ARTIFACT               部署的交付物包，通过该变量可获取交付物包 \n## 远程部署时，可以通过使用命令 `ssh -i $<AGENT_NAME>_PK $<AGENT_NAME>_USERNAME@$<AGENT_NAME>_IP '自定义脚本'` 进行部署操作\n#<------------------------------------------------------------------------------->\n#!/bin/bash\nset -e"
 export default {
   props: {
     isEdit: Boolean,
@@ -815,7 +831,7 @@ export default {
         main_file: '',
         post_build: {
         },
-        pm_deploy_scripts: "#<------------------------------------------------------------------------------->\n## 构建脚本中的变量均可使用，其他内置可用变量如下\n## ENV_NAME               环境名称，用于区分不同的集成环境，系统内置集成环境：dev，qa\n## <AGENT_NAME>_PK        通过 SSH Agent 远程登录服务器使用的私钥 id_rsa，其中 AGENT_NAME 为 SSH AGENT 名称，使用时需要自己填写完整  \n## <AGENT_NAME>_USERNAME  通过 SSH Agent 远程登录到服务器的用户名称 \n## <AGENT_NAME>_IP        SSH Agent 目标服务器的 IP 地址\n## 远程部署时，可以通过使用命令 `ssh -i $<AGENT_NAME>_PK $<AGENT_NAME>_USERNAME@$<AGENT_NAME>_IP '自定义脚本'` 进行部署操作\n#<------------------------------------------------------------------------------->\n#!/bin/bash\nset -e",
+        pm_deploy_scripts: pm_deploy_scripts,
         sshs: null
       },
       stcov_enabled: false,
@@ -827,6 +843,7 @@ export default {
       allApps: [],
       allCodeHosts: [],
       allHost: [],
+      allHostLabels: ['dev'],
       envNameList: [],
       codeInfo: {},
       createRules: {
@@ -867,7 +884,7 @@ export default {
         docker_file: [
           {
             type: 'string',
-            message: '请填写Dockerfile路径',
+            message: '请填写 Dockerfile 路径',
             required: true,
             trigger: 'blur'
           }
@@ -1017,6 +1034,9 @@ export default {
     addHostOperation () {
       this.$refs['add-host'].saveHost()
         .then(() => {
+          getHostLabelListAPI().then((res) => {
+            this.allHostLabels = res
+          })
           getHostListAPI().then((res) => {
             this.dialogHostCreateFormVisible = false
             this.allHost = res
@@ -1274,6 +1294,7 @@ export default {
         buildConfigPayload.pre_build.image_from = image.image_from
         buildConfigPayload.pre_build.build_os = image.value
       }
+      // 处理主机标签
       const pmServicePayload =
       {
         product_name: this.projectName,
@@ -1284,6 +1305,18 @@ export default {
         health_checks: this.check_status_enabled ? this.pmService.health_checks : [],
         env_configs: this.pmService.env_configs
       }
+      const hostIds = this.allHost.map(item => {
+        return item.id
+      })
+      // 处理主机标签
+      pmServicePayload.env_configs.forEach(element => {
+        element.labels = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) < 0)
+        })
+        element.host_ids = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) >= 0)
+        })
+      })
       const combinePayload = {
         pm_service_tmpl: pmServicePayload,
         build: buildConfigPayload
@@ -1346,6 +1379,18 @@ export default {
         pm_service_tmpl: pmServicePayload,
         build: buildConfigPayload
       }
+      const hostIds = this.allHost.map(item => {
+        return item.id
+      })
+      // 处理主机标签
+      pmServicePayload.env_configs.forEach(element => {
+        element.labels = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) < 0)
+        })
+        element.host_ids = element.host_ids.filter(item => {
+          return (hostIds.indexOf(item) >= 0)
+        })
+      })
       const refs = [this.$refs.addConfigForm]
       if (this.check_status_enabled) {
         refs.push(this.$refs.healthCheck)
@@ -1400,7 +1445,7 @@ export default {
         main_file: '',
         post_build: {
         },
-        pm_deploy_scripts: "#<------------------------------------------------------------------------------->\n## 构建脚本中的变量均可使用，其他内置可用变量如下\n## ENV_NAME               环境名称，用于区分不同的集成环境，系统内置集成环境：dev，qa\n## <AGENT_NAME>_PK        通过 SSH Agent 远程登录服务器使用的私钥 id_rsa，其中 AGENT_NAME 为 SSH AGENT 名称，使用时需要自己填写完整  \n## <AGENT_NAME>_USERNAME  通过 SSH Agent 远程登录到服务器的用户名称 \n## <AGENT_NAME>_IP        SSH Agent 目标服务器的 IP 地址\n## 远程部署时，可以通过使用命令 `ssh -i $<AGENT_NAME>_PK $<AGENT_NAME>_USERNAME@$<AGENT_NAME>_IP '自定义脚本'` 进行部署操作\n#<------------------------------------------------------------------------------->\n#!/bin/bash\nset -e",
+        pm_deploy_scripts: pm_deploy_scripts,
         sshs: []
       }
       this.pmService.health_checks = [{
@@ -1419,7 +1464,6 @@ export default {
     },
     loadPage () {
       const projectName = this.projectName
-      const orgId = this.currentOrganizationId
       getBuildConfigsAPI(this.projectName).then((res) => {
         this.builds = res
       })
@@ -1442,7 +1486,7 @@ export default {
           return { name: app.name, version: app.version, id: app.name + app.version }
         })
       })
-      getCodeSourceAPI(orgId).then((response) => {
+      getCodeSourceAPI().then((response) => {
         this.allCodeHosts = response
       })
       getImgListAPI().then((response) => {
@@ -1450,6 +1494,9 @@ export default {
         if (!this.isEdit) {
           this.buildConfig.pre_build.image_id = this.systems[0].id
         }
+      })
+      getHostLabelListAPI().then((res) => {
+        this.allHostLabels = res
       })
       getHostListAPI().then((res) => {
         this.allHost = res
@@ -1505,6 +1552,7 @@ export default {
           }
           if (res.env_configs && res.env_configs.length > 0) {
             this.pmService.env_configs.forEach(confItem => {
+              confItem.host_ids = confItem.host_ids.concat(confItem.labels)
               if (envNameList.indexOf(confItem.env_name) === -1) {
                 this.$set(confItem, 'showDelete', true)
               }
@@ -1535,9 +1583,6 @@ export default {
   computed: {
     projectName () {
       return this.$route.params.project_name
-    },
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
     },
     isOnboarding () {
       return (!!this.$route.path.includes(`/v1/projects/create/${this.projectName}/not_k8s/config`))

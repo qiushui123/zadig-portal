@@ -129,11 +129,6 @@ export default {
       return moment.unix(value).format('YYYY-MM-DD HH:mm:ss')
     }
   },
-  computed: {
-    currentOrganizationId () {
-      return this.$store.state.login.userinfo.organization.id
-    }
-  },
   activated () {
     this.getCleanStatus()
   },

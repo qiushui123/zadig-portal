@@ -195,7 +195,7 @@ export default {
       }
     },
     getProduct (product_name) {
-      const env_name = typeof this.envName !== 'undefined' ? this.envName : this.$store.state.login.userinfo.info.name
+      const env_name = typeof this.envName !== 'undefined' ? this.envName : this.$store.state.login.userinfo.name
       productEnvInfoAPI(product_name, env_name).then(
         response => {
           this.productInfo = response
@@ -203,7 +203,7 @@ export default {
       )
     },
     async getProducts () {
-      await this.$store.dispatch('getProductList')
+      await this.$store.dispatch('getProjectList')
     },
     fetchGroupsData (name, env_name = '') {
       return new Promise((resolve, reject) => {
