@@ -146,6 +146,7 @@
 
 <script>
 import bus from '@utils/event_bus'
+import store from 'storejs'
 import supportDoc from './common/support_doc.vue'
 import { updateCurrentUserInfoAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI, queryUserAPI } from '@api'
 import { mapState } from 'vuex'
@@ -202,7 +203,7 @@ export default {
       }
     },
     getJwtToken () {
-      this.jwtToken = JSON.parse(localStorage.getItem('userInfo')).token
+      this.jwtToken = store.get('userInfo').token
     },
     copySuccess (event) {
       this.$message({
@@ -303,7 +304,6 @@ export default {
     ...mapState({
       userinfo: (state) => state.login.userinfo,
       role: (state) => state.login.role
-
     })
   },
   created () {

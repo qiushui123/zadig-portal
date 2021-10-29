@@ -2,6 +2,7 @@ import * as types from '../mutations'
 import { userLoginAPI, queryUserBindings } from '@api'
 import { Message } from 'element-ui'
 import { parseJwt } from '@/utilities/jwt'
+import store from 'storejs'
 
 const state = {
   userinfo: {
@@ -20,7 +21,7 @@ const actions = {
   OTHERLOGIN (context, token) { // 第三方登录
     const info = parseJwt(token)
     const res = { ...info, token: token }
-    localStorage.setItem('userInfo', JSON.stringify(res))
+    store.set('userInfo', JSON.stringify(res))
     Message({
       message: '登录成功，欢迎 ' + res.name,
       type: 'success'
@@ -28,21 +29,23 @@ const actions = {
     return Promise.resolve(true)
   },
   async LOGIN (context, args) {
-    const res = await userLoginAPI(args).catch(error => console.log(error))
-    localStorage.setItem('userInfo', JSON.stringify(res)) // 存储用户信息
-    const res1 = await queryUserBindings(res.uid).catch(error => console.log(error))
-    if (res && res1) {
-      localStorage.setItem('role', JSON.stringify(res1)) // 存储用户角色信息
-      Message({
-        message: '登录成功，欢迎 ' + res.name,
-        type: 'success'
-      })
+    const userInfo = await userLoginAPI(args).catch(error => console.log(error))
+    if (userInfo) {
+      const roleBinding = await queryUserBindings(userInfo.uid).catch(error => console.log(error))
+      if (roleBinding) {
+        store.set('userInfo', JSON.stringify(userInfo)) // 存储用户信息
+        store.set('role', JSON.stringify(roleBinding)) // 存储用户角色信息
+        Message({
+          message: '登录成功，欢迎 ' + res.name,
+          type: 'success'
+        })
+      }
     }
-    return Promise.resolve(res)
+    return Promise.resolve(userInfo)
   },
   async LOGINOUT (context, args) {
-    localStorage.removeItem('userInfo')
-    localStorage.removeItem('role')
+    store.remove('userInfo')
+    store.remove('role')
 
     Message({
       message: '登出成功',
@@ -51,8 +54,8 @@ const actions = {
     return Promise.resolve(true)
   },
   async GETUSERINFO (context, args) {
-    context.commit('INJECT_PROFILE', JSON.parse(localStorage.getItem('userInfo')))
-    context.commit('INJECT_ROLE', JSON.parse(localStorage.getItem('role')).map(item => (item.role)))
+    context.commit('INJECT_PROFILE', store.get('userInfo'))
+    context.commit('INJECT_ROLE', store.get('role').map(item => (item.role)))
   }
 }
 
