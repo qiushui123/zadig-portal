@@ -26,13 +26,12 @@
 <script>
 import ChartValues from '@/components/projects/env/env_detail/common/updateHelmEnvChart.vue'
 import { updateHelmProductEnvAPI } from '@api'
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'updateHelmEnv',
   props: {
-    value: Boolean,
-    chartNames: Array
+    value: Boolean
   },
   data () {
     return {
@@ -75,6 +74,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      chartNames: state => state.service_manage.chartNames
+    }),
     updateHelmEnvDialogVisible: {
       get: function () {
         if (!this.value) {

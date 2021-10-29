@@ -83,15 +83,9 @@
         <!-- 右侧aside -->
       </div>
     </multipane>
-    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
-    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible.sync="dialogVisible" center @close="closeSelectRepo">
-      <Repo
-        ref="repo"
-        @triggleAction="changeExpandFileList('clear');clearCommitCache()"
-        :currentService="currentService"
-        @canUpdateEnv="canUpdateEnv($event)"
-        v-model="dialogVisible"
-      />
+    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" />
+    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible="dialogVisible" center @close="closeSelectRepo">
+      <Repo ref="repo" @triggleAction="changeExpandFileList('clear');clearCommitCache()" />
       <!-- 代码库弹窗 -->
     </el-dialog>
   </div>
@@ -147,11 +141,8 @@ export default {
   },
   data () {
     return {
-      currentService: null,
       actionList: actionList,
       updateHelmEnvDialogVisible: false,
-      updateEnv: false,
-      dialogVisible: false,
       commitCache: [],
       currentCode: null,
       page: {
@@ -167,37 +158,12 @@ export default {
       position: {
         left: 0,
         top: 0
-      },
-      chartNames: [
-        // { serviceName: 'common', type: 'common' },
-        // { serviceName: 'delete', type: 'delete' },
-        // { serviceName: 'update', type: 'update' },
-        // { serviceName: 'create', type: 'create' }
-      ]
+      }
     }
   },
   methods: {
-    handleChartNames (services) {
-      services.forEach(service => {
-        const serviceNames = this.chartNames.map(chart => chart.serviceName)
-        const index = serviceNames.indexOf(service.serviceName)
-        const type = service.type
-        if (type === 'delete') {
-          if (index !== -1) {
-            this.chartNames.splice(index, 1)
-          } else {
-            this.chartNames.push(service)
-          }
-        } else if (index === -1) {
-          this.chartNames.push(service)
-        }
-      })
-    },
-    canUpdateEnv (services) {
-      this.updateEnv = true
-      if (services) this.handleChartNames(services)
-    },
     closeSelectRepo () {
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', false)
       this.$refs.repo.closeSelectRepo()
     },
     loadData (data) {
@@ -278,7 +244,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
-        this.handleChartNames([
+        this.$store.commit('CHART_NAMES', [
           { serviceName: currentData.service_name, type: 'delete' }
         ])
         deleteServiceTemplateAPI(
@@ -290,7 +256,7 @@ export default {
           .then(res => {
             if (res) {
               if (this.envNameList.length) {
-                this.updateEnv = true
+                this.$store.commit('UPDATE_ENV_BUTTON', true)
               }
               this.$store.dispatch('queryService', {
                 projectName: this.projectName
@@ -370,7 +336,7 @@ export default {
         commitCache: this.commitCache
       }
       this.$store.dispatch('updateHelmChart', params).then(res => {
-        this.updateEnv = true
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
         this.clearCommitCache()
       })
     },
@@ -397,12 +363,8 @@ export default {
       this.modalvalue = status
     },
     openRepoModal (currentService) {
-      if (currentService) {
-        this.currentService = currentService
-      } else {
-        this.currentService = null
-      }
-      this.dialogVisible = true
+      this.$store.commit('CURRENT_SERVICE', cloneDeep(currentService) || null)
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', true)
     },
     update () {
       this.updateHelmEnvDialogVisible = true
@@ -446,7 +408,10 @@ export default {
       return envNameList
     },
     ...mapState({
-      service: state => state.service_manage.serviceList
+      service: state => state.service_manage.serviceList,
+      dialogVisible: state => state.service_manage.serviceDialogVisible,
+      currentService: state => state.service_manage.currentService,
+      updateEnv: state => state.service_manage.updateEnv
     })
   }
 }

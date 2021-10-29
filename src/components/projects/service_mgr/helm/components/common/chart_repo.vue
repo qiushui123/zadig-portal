@@ -66,25 +66,14 @@ export default {
     }
   },
   props: {
-    value: Boolean,
-    currentService: Object
-  },
-  computed: {
-    dialogVisible: {
-      get: function () {
-        return this.value
-      },
-      set: function (value) {
-        this.$emit('input', value)
-      }
-    }
+    currentSelect: String
   },
   methods: {
     closeSelectRepo () {
       console.log('close chart')
     },
     importChartRepo () {
-      // this.dialogVisible = false
+      // this.$store.commit('SERVICE_DIALOG_VISIBLE', false)
       console.log('importChartRepo', this.chartData)
     },
     deleteChart (index) {
