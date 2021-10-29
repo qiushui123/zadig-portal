@@ -692,40 +692,24 @@ export function registrationChangeAPI (payload) {
   return http.put(`/api/directory/isOpenRegistry`, { openRegistry: payload })
 }
 
-export function getSSOAPI () {
-  return http.get(`/api/directory/sso`)
+export function getConnectorsAPI () {
+  return http.get(`/api/v1/connectors`)
 }
 
-export function updateSSOAPI (payload) {
-  return http.post(`/api/directory/sso`, payload)
+export function deleteConnectorAPI (id) {
+  return http.delete(`/api/v1/connectors/${id}`)
 }
 
-export function deleteSSOAPI () {
-  return http.delete(`/api/directory/sso`)
+export function updateConnectorAPI (id, payload) {
+  return http.put(`/api/v1/connectors/${id}`, payload)
 }
 
-export function createSSOAPI (payload) {
-  return http.post(`/api/directory/sso`, payload)
+export function createConnectorAPI (payload) {
+  return http.post(`/api/v1/connectors`, payload)
 }
 
-export function getAccountAPI () {
-  return http.get(`/api/directory/ad/default`)
-}
-
-export function deleteAccountAPI () {
-  return http.delete(`/api/directory/ad/default`)
-}
-
-export function updateAccountAPI (payload) {
-  return http.put(`/api/directory/ad/default`, payload)
-}
-
-export function createAccountAPI (payload) {
-  return http.post(`/api/directory/ad`, payload)
-}
-
-export function syncAccountAPI () {
-  return http.post(`/api/directory/ads/sync`)
+export function syncLDAPAPI (id) {
+  return http.post(`/users/ldap/${id}`)
 }
 
 // Jira
