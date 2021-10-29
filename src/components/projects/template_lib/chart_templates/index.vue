@@ -66,7 +66,8 @@ function tree ({ chartName, files }) {
           name,
           children: r[name].result,
           chartName,
-          fullPath: `${chartName}/${file.path}`
+          fullPath: `${chartName}/${file.path}`,
+          yamlContent: ''
         })
       }
       return r[name]
@@ -76,8 +77,8 @@ function tree ({ chartName, files }) {
 }
 
 export default {
+  name: 'ChartTemp',
   data () {
-    this.yamlSet = {}
     return {
       yaml: '',
       chartDialogVisible: false,
@@ -134,10 +135,10 @@ export default {
       if (filter.length === 0) {
         this.displayedFile.push(data)
       }
-      if (!this.yamlSet[data.fullPath]) {
-        await this.getTemplateFileContent(data.chartName, data.path)
+      if (!data.yamlContent) {
+        await this.getTemplateFileContent(data.chartName, data.path, '', data)
       }
-      this.yaml = this.yamlSet[data.fullPath]
+      this.yaml = data.yamlContent
     },
     refreshChart (data) {
       this.chartDialogVisible = true
@@ -195,13 +196,13 @@ export default {
       })
     },
     clearUselessCache (serviceName) {
-      Object.keys(this.yamlSet).forEach(key => {
-        if (key.split('/')[0] === serviceName) {
-          delete this.yamlSet[key]
-        }
-      })
       this.displayedFile = this.displayedFile.filter(data => {
-        return data.fullPath.split('/')[0] !== serviceName
+        if (data.fullPath.split('/')[0] !== serviceName) {
+          return true
+        } else {
+          data.yamlContent = ''
+          return false
+        }
       })
     },
     getChartTemplates () {
@@ -232,7 +233,7 @@ export default {
         this.expandedKeys = [name]
       })
     },
-    async getTemplateFileContent (charName, fileName, filePath = '') {
+    async getTemplateFileContent (charName, fileName, filePath = '', data) {
       const res = await getTemplateFileContentAPI(
         charName,
         fileName,
@@ -241,7 +242,7 @@ export default {
         console.log(err)
       })
       if (res) {
-        this.yamlSet[`${charName}/${fileName}`] = res
+        data.yamlContent = res
       }
     }
   },
@@ -315,8 +316,8 @@ export default {
 
     .pane {
       .top {
-        height: 50px;
-        line-height: 50px;
+        height: 45px;
+        line-height: 45px;
       }
 
       &.left {
