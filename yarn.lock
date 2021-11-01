@@ -9177,6 +9177,11 @@ store@2.0.4:
   resolved "https://registry.npm.taobao.org/store/download/store-2.0.4.tgz#6c6819602a5497166ade85db2442cc64ebcc5761"
   integrity sha1-bGgZYCpUlxZq3oXbJELMZOvMV2E=
 
+storejs@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.npmmirror.com/storejs/download/storejs-2.0.1.tgz#3424f4c88ff979e3962413ce60ea43fd660a9657"
+  integrity sha1-NCT0yI/5eeOWJBPOYOpD/WYKllc=
+
 stream-browserify@^2.0.1:
   version "2.0.2"
   resolved "https://registry.npm.taobao.org/stream-browserify/download/stream-browserify-2.0.2.tgz#87521d38a44aa7ee91ce1cd2a47df0cb49dd660b"

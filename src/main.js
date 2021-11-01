@@ -51,7 +51,7 @@ const isSuperAdmin = () => {
   return utils.roleCheck().superAdmin
 }
 const userName = () => {
-  return utils.getUsername()
+  return utils.getUserName()
 }
 const analyticsRequest = (to, from) => {
   const hostname = window.location.hostname

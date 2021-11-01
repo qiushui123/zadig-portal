@@ -353,6 +353,8 @@ export default {
           message: '同步 LDAP 数据成功',
           type: 'success'
         })
+      }, () => {
+        this.syncAccountUserLoading = false
       })
     },
     createAccountUser () {
