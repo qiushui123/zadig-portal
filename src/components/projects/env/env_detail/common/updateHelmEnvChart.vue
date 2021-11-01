@@ -1,7 +1,8 @@
 <template>
   <div class="helm-chart-yaml-content">
-    <el-tabs tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
-      <el-tab-pane :name="name.serviceName" v-for="name in serviceNames" :key="name.serviceName" :disabled="name.type==='delete'">
+    <el-input class="search-service" v-model="searchService" placeholder="搜索服务" suffix-icon="el-icon-search" size="small"></el-input>
+    <el-tabs class="service-list" tab-position="left" type="border-card" v-model="selectedChart" :before-leave="switchTabs">
+      <el-tab-pane :name="name.serviceName" v-for="name in filteredServiceNames" :key="name.serviceName" :disabled="name.type==='delete'">
         <span slot="label">
           <i
             class="icon"
@@ -132,7 +133,8 @@ export default {
       selectedEnv: 'DEFAULT',
       disabledEnv: [],
       showReview: false,
-      listKeyValues: {}
+      listKeyValues: {},
+      searchService: ''
     }
   },
   computed: {
@@ -143,6 +145,11 @@ export default {
           return { serviceName: name, type: 'common' }
         })
       )
+    },
+    filteredServiceNames () {
+      return this.serviceNames.filter(name => {
+        return name.serviceName.includes(this.searchService)
+      })
     },
     projectName () {
       return this.$route.params.project_name
@@ -381,17 +388,43 @@ export default {
 
 <style lang="less" scoped>
 .helm-chart-yaml-content {
+  position: relative;
   display: flex;
   box-sizing: border-box;
   width: 100%;
+  max-height: 540px;
+
+  .search-service {
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+
+    /deep/.el-input__inner {
+      width: 100%;
+      height: 35px;
+      line-height: 35px;
+    }
+  }
 
   /deep/.el-tabs {
     flex-shrink: 0;
+
+    &.service-list {
+      width: 150px;
+
+      .el-tabs__nav {
+        max-height: calc(~'100% - 35px');
+        margin-top: 35px;
+        overflow: auto;
+      }
+    }
 
     .el-tabs__header {
       margin-right: 0;
 
       &.is-left {
+        border-right-width: 0;
+
         .el-tabs__item {
           width: 150px;
           overflow: hidden;
@@ -419,7 +452,9 @@ export default {
     position: relative;
     box-sizing: border-box;
     width: calc(~'100% - 160px');
+    max-height: 100%;
     padding: 0 20px;
+    overflow: auto;
     border: 1px solid #dcdfe6;
     border-left-width: 0;
     border-top-right-radius: 4px;
