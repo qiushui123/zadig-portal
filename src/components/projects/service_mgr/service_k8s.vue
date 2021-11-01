@@ -113,9 +113,8 @@ import serviceAsideK8s from './k8s/service_aside.vue'
 import serviceEditorK8s from './k8s/service_editor.vue'
 import serviceTree from './common/service_tree.vue'
 import addCode from './common/add_code.vue'
-import { mapGetters } from 'vuex'
 import { sortBy } from 'lodash'
-import { getSingleProjectAPI, getServiceTemplatesAPI, getServicesTemplateWithSharedAPI, serviceTemplateWithConfigAPI, autoUpgradeEnvAPI } from '@api'
+import { getSingleProjectAPI, getServiceTemplatesAPI, getServicesTemplateWithSharedAPI, serviceTemplateWithConfigAPI, autoUpgradeEnvAPI, listProductAPI } from '@api'
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 export default {
   data () {
@@ -132,7 +131,8 @@ export default {
       showNext: false,
       yamlChange: false,
       updateEnvDialogVisible: false,
-      addCodeDrawer: false
+      addCodeDrawer: false,
+      envNameList: []
     }
   },
   methods: {
@@ -217,9 +217,6 @@ export default {
         this.$refs.serviceEditor.jumpToWord(`kind: ${payload.kind}`)
       })
     },
-    async getProducts () {
-      await this.$store.dispatch('getProjectList')
-    },
     async checkProjectFeature () {
       const projectName = this.projectName
       this.projectInfo = await getSingleProjectAPI(projectName)
@@ -271,23 +268,19 @@ export default {
     },
     skipUpdate () {
       this.updateEnvDialogVisible = false
+    },
+    async getEnvNameList () {
+      const projectName = this.projectName
+      const envNameList = await listProductAPI('', projectName)
+      envNameList.forEach(element => {
+        element.envName = element.env_name
+      })
+      if (envNameList.length) {
+        this.envNameList = envNameList
+      }
     }
   },
   computed: {
-    ...mapGetters([
-      'productList'
-    ]),
-    envNameList () {
-      const envNameList = []
-      this.productList.forEach(element => {
-        if (element.product_name === this.projectName && element.source !== 'external') {
-          envNameList.push({
-            envName: element.env_name
-          })
-        }
-      })
-      return envNameList
-    },
     projectName () {
       return this.$route.params.project_name
     },
@@ -299,7 +292,7 @@ export default {
 
   },
   mounted () {
-    this.getProducts()
+    this.getEnvNameList()
     this.checkProjectFeature()
     this.getServices()
     this.getSharedServices()
