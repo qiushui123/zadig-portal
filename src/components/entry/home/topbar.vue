@@ -10,22 +10,6 @@
                               :to="item.url"
                               :key="index">{{item.title}}</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-select v-if="content.productList && content.productList.length > 0"
-                   ref="plutusProductSelect"
-                   v-model="selectedProduct"
-                   size="small"
-                   @change="changeSelectedProduct">
-          <el-option v-for="product in content.productList"
-                     :key="product.name"
-                     :value="product.name">
-            <div class="k8s-product-option">
-              <span>{{product.name}}</span>
-              <i class="el-icon-close"
-                 v-if="product.name !== '创建项目'"
-                 @click.stop="deletePlutusProduct(product.name)"></i>
-            </div>
-          </el-option>
-        </el-select>
       </div>
       <div class="kr-top-bar-end">
         <el-popover placement="bottom"
@@ -123,7 +107,7 @@
                     </div>
                     <ul class="content profile-list">
                       <li class="profile-list__item active">
-                        <span>{{userInfo.name}}</span>
+                        <span>{{userInfo.account}}</span>
                         <el-tag v-if="role.includes('admin')"
                                 size="mini"
                                 type="info">管理员</el-tag>
@@ -170,7 +154,7 @@
                    class="menu-avatar"
                    alt="">
               <span class="username">
-                {{ userInfo.name}}
+                {{ userInfo.account}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
             </div>
@@ -184,7 +168,7 @@
 import notification from './common/notification.vue'
 import mixin from '@utils/topbar_mixin'
 import bus from '@utils/event_bus'
-import { mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -196,22 +180,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'k8sProductSelected'
-    ]),
     ...mapState({
       role: (state) => state.login.role,
       userInfo: (state) => state.login.userinfo
-    }),
-    selectedProduct: {
-      get () {
-        return this.k8sProductSelected
-      },
-      set (value) {
-        this.$store.commit('SET_K8S_PRODUCT_SELECTED', value)
-        return value
-      }
-    }
+    })
   },
   methods: {
     async logOut () {
@@ -229,23 +201,6 @@ export default {
     },
     changeTitle (params) {
       this.content = params
-      if (this.content.productList) {
-        if (!this.selectedProduct) {
-          this.selectedProduct = this.content.productList[0].name
-        }
-      }
-    },
-    changeSelectedProduct () {
-      for (const pro of this.content.productList) {
-        if (pro.name === this.selectedProduct) {
-          this.$router.push(pro.url)
-          break
-        }
-      }
-    },
-    deletePlutusProduct (productName) {
-      this.$refs.plutusProductSelect.blur()
-      this.$store.commit('SET_DELETE_PRODUCT_SELECTED', productName)
     }
   },
   created () {

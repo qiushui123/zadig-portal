@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import store from 'storejs'
 import { createOrganizationInfoAPI, installationAnalysisRequestAPI, userLoginAPI } from '@api'
 export default {
   data () {
@@ -122,7 +123,7 @@ export default {
             })
           }).then(() => {
             userLoginAPI(loginPayload).then((res) => {
-              localStorage.setItem('token', res.token)
+              store.set('token', res.token)
               this.$router.push('/v1/projects/create')
             })
             if (this.allowUpload) {

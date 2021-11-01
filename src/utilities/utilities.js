@@ -1,4 +1,4 @@
-import storejs from '@node_modules/store/dist/store.legacy.js'
+import store from 'storejs'
 import { isEmpty } from 'lodash'
 
 const entitiesRegexp = /[&"'<>]/g
@@ -329,24 +329,21 @@ const utils = {
   /**
    *
    *角色检查
-   * @returns { admin:boolean,superAdmin:boolean}
+   * @returns {superAdmin:boolean}
    */
   roleCheck () {
     return {
-      /* DONOT USE ADMIN ROLE!!
-           admin role in system is deprecated now
-           admin: userinfo.info.isAdmin, */
-      superAdmin: !!JSON.parse(localStorage.getItem('role')).map(item => (item.role)).includes('admin')
+      superAdmin: store.get('role').map(item => (item.role)).includes('admin')
     }
   },
-  getUsername () {
-    const userinfo = storejs.get('ZADIG_LOGIN_INFO')
-    if (userinfo && userinfo.info) {
-      return userinfo.info.name
+  getUserName () {
+    const userinfo = store.get('userInfo')
+    if (userinfo && userinfo.name) {
+      return userinfo.name
     }
   },
   guideCheck (type) {
-    const guideInfo = storejs.get('ZADIG_GUIDE')
+    const guideInfo = store.get('ZADIG_GUIDE')
     if (guideInfo) {
       if (type) {
         return guideInfo[type]
@@ -359,7 +356,7 @@ const utils = {
   },
   setGuide (type) {
     if (type) {
-      let current = storejs.get('ZADIG_GUIDE')
+      let current = store.get('ZADIG_GUIDE')
       if (typeof current === 'undefined') {
         current = {}
       }

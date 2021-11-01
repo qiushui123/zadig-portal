@@ -41,6 +41,7 @@
 </template>
 <script>
 import { NavBar, Tag, Panel, Loading, Button, Notify } from 'vant'
+import store from 'storejs'
 export default {
   components: {
     [NavBar.name]: NavBar,
@@ -80,11 +81,10 @@ export default {
   },
   methods: {
     getJwtToken () {
-      this.jwtToken = JSON.parse(localStorage.getItem('userInfo')).token
+      this.jwtToken = store.get('userInfo').token
     },
     logout () {
-      localStorage.removeItem('token')
-      storejs.remove('ZADIG_LOGIN_INFO')
+      store.remove('token')
       this.$store.dispatch('clearProjectTemplates')
       this.$router.push('/signin')
       Notify({ type: 'success', message: '账号退出成功' })

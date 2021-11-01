@@ -1,5 +1,6 @@
 import axios from 'axios'
 import qs from 'qs'
+import store from 'storejs'
 import Element from 'element-ui'
 import errorMap from '@/utilities/errorMap'
 const specialAPIs = ['/api/directory/userss/search', '/api/aslan/system/operation', '/api/aslan/delivery/artifacts', '/api/aslan/environment/kube/workloads']
@@ -54,8 +55,8 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
-  if (localStorage.getItem('userInfo') && localStorage.getItem('userInfo') !== 'undefined') {
-    config.headers.Authorization = 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
+  if (store.get('userInfo') && store.get('userInfo') !== 'undefined') {
+    config.headers.Authorization = 'Bearer ' + store.get('userInfo').token
   }
   return config
 })
@@ -161,10 +162,10 @@ function makeEventSource (basePath, config) {
 
   const evtSource = new EventSource(path, {
     headers: {
-      Authorization: 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
+      Authorization: 'Bearer ' + store.get('userInfo').token
     }
   })
-  console.log('123', evtSource)
+
   evtSource.userCount = 0
 
   const normalHandlers = []
@@ -709,7 +710,7 @@ export function createConnectorAPI (payload) {
 }
 
 export function syncLDAPAPI (id) {
-  return http.post(`/users/ldap/${id}`)
+  return http.post(`/api/v1/users/ldap/${id}`)
 }
 
 // Jira

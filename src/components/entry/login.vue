@@ -15,9 +15,9 @@
                          :rules="rules"
                          ref="loginForm">
                   <el-form-item label=""
-                                prop="username">
-                    <el-input v-model="loginForm.username"
-                              placeholder="邮箱"
+                                prop="account">
+                    <el-input v-model="loginForm.account"
+                              placeholder="用户名"
                               autocomplete="off"></el-input>
                   </el-form-item>
                   <el-form-item label=""
@@ -37,13 +37,6 @@
                            class="btn-md btn-theme btn-block login-btn">
                   登录
                 </el-button>
-                <a :href="redirectUrl">
-                  <el-button v-if="showSSOBtn"
-                             class="btn-md btn-theme btn-block login-btn">
-
-                    SSO 登录
-                  </el-button>
-                </a>
               </section>
               <div class="bottom">
                   <a  href="/login">第三方登录</a>
@@ -80,7 +73,6 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
 import ForgetPassword from './components/forgetPassword.vue'
@@ -91,18 +83,14 @@ export default {
   data () {
     return {
       isLogin: true,
-      username: '',
-      password: '',
-      redirectUrl: '',
       loading: false,
-      showSSOBtn: false,
       loginForm: {
-        username: '',
+        account: '',
         password: ''
       },
       rules: {
-        username: [
-          { required: true, message: '请输入邮箱', trigger: 'change' }
+        account: [
+          { required: true, message: '请输入用户名', trigger: 'change' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'change' }
@@ -122,14 +110,13 @@ export default {
       this.$refs.loginForm.validate(async (valid) => {
         if (valid) {
           this.loading = true
-          const payload = {
-            email: this.loginForm.username,
-            password: this.loginForm.password
-          }
+          const payload = this.loginForm
           const res = await this.$store.dispatch('LOGIN', payload)
           if (res) {
             this.loading = false
             this.redirectByDevice()
+          } else {
+            this.loading = false
           }
         } else {
           return false
@@ -149,24 +136,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'signupStatus'
-    ]),
     processEnv () {
       return process.env
     },
     showCopywriting () {
       return this.copywriting.common
-    }
-  },
-  watch: {
-    signupStatus (val, oldval) {
-      if (val.ssoInfo) {
-        this.showSSOBtn = true
-        this.redirectUrl = val.ssoInfo.signIn
-      } else {
-        this.showSSOBtn = false
-      }
     }
   },
   async mounted () {
@@ -175,14 +149,6 @@ export default {
       const res = await this.$store.dispatch('OTHERLOGIN', token).catch(error => console.log(error))
       if (res) {
         this.redirectByDevice()
-      }
-    }
-
-    // this.checkLogin()
-    if (this.signupStatus) {
-      if (this.signupStatus.ssoInfo) {
-        this.showSSOBtn = true
-        this.redirectUrl = this.signupStatus.ssoInfo.signIn
       }
     }
   }
@@ -200,11 +166,13 @@ export default {
   a {
     padding-right: 10px;
     padding-left: 10px;
+    color: #717171;
     font-size: 14px;
     cursor: pointer !important;
 
     &:hover {
       color: #007bff !important;
+      text-decoration-line: none;
     }
   }
 }
