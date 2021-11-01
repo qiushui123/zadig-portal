@@ -454,6 +454,11 @@ export default {
       deep: true
     }
   },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
+    }
+  },
   methods: {
     /*
   任务操作
@@ -467,7 +472,7 @@ export default {
       if (task_type === 'running') {
         switch (operation) {
           case 'cancel':
-            cancelWorkflowAPI(pipeline_name, id).then(res => {
+            cancelWorkflowAPI(this.projectName, pipeline_name, id).then(res => {
               this.$notify({
                 title: '成功',
                 message: '运行任务取消成功',
@@ -486,7 +491,7 @@ export default {
       } else if (task_type === 'queue') {
         switch (operation) {
           case 'cancel':
-            cancelWorkflowAPI(pipeline_name, id).then(res => {
+            cancelWorkflowAPI(this.projectName, pipeline_name, id).then(res => {
               this.$notify({
                 title: '成功',
                 message: '队列任务取消成功',

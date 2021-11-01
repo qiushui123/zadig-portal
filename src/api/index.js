@@ -536,15 +536,15 @@ export function cancelWorkflowAPI (workflowName, taskID) {
 }
 
 export function workflowTaskListAPI (name, start, max, workflowType = '') {
-  return http.get(`/api/aslan/workflow/workflowtask/max/${max}/start/${start}/pipelines/${name}?workflowType=${workflowType}`)
+  return http.get(`/api/aslan/workflow/workflowtask/max/${max}/start/${start}/pipelines/${name}?projectName=${name}&workflowType=${workflowType}`)
 }
 
-export function workflowTaskDetailAPI (workflowName, taskID, workflowType = '') {
-  return http.get(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}?workflowType=${workflowType}`)
+export function workflowTaskDetailAPI (projectName, workflowName, taskID, workflowType = '') {
+  return http.get(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}?projectName=${projectName}&workflowType=${workflowType}`)
 }
 
-export function workflowTaskDetailSSEAPI (workflowName, taskID, workflowType = '') {
-  return makeEventSource(`/api/aslan/workflow/sse/workflows/id/${taskID}/pipelines/${workflowName}?workflowType=${workflowType}`)
+export function workflowTaskDetailSSEAPI (projectName, workflowName, taskID, workflowType = '') {
+  return makeEventSource(`/api/aslan/workflow/sse/workflows/id/${taskID}/pipelines/${workflowName}?projectName=${projectName}&workflowType=${workflowType}`)
 }
 
 // Test

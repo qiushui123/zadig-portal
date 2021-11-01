@@ -104,6 +104,11 @@ export default {
       pendingTasks: []
     }
   },
+  computed: {
+    projectName () {
+      return this.$route.params.project_name
+    }
+  },
   methods: {
     showTaskList (type) {
       if (type === 'running') {
@@ -132,7 +137,7 @@ export default {
     taskOperation (operation, id, pipeline_name) {
       switch (operation) {
         case 'cancel':
-          cancelWorkflowAPI(pipeline_name, id).then(res => {
+          cancelWorkflowAPI(this.projectName, pipeline_name, id).then(res => {
             Notify({ type: 'success', message: '任务取消成功' })
           })
           break

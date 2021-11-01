@@ -172,7 +172,7 @@ export default {
           this.$router.push('/mobile/status')
         })
       } else if (action.name === '取消任务') {
-        cancelWorkflowAPI(this.workflowName, this.taskID).then(res => {
+        cancelWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
           if (this.$refs && this.$refs.buildComp) {
             this.$refs.buildComp.killLog('buildv2')
             this.$refs.buildComp.killLog('docker_build')
@@ -237,14 +237,14 @@ export default {
       }
     },
     fetchTaskDetail () {
-      return workflowTaskDetailSSEAPI(this.workflowName, this.taskID).then(res => {
+      return workflowTaskDetailSSEAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res.data)
         this.taskDetail = res.data
         this.workflow = res.data.workflow_args
       }).closeWhenDestroy(this)
     },
     fetchOldTaskDetail () {
-      workflowTaskDetailAPI(this.workflowName, this.taskID).then(res => {
+      workflowTaskDetailAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res)
         this.taskDetail = res
         this.workflow = res.workflow_args
