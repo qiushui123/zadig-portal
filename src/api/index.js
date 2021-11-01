@@ -58,7 +58,6 @@ http.interceptors.request.use((config) => {
   if (store.get('userInfo') && store.get('userInfo') !== 'undefined') {
     config.headers.Authorization = 'Bearer ' + store.get('userInfo').token
   }
-  config.headers.Authorization = 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYWRtaW4xIiwiZW1haWwiOiJhZG1pbjFAa29kZXJvdmVyLmNvbSIsInVpZCI6IjJlNmM1MjAwLTM1OGYtMTFlYy05ODFmLWRlMjI2OTM1MWExZSIsImZlZGVyYXRlZF9jbGFpbXMiOnsiY29ubmVjdG9yX2lkIjoiIiwidXNlcl9pZCI6IiJ9LCJhdWQiOiJ6YWRpZyIsImV4cCI6MTYzNTU4MjY5NH0.jJFkRDVXaF2ZcVCE8xrGcF1dcH22Xi9jkGPXGGsSFOo'
   return config
 })
 
