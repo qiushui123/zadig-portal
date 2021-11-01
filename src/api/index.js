@@ -125,13 +125,15 @@ http.interceptors.response.use(
       if (document.title !== '登录' && document.title !== '系统初始化') {
         // unauthorized 401
         if (error.response.status === 401) {
-          // const redirectPath = window.location.pathname + window.location.search
-          // Element.Message.error('登录信息失效, 请返回重新登录')
-          // if (redirectPath.includes('/setup/')) {
-          //   window.location.href = `/signin`
-          // } else {
-          //   window.location.href = `/signin?redirect=${redirectPath}`
-          // }
+          const redirectPath = window.location.pathname + window.location.search
+          localStorage.removeItem('userInfo')
+          localStorage.removeItem('role')
+          Element.Message.error('登录信息失效, 请返回重新登录')
+          if (redirectPath.includes('/setup/')) {
+            window.location.href = `/signin`
+          } else {
+            window.location.href = `/signin?redirect=${redirectPath}`
+          }
         } else if (error.response.status === 403) {
           Element.Message.error('暂无权限')
         } else if (error.response.data.code !== 6168) {
@@ -164,7 +166,6 @@ function makeEventSource (basePath, config) {
       Authorization: 'Bearer ' + JSON.parse(localStorage.getItem('userInfo')).token
     }
   })
-  console.log('123', evtSource)
   evtSource.userCount = 0
 
   const normalHandlers = []
