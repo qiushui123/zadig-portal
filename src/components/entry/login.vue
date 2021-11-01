@@ -76,6 +76,8 @@
 import moment from 'moment'
 import { isMobile } from 'mobile-device-detect'
 import ForgetPassword from './components/forgetPassword.vue'
+import store from 'storejs'
+
 export default {
   components: {
     ForgetPassword
@@ -123,6 +125,12 @@ export default {
         }
       })
     },
+    checkLogin () {
+      const userInfo = store.get('userInfo')
+      if (userInfo) {
+        this.redirectByDevice()
+      }
+    },
     redirectByDevice () {
       if (isMobile) {
         this.$router.push('/mobile')
@@ -150,6 +158,8 @@ export default {
       if (res) {
         this.redirectByDevice()
       }
+    } else {
+      this.checkLogin()
     }
   }
 }
