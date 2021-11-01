@@ -266,7 +266,7 @@ export default {
             this.dialogAddUserVisible = false
             if (payload.isSuperUser) {
               const paload = {
-                name: res.email + '-' + 'admin',
+                name: res.uid + '-' + 'admin',
                 role: 'admin',
                 uid: res.uid
               }
