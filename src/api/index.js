@@ -710,7 +710,7 @@ export function createConnectorAPI (payload) {
 }
 
 export function syncLDAPAPI (id) {
-  return http.post(`/users/ldap/${id}`)
+  return http.post(`/api/v1/users/ldap/${id}`)
 }
 
 // Jira

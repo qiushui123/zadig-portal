@@ -1,51 +1,38 @@
 <template>
-  <div v-loading="loading"
-       element-loading-text="加载中..."
-       element-loading-spinner="iconfont iconfont-loading icongeren"
-       class="users-overview-container">
+  <div
+    v-loading="loading"
+    element-loading-text="加载中..."
+    element-loading-spinner="iconfont iconfont-loading icongeren"
+    class="users-overview-container"
+  >
     <!--start of add user dialog-->
-    <el-dialog title="新建用户"
-               custom-class="create-user-dialog"
-               :close-on-click-modal="false"
-               :visible.sync="dialogAddUserVisible">
-      <el-form :model="addUser"
-               @submit.native.prevent
-               :rules="addUserRule"
-               ref="addUserForm">
-        <el-form-item label="登录邮箱"
-                      prop="email">
-          <el-input size="small"
-                    v-model="addUser.email"></el-input>
+    <el-dialog title="新建用户" custom-class="create-user-dialog" :close-on-click-modal="false" :visible.sync="dialogAddUserVisible">
+      <el-form :model="addUser" @submit.native.prevent :rules="addUserRule" ref="addUserForm">
+        <el-form-item label="用户名" prop="account">
+          <el-input size="small" v-model="addUser.account"></el-input>
         </el-form-item>
-        <el-form-item label="用户名"
-                      prop="name">
-          <el-input size="small"
-                    v-model="addUser.name"></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input size="small" v-model="addUser.password"></el-input>
         </el-form-item>
-        <el-form-item label="密码"
-                      prop="password">
-          <el-input size="small"
-                    v-model="addUser.password"></el-input>
+        <el-form-item label="昵称" prop="name">
+          <el-input size="small" v-model="addUser.name"></el-input>
         </el-form-item>
-        <el-form-item label="角色"
-                      prop="isSuperUser">
+        <el-form-item label="邮箱" prop="email">
+          <el-input size="small" v-model="addUser.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="phone">
+          <el-input size="small" v-model="addUser.phone"></el-input>
+        </el-form-item>
+        <!-- <el-form-item label="角色" prop="isSuperUser">
           <el-radio-group v-model="addUser.isSuperUser">
             <el-radio :label="true">管理员</el-radio>
             <el-radio :label="false">普通用户</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item>-->
       </el-form>
-      <div slot="footer"
-           class="dialog-footer">
-        <el-button type="primary"
-                   native-type="submit"
-                   size="small"
-                   @click="addUserOperation"
-                   class="start-create">确定</el-button>
-        <el-button plain
-                   native-type="submit"
-                   size="small"
-                   @click="dialogAddUserVisible = false">取消</el-button>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" native-type="submit" size="small" @click="addUserOperation" class="start-create">确定</el-button>
+        <el-button plain native-type="submit" size="small" @click="dialogAddUserVisible = false">取消</el-button>
       </div>
     </el-dialog>
     <!--end of add user dialog-->
@@ -55,86 +42,93 @@
         <el-col :span="6">
           <div class="search-member">
             <span class="text-title">搜索成员:</span>
-            <el-button v-if="!searchInputVisible"
-                       size="small"
-                       @click="searchInputVisible=true"
-                       plain
-                       type="primary"
-                       icon="el-icon-search"></el-button>
+            <el-button v-if="!searchInputVisible" size="small" @click="searchInputVisible=true" plain type="primary" icon="el-icon-search"></el-button>
             <transition name="fade">
-              <el-input v-if="searchInputVisible"
-                        size="small"
-                        v-model.lazy="searchUser"
-                        placeholder="请输入用户名"
-                        autofocus
-                        clearable
-                        prefix-icon="el-icon-search">
-              </el-input>
+              <el-input
+                v-if="searchInputVisible"
+                size="small"
+                v-model.lazy="searchUser"
+                placeholder="请输入用户名"
+                autofocus
+                clearable
+                prefix-icon="el-icon-search"
+              ></el-input>
             </transition>
           </div>
         </el-col>
         <el-col :span="3">
-          <el-button @click="dialogAddUserVisible=true"
-                     size="small"
-                     plain
-                     type="primary">新建用户</el-button>
+          <el-button @click="dialogAddUserVisible=true" size="small" plain type="primary">新建用户</el-button>
         </el-col>
       </el-row>
-
     </div>
     <div class="users-container">
-      <el-table :data="usersTableData"
-                style="width: 100%;">
-        <el-table-column label="用户名称">
+      <el-table :data="users" style="width: 100%;">
+        <el-table-column label>
           <template slot-scope="scope">
-            {{scope.row.name}}
+            <div class="name-listing-details">
+              <!-- Logo -->
+              <div class="avator">
+                <img src="@assets/icons/others/profile.png" alt />
+              </div>
+              <!-- Details -->
+              <div class="name-listing-description">
+                <h3 class="name-listing-title">{{scope.row.account}} <el-tag size="mini" effect="plain">{{identityTypeMap[scope.row.identity_type]}}</el-tag></h3>
+                <!-- Name Listing Footer -->
+                <div class="name-listing-footer">
+                  <ul>
+                    <li v-if="scope.row.email">
+                      <i class="icon-material-outline-business"></i>
+                      {{scope.row.email}}
+                    </li>
+                    <li v-if="scope.row.phone">
+                      <i class="icon-material-outline-location-on"></i>
+                      {{scope.row.phone}}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column label="邮件">
-          <template slot-scope="scope">
-            {{ scope.row.email}}
-          </template>
-        </el-table-column>
-        <el-table-column prop="lastLoginTime"
-                         label="登录信息">
+        <el-table-column prop="lastLoginTime" label="登录信息">
           <template slot-scope="scope">
             <span v-if="scope.row.lastLoginTime">{{$utils.convertTimestamp(scope.row.lastLoginTime)}}</span>
             <span v-else>{{'尚未登录'}}</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="操作"
-                         width="280">
-           <template slot-scope="scope">
-            <el-button @click="editUserRole(scope.row)"
-                       type="primary"
-                       size="mini"
-                       plain>更改角色</el-button>
+        <el-table-column label="操作" width="280">
+          <template slot-scope="scope">
+            <el-button @click="editUserRole(scope.row)" type="primary" size="mini" plain>更改角色</el-button>
           </template>
         </el-table-column>
       </el-table>
       <!--start of page-divide -->
       <div class="user-table-pagination">
-        <el-pagination background
-                       @size-change="handleSizeChange"
-                       @current-change="handleCurrentChange"
-                       :current-page="currentPageList"
-                       :page-sizes="[10, 20, 30, 40]"
-                       :page-size="userPageSize"
-                       layout="total, sizes, prev, pager, next, jumper"
-                       :total="totalUser">
-        </el-pagination>
+        <el-pagination
+          background
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPageList"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="userPageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalUser"
+        ></el-pagination>
       </div>
       <!--page divide-->
-
     </div>
-  <EditUserRole ref="editUserRole" :editUser="editUser" />
+    <EditUserRole ref="editUserRole" :editUser="editUser" />
   </div>
 </template>
 
 <script>
-
-import { addUserAPI, usersAPI, deleteUserAPI, addSystemRoleBindings } from '@api'
+import {
+  addUserAPI,
+  usersAPI,
+  deleteUserAPI,
+  addSystemRoleBindings
+} from '@api'
 import bus from '@utils/event_bus'
 import EditUserRole from './editUserRole.vue'
 export default {
@@ -144,12 +138,11 @@ export default {
   data () {
     return {
       users: [],
-      usersTableData: [],
       addUser: {
+        account: '',
+        name: '',
         email: '',
         password: '',
-        isSuperUser: true,
-        name: '',
         phone: ''
       },
       editUser: null,
@@ -161,8 +154,13 @@ export default {
       dialogAddUserVisible: false,
       searchInputVisible: true,
       loading: true,
+      identityTypeMap: {
+        github: 'GitHub',
+        system: '系统创建',
+        ldap: 'OpenLDAP'
+      },
       addUserRule: {
-        name: [
+        account: [
           {
             type: 'string',
             required: true,
@@ -173,7 +171,7 @@ export default {
         email: [
           {
             type: 'string',
-            required: true,
+            required: false,
             message: '请输入登录邮箱',
             trigger: 'blur'
           },
@@ -214,7 +212,7 @@ export default {
       this.$refs.editUserRole.dialogEditRoleVisible = true
     },
     submit () {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(valid => {
         if (valid) {
           this.upsertRole()
         }
@@ -225,12 +223,12 @@ export default {
       const payload = {
         page: page_index,
         per_page: page_size,
-        name: keyword
+        account: keyword
       }
       const res = await usersAPI(payload).catch(error => console.log(error))
       if (res) {
         this.totalUser = res.totalCount
-        this.usersTableData = res.users
+        this.users = res.users
       }
       this.loading = false
     },
@@ -239,26 +237,32 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        deleteUserAPI(row.id).then((res) => {
-          this.$message({
-            type: 'success',
-            message: '删除用户成功'
-          })
-          this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
       })
+        .then(() => {
+          deleteUserAPI(row.id).then(res => {
+            this.$message({
+              type: 'success',
+              message: '删除用户成功'
+            })
+            this.getUsers(
+              this.userPageSize,
+              this.currentPageList,
+              this.searchUser
+            )
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     addUserOperation () {
-      this.$refs.addUserForm.validate((valid) => {
+      this.$refs.addUserForm.validate(valid => {
         if (valid) {
           const payload = this.addUser
-          addUserAPI(payload).then(async (res) => {
+          addUserAPI(payload).then(async res => {
             this.dialogAddUserVisible = false
             if (payload.isSuperUser) {
               const paload = {
@@ -266,10 +270,16 @@ export default {
                 role: 'admin',
                 uid: res.uid
               }
-              await addSystemRoleBindings(paload).catch(error => console.log(error))
+              await addSystemRoleBindings(paload).catch(error =>
+                console.log(error)
+              )
             }
             this.$refs.addUserForm.resetFields()
-            this.getUsers(this.userPageSize, this.currentPageList, this.searchUser)
+            this.getUsers(
+              this.userPageSize,
+              this.currentPageList,
+              this.searchUser
+            )
             this.$message({
               type: 'success',
               message: '新建用户成功'
@@ -349,71 +359,50 @@ export default {
     font-size: 2rem;
   }
 
-  .create-team {
-    margin-top: 10px;
-    margin-bottom: 15px;
+  .users-container {
+    .name-listing-details {
+      top: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 0;
 
-    .text-title {
-      margin-right: 15px;
-      color: rgba(0, 0, 0, 0.65);
-    }
-
-    .team-select {
-      .el-select {
-        width: calc(~"100% - 60px");
-      }
-    }
-
-    .search-member {
-      .el-input {
-        width: calc(~"100% - 80px");
-      }
-    }
-  }
-
-  .permission-form {
-    .el-form-item__label {
-      line-height: 28px;
-    }
-
-    .el-form-item {
-      &:last-child {
-        margin-bottom: 0;
+      .avator img {
+        position: relative;
+        top: 0;
+        flex: 1;
+        max-width: 30px;
+        margin-right: 25px;
+        margin-right: 10px;
       }
 
-      .el-form-item__content {
-        line-height: 28px;
-      }
-    }
-
-    .permissions-group {
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .sub-permissions {
-        margin-left: 25px;
-
-        .sub-permissions-checkbox {
-          min-width: ~"calc(25% - 30px)";
-          font-weight: normal;
+      .name-listing-description {
+        .name-listing-title {
+          margin: 0;
+          color: #333;
+          font-weight: 300;
+          font-size: 16px;
+          line-height: 1;
         }
       }
-    }
-  }
 
-  .users-container {
-    .name-wrapper {
-      font-size: 24px;
-      line-height: 23px;
+      .name-listing-footer {
+        position: relative;
+        margin-top: 3px;
+        padding: 0;
+        background-color: transparent;
+        border-radius: 0 0 4px 4px;
 
-      .icon {
-        margin-right: 5px;
-        color: #c0c4cc;
-        cursor: pointer;
+        ul {
+          margin: 0;
+          padding: 0;
+          list-style: none;
 
-        &:hover {
-          color: #1989fa;
+          li {
+            display: inline-block;
+            margin-right: 10px;
+            color: #777;
+          }
         }
       }
     }
@@ -423,18 +412,24 @@ export default {
     }
   }
 
+  .create-team {
+    margin-top: 10px;
+    margin-bottom: 15px;
+
+    .text-title {
+      margin-right: 15px;
+      color: rgba(0, 0, 0, 0.65);
+    }
+
+    .search-member {
+      .el-input {
+        width: calc(~"100% - 80px");
+      }
+    }
+  }
+
   .el-table th > .cell {
     color: #97a8be;
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.6s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

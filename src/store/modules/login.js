@@ -21,7 +21,7 @@ const actions = {
   OTHERLOGIN (context, token) { // 第三方登录
     const info = parseJwt(token)
     const res = { ...info, token: token }
-    store.set('userInfo', JSON.stringify(res))
+    store.set('userInfo', res)
     Message({
       message: '登录成功，欢迎 ' + res.name,
       type: 'success'
@@ -31,12 +31,12 @@ const actions = {
   async LOGIN (context, args) {
     const userInfo = await userLoginAPI(args).catch(error => console.log(error))
     if (userInfo) {
+      store.set('userInfo', userInfo) // 存储用户信息，包括 Token
       const roleBinding = await queryUserBindings(userInfo.uid).catch(error => console.log(error))
       if (roleBinding) {
-        store.set('userInfo', JSON.stringify(userInfo)) // 存储用户信息
-        store.set('role', JSON.stringify(roleBinding)) // 存储用户角色信息
+        store.set('role', roleBinding) // 存储用户角色信息
         Message({
-          message: '登录成功，欢迎 ' + res.name,
+          message: '登录成功，欢迎 ' + userInfo.account,
           type: 'success'
         })
       }
