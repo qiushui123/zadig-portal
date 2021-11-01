@@ -23,12 +23,12 @@
         <el-form-item label="手机" prop="phone">
           <el-input size="small" v-model="addUser.phone"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="角色" prop="isSuperUser">
-          <el-radio-group v-model="addUser.isSuperUser">
+        <el-form-item label="角色" prop="isAdmin">
+          <el-radio-group v-model="addUser.isAdmin">
             <el-radio :label="true">管理员</el-radio>
             <el-radio :label="false">普通用户</el-radio>
           </el-radio-group>
-        </el-form-item>-->
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" native-type="submit" size="small" @click="addUserOperation" class="start-create">确定</el-button>
@@ -36,8 +36,7 @@
       </div>
     </el-dialog>
     <!--end of add user dialog-->
-
-    <div class="create-team">
+    <div class="search-user">
       <el-row :gutter="10">
         <el-col :span="6">
           <div class="search-member">
@@ -72,17 +71,24 @@
               </div>
               <!-- Details -->
               <div class="name-listing-description">
-                <h3 class="name-listing-title">{{scope.row.account}} <el-tag size="mini" effect="plain">{{identityTypeMap[scope.row.identity_type]}}</el-tag></h3>
+                <h3 class="name-listing-title">
+                  {{scope.row.account}}
+                  <el-tag size="mini" effect="plain">{{ scope.row.role === 'admin'?'管理员':'普通用户' }}</el-tag>
+                </h3>
                 <!-- Name Listing Footer -->
                 <div class="name-listing-footer">
                   <ul>
+                    <li v-if="scope.row.identity_type">
+                      <i class="el-icon-receiving"></i>
+                      {{identityTypeMap[scope.row.identity_type]}}
+                    </li>
                     <li v-if="scope.row.email">
-                      <i class="icon-material-outline-business"></i>
-                      {{scope.row.email}}
+                      <i class="el-icon-message"></i>
+                      <a :href="`mailto:${scope.row.email}`">{{scope.row.email}}</a>
                     </li>
                     <li v-if="scope.row.phone">
-                      <i class="icon-material-outline-location-on"></i>
-                      {{scope.row.phone}}
+                      <i class="el-icon-mobile"></i>
+                      <a :href="`tel:${scope.row.phone}`">{{scope.row.phone}}</a>
                     </li>
                   </ul>
                 </div>
@@ -118,7 +124,7 @@
       </div>
       <!--page divide-->
     </div>
-    <EditUserRole ref="editUserRole" :editUser="editUser" />
+    <EditUserRole ref="editUserRole" :editUser="editUser" @refreshUserList="getUsers(userPageSize, currentPageList, searchUser)" />
   </div>
 </template>
 
@@ -127,7 +133,8 @@ import {
   addUserAPI,
   usersAPI,
   deleteUserAPI,
-  addSystemRoleBindings
+  getSystemRoleBindingsAPI,
+  addSystemRoleBindingsAPI
 } from '@api'
 import bus from '@utils/event_bus'
 import EditUserRole from './editUserRole.vue'
@@ -143,9 +150,12 @@ export default {
         name: '',
         email: '',
         password: '',
-        phone: ''
+        phone: '',
+        isAdmin: false
       },
-      editUser: null,
+      editUser: {
+        account: ''
+      },
       searchUser: '',
       totalUser: 0,
       userPageSize: 10,
@@ -189,7 +199,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        isSuperUser: [
+        isAdmin: [
           {
             type: 'boolean',
             required: true,
@@ -225,10 +235,25 @@ export default {
         per_page: page_size,
         account: keyword
       }
-      const res = await usersAPI(payload).catch(error => console.log(error))
-      if (res) {
-        this.totalUser = res.totalCount
-        this.users = res.users
+      const usersData = await usersAPI(payload).catch(error =>
+        console.log(error)
+      )
+      const rolesData = await getSystemRoleBindingsAPI().catch(error =>
+        console.log(error)
+      )
+      if (usersData && rolesData) {
+        this.totalUser = usersData.totalCount
+        this.users = usersData.users.map(user => {
+          const roleInfo = rolesData.find(role => {
+            return role.uid === user.uid
+          })
+          if (roleInfo) {
+            user.role = roleInfo.role
+          } else {
+            user.role = ''
+          }
+          return user
+        })
       }
       this.loading = false
     },
@@ -264,13 +289,13 @@ export default {
           const payload = this.addUser
           addUserAPI(payload).then(async res => {
             this.dialogAddUserVisible = false
-            if (payload.isSuperUser) {
+            if (payload.isAdmin) {
               const paload = {
                 name: res.uid + '-' + 'admin',
                 role: 'admin',
                 uid: res.uid
               }
-              await addSystemRoleBindings(paload).catch(error =>
+              await addSystemRoleBindingsAPI(paload).catch(error =>
                 console.log(error)
               )
             }
@@ -400,8 +425,9 @@ export default {
 
           li {
             display: inline-block;
-            margin-right: 10px;
+            margin-right: 8px;
             color: #777;
+            font-size: 12px;
           }
         }
       }
@@ -412,7 +438,7 @@ export default {
     }
   }
 
-  .create-team {
+  .search-user {
     margin-top: 10px;
     margin-bottom: 15px;
 
@@ -423,7 +449,7 @@ export default {
 
     .search-member {
       .el-input {
-        width: calc(~"100% - 80px");
+        width: calc(~'100% - 80px');
       }
     }
   }
