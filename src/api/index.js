@@ -1375,11 +1375,16 @@ export function queryUserBindings (uid, projectName = '') { // 查询用户所�
   return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
 }
 // role system
-export function addSystemRoleBindings (payload) {
+
+export function getSystemRoleBindingsAPI () {
+  return http.get(`/api/v1/system-rolebindings`)
+}
+
+export function addSystemRoleBindingsAPI (payload) {
   return http.post(`/api/v1/system-rolebindings`, payload)
 }
 
-export function deleteSystemRoleBindings (name) {
+export function deleteSystemRoleBindingsAPI (name) {
   return http.delete(`/api/v1/system-rolebindings/${name}`)
 }
 
