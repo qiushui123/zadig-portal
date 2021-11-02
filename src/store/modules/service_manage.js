@@ -5,7 +5,11 @@ export default {
   state: {
     serviceList: [],
     serviceModules: [],
-    showNext: false
+    showNext: false,
+    serviceDialogVisible: false,
+    currentService: null,
+    chartNames: [],
+    updateEnv: false
   },
   mutations: {
     [Mutation.QUERY_SERVICE_MODULE] (state, payload) {
@@ -19,6 +23,33 @@ export default {
     },
     [Mutation.OPEN_SHOW_NEXT] (state, payload) {
       state.showNext = payload
+    },
+    [Mutation.SERVICE_DIALOG_VISIBLE] (state, payload) {
+      state.serviceDialogVisible = payload
+    },
+    [Mutation.CURRENT_SERVICE] (state, payload) {
+      state.currentService = payload
+    },
+    [Mutation.CHART_NAMES] (state, services) {
+      const chartNames = state.chartNames
+      services.forEach(service => {
+        const serviceNames = chartNames.map(chart => chart.serviceName)
+        const index = serviceNames.indexOf(service.serviceName)
+        const type = service.type
+        if (type === 'delete') {
+          if (index !== -1) {
+            chartNames.splice(index, 1)
+          } else {
+            chartNames.push(service)
+          }
+        } else if (index === -1) {
+          chartNames.push(service)
+        }
+      })
+      state.chartNames = chartNames
+    },
+    [Mutation.UPDATE_ENV_BUTTON] (state, payload) {
+      state.updateEnv = payload
     }
   },
   actions: {

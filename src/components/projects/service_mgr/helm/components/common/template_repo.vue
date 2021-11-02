@@ -31,7 +31,7 @@
       </div>
       <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo"></ImportValues>
       <el-form-item>
-        <el-button size="small" @click="dialogVisible = false">取消</el-button>
+        <el-button size="small" @click="commitDialogVisible(false)">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
       </el-form-item>
     </el-form>
@@ -47,6 +47,7 @@ import {
   getChartTemplatesAPI,
   getHelmTemplateVariableAPI
 } from '@api'
+import { mapState } from 'vuex'
 
 const rules = {
   serviceName: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
@@ -89,23 +90,18 @@ export default {
     }
   },
   props: {
-    value: Boolean,
-    currentService: Object
+    currentSelect: String
   },
   computed: {
-    dialogVisible: {
-      get: function () {
-        return this.value
-      },
-      set: function (value) {
-        this.$emit('input', value)
-      }
-    }
+    ...mapState({
+      currentService: state => state.service_manage.currentService
+    })
+
   },
   watch: {
     currentService: {
       handler (val) {
-        if (val) {
+        if (this.currentSelect === 'template' && val) {
           const createFrom = val.create_from
           this.tempData = {
             serviceName: createFrom.service_name,
@@ -139,6 +135,9 @@ export default {
           console.log(err)
           this.variables = []
         })
+    },
+    commitDialogVisible (value) {
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', value)
     },
     triggerSubstantial (substantial) {
       this.closeSelectRepo()
@@ -188,11 +187,13 @@ export default {
         this.$message.success(
           `${this.isUpdate ? '更新' : '新建'}服务 ${payload.name} 成功`
         )
-        this.dialogVisible = false
+        this.commitDialogVisible(false)
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit('canUpdateEnv', [
+
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
+        this.$store.commit('CHART_NAMES', [
           {
             serviceName: payload.name,
             type: this.isUpdate ? 'update' : 'create'
@@ -222,19 +223,19 @@ export default {
       this.importLoading = false
       if (res) {
         this.$message.success(`导入模板成功`)
-        this.dialogVisible = false
+        this.commitDialogVisible(false)
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit(
-          'canUpdateEnv',
-          res.successServices.map(service => {
-            return {
-              serviceName: service,
-              type: 'create'
-            }
-          })
-        )
+
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
+        this.$store.commit('CHART_NAMES', res.successServices.map(service => {
+          return {
+            serviceName: service,
+            type: 'create'
+          }
+        }))
+
         if (res.failedServices.length) {
           let message = ``
           res.failedServices.forEach(fail => {

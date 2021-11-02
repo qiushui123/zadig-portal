@@ -12,28 +12,19 @@
     <GitRepo
       v-show="tabName === 'git'"
       @triggleAction="$emit('triggleAction')"
-      @canUpdateEnv="$emit('canUpdateEnv', $event)"
-      :currentService="gitCurrentService"
-      @input="$emit('input', $event)"
-      :value="value"
+      :currentSelect="tabName"
       ref="gitRepo"
     ></GitRepo>
 
     <ChartRepo
       v-show="tabName === 'chart'"
-      @canUpdateEnv="$emit('canUpdateEnv', $event)"
-      :currentService="chartCurrentService"
-      @input="$emit('input', $event)"
-      :value="value"
+      :currentSelect="tabName"
       ref="chartRepo"
     ></ChartRepo>
 
     <TemplateRepo
       v-show="tabName === 'template'"
-      @canUpdateEnv="$emit('canUpdateEnv', $event)"
-      @input="$emit('input', $event)"
-      :currentService="templateCurrentService"
-      :value="value"
+      :currentSelect="tabName"
       ref="templateRepo"
     ></TemplateRepo>
   </div>
@@ -42,35 +33,30 @@
 import GitRepo from './git_repo.vue'
 import ChartRepo from './chart_repo.vue'
 import TemplateRepo from './template_repo.vue'
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
       tabName: '',
-      gitCurrentService: null,
-      chartCurrentService: null,
-      templateCurrentService: null,
       isUpdate: false
     }
   },
-  props: {
-    value: Boolean,
-    currentService: Object
+  computed: {
+    ...mapState({
+      value: state => state.service_manage.serviceDialogVisible,
+      currentService: state => state.service_manage.currentService
+    })
   },
   watch: {
     value: {
       handler (val) {
-        this.gitCurrentService = null
-        this.chartCurrentService = null
-        this.templateCurrentService = null
         if (val) {
-          const cs = this.currentService
           this.tabName = 'git'
-          this.gitCurrentService = cs
+          const cs = this.currentService
           if (cs) {
             this.isUpdate = true
             if (cs.source && cs.source === 'chartTemplate') {
               this.tabName = 'template'
-              this.templateCurrentService = cs
             }
           } else {
             this.isUpdate = false

@@ -1,30 +1,6 @@
 <template>
-  <div class="content">
-    <div class="modalContent" :style="`z-index: ${zindex}`" @click="changeModalStatus(null, false, null, true)">
-      <div class="modal" v-show="modalvalue" :style="`left:${position.left}px;top: ${position.top}px`">
-        <!-- <div
-          class="item"
-          v-if="!(currentData && !currentData.type ==='folder')"
-          @click="newFile('file')"
-        >
-          新增文件
-        </div>
-        <div
-          class="item"
-          v-if="!(currentData && !currentData.type ==='folder')"
-          @click="newFile('folder')"
-        >
-          新增目录
-        </div>
-        <div class="item" v-if="currentData" @click="updateFileName">
-          重命名
-        </div>
-        <div class="item" v-if="currentData" @click="deleteFile">删除</div>-->
-        <div class="item" v-if="currentData.type && (actionList[currentData.type].includes('deleteServer'))" @click="deleteServer">删除服务</div>
-      </div>
-    </div>
-
-    <multipane class="custom-resizer" layout="vertical">
+  <div class="code-content">
+    <multipane class="custom-resizer" :class="{'limit-height': !isCreate}" layout="vertical">
       <div class="left">
         <div class="title">
           <el-button @click="openRepoModal()" size="mini" icon="el-icon-plus" plain circle></el-button>
@@ -37,15 +13,14 @@
           :saveFileName="saveFileName"
           :saveNewFile="saveNewFile"
           :saveNewFolder="saveNewFolder"
-          :nodeData="nodeData"
+          :nodeData="filteredNodeData"
           :expandKey="expandKey"
           :changeExpandFileList="changeExpandFileList"
           :deleteServer="deleteServer"
           :openRepoModal="openRepoModal"
         />
-        <div class="bottom" v-if="!isCreate">
-          <!-- <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button> -->
-          <el-button size="small" type="primary" :disabled="!updateEnv || !envNameList.length" @click="update">更新环境</el-button>
+        <div class="bottom">
+          <el-input v-model="searchService" placeholder="搜索服务" suffix-icon="el-icon-search" size="small"></el-input>
         </div>
       </div>
       <multipane-resizer class="resizer1"></multipane-resizer>
@@ -83,15 +58,14 @@
         <!-- 右侧aside -->
       </div>
     </multipane>
-    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" :chartNames="chartNames" />
-    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible.sync="dialogVisible" center @close="closeSelectRepo">
-      <Repo
-        ref="repo"
-        @triggleAction="changeExpandFileList('clear');clearCommitCache()"
-        :currentService="currentService"
-        @canUpdateEnv="canUpdateEnv($event)"
-        v-model="dialogVisible"
-      />
+
+    <div class="env-bottom" v-if="!isCreate">
+      <!-- <el-button size="small" type="primary" @click="commit" :disabled="!commitCache.length">保存</el-button> -->
+      <el-button size="small" type="primary" :disabled="!updateEnv || !envNameList.length" @click="update">更新环境</el-button>
+    </div>
+    <UpdateHelmEnv v-model="updateHelmEnvDialogVisible" />
+    <el-dialog :title="currentService ? '更新服务' : '新建服务'" :visible="dialogVisible" center @close="closeSelectRepo">
+      <Repo ref="repo" @triggleAction="changeExpandFileList('clear');clearCommitCache()" />
       <!-- 代码库弹窗 -->
     </el-dialog>
   </div>
@@ -147,11 +121,8 @@ export default {
   },
   data () {
     return {
-      currentService: null,
       actionList: actionList,
       updateHelmEnvDialogVisible: false,
-      updateEnv: false,
-      dialogVisible: false,
       commitCache: [],
       currentCode: null,
       page: {
@@ -168,36 +139,12 @@ export default {
         left: 0,
         top: 0
       },
-      chartNames: [
-        // { serviceName: 'common', type: 'common' },
-        // { serviceName: 'delete', type: 'delete' },
-        // { serviceName: 'update', type: 'update' },
-        // { serviceName: 'create', type: 'create' }
-      ]
+      searchService: ''
     }
   },
   methods: {
-    handleChartNames (services) {
-      services.forEach(service => {
-        const serviceNames = this.chartNames.map(chart => chart.serviceName)
-        const index = serviceNames.indexOf(service.serviceName)
-        const type = service.type
-        if (type === 'delete') {
-          if (index !== -1) {
-            this.chartNames.splice(index, 1)
-          } else {
-            this.chartNames.push(service)
-          }
-        } else if (index === -1) {
-          this.chartNames.push(service)
-        }
-      })
-    },
-    canUpdateEnv (services) {
-      this.updateEnv = true
-      if (services) this.handleChartNames(services)
-    },
     closeSelectRepo () {
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', false)
       this.$refs.repo.closeSelectRepo()
     },
     loadData (data) {
@@ -278,7 +225,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.page.expandFileList = []
-        this.handleChartNames([
+        this.$store.commit('CHART_NAMES', [
           { serviceName: currentData.service_name, type: 'delete' }
         ])
         deleteServiceTemplateAPI(
@@ -290,7 +237,7 @@ export default {
           .then(res => {
             if (res) {
               if (this.envNameList.length) {
-                this.updateEnv = true
+                this.$store.commit('UPDATE_ENV_BUTTON', true)
               }
               this.$store.dispatch('queryService', {
                 projectName: this.projectName
@@ -370,7 +317,7 @@ export default {
         commitCache: this.commitCache
       }
       this.$store.dispatch('updateHelmChart', params).then(res => {
-        this.updateEnv = true
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
         this.clearCommitCache()
       })
     },
@@ -397,12 +344,8 @@ export default {
       this.modalvalue = status
     },
     openRepoModal (currentService) {
-      if (currentService) {
-        this.currentService = currentService
-      } else {
-        this.currentService = null
-      }
-      this.dialogVisible = true
+      this.$store.commit('CURRENT_SERVICE', cloneDeep(currentService) || null)
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', true)
     },
     update () {
       this.updateHelmEnvDialogVisible = true
@@ -446,54 +389,28 @@ export default {
       return envNameList
     },
     ...mapState({
-      service: state => state.service_manage.serviceList
-    })
+      service: state => state.service_manage.serviceList,
+      dialogVisible: state => state.service_manage.serviceDialogVisible,
+      currentService: state => state.service_manage.currentService,
+      updateEnv: state => state.service_manage.updateEnv
+    }),
+    filteredNodeData () {
+      return this.nodeData.filter(node => {
+        return node.service_name.includes(this.searchService)
+      })
+    }
   }
 }
 </script>
 <style lang="less" scoped>
-.content {
+.code-content {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
   overflow: auto;
   background-color: #fff;
   // user-select: none;
-
-  .modalContent {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    .modal {
-      position: absolute;
-      z-index: 999;
-      width: 140px;
-      padding-top: 10px;
-      padding-bottom: 10px;
-      background-color: rgb(241, 241, 241);
-      border: 1px solid rgb(197, 197, 197);
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgb(197, 197, 197);
-      cursor: pointer;
-
-      .item {
-        height: 25px;
-        padding-left: 20px;
-        color: #606266;
-        font-size: 14px;
-        line-height: 25px;
-        border-bottom: 1px solid #eaeefb;
-      }
-
-      .item:hover {
-        color: #fff;
-        background-color: rgb(55, 134, 240);
-      }
-    }
-  }
 
   .left {
     display: flex;
@@ -526,8 +443,8 @@ export default {
 
     .bottom {
       flex: 0 0 auto;
-      height: 50px;
-      padding-left: 20px;
+      height: 40px;
+      padding: 0 10px;
     }
   }
 
@@ -604,10 +521,25 @@ export default {
     min-width: 200px;
     background-color: #fff;
   }
+
+  .env-bottom {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 55px;
+    padding-left: 10px;
+    background-color: #fff;
+    border-top: 1px solid #dbdbdb;
+  }
 }
 
 .custom-resizer {
   width: 100%;
+  height: 100%;
+
+  &.limit-height {
+    height: calc(~'100% - 55px');
+  }
 }
 
 ::-webkit-scrollbar {
