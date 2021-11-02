@@ -127,8 +127,8 @@ http.interceptors.response.use(
         // unauthorized 401
         if (error.response.status === 401) {
           const redirectPath = window.location.pathname + window.location.search
-          localStorage.removeItem('userInfo')
-          localStorage.removeItem('role')
+          store.remove('userInfo')
+          store.remove('role')
           Element.Message.error('登录信息失效, 请返回重新登录')
           if (redirectPath.includes('/setup/')) {
             window.location.href = `/signin`
@@ -1380,6 +1380,11 @@ export function queryUserBindings (uid, projectName = '') { // 查询用户所�
   return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
 }
 // role system
+
+export function getSystemRoleBindingsAPI () {
+  return http.get(`/api/v1/system-rolebindings`)
+}
+
 export function addSystemRoleBindingsAPI (payload) {
   return http.post(`/api/v1/system-rolebindings`, payload)
 }
