@@ -201,18 +201,29 @@ export default {
       }
     },
     async deleteProject (projectName) {
-      const result = await Promise.all([listWorkflowAPI(), listProductAPI('', projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
+      const externalFlag = this.projects.filter(project => project.product_name === projectName)[0].product_feature.create_env_type === 'external'
+      const result = await Promise.all([listWorkflowAPI(), getProductsAPI(projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
       const workflows = result[0].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
       const envNames = result[1].map((element) => { return element.env_name })
       const services = flattenDeep(result[2].services)
       const buildConfigs = result[3].map((element) => { return element.name })
-      const htmlTemplate = `
+      const htmlTemplate = externalFlag
+        ? `
+        <p>该项目下的以下资源会被取消托管，<span style="color:red">请谨慎操作！！</span></p>
+        <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
+        <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
+        <p>该项目下的以下资源会同时被删除，<span style="color:red">请谨慎操作！！</span></p>
+        <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
+        <span><b>工作流：</b>${workflows.length > 0 ? workflows.join(', ') : '无'}</span>
+      `
+        : `
+        该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br>
         <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
         <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
         <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
         <span><b>工作流：</b>${workflows.length > 0 ? workflows.join(', ') : '无'}</span>
         `
-      this.$prompt(`该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br> ${htmlTemplate}`, `请输入项目名 ${projectName} 确认删除`, {
+      this.$prompt(htmlTemplate, `请输入项目名 ${projectName} 确认删除`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         dangerouslyUseHTMLString: true,
