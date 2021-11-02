@@ -167,12 +167,12 @@ export default {
     },
     onSelectAction (action) {
       if (action.name === '失败重试') {
-        restartWorkflowAPI(this.workflowName, this.taskID).then(res => {
+        restartWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
           Notify({ type: 'success', message: '任务已重新启动' })
           this.$router.push('/mobile/status')
         })
       } else if (action.name === '取消任务') {
-        cancelWorkflowAPI(this.workflowName, this.taskID).then(res => {
+        cancelWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
           if (this.$refs && this.$refs.buildComp) {
             this.$refs.buildComp.killLog('buildv2')
             this.$refs.buildComp.killLog('docker_build')
@@ -237,14 +237,14 @@ export default {
       }
     },
     fetchTaskDetail () {
-      return workflowTaskDetailSSEAPI(this.workflowName, this.taskID).then(res => {
+      return workflowTaskDetailSSEAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res.data)
         this.taskDetail = res.data
         this.workflow = res.data.workflow_args
       }).closeWhenDestroy(this)
     },
     fetchOldTaskDetail () {
-      workflowTaskDetailAPI(this.workflowName, this.taskID).then(res => {
+      workflowTaskDetailAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res)
         this.taskDetail = res
         this.workflow = res.workflow_args

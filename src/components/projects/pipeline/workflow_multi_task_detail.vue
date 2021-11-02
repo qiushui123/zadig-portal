@@ -845,13 +845,13 @@ export default {
     },
     rerun () {
       const taskUrl = `/v1/projects/detail/${this.projectName}/pipelines/multi/${this.workflowName}/${this.taskID}`
-      restartWorkflowAPI(this.workflowName, this.taskID).then(res => {
+      restartWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.$message.success('任务已重新启动')
         this.$router.push(taskUrl)
       })
     },
     cancel () {
-      cancelWorkflowAPI(this.workflowName, this.taskID).then(res => {
+      cancelWorkflowAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         if (this.$refs && this.$refs.buildComp) {
           this.$refs.buildComp.killLog('buildv2')
           this.$refs.buildComp.killLog('docker_build')
@@ -865,7 +865,7 @@ export default {
     checkDeliveryList () {
       const workflowName = this.workflowName
       const taskId = this.taskID
-      getVersionListAPI(workflowName, '', taskId).then((res) => {
+      getVersionListAPI(workflowName, this.projectName, taskId).then((res) => {
         this.versionList = res
       })
     },
@@ -904,14 +904,14 @@ export default {
     },
 
     fetchTaskDetail () {
-      return workflowTaskDetailSSEAPI(this.workflowName, this.taskID).then(res => {
+      return workflowTaskDetailSSEAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res.data)
         this.taskDetail = res.data
         this.workflow = res.data.workflow_args
       }).closeWhenDestroy(this)
     },
     fetchOldTaskDetail () {
-      workflowTaskDetailAPI(this.workflowName, this.taskID).then(res => {
+      workflowTaskDetailAPI(this.projectName, this.workflowName, this.taskID).then(res => {
         this.adaptTaskDetail(res)
         this.taskDetail = res
         this.workflow = res.workflow_args

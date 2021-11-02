@@ -449,7 +449,7 @@ export default {
       }
     },
     getRegistryWhenBuild () {
-      getRegistryWhenBuildAPI().then((res) => {
+      getRegistryWhenBuildAPI(this.projectName).then((res) => {
         this.allRegistry = res
       })
     }

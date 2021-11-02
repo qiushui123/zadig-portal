@@ -668,7 +668,7 @@ export default {
       this.$refs.sourceForm.validate((valid) => {
         if (valid) {
           this.importLoading = true
-          loadRepoServiceAPI(codehostId, repoOwner, repoName, branchName, remoteName, repoUUID, payload).then((res) => {
+          loadRepoServiceAPI(this.projectName, codehostId, repoOwner, repoName, branchName, remoteName, repoUUID, payload).then((res) => {
             this.$emit('onRefreshService')
             this.$emit('onRefreshSharedService')
             this.$emit('update:showNext', true)
@@ -742,7 +742,7 @@ export default {
         this.askSaveYamlConfig()
         return
       }
-      const res = await getCodeSourceByAdminAPI(1)
+      const res = await getCodeSourceByAdminAPI(0)
       if (cmd && this.deployType === 'k8s') {
         if (cmd === 'platform') {
           this.showNewServiceInput = true

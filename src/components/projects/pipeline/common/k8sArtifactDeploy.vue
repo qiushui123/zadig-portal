@@ -206,11 +206,14 @@ export default {
         services: this.pickedTargetServices,
         pickedRegistry: this.pickedRegistry
       }
+    },
+    projectName () {
+      return this.$route.params.project_name
     }
   },
   created () {
     // 如果 K8s 交付物部署开启则获取对应服务和镜像仓库
-    getRegistryWhenBuildAPI().then((res) => {
+    getRegistryWhenBuildAPI(this.projectName).then((res) => {
       this.allRegistry = res
       // 克隆任务数据
       if (this.forcedUserInput.version_args && this.forcedUserInput.version_args.version) {

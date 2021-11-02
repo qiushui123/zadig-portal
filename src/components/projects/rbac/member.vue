@@ -8,12 +8,12 @@
     <el-table v-loading="loading" row-key="id" :data="members" style="width: 100%;">
       <el-table-column label="用户名称">
         <template slot-scope="scope">
-          <span>{{scope.row.uid}}</span>
+          <span>{{scope.row.username}}</span>
         </template>
       </el-table-column>
       <el-table-column label="邮件">
         <template slot-scope="scope">
-          <span>{{scope.row.uid}}</span>
+          <span>{{scope.row.email}}</span>
         </template>
       </el-table-column>
       <el-table-column label="角色">
@@ -38,7 +38,7 @@
 <script>
 import bus from '@utils/event_bus'
 import AddRoleBind from './addroleBind.vue'
-import { queryRoleBindings, queryrole, queryPublicRole, deleteroleBindings } from '@/api'
+import { queryRoleBindingsAPI, queryrole, queryPublicRole, deleteroleBindings } from '@/api'
 
 export default {
   name: 'member',
@@ -72,7 +72,7 @@ export default {
       })
     },
     async getRoleBindings () {
-      const res = await queryRoleBindings(this.projectName).catch(error =>
+      const res = await queryRoleBindingsAPI(this.projectName).catch(error =>
         console.log(error)
       )
       if (res) {

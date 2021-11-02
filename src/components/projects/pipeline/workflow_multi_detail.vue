@@ -251,10 +251,10 @@ export default {
           }
         }
       }).then(({ value }) => {
-        deleteWorkflowAPI(name).then(() => {
+        deleteWorkflowAPI(this.$route.params.project_name, name).then(() => {
           this.$message.success('删除成功')
           this.$router.push(`/v1/projects/detail/${this.projectName}/pipelines`)
-          this.$store.dispatch('refreshWorkflowList')
+          this.$store.dispatch('refreshWorkflowList', this.projectName)
         })
       })
     },

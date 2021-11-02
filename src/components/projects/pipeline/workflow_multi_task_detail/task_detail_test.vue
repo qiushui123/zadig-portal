@@ -199,6 +199,9 @@ export default {
     },
     testName () {
       return this.testingv2 && this.testingv2.test_name
+    },
+    projectName () {
+      return this.$route.params.project_name
     }
   },
   watch: {
@@ -265,7 +268,7 @@ export default {
       this.openTestLog()
     }
     if (this.test_done) {
-      getWorkflowHistoryTestLogAPI(this.pipelineName, this.taskID, this.testName, this.serviceName).then(
+      getWorkflowHistoryTestLogAPI(this.projectName, this.pipelineName, this.taskID, this.testName, this.serviceName).then(
         response => {
           this.testAnyLog = (response.split('\n')).map(element => {
             return element + '\n'

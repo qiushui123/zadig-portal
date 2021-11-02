@@ -81,7 +81,7 @@
                                type="text">点击下载</el-button>
                   </td>
                 </tr>
-                <tr v-if="currentEditUserInfo.identityType ==='system'">
+                <tr v-if="currentEditUserInfo.identity_type ==='system'">
                   <td>
                     <span>修改密码
                     </span>

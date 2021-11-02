@@ -300,7 +300,7 @@ export default {
         }
         usersAPI(paload).then((res) => {
           this.loading = false
-          this.users = this.$utils.deepSortOn(res.data, 'name')
+          this.users = this.$utils.deepSortOn(res.users, 'name')
         })
       } else {
         this.users = []
