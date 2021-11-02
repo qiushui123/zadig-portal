@@ -51,7 +51,9 @@ const actions = {
     if (userInfo) {
       const roleBinding = await queryUserBindings(userInfo.uid).catch(error => console.log(error))
       if (roleBinding) {
-        context.commit('INJECT_ROLE', roleBinding.map(item => (item.role)))
+        const role = roleBinding.map(item => (item.role))
+        store.set('role', role)
+        context.commit('INJECT_ROLE', role)
       }
     }
   },
