@@ -290,7 +290,6 @@ export default {
       }
       usersAPI(paload).then((res) => {
         this.users = this.$utils.deepSortOn(res.users, 'name')
-        console.log(this.users)
       })
     },
     remoteMethod (query) {
