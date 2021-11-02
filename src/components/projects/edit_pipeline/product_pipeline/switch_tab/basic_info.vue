@@ -148,23 +148,26 @@ export default {
     }
   },
   watch: {
-    pipelineInfo () {
-      if (this.$route.query.projectName) {
-        this.pipelineInfo.product_tmpl_name = this.$route.query.projectName
-      }
+    pipelineInfo: {
+      immediate: true,
+      handler: function () {
+        if (this.$route.query.projectName) {
+          this.pipelineInfo.product_tmpl_name = this.$route.query.projectName
+        }
 
-      if (!this.$route.query.projectName && !this.editMode) {
-        templatesAPI().then(res => {
-          this.projects = res
+        if (!this.$route.query.projectName && !this.editMode) {
+          templatesAPI().then(res => {
+            this.projects = res
+          })
+        }
+        const projectName = this.pipelineInfo.product_tmpl_name
+        bus.$on('check-tab:basicInfo', () => {
+          this.$refs.pipelineInfo.validate(valid => {
+            bus.$emit('receive-tab-check:basicInfo', valid)
+          })
         })
+        this.getEnvServices(projectName)
       }
-      const projectName = this.pipelineInfo.product_tmpl_name
-      bus.$on('check-tab:basicInfo', () => {
-        this.$refs.pipelineInfo.validate(valid => {
-          bus.$emit('receive-tab-check:basicInfo', valid)
-        })
-      })
-      this.getEnvServices(projectName)
     }
   },
   beforeDestroy () {

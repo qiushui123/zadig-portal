@@ -172,7 +172,7 @@ export default {
   },
   methods: {
     getLatestTest () {
-      getLatestTestReportAPI(projectName, this.serviceName).then(res => {
+      getLatestTestReportAPI(this.projectName, this.serviceName).then(res => {
         this.latestTestSummary = res
         this.testCases = res.testcase
         this.testCases.forEach(testCase => {
