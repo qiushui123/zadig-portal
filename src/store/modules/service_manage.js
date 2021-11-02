@@ -9,8 +9,7 @@ export default {
     serviceDialogVisible: false,
     currentService: null,
     chartNames: [],
-    updateEnv: false,
-    services: [] // used for service order
+    updateEnv: false
   },
   mutations: {
     [Mutation.QUERY_SERVICE_MODULE] (state, payload) {
@@ -51,9 +50,6 @@ export default {
     },
     [Mutation.UPDATE_ENV_BUTTON] (state, payload) {
       state.updateEnv = payload
-    },
-    [Mutation.QUERY_ORDER_SERVICE] (state, payload) {
-      state.services = payload
     }
   },
   actions: {
@@ -61,12 +57,11 @@ export default {
       const service = []
       const res = await Api.getHelmChartService(payload.projectName).catch(error => console.log(error))
       if (res) {
-        commit(Mutation.QUERY_ORDER_SERVICE, res.services || [])
-        res.serviceInfos = res.service_infos ? res.service_infos : []
-        if (res.serviceInfos.length) {
+        res.services = res.services ? res.services : []
+        if (res.services.length) {
           commit(Mutation.OPEN_SHOW_NEXT, true)
           let item = null
-          res.serviceInfos.forEach((element, index) => {
+          res.services.forEach((element, index) => {
             item = element
             item.id = index
             item.label = element.service_name
