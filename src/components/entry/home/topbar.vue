@@ -110,10 +110,13 @@
                         <span>{{userInfo.account}}</span>
                         <el-tag v-if="role.includes('admin')"
                                 size="mini"
-                                type="info">管理员</el-tag>
+                                type="primary"
+                                effect="plain"
+                                >管理员</el-tag>
                         <el-tag v-else
                                 size="mini"
-                                type="info">普通用户</el-tag>
+                                type="primary"
+                                effect="plain">普通用户</el-tag>
                       </li>
                     </ul>
                   </li>
