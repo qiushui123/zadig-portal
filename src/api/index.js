@@ -1225,6 +1225,14 @@ export function createTemplateMultiServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services/bulk?productName=${productName}`, payload)
 }
 
+export function getHelmTemplateVariableAPI (name) {
+  return http.get(`/api/aslan/template/charts/${name}/variables`)
+}
+
+export function saveHelmTemplateVariableAPI (name, payload) {
+  return http.put(`/api/aslan/template/charts/${name}/variables`, payload)
+}
+
 // Template Dockerfile
 export function getDockerfileTemplatesAPI () {
   return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)

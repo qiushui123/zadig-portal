@@ -55,10 +55,6 @@ export default {
 
 <style lang="less" scoped>
 .page-nav-container {
-  &::-webkit-scrollbar {
-    display: none; /* Chrome Safari */
-  }
-
   display: flex;
   align-items: center;
   width: 100%;
@@ -66,6 +62,9 @@ export default {
   font-size: 13px;
   scrollbar-width: none; /* firefox */
   -ms-overflow-style: none; /* IE 10+ */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome Safari */
+  }
 
   .tab {
     display: flex;
