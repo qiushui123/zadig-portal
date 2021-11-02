@@ -367,19 +367,30 @@ export default {
       }
     },
     deleteProject () {
+      const externalFlag = this.currentProject.product_feature.create_env_type === 'external'
       const services = _.flattenDeep(this.currentProject.services)
       const envNames = this.envList.map((element) => { return element.env_name })
       const buildConfigs = this.buildConfigs.map((element) => { return element.name })
       const workflows = this.workflows.map((element) => { return element.name })
       const allWorkflows = workflows
-      const htmlTemplate = `
-      <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
-      <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
-      <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
-      <span><b>工作流：</b>${allWorkflows.length > 0 ? allWorkflows.join(', ') : '无'}</span>
-      `
+      const htmlTemplate = externalFlag
+        ? `
+          <p>该项目下的以下资源会被取消托管，<span style="color:red">请谨慎操作！！</span></p>
+          <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
+          <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
+          <p>该项目下的以下资源会同时被删除，<span style="color:red">请谨慎操作！！</span></p>
+          <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
+          <span><b>工作流：</b>${allWorkflows.length > 0 ? allWorkflows.join(', ') : '无'}</span>
+        `
+        : `
+          该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br>
+          <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
+          <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
+          <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
+          <span><b>工作流：</b>${allWorkflows.length > 0 ? allWorkflows.join(', ') : '无'}</span>
+        `
       const projectName = this.projectName
-      this.$prompt(`该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br> ${htmlTemplate}`, `请输入项目名 ${projectName} 确认删除`, {
+      this.$prompt(htmlTemplate, `请输入项目名 ${projectName} 确认删除`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         dangerouslyUseHTMLString: true,

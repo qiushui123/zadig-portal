@@ -1,10 +1,5 @@
 <template>
-  <div
-    v-loading="loading"
-    element-loading-text="加载中..."
-    element-loading-spinner="iconfont iconfont-loading icongeren"
-    class="users-overview-container"
-  >
+  <div class="users-overview-container">
     <!--start of add user dialog-->
     <el-dialog title="新建用户" custom-class="create-user-dialog" :close-on-click-modal="false" :visible.sync="dialogAddUserVisible">
       <el-form :model="addUser" @submit.native.prevent :rules="addUserRule" ref="addUserForm">
@@ -60,9 +55,14 @@
         </el-col>
       </el-row>
     </div>
-    <div class="users-container">
+    <div
+      v-loading="loading"
+      element-loading-text="加载中..."
+      element-loading-spinner="iconfont iconfont-loading icongeren"
+      class="users-container"
+    >
       <el-table :data="users" style="width: 100%;">
-        <el-table-column label>
+        <el-table-column label="用户">
           <template slot-scope="scope">
             <div class="name-listing-details">
               <!-- Logo -->
