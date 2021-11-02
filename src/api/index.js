@@ -1369,23 +1369,18 @@ export function deleteroleBindings (name, projectName) { // 删除项目中的�
 }
 
 export function queryRoleBindings (projectName) { // 查询项目中的角色
-  return http.get(`/api/v1/rolebindings?projectName=${projectName}`)
+  return http.get(`/api/v1/picket/rolebindings?projectName=${projectName}`)
 }
 
 export function queryUserBindings (uid, projectName = '') { // 查询用户所有绑定的角色 传projectName是项目绑定，不传是系统绑定
   return http.get(`/api/v1/userbindings?uid=${uid}&projectName=${projectName}`)
 }
 // role system
-
-export function getSystemRoleBindingsAPI () {
-  return http.get(`/api/v1/system-rolebindings`)
-}
-
-export function addSystemRoleBindingsAPI (payload) {
+export function addSystemRoleBindings (payload) {
   return http.post(`/api/v1/system-rolebindings`, payload)
 }
 
-export function deleteSystemRoleBindingsAPI (name) {
+export function deleteSystemRoleBindings (name) {
   return http.delete(`/api/v1/system-rolebindings/${name}`)
 }
 

@@ -18,8 +18,8 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button @click="editrole(scope.row)" v-if="scope.row.name !== 'admin'"  size="mini" type="primary">编辑</el-button>
-          <el-button @click="deleterole(scope.row)"  v-if="scope.row.name !== 'admin'"  size="mini" type="danger">删除</el-button>
+          <el-button @click="editrole(scope.row)" v-if="scope.row.name !== 'admin' || !scope.row.isPublic"  size="mini" type="primary">编辑</el-button>
+          <el-button @click="deleterole(scope.row)"  v-if="scope.row.name !== 'admin' || !scope.row.isPublic"  size="mini" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
