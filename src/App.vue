@@ -18,8 +18,6 @@ export default {
     ...mapGetters([
       'signupStatus'
     ])
-  },
-  created () {
   }
 }
 </script>
