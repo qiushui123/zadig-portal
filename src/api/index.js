@@ -337,7 +337,7 @@ export function getHelmChartService (projectName) {
   return http.get(`/api/aslan/service/helm/${projectName}`)
 }
 
-export function updateHelmServicesOrderAPI (projectName, payload) {
+export function updateServicesOrchestrationAPI (projectName, payload) {
   return http.put(`/api/aslan/project/products/${projectName}/serviceOrder`, payload)
 }
 

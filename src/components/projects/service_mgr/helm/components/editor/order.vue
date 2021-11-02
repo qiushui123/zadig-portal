@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { updateHelmServicesOrderAPI } from '@api'
+import { updateServicesOrchestrationAPI } from '@api'
 import { mapState } from 'vuex'
 
 export default {
@@ -42,7 +42,7 @@ export default {
         .map(node => {
           return node.children.map(child => child.label)
         })
-      updateHelmServicesOrderAPI(this.projectName, { services })
+      updateServicesOrchestrationAPI(this.projectName, { services })
     },
     allowDrop (draggingNode, dropNode, type) {
       if (dropNode.data.label.indexOf('启动顺序') === -1) {
