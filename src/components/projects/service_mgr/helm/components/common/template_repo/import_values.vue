@@ -39,7 +39,7 @@ export default {
       return this.$refs.valueRepoRef.validate()
     },
     resetValueRepoInfo () {
-      this.$refs.valueRepoRef && this.$refs.valueRepoRef.resetSource()
+      this.$refs.valueRepoRef.resetSource()
     }
   },
   components: {

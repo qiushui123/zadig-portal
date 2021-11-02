@@ -4,11 +4,12 @@
       <ImportChart v-model="chartDialogVisible" :chartCurrentService="currentService" @importChart="chartTemplateUpdate($event)"></ImportChart>
     </el-dialog>
     <multipane>
-      <div class="pane left" :style="{minWidth: '200px', width: '230px', maxWidth: '400px'}">
+      <div class="pane left" :style="{width: '200px', maxWidth: '400px'}">
         <div class="top">
           <el-button icon="el-icon-plus" circle size="mini" @click="chartDialogVisible = !chartDialogVisible"></el-button>
         </div>
         <Folder
+          ref="folderRef"
           v-if="fileData.length"
           :fileData="fileData"
           :expandedKeys="expandedKeys"
@@ -25,7 +26,12 @@
         <Codemirror v-if="currentTab" v-model="yaml" :cmOption="{ readOnly: true }" class="mirror"></Codemirror>
       </div>
       <multipane-resizer></multipane-resizer>
-      <ModuleUse class="pane right" :style="{flexGrow: 1, minWidth: '372px'}"></ModuleUse>
+      <Aside
+        class="pane right"
+        :style="{flexGrow: 1, minWidth: '372px'}"
+        :systemVariables="systemVariables"
+        :customVariables="customVariables"
+      ></Aside>
     </multipane>
   </div>
 </template>
@@ -33,10 +39,12 @@
 <script>
 import { Multipane, MultipaneResizer } from 'vue-multipane'
 import Codemirror from '@/components/projects/common/codemirror.vue'
-import ModuleUse from './module_use.vue'
+
 import Folder from './folder.vue'
 import ImportChart from './import_chart.vue'
 import PageNav from './page_nav.vue'
+import Aside from './aside.vue'
+
 import {
   getChartTemplatesAPI,
   getChartTemplateByNameAPI,
@@ -58,7 +66,8 @@ function tree ({ chartName, files }) {
           name,
           children: r[name].result,
           chartName,
-          fullPath: `${chartName}/${file.path}`
+          fullPath: `${chartName}/${file.path}`,
+          yamlContent: ''
         })
       }
       return r[name]
@@ -68,6 +77,7 @@ function tree ({ chartName, files }) {
 }
 
 export default {
+  name: 'ChartTemp',
   data () {
     return {
       yaml: '',
@@ -76,17 +86,33 @@ export default {
       currentService: null,
       fileData: [],
       displayedFile: [],
-      yamlSet: {},
-      expandedKeys: []
+      expandedKeys: [],
+      systemVariables: []
     }
   },
   computed: {
     fileDataObj () {
       return keyBy(this.fileData, 'name')
+    },
+    serviceName () {
+      return this.$route.query.service_name || ''
+    },
+    customVariables () {
+      const data = this.fileDataObj[this.serviceName]
+      return data ? data.variables || [] : []
     }
   },
   methods: {
+    updateSelectedService (serviceName = '', nodeKey = '') {
+      this.$router.replace({
+        query: {
+          service_name: serviceName
+        }
+      })
+      if (nodeKey) this.$refs.folderRef.setFileSelected(nodeKey)
+    },
     handleFileClick (data) {
+      this.updateSelectedService(data.chartName || data.name)
       if (data.is_chart) {
         // 请求 chart 目录文件
         this.getChartTemplateByName(data.name)
@@ -109,10 +135,10 @@ export default {
       if (filter.length === 0) {
         this.displayedFile.push(data)
       }
-      if (!this.yamlSet[data.fullPath]) {
-        await this.getTemplateFileContent(data.chartName, data.path)
+      if (!data.yamlContent) {
+        await this.getTemplateFileContent(data.chartName, data.path, '', data)
       }
-      this.yaml = this.yamlSet[data.fullPath]
+      this.yaml = data.yamlContent
     },
     refreshChart (data) {
       this.chartDialogVisible = true
@@ -126,11 +152,29 @@ export default {
       }
     },
     chartTemplateUpdate ({ deleteFlag, update, create, name }) {
+      this.clearUselessCache(name)
+
+      const fn = data => {
+        const valuesYaml =
+          data.children.find(data => data.name === 'values.yaml') ||
+          data.children[0]
+        this.showFile({ data: valuesYaml })
+        this.updateSelectedService(data.name, data.fullPath)
+      }
+
       if (deleteFlag) {
         const id = this.fileData.findIndex(file => file.name === name)
         this.fileData.splice(id, 1)
+        if (name === this.serviceName) {
+          if (this.fileData.length) {
+            fn(this.fileData[0])
+          } else {
+            this.updateSelectedService()
+          }
+        }
         return
       }
+
       this.getChartTemplates().then(res => {
         if (update) {
           const id = this.fileData.findIndex(file => {
@@ -145,14 +189,25 @@ export default {
           const file = res.find(file => file.name === name)
           this.fileData.push(file)
         }
+
         this.getChartTemplateByName(name).then(() => {
-          this.showFile({ data: this.fileDataObj[name].children[0] })
+          fn(this.fileDataObj[name])
         })
+      })
+    },
+    clearUselessCache (serviceName) {
+      this.displayedFile = this.displayedFile.filter(data => {
+        if (data.fullPath.split('/')[0] !== serviceName) {
+          return true
+        } else {
+          data.yamlContent = ''
+          return false
+        }
       })
     },
     getChartTemplates () {
       return getChartTemplatesAPI().then(res => {
-        const list = res.map(re => {
+        const list = res.chartTemplates.map(re => {
           return {
             ...re,
             is_chart: true,
@@ -161,6 +216,7 @@ export default {
             children: []
           }
         })
+        this.systemVariables = res.systemVariables
         return list
       })
     },
@@ -173,10 +229,11 @@ export default {
           chartName: name,
           files: res.files
         })
+        this.$set(this.fileDataObj[name], 'variables', res.variables || [])
         this.expandedKeys = [name]
       })
     },
-    async getTemplateFileContent (charName, fileName, filePath = '') {
+    async getTemplateFileContent (charName, fileName, filePath = '', data) {
       const res = await getTemplateFileContentAPI(
         charName,
         fileName,
@@ -185,7 +242,7 @@ export default {
         console.log(err)
       })
       if (res) {
-        this.$set(this.yamlSet, `${charName}/${fileName}`, res)
+        data.yamlContent = res
       }
     }
   },
@@ -203,7 +260,14 @@ export default {
       if (res.length) {
         const name = res[0].name
         this.getChartTemplateByName(name).then(() => {
-          this.showFile({ data: this.fileDataObj[name].children[0] })
+          const valuesYaml =
+            this.fileDataObj[name].children.find(
+              data => data.name === 'values.yaml'
+            ) || this.fileDataObj[name].children[0]
+          this.showFile({ data: valuesYaml })
+        })
+        this.$nextTick(() => {
+          this.updateSelectedService(name, res[0].fullPath)
         })
       }
     })
@@ -212,10 +276,10 @@ export default {
     Multipane,
     MultipaneResizer,
     Codemirror,
-    ModuleUse,
     Folder,
     ImportChart,
-    PageNav
+    PageNav,
+    Aside
   }
 }
 </script>
@@ -224,6 +288,7 @@ export default {
 .chart-template-container {
   width: 100%;
   height: 100%;
+  background-color: #f5f7f7;
 
   /deep/.multipane {
     width: 100%;
@@ -237,7 +302,7 @@ export default {
       &::before {
         position: absolute;
         top: 50%;
-        left: 50%;
+        left: 0;
         width: 8px;
         height: 56px;
         margin-top: -28px;
@@ -251,11 +316,14 @@ export default {
 
     .pane {
       .top {
-        height: 50px;
-        line-height: 50px;
+        height: 45px;
+        line-height: 45px;
       }
 
       &.left {
+        margin-right: 10px;
+        background-color: #fff;
+
         .top {
           padding: 0 10px;
           text-align: right;
@@ -264,19 +332,12 @@ export default {
       }
 
       &.center {
-        background-color: #f5f7fa;
-        border-right: 1px solid #ebedef;
-        border-left: 1px solid #ebedef;
+        margin-right: 10px;
 
         .mirror {
           height: calc(~'100% - 50px');
           padding: 5px;
         }
-      }
-
-      &.right {
-        box-sizing: border-box;
-        padding: 10px 20px 20px;
       }
     }
   }

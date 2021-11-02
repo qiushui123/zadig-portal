@@ -107,7 +107,7 @@ export default {
         valuesPaths: []
       }
       this.$nextTick(() => {
-        this.$refs.repoForm.clearValidate()
+        this.$refs.repoForm && this.$refs.repoForm.clearValidate()
       })
     }
   },

@@ -3,7 +3,7 @@
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <h4 class="flex-center" style="padding-left: 40px;">
         <span>Chart 模板</span>
-        <el-button type="text" @click="triggerSubstantial" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
+        <el-button type="text" @click="triggerSubstantial(substantial)" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
       </h4>
       <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
@@ -12,19 +12,24 @@
         <span style="line-height: 41px;">批量创建的服务名称为 values 文件名称</span>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
-        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate">
+        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate" @change="getHelmTemplateVariable">
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <keep-alive>
-        <component
-          :is="isComp"
-          ref="importValues"
-          :importRepoInfo.sync="importRepoInfo"
-          :resize="{height: '188px'}"
-          :style="{'padding-left': substantial ? '0px':'40px'}"
-        ></component>
-      </keep-alive>
+      <div v-if="!substantial" style="padding-left: 40px;">
+        <div class="custom-variable" v-if="!substantial && variables.length">
+          <h4 class="var-title">变量</h4>
+          <div class="variable-row" v-for="vars in variables" :key="vars.key">
+            <div class="row-left">{{ vars.key }}</div>
+            <div class="row-right">
+              <el-input v-model="vars.value" :placeholder="vars.value" size="small"></el-input>
+            </div>
+          </div>
+        </div>
+        <el-button v-if="importRepoInfo.yamlSource === 'default'" type="text" @click="importRepoInfo.yamlSource = 'freeEdit'">高级设置</el-button>
+        <CommonImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo" :resize="{height: '188px'}" showDelete></CommonImportValues>
+      </div>
+      <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo"></ImportValues>
       <el-form-item>
         <el-button size="small" @click="commitDialogVisible(false)">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
@@ -39,7 +44,8 @@ import ImportValues from './template_repo/import_values.vue'
 import {
   createTemplateServiceAPI,
   createTemplateMultiServiceAPI,
-  getChartTemplatesAPI
+  getChartTemplatesAPI,
+  getHelmTemplateVariableAPI
 } from '@api'
 import { mapState } from 'vuex'
 
@@ -73,25 +79,24 @@ export default {
         moduleName: ''
       },
       importRepoInfo: {
-        yamlSource: 'freeEdit',
+        yamlSource: 'default',
         overrideYaml: '',
         gitRepoConfig: null
       },
       substantial: false,
       importLoading: false,
-      isUpdate: false
+      isUpdate: false,
+      variables: []
     }
   },
   props: {
     currentSelect: String
   },
   computed: {
-    isComp () {
-      return this.substantial ? ImportValues : CommonImportValues
-    },
     ...mapState({
       currentService: state => state.service_manage.currentService
     })
+
   },
   watch: {
     currentService: {
@@ -104,11 +109,14 @@ export default {
           }
           if (createFrom.yaml_data) {
             this.importRepoInfo = {
-              yamlSource: 'freeEdit',
+              yamlSource: createFrom.yaml_data.yaml_content
+                ? 'freeEdit'
+                : 'default',
               overrideYaml: createFrom.yaml_data.yaml_content,
               gitRepoConfig: null
             }
           }
+          this.variables = createFrom.variables || []
           this.isUpdate = true
         } else {
           this.isUpdate = false
@@ -118,30 +126,40 @@ export default {
     }
   },
   methods: {
+    getHelmTemplateVariable (value) {
+      getHelmTemplateVariableAPI(value)
+        .then(res => {
+          this.variables = res
+        })
+        .catch(err => {
+          console.log(err)
+          this.variables = []
+        })
+    },
     commitDialogVisible (value) {
       this.$store.commit('SERVICE_DIALOG_VISIBLE', value)
     },
-    triggerSubstantial () {
-      this.substantial = !this.substantial
+    triggerSubstantial (substantial) {
       this.closeSelectRepo()
+      this.substantial = !substantial
     },
     closeSelectRepo () {
       this.tempData = {
         serviceName: '',
         moduleName: ''
       }
+      this.variables = []
       this.importRepoInfo = {
-        yamlSource: 'freeEdit',
+        yamlSource: 'default',
         overrideYaml: '',
         gitRepoConfig: null
       }
+      this.substantial = false
       this.$refs.tempForm.clearValidate()
-      this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
-        this.tempCharts = res
-        return res
+        this.tempCharts = res.chartTemplates
       })
     },
     async createTemplateService () {
@@ -151,7 +169,11 @@ export default {
         name: this.tempData.serviceName,
         createFrom: {
           templateName: this.tempData.moduleName,
-          valuesYAML: this.importRepoInfo.overrideYaml
+          valuesYAML:
+            this.importRepoInfo.yamlSource === 'default'
+              ? ''
+              : this.importRepoInfo.overrideYaml,
+          variables: this.variables
         }
       }
 
@@ -229,9 +251,12 @@ export default {
       }
     },
     async importTempRepo () {
-      const valid1 = await this.$refs.importValues
-        .validate()
-        .catch(err => console.log(err))
+      let valid1 = true
+      if (this.$refs.importValues) {
+        valid1 = await this.$refs.importValues
+          .validate()
+          .catch(err => console.log(err))
+      }
       const valid2 = await this.$refs.tempForm.validate().catch(err => {
         console.log(err)
       })
@@ -245,6 +270,10 @@ export default {
         this.createTemplateService()
       }
     }
+  },
+  components: {
+    CommonImportValues,
+    ImportValues
   },
   created () {
     this.getTemplateCharts()
@@ -271,6 +300,32 @@ export default {
 
       .el-select {
         width: 100%;
+      }
+    }
+  }
+
+  .custom-variable {
+    margin-bottom: 20px;
+
+    .var-title {
+      margin: 7px 0;
+      color: #606266;
+      font-size: 14px;
+    }
+
+    .variable-row {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+
+      .row-left {
+        width: 78px;
+        padding-right: 12px;
+        text-align: right;
+      }
+
+      .row-right {
+        flex: 1;
       }
     }
   }
