@@ -320,7 +320,6 @@ export default {
   methods: {
     async addBuild (item) {
       const res = await getCodeSourceByAdminAPI(0)
-      console.log(res)
       if (res && res.length > 0) {
         this.$router.push(`${this.buildBaseUrl}?rightbar=build&service_name=${item.name}&build_add=true`)
       } else {
