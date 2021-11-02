@@ -240,7 +240,7 @@ export function listProductAPI (envType = '', productName = '') {
 }
 
 export function getServicePipelineAPI (projectName, envName, serviceName, serviceType) {
-  return http.get(`/api/aslan/workflow/servicetask/workflows/${projectName}/${envName}/${serviceName}/${serviceType}`)
+  return http.get(`/api/aslan/workflow/servicetask/workflows/${projectName}/${envName}/${serviceName}/${serviceType}?projectName=${projectName}`)
 }
 
 export function envRevisionsAPI (projectName, envName) {
@@ -256,11 +256,11 @@ export function productServicesAPI (projectName, envName, envSource, searchName 
 }
 
 export function fetchGroupsDataAPI (name, envName) {
-  return http.get(`/api/aslan/environment/environments/${name}/groups?envName=${envName}`)
+  return http.get(`/api/aslan/environment/environments/${name}/groups?projectName=${name}&envName=${envName}`)
 }
 
 export function productEnvInfoAPI (projectName, envName) {
-  return http.get(`/api/aslan/environment/environments/${projectName}?envName=${envName}`)
+  return http.get(`/api/aslan/environment/environments/${projectName}?projectName=${projectName}&envName=${envName}`)
 }
 
 // Project
@@ -286,7 +286,7 @@ export function serviceTemplateAPI (name, type, projectName) {
 }
 
 export function serviceTemplateAfterRenderAPI (product_name, service_name, env_name) {
-  return http.get(`/api/aslan/environment/diff/products/${product_name}/service/${service_name}?envName=${env_name}`)
+  return http.get(`/api/aslan/environment/diff/products/${product_name}/service/${service_name}?projectName=${product_name}&envName=${env_name}`)
 }
 
 export function saveServiceTemplateAPI (payload) {
@@ -1387,7 +1387,9 @@ export function addSystemRoleBindingsAPI (payload) {
 export function deleteSystemRoleBindingsAPI (name) {
   return http.delete(`/api/v1/system-rolebindings/${name}`)
 }
-
+export function getSystemRoleBindingsAPI () {
+  return http.get('/api/v1/system-rolebindings')
+}
 export function getArtifactFileAPI (payload, id) {
   return http.post(`/api/aslan/system/s3storage/${id}/releases/search?kind=file`, payload)
 }

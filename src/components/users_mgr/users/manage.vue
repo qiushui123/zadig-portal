@@ -133,7 +133,7 @@ import {
   addUserAPI,
   usersAPI,
   deleteUserAPI,
-  queryRoleBindingsAPI,
+  getSystemRoleBindingsAPI,
   addSystemRoleBindingsAPI
 } from '@api'
 import bus from '@utils/event_bus'
@@ -238,7 +238,7 @@ export default {
       const usersData = await usersAPI(payload).catch(error =>
         console.log(error)
       )
-      const rolesData = await queryRoleBindingsAPI().catch(error =>
+      const rolesData = await getSystemRoleBindingsAPI().catch(error =>
         console.log(error)
       )
       if (usersData && rolesData) {
