@@ -281,7 +281,7 @@
   </div>
 </template>
 <script>
-import { getProjectInfoAPI, getProductInfo, deleteProjectAPI, getClusterListAPI, listProductAPI, usersAPI, getServiceTemplatesAPI, getBuildConfigsAPI, downloadDevelopCLIAPI } from '@api'
+import { getProjectInfoAPI, getProductInfo, deleteProjectAPI, getClusterListAPI, listProductAPI, getServiceTemplatesAPI, getBuildConfigsAPI, downloadDevelopCLIAPI } from '@api'
 import { mapGetters } from 'vuex'
 import { getProductStatus } from '@utils/word_translate'
 import { wordTranslate } from '@utils/word_translate.js'
