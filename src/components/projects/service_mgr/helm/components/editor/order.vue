@@ -14,32 +14,17 @@
 </template>
 
 <script>
+import { updateHelmServicesOrderAPI } from '@api'
+import { mapState } from 'vuex'
+
 export default {
   name: 'serviceOrder',
-  props: {
-    services: {
-      default: () => {
-        return [
-          ['go-sample-site-2', 'gss-5', 'gss-2', 'gss-1', 'gss-4'],
-          ['gss-11', 'gss-13', 'gss-14', 'gss-10', 'gss-12', 'gss-7', 'gss-9'],
-          [
-            'gss-21',
-            'gss-19',
-            'gss-6',
-            'gss-18',
-            'gss-23',
-            'gss-24',
-            'gss-8',
-            'gss-22',
-            'gss-20',
-            'gss-15',
-            'gss-17',
-            'gss-16',
-            'gss-25',
-            'gss-3'
-          ]
-        ]
-      }
+  computed: {
+    ...mapState({
+      services: state => state.service_manage.services
+    }),
+    projectName () {
+      return this.$route.params.project_name
     }
   },
   data () {
@@ -50,17 +35,14 @@ export default {
   },
   methods: {
     handleDrop (draggingNode, dropNode, dropType, ev) {
-      const length = this.nodeData.length
-      if (this.nodeData[length - 1].children.length !== 0) {
-        this.nodeData.push({
-          label: `启动顺序 ${length}`,
-          children: []
+      const services = Object.values(this.nodeData)
+        .filter(node => {
+          return node.children.length
         })
-      }
-      const res = Object.values(this.nodeData).map(node => {
-        return node.children.map(child => child.label)
-      })
-      console.log('put数据：', res)
+        .map(node => {
+          return node.children.map(child => child.label)
+        })
+      updateHelmServicesOrderAPI(this.projectName, { services })
     },
     allowDrop (draggingNode, dropNode, type) {
       if (dropNode.data.label.indexOf('启动顺序') === -1) {
@@ -91,8 +73,27 @@ export default {
       this.nodeData = nodeData
     }
   },
-  created () {
-    this.generateNodeData()
+  watch: {
+    services: {
+      handler (newV, oldV) {
+        this.generateNodeData()
+      },
+      immediate: true
+    }
   }
 }
 </script>
+
+<style lang="less" scoped>
+.service-order {
+  /deep/.el-tree {
+    .el-tree-node__content {
+      height: 30px;
+    }
+
+    .el-tree-node__label {
+      font-size: 13px;
+    }
+  }
+}
+</style>
