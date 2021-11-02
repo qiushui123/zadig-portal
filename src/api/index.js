@@ -249,9 +249,9 @@ export function envRevisionsAPI (projectName, envName) {
 
 export function productServicesAPI (projectName, envName, envSource, searchName = '', perPage = 20, page = 1) {
   if (envSource === 'helm' || envSource === 'external') {
-    return http.get(`/api/aslan/environment/environments/${projectName}/workloads?env=${envName}&filter=name=${searchName}&perPage=${perPage}&page=${page}`)
+    return http.get(`/api/aslan/environment/environments/${projectName}/workloads?env=${envName}&projectName=${projectName}&filter=name=${searchName}&perPage=${perPage}&page=${page}`)
   } else {
-    return http.get(`/api/aslan/environment/environments/${projectName}/groups?envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
+    return http.get(`/api/aslan/environment/environments/${projectName}/groups?projectName=${projectName}&envName=${envName}&serviceName=${searchName}&perPage=${perPage}&page=${page}`)
   }
 }
 
@@ -1282,23 +1282,23 @@ export function getAllChartValuesYamlAPI (productName, envName, serviceName = []
 }
 
 export function createHelmProductEnvAPI (productName, payload) {
-  return http.post(`/api/aslan/environment/environments/${productName}/helm`, payload)
+  return http.post(`/api/aslan/environment/environments/${productName}/helm?projectName=${productName}`, payload)
 }
 
 export function updateHelmProductEnvAPI (productName, payload) {
-  return http.put(`/api/aslan/environment/environments/${productName}/multiHelmEnv`, payload)
+  return http.put(`/api/aslan/environment/environments/${productName}/multiHelmEnv?projectName=${productName}`, payload)
 }
 
 export function updateHelmEnvVarAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?envName=${envName}`, payload)
+  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?projectName=${productName}&envName=${envName}`, payload)
 }
 
 export function updateMatchRulesAPI (productName, payload) {
-  return http.put(`/api/aslan/project/products/${productName}/searching-rules`, payload)
+  return http.put(`/api/aslan/project/products/${productName}/searching-rules?projectName=${productName}`, payload)
 }
 
 export function getMatchRulesAPI (productName) {
-  return http.get(`/api/aslan/project/products/${productName}/searching-rules`)
+  return http.get(`/api/aslan/project/products/${productName}/searching-rules?projectName=${productName}`)
 }
 
 // exteranl
