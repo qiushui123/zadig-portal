@@ -74,7 +74,7 @@
                   </div>
                   <div class="card-text">
                     <h4 class="project-name">
-                      {{project.project_name?project.project_name:project.name}}
+                      {{project.project_name?project.project_name:project.name}}{{project.public ? '': '&nbsp;🔐'}}
                     </h4>
                   </div>
                   <div class="info">
