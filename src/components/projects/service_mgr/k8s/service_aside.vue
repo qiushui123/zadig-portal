@@ -3,7 +3,7 @@
     <el-drawer title="代码源集成"
                :visible.sync="addCodeDrawer"
                direction="rtl">
-      <add-code @cancel="addCodeDrawer = false"></add-code>
+      <AddCode @cancel="addCodeDrawer = false"></AddCode>
     </el-drawer>
     <el-drawer title="镜像仓库集成"
                :visible.sync="registryCreateVisible">
@@ -319,7 +319,8 @@ export default {
   },
   methods: {
     async addBuild (item) {
-      const res = await getCodeSourceByAdminAPI(1)
+      const res = await getCodeSourceByAdminAPI(0)
+      console.log(res)
       if (res && res.length > 0) {
         this.$router.push(`${this.buildBaseUrl}?rightbar=build&service_name=${item.name}&build_add=true`)
       } else {
@@ -523,7 +524,7 @@ export default {
   components: {
     build,
     help,
-    'add-code': addCode,
+    AddCode: addCode,
     IntegrationRegistry
   }
 }

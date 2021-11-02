@@ -896,8 +896,19 @@ const routes = [
   }
 ]
 
-export default new VueRouter({
+const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: routes
 })
+
+router.onError((error) => {
+  console.log(error, router)
+  const pattern = /Loading chunk (\d)+ failed/g
+  const isChunkLoadFailed = error.message.match(pattern)
+  if (isChunkLoadFailed) {
+    window.location.replace(window.location.href)
+  }
+})
+
+export default router
