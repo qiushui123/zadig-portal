@@ -127,8 +127,8 @@ http.interceptors.response.use(
         // unauthorized 401
         if (error.response.status === 401) {
           const redirectPath = window.location.pathname + window.location.search
-          localStorage.removeItem('userInfo')
-          localStorage.removeItem('role')
+          store.remove('userInfo')
+          store.remove('role')
           Element.Message.error('登录信息失效, 请返回重新登录')
           if (redirectPath.includes('/setup/')) {
             window.location.href = `/signin`
