@@ -7,7 +7,15 @@
       <el-checkbox-group v-model="checkedEnvList">
         <el-checkbox v-for="(env, index) in envNameList" :key="index" :label="env.envName"></el-checkbox>
       </el-checkbox-group>
-      <ChartValues v-if="chartNames" class="chart-value" ref="chartValuesRef" :envNames="checkedEnvList" :chartNames="chartNames"></ChartValues>
+      <ChartValues
+        v-if="chartNames"
+        class="chart-value"
+        ref="chartValuesRef"
+        :envNames="checkedEnvList"
+        :chartNames="chartNames"
+        showEnvTabs
+        :envScene="`updateEnv`"
+      ></ChartValues>
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button size="small" :disabled="!checkedEnvList.length" type="primary" @click="autoUpgradeEnv">确 定</el-button>
@@ -18,13 +26,12 @@
 <script>
 import ChartValues from '@/components/projects/env/env_detail/common/updateHelmEnvChart.vue'
 import { updateHelmProductEnvAPI } from '@api'
-import { mapGetters } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'updateHelmEnv',
   props: {
-    value: Boolean,
-    chartNames: Array
+    value: Boolean
   },
   data () {
     return {
@@ -67,6 +74,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      chartNames: state => state.service_manage.chartNames
+    }),
     updateHelmEnvDialogVisible: {
       get: function () {
         if (!this.value) {
@@ -116,17 +126,8 @@ export default {
     }
 
     .content {
-      .tip {
-        margin-top: 30px;
-        vertical-align: text-top;
-
-        .el-switch__label {
-          color: #606266;
-
-          &.is-active {
-            color: #409eff;
-          }
-        }
+      .chart-value {
+        margin-top: 12px;
       }
     }
   }

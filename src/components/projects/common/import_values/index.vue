@@ -2,53 +2,48 @@
   <div class="values-outer">
     <h4>
       <span>values 文件</span>
+      <el-button type="text" class="title-btn" @click="showGitImportDialog = true">从 Git 导入</el-button>
       <i v-if="showDelete" class="el-icon-delete-solid icon-delete" @click="closeValueEdit"></i>
     </h4>
     <el-divider></el-divider>
-    <div class="desc">
-      <template>
-        <div class="desc-title">文件来源</div>
-        <el-select v-model="importRepoInfoUse.yamlSource" size="small" class="height-40">
-          <el-option label="Git 仓库" value="gitRepo"></el-option>
-          <el-option label="手动输入" value="freeEdit"></el-option>
-          <!-- <el-option label="使用默认" value="default"></el-option> -->
-        </el-select>
-      </template>
-      <template v-if="importRepoInfoUse.yamlSource !== 'default'">
-        <div class="desc-title">{{ importRepoInfoUse.yamlSource === 'gitRepo' ? '仓库信息' : '文件内容' }}</div>
-        <Resize v-if="importRepoInfoUse.yamlSource === 'freeEdit'" class="mirror" :resize="setResize.direction" :height="setResize.height">
-          <codemirror v-model="importRepoInfoUse.valuesYAML"></codemirror>
-        </Resize>
-        <ValueRepo
-          v-if="importRepoInfoUse.yamlSource === 'gitRepo'"
-          ref="valueRepo"
-          :valueRepoInfo.sync="importRepoInfoUse.gitRepoConfig"
-        ></ValueRepo>
-      </template>
-    </div>
+    <Resize class="desc mirror" :resize="setResize.direction" :height="setResize.height" @sizeChange="$refs.codemirror.refresh()">
+      <codemirror ref="codemirror" v-model="importRepoInfoUse.overrideYaml"></codemirror>
+    </Resize>
+    <el-dialog title="从 Git 仓库导入" :visible.sync="showGitImportDialog" append-to-body>
+      <Repository ref="valueRepoRef" :repoSource="importRepoInfoUse.gitRepoConfig"></Repository>
+      <div slot="footer">
+        <el-button @click="showGitImportDialog = false" size="small">取 消</el-button>
+        <el-button type="primary" @click="importOverrideYaml" size="small" :loading="loadValueYamls">导 入</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Resize from '@/components/common/resize'
 import Codemirror from '../codemirror.vue'
-import ValueRepo from './value_repo.vue'
+import Repository from './repository.vue'
+import { cloneDeep } from 'lodash'
+import { getValuesYamlFromGitAPI } from '@api'
 
 const valueInfo = {
-  yamlSource: '', // gitRepo or freeEdit or default(不上传)
-  valuesYAML: '',
+  yamlSource: '', // freeEdit or default(不上传)
+  overrideYaml: '',
   gitRepoConfig: {
     codehostID: null,
     owner: '',
     repo: '',
     branch: '',
-    valuesPaths: ['']
+    valuesPaths: []
   }
 }
 
 export default {
   data () {
-    return {}
+    return {
+      showGitImportDialog: false,
+      loadValueYamls: false
+    }
   },
   props: {
     showDelete: {
@@ -59,7 +54,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          height: '300px',
+          height: '260px',
           direction: 'none'
         }
       }
@@ -69,7 +64,7 @@ export default {
   computed: {
     setResize () {
       return {
-        height: '300px',
+        height: '260px',
         direction: 'none',
         ...this.resize
       }
@@ -78,7 +73,7 @@ export default {
       get () {
         let gitRepoConfig = {}
         if (!this.importRepoInfo.gitRepoConfig) {
-          gitRepoConfig = { gitRepoConfig: valueInfo.gitRepoConfig }
+          gitRepoConfig = { gitRepoConfig: cloneDeep(valueInfo.gitRepoConfig) }
         }
         return Object.assign(this.importRepoInfo, gitRepoConfig)
       },
@@ -89,32 +84,36 @@ export default {
     }
   },
   methods: {
+    importOverrideYaml () {
+      this.$refs.valueRepoRef.validate().then(
+        async () => {
+          this.loadValueYamls = true
+          const res = await getValuesYamlFromGitAPI(this.importRepoInfoUse.gitRepoConfig).catch(error =>
+            console.log(error)
+          )
+          this.loadValueYamls = false
+          if (res) {
+            this.showGitImportDialog = false
+            this.importRepoInfoUse.overrideYaml = res
+          }
+        }
+      )
+    },
     closeValueEdit () {
       this.importRepoInfoUse.yamlSource = 'default'
       this.$emit('closeValueEdit')
     },
     validate () {
-      if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
-        const valueRepo = this.$refs.valueRepo
-        return Promise.all([valueRepo.validate(), valueRepo.validateRoute()])
-      } else {
-        return Promise.all([Promise.resolve(true)])
-      }
+      return Promise.all([Promise.resolve(true)])
     },
     resetValueRepoInfo () {
-      this.$nextTick(() => {
-        if (this.importRepoInfoUse.yamlSource === 'gitRepo') {
-          this.$refs.valueRepo.resetSource(
-            this.importRepoInfoUse.gitRepoConfig
-          )
-        }
-      })
+      this.$refs.valueRepoRef && this.$refs.valueRepoRef.resetSource()
     }
   },
   components: {
     Codemirror,
     Resize,
-    ValueRepo
+    Repository
   }
 }
 </script>
@@ -136,6 +135,12 @@ export default {
     margin: 7px 0;
     color: #606266;
     font-size: 14px;
+
+    .title-btn {
+      margin-left: 10px;
+      padding: 0;
+      font-size: 12px;
+    }
 
     .icon-delete {
       float: right;
@@ -164,5 +169,9 @@ export default {
   /deep/.el-select {
     width: 100%;
   }
+}
+
+/deep/.el-dialog__body {
+  padding: 10px 20px;
 }
 </style>

@@ -238,21 +238,7 @@
              element-loading-text="正在获取服务信息"
              element-loading-spinner="el-icon-loading"
              class="service-container">
-          <el-input v-if="envSource !== 'helm' && envSource !== 'external'"
-                    size="mini"
-                    class="search-input"
-                    clearable
-                    v-model="serviceSearch"
-                    placeholder="搜索服务"
-                    @keyup.enter.native="searchServicesByKeyword"
-                    @clear="searchServicesByKeyword">
-            <template slot="append">
-              <el-button class="el-icon-search"
-                         @click="searchServicesByKeyword"></el-button>
-            </template>
-          </el-input>
-                    <el-input v-if="envSource === 'external'"
-                    size="mini"
+          <el-input size="mini"
                     class="search-input"
                     clearable
                     v-model="serviceSearch"

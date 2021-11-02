@@ -475,8 +475,8 @@ export function getWorkflowBindAPI (testName) {
   return http.get(`/api/aslan/workflow/workflow/testName/${testName}`)
 }
 
-export function listWorkflowAPI () {
-  return http.get('/api/aslan/workflow/workflow')
+export function listWorkflowAPI (productName = '') {
+  return http.get(`/api/aslan/workflow/workflow?productName=${productName}`)
 }
 
 export function setFavoriteAPI (payload) {
@@ -1297,16 +1297,16 @@ export function updateKubernetesTemplateVariablesAPI (id, payload) {
 }
 
 // helm env and service
-export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}`, payload)
-}
-
 export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/rendersets/renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
 export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/environments/estimated-renderchart?productName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+}
+
+export function getEnvDefaultVariableAPI (productName, envName) {
+  return http.get(`/api/aslan/environment/rendersets/default-values?productName=${productName}&envName=${envName}`)
 }
 
 export function createHelmProductEnvAPI (productName, payload) {
@@ -1318,7 +1318,7 @@ export function updateHelmProductEnvAPI (productName, payload) {
 }
 
 export function updateHelmEnvVarAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?envName=${envName}`, payload)
+  return http.put(`/api/aslan/environment/environments/${productName}/renderset?envName=${envName}`, payload)
 }
 
 export function updateMatchRulesAPI (productName, payload) {
@@ -1327,6 +1327,26 @@ export function updateMatchRulesAPI (productName, payload) {
 
 export function getMatchRulesAPI (productName) {
   return http.get(`/api/aslan/project/products/${productName}/searching-rules`)
+}
+
+export function getCreateHelmEnvStatusAPI (productName) {
+  return http.get(`/api/aslan/environment/environments/${productName}/status`)
+}
+
+export function getCalculatedValuesYamlAPI ({ productName, serviceName, envName, format, scene }, payload) { // defaultValues, overrideYaml, overrideValues
+  return http.post(`/api/aslan/environment/environments/${productName}/estimated-values?format=${format}&envName=${envName}&serviceName=${serviceName}&scene=${scene}`, payload)
+}
+
+export function getValuesYamlFromGitAPI ({ codehostID, owner, repo, branch, valuesPaths }) {
+  return http.get(`/api/aslan/environment/rendersets/yamlContent`, {
+    params: {
+      codehostID,
+      owner,
+      repo,
+      branch,
+      valuesPaths: valuesPaths.join(',')
+    }
+  })
 }
 
 // exteranl
