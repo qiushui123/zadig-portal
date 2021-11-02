@@ -1392,9 +1392,7 @@ export function addSystemRoleBindingsAPI (payload) {
 export function deleteSystemRoleBindingsAPI (name) {
   return http.delete(`/api/v1/system-rolebindings/${name}`)
 }
-export function getSystemRoleBindingsAPI () {
-  return http.get('/api/v1/system-rolebindings')
-}
+
 export function getArtifactFileAPI (payload, id) {
   return http.post(`/api/aslan/system/s3storage/${id}/releases/search?kind=file`, payload)
 }
