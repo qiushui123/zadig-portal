@@ -38,7 +38,7 @@
 <script>
 import bus from '@utils/event_bus'
 import AddRoleBind from './addroleBind.vue'
-import { queryRoleBindings, queryrole, queryPublicRole, deleteroleBindings } from '@/api'
+import { queryRoleBindingsAPI, queryrole, queryPublicRole, deleteroleBindings } from '@/api'
 
 export default {
   name: 'member',
@@ -72,7 +72,7 @@ export default {
       })
     },
     async getRoleBindings () {
-      const res = await queryRoleBindings(this.projectName).catch(error =>
+      const res = await queryRoleBindingsAPI(this.projectName).catch(error =>
         console.log(error)
       )
       if (res) {
