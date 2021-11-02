@@ -338,7 +338,7 @@ export function getHelmChartService (projectName) {
 }
 
 export function updateServicesOrchestrationAPI (projectName, payload) {
-  return http.put(`/api/aslan/project/products/${projectName}/serviceOrder`, payload)
+  return http.patch(`/api/aslan/project/products/${projectName}`, payload)
 }
 
 export function getHelmChartServiceFilePath (projectName, serviceName, path) {
