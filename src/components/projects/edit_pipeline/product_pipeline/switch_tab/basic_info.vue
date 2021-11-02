@@ -166,7 +166,9 @@ export default {
             bus.$emit('receive-tab-check:basicInfo', valid)
           })
         })
-        this.getEnvServices(projectName)
+        if (projectName) {
+          this.getEnvServices(projectName)
+        }
       }
     }
   },
