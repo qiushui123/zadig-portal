@@ -14,7 +14,7 @@
                  description=""></el-step>
         <el-step title="创建服务"
                  description=""></el-step>
-        <el-step title="加入运行环境"
+        <el-step :title="stepThreeTitle"
                  description=""></el-step>
         <el-step title="工作流交付"
                  description=""></el-step>
@@ -76,6 +76,10 @@ export default {
     activeStep: {
       required: true,
       type: Number
+    },
+    stepThreeTitle: {
+      default: '加入运行环境',
+      type: String
     }
   }
 }
