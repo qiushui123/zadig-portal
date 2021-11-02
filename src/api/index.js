@@ -533,8 +533,8 @@ export function restartWorkflowAPI (projectName, workflowName, taskID) {
   return http.post(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}/restart?projectName=${projectName}`)
 }
 
-export function cancelWorkflowAPI (workflowName, taskID) {
-  return http.delete(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}`)
+export function cancelWorkflowAPI (projectName, workflowName, taskID) {
+  return http.delete(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}?projectName=${projectName}`)
 }
 
 export function workflowTaskListAPI (name, start, max, workflowType = '') {
