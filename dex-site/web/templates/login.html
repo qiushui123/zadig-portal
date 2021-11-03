@@ -1,0 +1,24 @@
+{{ template "header.html" . }}
+
+<!-- 头结束 -->
+<header>
+    <a href="#"><img src="{{ url .ReqPath "static/img/default-logo.png" }}" alt="logo" /></a>
+</header>
+<section class="auth-types">
+  {{ range $c := .Connectors }}
+  {{ if ne $c.Name "Email" }}
+  <a href="{{ $c.URL }}">
+      <span class="login-button-show">
+          <i class="iconfont icon{{ $c.Type }}"></i>
+          <span>{{ $c.Name }}</span>
+      </span>
+  </a>
+  {{ end }}
+  {{ end }}
+</section>
+<div class="bottom">
+    <a href="/signin">账号密码登录</a>
+</div>
+<!-- 尾结束 -->
+
+{{ template "footer.html" . }}
