@@ -11,11 +11,11 @@
       <el-form :model="webhookSwap"
                ref="triggerForm"
                label-position="left"
-               label-width="80px">
+               label-width="80px"
+               :rules="rules">
         <el-form-item label="名称"
                       prop="name"
-                      class="bottom-22"
-                      :rules="nameRules">
+                      class="bottom-22">
           <el-input size="small"
                     autofocus
                     ref="webhookNamedRef"
@@ -28,7 +28,10 @@
                     v-model="webhookSwap.description"
                     placeholder="请输入描述"></el-input>
         </el-form-item>
-        <el-form-item label="代码库">
+        <el-form-item label="代码库" prop="repo"
+        :rules="[
+          { trigger: ['blur', 'change'], validator: validateRepo }
+        ]">
           <el-select style="width: 100%;"
                      v-model="webhookSwap.repo"
                      size="small"
@@ -44,7 +47,10 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="目标分支">
+        <el-form-item label="目标分支" prop="repo.branch"
+        :rules="[
+          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] }
+        ]">
           <el-select v-show="!webhookSwap.repo.is_regular"
                       style="width: 100%;"
                      v-model="webhookSwap.repo.branch"
@@ -65,7 +71,7 @@
             @change="webhookSwap.repo.branch = ''">
           </el-switch>
         </el-form-item>
-        <el-form-item label="部署环境">
+        <el-form-item label="部署环境" prop="namespace">
           <el-select style="width: 100%;"
                      v-model="webhookSwap.namespace"
                      multiple
@@ -139,7 +145,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="部署服务">
+        <el-form-item label="部署服务" prop="targets">
           <el-select style="width: 100%;"
                      v-model="webhookSwap.targets"
                      multiple
@@ -155,7 +161,8 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="webhookSwap.repo.source==='gerrit'"
-                      label="触发事件">
+                      label="触发事件"
+                      prop="events">
           <el-checkbox-group v-model="webhookSwap.events">
             <el-checkbox style="display: block;"
                          label="change-merged"></el-checkbox>
@@ -175,7 +182,8 @@
 
         </el-form-item>
         <el-form-item v-else-if="webhookSwap.repo.source!=='gerrit'"
-                      label="触发事件">
+                      label="触发事件"
+                      prop="events">
           <el-checkbox-group v-model="webhookSwap.events">
             <el-checkbox label="push"></el-checkbox>
             <el-checkbox label="pull_request"></el-checkbox>
@@ -201,7 +209,8 @@
           </el-checkbox>
         </el-form-item>
         <el-form-item v-if="webhookSwap.repo.source!=='gerrit' && webhookSwap.repo.source!=='codehub'"
-                      label="文件目录">
+                      label="文件目录"
+                      prop="match_folders">
           <el-input :autosize="{ minRows: 4, maxRows: 10}"
                     type="textarea"
                     v-model="webhookSwap.match_folders"
@@ -365,6 +374,23 @@ export default {
         callback()
       }
     }
+
+    this.validateRepo = (rule, value, callback) => {
+      if (Object.keys(value).length === 0) {
+        callback(new Error('请输入代码库'))
+      } else {
+        callback()
+      }
+    }
+
+    this.rules = {
+      name: [{ type: 'string', trigger: 'change', validator: validateName }],
+      namespace: [{ required: true, message: '请输入部署环境', trigger: ['blur', 'change'] }],
+      targets: [{ required: true, message: '请输入部署服务', trigger: ['blur', 'change'] }],
+      events: [{ required: true, message: '请输入触发事件', trigger: ['blur', 'change'] }],
+      match_folders: [{ required: true, message: '请输入文件目录', trigger: ['blur', 'change'] }]
+    }
+
     return {
       testInfos: [],
       gotScheduleRepo: false,
@@ -387,10 +413,7 @@ export default {
       webhookEditMode: false,
       webhookAddMode: false,
       showEnvUpdatePolicy: false,
-      firstShowPolicy: false,
-      nameRules: [
-        { type: 'string', trigger: 'change', validator: validateName }
-      ]
+      firstShowPolicy: false
     }
   },
   props: {
