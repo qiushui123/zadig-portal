@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,viewport-fit=cover" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png" />
+    <link rel="manifest" href="/static/site.webmanifest" />
+    <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#e20382" />
+    <meta name="msapplication-TileColor" content="#e20382" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="preconnect" href="https://fonts.googleapis.com/css?family=Overpass:200,300,400,500,600,700"
+        crossorigin="" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Overpass:200,300,400,500,600,700" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Overpass:200,300,400,500,600,700" media="all"
+        onload="this.media='all'" />
+    <link rel="preconnect" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:200,300,400,500,600,700"
+        crossorigin="" />
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:200,300,400,500,600,700" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:200,300,400,500,600,700"
+        media="all" onload="this.media='all'" />
+    <link href="../static/bootstrap.css" rel="stylesheet" />
+    <link href="../static/main.css" rel="stylesheet" />
+    <title>登录</title>
+</head>
+
+<body>
+    <div style="height: 100%; display: flex; flex-direction: column">
+        <div class="login tab-box" style="height: 100%">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-7 col-md-12 col-pad-0 form-section">
+                        <div class="login-inner-form">
+                            <div class="details">
+                            <!-- 头结束 -->
+                            <div class="grant-access-container">
+                                <h4 class="heading">授予访问权限</h4>
+                                <hr>
+                                <div>
+                                  {{ if .Scopes }}
+                                  <div class="subtle-text">{{ .Client }} 想要获取以下权限:</div>
+                                  <ul class="permission-list">
+                                    {{ range $scope := .Scopes }}
+                                    <li>{{ $scope }}</li>
+                                    {{ end }}
+                                  </ul>
+                                  {{ else }}
+                                  <div class="subtle-text">{{ .Client }} 不会收集任何个人信息</div>
+                                  {{ end }}
+                                </div>
+                                <hr>
+                                <div class="container">
+                                    <div class="row">
+                                      <div class="col-sm">
+                                        <form method="post">
+                                            <input type="hidden" name="req" value="{{ .AuthReqID }}"/>
+                                            <input type="hidden" name="approval" value="approve">
+                                            <button type="submit" class="btn btn-primary btn-sm btn-block">授权</button>
+                                          </form>
+                                      </div>
+                                      <div class="col-sm">
+                                        <form method="post">
+                                            <input type="hidden" name="req" value="{{ .AuthReqID }}"/>
+                                            <input type="hidden" name="approval" value="rejected">
+                                            <button type="submit" class="btn btn-light btn-sm btn-block">取消</button>
+                                          </form>
+                                      </div>
+                                    </div>
+                                  </div>
+                              
+                              </div>
+                            <!-- 尾结束 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-12 col-pad-0 bg-img none-992">
+                        <div class="information">
+                            <div class="btn-section"></div>
+                            <h3>高效研发从现在开始</h3>
+                            <p>
+                                面向开发者设计的高可用 CI/CD：Zadig 强大的云原生多环境能力，轻松实现本地联调、微服务并行构建、集成测试和持续部署。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <div class="copyright">
+                    筑栈（上海）信息技术有限公司 KodeRover ©2021
+                    <span class="el-tooltip el-icon-info" aria-describedby="el-tooltip-1130" tabindex="0"></span>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+
+</html>
