@@ -55,7 +55,7 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
-  if (store.get('userInfo') && store.get('userInfo') !== 'undefined') {
+  if (store.get('userInfo') && store.get('userInfo') !== 'undefined' && config.url !== analyticsReq) {
     config.headers.Authorization = 'Bearer ' + store.get('userInfo').token
   }
   return config
@@ -127,8 +127,6 @@ http.interceptors.response.use(
         // unauthorized 401
         if (error.response.status === 401) {
           const redirectPath = window.location.pathname + window.location.search
-          store.remove('userInfo')
-          store.remove('role')
           Element.Message.error('登录信息失效, 请返回重新登录')
           if (redirectPath.includes('/setup/')) {
             window.location.href = `/signin`

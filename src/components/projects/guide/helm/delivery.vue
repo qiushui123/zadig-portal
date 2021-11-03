@@ -114,7 +114,7 @@
 import bus from '@utils/event_bus'
 import step from '../common/step.vue'
 import runWorkflow from '../../pipeline/common/run_workflow.vue'
-import { getProjectIngressAPI, generatePipeAPI, listWorkflowAPI } from '@api'
+import { getProjectIngressAPI, generatePipeAPI } from '@api'
 export default {
   data () {
     return {
