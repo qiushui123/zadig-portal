@@ -178,8 +178,7 @@
 </template>
 <script>
 import bus from '@utils/event_bus'
-import { listWorkflowAPI, listProductAPI, getBuildConfigsAPI, getSingleProjectAPI, deleteProjectAPI } from '@api'
-import { flattenDeep } from 'lodash'
+import { listWorkflowAPI, getBuildConfigsAPI, getSingleProjectAPI, getServiceTemplatesAPI, deleteProjectAPI } from '@api'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -201,18 +200,29 @@ export default {
       }
     },
     async deleteProject (projectName) {
-      const result = await Promise.all([listWorkflowAPI(), listProductAPI('', projectName), getSingleProjectAPI(projectName), getBuildConfigsAPI(projectName)])
-      const workflows = result[0].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
-      const envNames = result[1].map((element) => { return element.env_name })
-      const services = flattenDeep(result[2].services)
+      const result = await Promise.all([getSingleProjectAPI(projectName), listWorkflowAPI(projectName), getServiceTemplatesAPI(projectName), getBuildConfigsAPI(projectName)])
+      const externalFlag = result[0].product_feature.create_env_type
+      const workflows = result[1].filter(w => w.product_tmpl_name === projectName).map((element) => { return element.name })
+      const services = result[2].data.filter(element => element.product_name === projectName).map((element) => { return element.service_name })
       const buildConfigs = result[3].map((element) => { return element.name })
-      const htmlTemplate = `
+      const envNames = this.productList.filter(elemnet => elemnet.name === projectName)[0].envs
+      const htmlTemplate = externalFlag === 'external'
+        ? `
+        <p>该项目下的以下资源会被取消托管，<span style="color:red">请谨慎操作！！</span></p>
+        <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
+        <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
+        <p>该项目下的以下资源会同时被删除，<span style="color:red">请谨慎操作！！</span></p>
+        <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
+        <span><b>工作流：</b>${workflows.length > 0 ? workflows.join(', ') : '无'}</span>
+      `
+        : `
+        该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br>
         <span><b>服务：</b>${services.length > 0 ? services.join(', ') : '无'}</span><br>
         <span><b>构建：</b>${buildConfigs.length > 0 ? buildConfigs.join(', ') : '无'}</span><br>
         <span><b>环境：</b>${envNames.length > 0 ? envNames.join(', ') : '无'}</span><br>
         <span><b>工作流：</b>${workflows.length > 0 ? workflows.join(', ') : '无'}</span>
         `
-      this.$prompt(`该项目下的资源会同时被删除<span style="color:red">请谨慎操作！！</span><br> ${htmlTemplate}`, `请输入项目名 ${projectName} 确认删除`, {
+      this.$prompt(htmlTemplate, `请输入项目名 ${projectName} 确认删除`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         dangerouslyUseHTMLString: true,
@@ -253,7 +263,7 @@ export default {
     ])
   },
   mounted () {
-    this.$store.dispatch('getWorkflowList')
+    this.$store.dispatch('getProjectList')
     bus.$emit('show-sidebar', true)
     bus.$emit('set-topbar-title', { title: '项目', breadcrumb: [] })
     bus.$emit('set-sub-sidebar-title', {

@@ -179,7 +179,7 @@ export default {
         })
     },
     getHistoryArtifactDeployLog () {
-      return getWorkflowHistoryBuildLogAPI(this.workflowName, this.taskID, this.serviceName, 'artifact_deploy').then(
+      return getWorkflowHistoryBuildLogAPI(this.projectName, this.workflowName, this.taskID, this.serviceName, 'artifact_deploy').then(
         response => {
           this.artifactDeployLog = (response.split('\n')).map(element => {
             return element + '\n'

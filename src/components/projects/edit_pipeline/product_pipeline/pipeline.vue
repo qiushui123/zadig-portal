@@ -255,7 +255,7 @@ export default {
         }
         (this.editMode ? updateWorkflowAPI : createWorkflowAPI)(this.pipelineInfo).then(res => {
           this.$message.success('保存成功')
-          this.$store.dispatch('refreshWorkflowList')
+          this.$store.dispatch('refreshWorkflowList', this.pipelineInfo.product_tmpl_name)
           if (this.$route.query.from) {
             this.$router.push(this.$route.query.from)
           } else {

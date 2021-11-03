@@ -33,25 +33,25 @@ const theGetPromise = new Promise((resolve, reject) => {
 })
 
 const actions = {
-  getWorkflowList ({ commit, state }) {
+  getWorkflowList ({ commit, state }, projectName) {
     if (requestStarted) {
       return theGetPromise
     } else {
       requestStarted = true
-      return doGet({ commit, state })
+      return doGet({ commit, state }, projectName)
     }
   },
-  refreshWorkflowList ({ commit, state }) {
-    return doGet({ commit, state })
+  refreshWorkflowList ({ commit, state }, projectName) {
+    return doGet({ commit, state }, projectName)
   }
 }
 
-function doGet ({ commit, state }) {
+function doGet ({ commit, state }, projectName) {
   if (state.workflowListLoading) {
     return resolveGet()
   }
   commit(workflow.SET_WORKFLOW_LIST_LOADING, true)
-  return listWorkflowAPI().then((res) => {
+  return listWorkflowAPI(projectName).then((res) => {
     res.forEach((element) => {
       element.type = 'product'
     })

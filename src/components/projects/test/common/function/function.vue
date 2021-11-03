@@ -154,7 +154,7 @@ export default {
     addConnection (testName) {
       this.selectWorkflowDialogVisible = true
       this.currentTestName = testName
-      getWorkflowBindAPI(testName).then((res) => {
+      getWorkflowBindAPI(this.projectName, testName).then((res) => {
         this.availableWorkflows = res.filter(element => {
           return element.product_tmpl_name
         })

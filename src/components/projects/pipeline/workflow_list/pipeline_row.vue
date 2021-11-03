@@ -130,7 +130,7 @@ export default {
       if (this.isFavorite) {
         deleteFavoriteAPI(productName, workflowName, type).then((res) => {
           if (type === 'workflow') {
-            this.$store.dispatch('refreshWorkflowList')
+            this.$store.dispatch('refreshWorkflowList', productName)
           }
           this.$message({
             type: 'success',
@@ -140,7 +140,7 @@ export default {
       } else {
         setFavoriteAPI(payload).then((res) => {
           if (type === 'workflow') {
-            this.$store.dispatch('refreshWorkflowList')
+            this.$store.dispatch('refreshWorkflowList', productName)
           }
           this.$message({
             type: 'success',

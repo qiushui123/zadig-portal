@@ -1,8 +1,8 @@
 <template>
-  <el-dialog :title="`${editUser.name} 系统角色`" width="20%" custom-class="create-team-dialog" :visible.sync="dialogEditRoleVisible">
-    <el-form  @submit.native.prevent  ref="nameForm">
+  <el-dialog :title="`${editUser.account} 系统角色`" width="30%" custom-class="edit-role-dialog" :visible.sync="dialogEditRoleVisible">
+    <el-form @submit.native.prevent ref="nameForm">
       <el-form-item label="系统角色" prop="leaders">
-        <el-select size="small" v-model="isSuperUser">
+        <el-select size="small" v-model="isAdmin" style="width: 100%;">
           <el-option label="管理员" :value="true"></el-option>
           <el-option label="普通用户" :value="false"></el-option>
         </el-select>
@@ -15,29 +15,36 @@
   </el-dialog>
 </template>
 <script>
-import { queryUserBindings, addSystemRoleBindings, deleteSystemRoleBindings } from '@/api'
+import {
+  queryUserBindings,
+  addSystemRoleBindingsAPI,
+  deleteSystemRoleBindingsAPI
+} from '@api'
 export default {
   name: 'editUserRole',
   props: {
-    editUser: Object
+    editUser: {
+      type: Object,
+      required: true
+    }
   },
   data () {
     return {
-      dialogEditRoleVisible: false,
-      isSuperUser: false,
-      adminRole: null
+      isAdmin: false,
+      adminRole: null,
+      dialogEditRoleVisible: false
     }
   },
   methods: {
     handleUserRoleUpdate () {
       if (this.adminRole) {
-        if (this.isSuperUser) {
+        if (this.isAdmin) {
           this.dialogEditRoleVisible = false
         } else {
           this.deleteBindings(this.adminRole.name)
         }
       } else {
-        if (this.isSuperUser) {
+        if (this.isAdmin) {
           this.addBindings()
         } else {
           this.dialogEditRoleVisible = false
@@ -45,32 +52,40 @@ export default {
       }
     },
     async deleteBindings (name) {
-      const res = await deleteSystemRoleBindings(name).catch(error => console.log(error))
+      const res = await deleteSystemRoleBindingsAPI(name).catch(error =>
+        console.log(error)
+      )
       if (res) {
-        this.$message.success('删除管理员权限成功')
+        this.$message.success('角色权限设置成功')
+        this.$emit('refreshUserList')
         this.dialogEditRoleVisible = false
       }
     },
     async addBindings () {
       const paload = {
-        name: this.editUser.email + '-' + 'admin',
+        name: this.editUser.account + '-' + this.editUser.identity_type,
         role: 'admin',
         uid: this.editUser.uid
       }
-      const res = await addSystemRoleBindings(paload).catch(error => console.log(error))
+      const res = await addSystemRoleBindingsAPI(paload).catch(error =>
+        console.log(error)
+      )
       if (res) {
-        this.$message.success('创建管理员权限成功')
+        this.$message.success('角色权限设置成功')
+        this.$emit('refreshUserList')
         this.dialogEditRoleVisible = false
       }
     },
     async getBindings () {
-      this.isSuperUser = false
+      this.isAdmin = false
       this.adminRole = null
-      const res = await queryUserBindings(this.editUser.uid).catch(error => console.log(error))
+      const res = await queryUserBindings(this.editUser.uid).catch(error =>
+        console.log(error)
+      )
       if (res) {
         res.forEach(item => {
           if (item.role === 'admin') {
-            this.isSuperUser = true
+            this.isAdmin = true
             this.adminRole = item
           }
         })

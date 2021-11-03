@@ -28,21 +28,28 @@
   </el-dialog>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import { autoUpgradeEnvAPI } from '@api'
+import { autoUpgradeEnvAPI, listProductAPI } from '@api'
 export default {
   data () {
     return {
       checkList: [],
-      updateEnvDialogVisible: false
+      updateEnvDialogVisible: false,
+      envNameList: []
     }
   },
   methods: {
+    async getEnvNameList () {
+      const projectName = this.projectName
+      const envNameList = await listProductAPI('', projectName)
+      envNameList.forEach(element => {
+        element.envName = element.env_name
+      })
+      if (envNameList.length) {
+        this.envNameList = envNameList
+      }
+    },
     openDialog () {
       this.updateEnvDialogVisible = true
-    },
-    async getProducts () {
-      await this.$store.dispatch('getProjectList')
     },
     autoUpgradeEnv () {
       const payload = {
@@ -59,24 +66,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['productList']),
     projectName () {
       return this.$route.params.project_name
-    },
-    envNameList () {
-      const envNameList = []
-      this.productList.forEach((element) => {
-        if (element.product_name === this.projectName) {
-          envNameList.push({
-            envName: element.env_name
-          })
-        }
-      })
-      return envNameList
     }
   },
   created () {
-    this.getProducts()
+    this.getEnvNameList()
   }
 }
 </script>

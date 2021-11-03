@@ -99,7 +99,7 @@ export default {
     getTestCases () {
       const { workflow_name, task_id, test_name } = this.$route.params
       const { service_name, test_type } = this.$route.query
-      getTestReportAPI(workflow_name, task_id, test_name, service_name, test_type, 'test').then((res) => {
+      getTestReportAPI(this.projectName, workflow_name, task_id, test_name, service_name, test_type, 'test').then((res) => {
         if (test_type === 'undefined' || test_type === 'function') {
           this.testSummary = res.functionTestSuite
           this.testCases = res.functionTestSuite.testcase

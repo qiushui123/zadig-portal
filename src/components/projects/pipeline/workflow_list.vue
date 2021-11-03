@@ -194,7 +194,7 @@ export default {
   },
   methods: {
     fetchWorkflows () {
-      this.$store.dispatch('getWorkflowList')
+      this.$store.dispatch('getWorkflowList', this.projectName)
     },
     deleteWorkflow (name) {
       this.$prompt('输入工作流名称确认', '删除工作流 ' + name, {
@@ -211,9 +211,9 @@ export default {
           }
         }
       }).then(({ value }) => {
-        deleteWorkflowAPI(name).then(() => {
+        deleteWorkflowAPI(this.projectName, name).then(() => {
           this.$message.success('删除成功')
-          this.$store.dispatch('refreshWorkflowList')
+          this.$store.dispatch('refreshWorkflowList', this.projectName)
         })
       })
     },
@@ -253,12 +253,12 @@ export default {
       })
     },
     copyWorkflowReq (oldName, newName) {
-      copyWorkflowAPI(oldName, newName).then(() => {
+      copyWorkflowAPI(this.projectName, oldName, newName).then(() => {
         this.$message({
           message: '复制流水线成功',
           type: 'success'
         })
-        this.$store.dispatch('refreshWorkflowList')
+        this.$store.dispatch('refreshWorkflowList', this.projectName)
         this.$router.push(`/productpipelines/edit/${newName}`)
       })
     },

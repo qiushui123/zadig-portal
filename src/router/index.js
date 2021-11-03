@@ -174,7 +174,7 @@ const routes = [
       },
       {
         path: 'projects/create/:project_name/helm/runtime',
-        component: () => import(/* webpackChunkName: "onboarding-helm" */ '@/components/projects/guide/runtime.vue'),
+        component: () => import(/* webpackChunkName: "onboarding-helm" */ '@/components/projects/guide/helm/runtime.vue'),
         meta: {
           requiresAuth: true,
           title: '新建项目'
@@ -896,8 +896,19 @@ const routes = [
   }
 ]
 
-export default new VueRouter({
+const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: routes
 })
+
+router.onError((error) => {
+  console.log(error, router)
+  const pattern = /Loading chunk (\d)+ failed/g
+  const isChunkLoadFailed = error.message.match(pattern)
+  if (isChunkLoadFailed) {
+    window.location.replace(window.location.href)
+  }
+})
+
+export default router

@@ -81,7 +81,7 @@
                                type="text">点击下载</el-button>
                   </td>
                 </tr>
-                <tr v-if="currentEditUserInfo.identityType ==='system'">
+                <tr v-if="currentEditUserInfo.identity_type ==='system'">
                   <td>
                     <span>修改密码
                     </span>
@@ -148,7 +148,7 @@
 import bus from '@utils/event_bus'
 import store from 'storejs'
 import supportDoc from './common/support_doc.vue'
-import { updateCurrentUserInfoAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI, queryUserAPI } from '@api'
+import { getCurrentUserInfoAPI, updateCurrentUserInfoAPI, getSubscribeAPI, saveSubscribeAPI, downloadPubKeyAPI } from '@api'
 import { mapState } from 'vuex'
 
 export default {
@@ -196,8 +196,8 @@ export default {
     }
   },
   methods: {
-    async getUserInfo () {
-      const res = await queryUserAPI(this.userinfo.uid).catch(error => console.log(error))
+    async getCurrentUserInfo () {
+      const res = await getCurrentUserInfoAPI(this.userinfo.uid).catch(error => console.log(error))
       if (res) {
         this.currentEditUserInfo = res
       }
@@ -314,7 +314,7 @@ export default {
     })
     this.getJwtToken()
     this.getSubscribe()
-    this.getUserInfo()
+    this.getCurrentUserInfo()
   },
   components: {
     supportDoc

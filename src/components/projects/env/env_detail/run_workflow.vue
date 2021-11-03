@@ -355,12 +355,12 @@ export default {
           }
         }
       }
-      runWorkflowAPI(clone).then(res => {
-        const projectName = this.workflowMeta.product_tmpl_name
+      const projectName = this.workflowMeta.product_tmpl_name
+      runWorkflowAPI(projectName, clone).then(res => {
         this.$message.success('创建成功')
         this.$emit('success')
         this.$router.push(`/v1/projects/detail/${projectName}/pipelines/multi/${res.pipeline_name}/${res.task_id}?status=running`)
-        this.$store.dispatch('refreshWorkflowList')
+        this.$store.dispatch('refreshWorkflowList', projectName)
       }).catch(error => {
         if (error.response && error.response.data.code === 6168) {
           const projectName = error.response.data.extra.productName

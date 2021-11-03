@@ -137,13 +137,13 @@ export default {
       })
       this.runner.registry_id = this.imageConfigs[0].registryId
       const clone = this.$utils.cloneObj(this.runner)
-      runWorkflowAPI(clone, artifactDeployEnabled).then(res => {
+      runWorkflowAPI(projectName, clone, artifactDeployEnabled).then(res => {
         const taskId = res.task_id
         const pipelineName = res.pipeline_name
         this.$message.success('创建成功')
         this.$emit('success')
         this.$router.push(`/v1/projects/detail/${projectName}/pipelines/multi/${pipelineName}/${taskId}?status=running`)
-        this.$store.dispatch('refreshWorkflowList')
+        this.$store.dispatch('refreshWorkflowList', projectName)
       }).catch(error => {
         console.log(error)
         if (error.response && error.response.data.code === 6168) {
