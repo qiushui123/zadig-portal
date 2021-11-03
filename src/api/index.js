@@ -55,7 +55,7 @@ http.interceptors.request.use((config) => {
     analyticsReqSource.initSource()
     config.cancelToken = analyticsReqSource.sourceToken
   }
-  if (store.get('userInfo') && store.get('userInfo') !== 'undefined') {
+  if (store.get('userInfo') && store.get('userInfo') !== 'undefined' && config.url !== analyticsReq) {
     config.headers.Authorization = 'Bearer ' + store.get('userInfo').token
   }
   return config
@@ -127,8 +127,6 @@ http.interceptors.response.use(
         // unauthorized 401
         if (error.response.status === 401) {
           const redirectPath = window.location.pathname + window.location.search
-          store.remove('userInfo')
-          store.remove('role')
           Element.Message.error('登录信息失效, 请返回重新登录')
           if (redirectPath.includes('/setup/')) {
             window.location.href = `/signin`
@@ -1197,6 +1195,14 @@ export function createTemplateMultiServiceAPI (productName, payload) {
   return http.post(`/api/aslan/service/helm/services/bulk?productName=${productName}`, payload)
 }
 
+export function getHelmTemplateVariableAPI (name) {
+  return http.get(`/api/aslan/template/charts/${name}/variables`)
+}
+
+export function saveHelmTemplateVariableAPI (name, payload) {
+  return http.put(`/api/aslan/template/charts/${name}/variables`, payload)
+}
+
 // Template Dockerfile
 export function getDockerfileTemplatesAPI () {
   return http.get(`/api/aslan/template/dockerfile?page_num=1&page_size=9999`)
@@ -1269,16 +1275,16 @@ export function updateKubernetesTemplateVariablesAPI (id, payload) {
 }
 
 // helm env and service
-export function addChartValuesYamlByEnvAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/rendersets/renderchart?projectName=${productName}&envName=${envName}`, payload)
-}
-
 export function getChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/rendersets/renderchart?projectName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
 }
 
 export function getAllChartValuesYamlAPI (productName, envName, serviceName = []) {
   return http.get(`/api/aslan/environment/environments/estimated-renderchart?projectName=${productName}&envName=${envName}&serviceName=${serviceName.join(',')}`)
+}
+
+export function getEnvDefaultVariableAPI (productName, envName) {
+  return http.get(`/api/aslan/environment/rendersets/default-values?productName=${productName}&envName=${envName}`)
 }
 
 export function createHelmProductEnvAPI (productName, payload) {
@@ -1290,7 +1296,7 @@ export function updateHelmProductEnvAPI (productName, payload) {
 }
 
 export function updateHelmEnvVarAPI (productName, envName, payload) {
-  return http.put(`/api/aslan/environment/environments/${productName}/renderchart?projectName=${productName}&envName=${envName}`, payload)
+  return http.put(`/api/aslan/environment/environments/${productName}/renderset?projectName=${productName}&envName=${envName}`, payload)
 }
 
 export function updateMatchRulesAPI (productName, payload) {
@@ -1299,6 +1305,26 @@ export function updateMatchRulesAPI (productName, payload) {
 
 export function getMatchRulesAPI (productName) {
   return http.get(`/api/aslan/project/products/${productName}/searching-rules?projectName=${productName}`)
+}
+
+export function getCreateHelmEnvStatusAPI (productName) {
+  return http.get(`/api/aslan/environment/environments/${productName}/status?projectName=${productName}`)
+}
+
+export function getCalculatedValuesYamlAPI ({ productName, serviceName, envName, format, scene }, payload) { // defaultValues, overrideYaml, overrideValues
+  return http.post(`/api/aslan/environment/environments/${productName}/estimated-values??projectName=${productName}&format=${format}&envName=${envName}&serviceName=${serviceName}&scene=${scene}`, payload)
+}
+
+export function getValuesYamlFromGitAPI ({ codehostID, owner, repo, branch, valuesPaths }) {
+  return http.get(`/api/aslan/environment/rendersets/yamlContent`, {
+    params: {
+      codehostID,
+      owner,
+      repo,
+      branch,
+      valuesPaths: valuesPaths.join(',')
+    }
+  })
 }
 
 // exteranl
@@ -1311,7 +1337,7 @@ export function queryServiceWorkloads (projectName, envName) {
 }
 
 export function postWorkloads (payload) {
-  return http.post(`/api/aslan/service/workloads`, payload)
+  return http.post(`/api/aslan/service/workloads?projectName=${payload.product_name}`, payload)
 }
 
 export function editWorkloads (payload) {

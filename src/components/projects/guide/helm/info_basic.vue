@@ -8,7 +8,7 @@
     </transition>
 
     <div class="guide-container">
-      <step :activeStep="0">
+      <step :activeStep="0" :stepThreeTitle="`配置环境`">
       </step>
       <div class="current-step-container">
         <div class="title-container">
@@ -48,7 +48,7 @@
                   <div class="integration-name cf-sub-title">3 条工作流</div>
                   <div class="integration-details">
                     {{projectName}}-workflow-dev , {{projectName}}-workflow-qa ,
-                    {{projectName}}-workflow-ops
+                    {{projectName}}-ops-workflow
                   </div>
                 </div>
               </div>

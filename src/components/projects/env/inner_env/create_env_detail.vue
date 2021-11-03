@@ -25,8 +25,9 @@
         <el-form-item label="环境名称：" prop="env_name">
           <el-input @input="changeEnvName" v-model="projectConfig.env_name" size="small"></el-input>
         </el-form-item>
-        <el-form-item label="命名空间："  v-if="projectConfig.source==='system' && $utils.isEmpty(pmServiceMap)" prop="defaultNamespace">
-          <el-input style="width: 250px;" :disabled="editButtonDisabled" v-model="projectConfig.defaultNamespace" size="small"></el-input><span class="editButton" @click="editButtonDisabled = !editButtonDisabled">{{editButtonDisabled? '编辑' : '完成'}}</span>
+        <el-form-item label="命名空间：" v-if="projectConfig.source==='system' && $utils.isEmpty(pmServiceMap)" prop="defaultNamespace">
+          <el-input style="width: 250px;" :disabled="editButtonDisabled" v-model="projectConfig.defaultNamespace" size="small"></el-input>
+          <span class="editButton" @click="editButtonDisabled = !editButtonDisabled">{{editButtonDisabled? '编辑' : '完成'}}</span>
         </el-form-item>
         <el-form-item label="创建方式" prop="source" v-if="$utils.isEmpty(pmServiceMap)">
           <el-select class="select" @change="changeCreateMethod" v-model="projectConfig.source" size="small" placeholder="请选择环境类型">
@@ -232,7 +233,7 @@
               <span class="second-title">Chart (HELM 部署)</span>
               <span class="small-title"></span>
             </div>
-            <ChartValues class="chart-value" ref="chartValuesRef" :envNames="envNames" :chartNames="chartNames"></ChartValues>
+            <HelmEnvTemplate class="chart-value" ref="helmEnvTemplateRef" :chartNames="chartNames" :envScene="`createEnv`"></HelmEnvTemplate>
           </el-card>
         </template>
       </div>
@@ -284,7 +285,7 @@ import bus from '@utils/event_bus'
 import { mapGetters } from 'vuex'
 import { uniq, cloneDeep } from 'lodash'
 import { serviceTypeMap } from '@utils/word_translate'
-import ChartValues from '../env_detail/common/updateHelmEnvChart.vue'
+import HelmEnvTemplate from '../env_detail/components/updateHelmEnvTemp.vue'
 
 const validateKey = (rule, value, callback) => {
   if (typeof value === 'undefined' || value === '') {
@@ -389,7 +390,6 @@ export default {
           }
         ]
       },
-      envNames: 'DEFAULT',
       chartNames: []
     }
   },
@@ -421,7 +421,10 @@ export default {
   },
   methods: {
     changeEnvName (value) {
-      if (this.projectConfig.source === 'system' && this.$utils.isEmpty(this.pmServiceMap)) {
+      if (
+        this.projectConfig.source === 'system' &&
+        this.$utils.isEmpty(this.pmServiceMap)
+      ) {
         this.projectConfig.defaultNamespace = this.projectName + '-env-' + value
       }
     },
@@ -794,7 +797,7 @@ export default {
       })
     },
     async deployHelmEnv () {
-      const res = await this.$refs.chartValuesRef.validate().catch(err => {
+      const res = await this.$refs.helmEnvTemplateRef.validate().catch(err => {
         console.log(err)
       })
       if (!res) {
@@ -802,15 +805,18 @@ export default {
       }
       this.$refs['create-env-ref'].validate(valid => {
         if (valid) {
+          const valueInfo = this.$refs.helmEnvTemplateRef.getAllInfo()
           const payload = {
             envName: this.projectConfig.env_name,
             clusterID: this.projectConfig.cluster_id,
-            chartValues: this.$refs.chartValuesRef.getAllChartNameInfo(),
+            chartValues: valueInfo.chartInfo,
+            defaultValues: valueInfo.envInfo.DEFAULT || '',
             namespace: this.projectConfig.defaultNamespace
           }
-
           this.startDeployLoading = true
-          createHelmProductEnvAPI(this.projectConfig.product_name, payload).then(
+          createHelmProductEnvAPI(this.projectConfig.product_name, [
+            payload
+          ]).then(
             res => {
               const envName = payload.envName
               this.startDeployLoading = false
@@ -884,7 +890,7 @@ export default {
     })
   },
   components: {
-    ChartValues
+    HelmEnvTemplate
   }
 }
 </script>
@@ -1014,7 +1020,7 @@ export default {
     .chart-value {
       width: 80%;
       min-width: 450px;
-      margin-left: 3%;
+      margin-left: 5px;
     }
   }
 

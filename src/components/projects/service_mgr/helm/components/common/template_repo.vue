@@ -3,7 +3,7 @@
     <el-form ref="tempForm" :model="tempData" label-width="140px" :rules="rules">
       <h4 class="flex-center" style="padding-left: 40px;">
         <span>Chart 模板</span>
-        <el-button type="text" @click="triggerSubstantial">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
+        <el-button type="text" @click="triggerSubstantial(substantial)" :disabled="isUpdate">{{substantial ? '关闭批量创建' : '批量创建'}}</el-button>
       </h4>
       <el-form-item label="服务名称" prop="serviceName" v-if="!substantial">
         <el-input v-model="tempData.serviceName" placeholder="请输入服务名称" size="small" :disabled="isUpdate"></el-input>
@@ -12,14 +12,26 @@
         <span style="line-height: 41px;">批量创建的服务名称为 values 文件名称</span>
       </el-form-item>
       <el-form-item label="选择模板" prop="moduleName">
-        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate">
+        <el-select v-model="tempData.moduleName" placeholder="请选择模板" size="small" :disabled="isUpdate" @change="getHelmTemplateVariable">
           <el-option :label="chart.name" :value="chart.name" v-for="chart in tempCharts" :key="chart.name"></el-option>
         </el-select>
       </el-form-item>
-      <h4 style="padding-left: 40px;">values 文件</h4>
-      <ImportValues ref="importValues" :importRepoInfo.sync="importRepoInfo" :substantial="substantial"></ImportValues>
+      <div v-if="!substantial" style="padding-left: 40px;">
+        <div class="custom-variable" v-if="!substantial && variables.length">
+          <h4 class="var-title">变量</h4>
+          <div class="variable-row" v-for="vars in variables" :key="vars.key">
+            <div class="row-left">{{ vars.key }}</div>
+            <div class="row-right">
+              <el-input v-model="vars.value" :placeholder="vars.value" size="small"></el-input>
+            </div>
+          </div>
+        </div>
+        <el-button v-if="importRepoInfo.yamlSource === 'default'" type="text" @click="importRepoInfo.yamlSource = 'freeEdit'">高级设置</el-button>
+        <CommonImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo" :resize="{height: '188px'}" showDelete></CommonImportValues>
+      </div>
+      <ImportValues v-else ref="importValues" :importRepoInfo.sync="importRepoInfo"></ImportValues>
       <el-form-item>
-        <el-button size="small" @click="dialogVisible = false">取消</el-button>
+        <el-button size="small" @click="commitDialogVisible(false)">取消</el-button>
         <el-button type="primary" size="small" @click="importTempRepo" :loading="importLoading">导入</el-button>
       </el-form-item>
     </el-form>
@@ -27,12 +39,15 @@
 </template>
 
 <script>
+import CommonImportValues from '@/components/projects/common/import_values/index.vue'
 import ImportValues from './template_repo/import_values.vue'
 import {
   createTemplateServiceAPI,
   createTemplateMultiServiceAPI,
-  getChartTemplatesAPI
+  getChartTemplatesAPI,
+  getHelmTemplateVariableAPI
 } from '@api'
+import { mapState } from 'vuex'
 
 const rules = {
   serviceName: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
@@ -44,9 +59,7 @@ const rules = {
 //   name: '',
 //   createFrom: {
 //     templateName: '',
-
-//     valuesYAML: '',
-
+//     valuesYAML: '',  // 后端传输字段，这里使用的是 overrideYaml
 //     valuesPaths: [],
 //     codehostID: null,
 //     owner: '',
@@ -58,6 +71,7 @@ const rules = {
 export default {
   name: 'TemplateRepo',
   data () {
+    this.rules = rules
     return {
       tempCharts: [],
       tempData: {
@@ -65,61 +79,44 @@ export default {
         moduleName: ''
       },
       importRepoInfo: {
-        yamlSource: 'gitRepo',
-        valuesYAML: '',
+        yamlSource: 'default',
+        overrideYaml: '',
         gitRepoConfig: null
       },
       substantial: false,
       importLoading: false,
-      isUpdate: false
+      isUpdate: false,
+      variables: []
     }
   },
   props: {
-    value: Boolean,
-    currentService: Object
+    currentSelect: String
   },
   computed: {
-    dialogVisible: {
-      get: function () {
-        return this.value
-      },
-      set: function (value) {
-        this.$emit('input', value)
-      }
-    }
+    ...mapState({
+      currentService: state => state.service_manage.currentService
+    })
+
   },
   watch: {
     currentService: {
       handler (val) {
-        if (val) {
+        if (this.currentSelect === 'template' && val) {
           const createFrom = val.create_from
           this.tempData = {
             serviceName: createFrom.service_name,
             moduleName: createFrom.template_name
           }
           if (createFrom.yaml_data) {
-            const yamlData = createFrom.yaml_data
-            if (yamlData.yaml_source === 'freeEdit') {
-              this.importRepoInfo = {
-                yamlSource: 'freeEdit',
-                valuesYAML: yamlData.yaml_content,
-                gitRepoConfig: null
-              }
-            } else if (yamlData.yaml_source === 'gitRepo') {
-              const gitConfig = yamlData.git_repo_config
-              this.importRepoInfo = {
-                yamlSource: 'gitRepo',
-                valuesYAML: '',
-                gitRepoConfig: {
-                  codehostID: gitConfig.codehost_id,
-                  owner: gitConfig.owner,
-                  repo: gitConfig.repo,
-                  branch: gitConfig.branch,
-                  valuesPaths: yamlData.values_paths
-                }
-              }
+            this.importRepoInfo = {
+              yamlSource: createFrom.yaml_data.yaml_content
+                ? 'freeEdit'
+                : 'default',
+              overrideYaml: createFrom.yaml_data.yaml_content,
+              gitRepoConfig: null
             }
           }
+          this.variables = createFrom.variables || []
           this.isUpdate = true
         } else {
           this.isUpdate = false
@@ -129,52 +126,57 @@ export default {
     }
   },
   methods: {
-    triggerSubstantial () {
-      this.substantial = !this.substantial
+    getHelmTemplateVariable (value) {
+      getHelmTemplateVariableAPI(value)
+        .then(res => {
+          this.variables = res
+        })
+        .catch(err => {
+          console.log(err)
+          this.variables = []
+        })
+    },
+    commitDialogVisible (value) {
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', value)
+    },
+    triggerSubstantial (substantial) {
       this.closeSelectRepo()
+      this.substantial = !substantial
     },
     closeSelectRepo () {
       this.tempData = {
         serviceName: '',
         moduleName: ''
       }
+      this.variables = []
       this.importRepoInfo = {
-        yamlSource: 'gitRepo',
-        valuesYAML: '',
+        yamlSource: 'default',
+        overrideYaml: '',
         gitRepoConfig: null
       }
+      this.substantial = false
       this.$refs.tempForm.clearValidate()
-      this.$refs.importValues.resetValueRepoInfo()
     },
     getTemplateCharts () {
       return getChartTemplatesAPI().then(res => {
-        this.tempCharts = res
-        return res
+        this.tempCharts = res.chartTemplates
       })
     },
     async createTemplateService () {
       const projectName = this.$route.params.project_name
-      let payload = {
+      const payload = {
         source: 'chartTemplate',
-        name: this.tempData.serviceName
-      }
-      if (this.importRepoInfo.yamlSource === 'freeEdit') {
-        payload = {
-          ...payload,
-          createFrom: {
-            templateName: this.tempData.moduleName,
-            valuesYAML: this.importRepoInfo.valuesYAML
-          }
-        }
-      } else if (this.importRepoInfo.yamlSource === 'gitRepo') {
-        payload = {
-          ...payload,
-          createFrom: {
-            ...this.importRepoInfo.gitRepoConfig,
-            templateName: this.tempData.moduleName
-          }
+        name: this.tempData.serviceName,
+        createFrom: {
+          templateName: this.tempData.moduleName,
+          valuesYAML:
+            this.importRepoInfo.yamlSource === 'default'
+              ? ''
+              : this.importRepoInfo.overrideYaml,
+          variables: this.variables
         }
       }
+
       const res = await createTemplateServiceAPI(projectName, payload).catch(
         err => {
           console.log(err)
@@ -182,13 +184,20 @@ export default {
       )
       this.importLoading = false
       if (res) {
-        this.$message.success(`导入模板 ${payload.name} 成功`)
-        this.dialogVisible = false
+        this.$message.success(
+          `${this.isUpdate ? '更新' : '新建'}服务 ${payload.name} 成功`
+        )
+        this.commitDialogVisible(false)
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit('canUpdateEnv', [
-          { serviceName: payload.name, type: this.isUpdate ? 'update' : 'create' }
+
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
+        this.$store.commit('CHART_NAMES', [
+          {
+            serviceName: payload.name,
+            type: this.isUpdate ? 'update' : 'create'
+          }
         ])
       }
     },
@@ -198,7 +207,6 @@ export default {
         source: 'chartTemplate',
         createFrom: { templateName: this.tempData.moduleName },
         valuesData: {
-          yamlSource: 'gitRepo',
           gitRepoConfig: this.importRepoInfo.gitRepoConfig
         }
       }
@@ -215,37 +223,40 @@ export default {
       this.importLoading = false
       if (res) {
         this.$message.success(`导入模板成功`)
-        this.dialogVisible = false
+        this.commitDialogVisible(false)
         this.$store.dispatch('queryService', {
           projectName: this.$route.params.project_name
         })
-        this.$emit(
-          'canUpdateEnv',
-          res.successServices.map(service => {
-            return {
-              serviceName: service,
-              type: 'create'
-            }
-          })
-        )
+
+        this.$store.commit('UPDATE_ENV_BUTTON', true)
+        this.$store.commit('CHART_NAMES', res.successServices.map(service => {
+          return {
+            serviceName: service,
+            type: 'create'
+          }
+        }))
+
         if (res.failedServices.length) {
           let message = ``
           res.failedServices.forEach(fail => {
-            message += `<div>${fail.path}: ${fail.error}</div>`
+            message += `<div style="margin-bottom: 10px;"><span style="color: #e6a23c;">${fail.path}</span>: ${fail.error}</div>`
           })
-          this.$message.error({
+          this.$notify.error({
             dangerouslyUseHTMLString: true,
             message,
             duration: 0,
-            showClose: true
+            title: '批量创建失败服务列表'
           })
         }
       }
     },
     async importTempRepo () {
-      const valid1 = await this.$refs.importValues
-        .validate()
-        .catch(err => console.log(err))
+      let valid1 = true
+      if (this.$refs.importValues) {
+        valid1 = await this.$refs.importValues
+          .validate()
+          .catch(err => console.log(err))
+      }
       const valid2 = await this.$refs.tempForm.validate().catch(err => {
         console.log(err)
       })
@@ -261,10 +272,10 @@ export default {
     }
   },
   components: {
+    CommonImportValues,
     ImportValues
   },
   created () {
-    this.rules = rules
     this.getTemplateCharts()
   }
 }
@@ -289,6 +300,32 @@ export default {
 
       .el-select {
         width: 100%;
+      }
+    }
+  }
+
+  .custom-variable {
+    margin-bottom: 20px;
+
+    .var-title {
+      margin: 7px 0;
+      color: #606266;
+      font-size: 14px;
+    }
+
+    .variable-row {
+      display: flex;
+      align-items: center;
+      padding: 5px 0;
+
+      .row-left {
+        width: 78px;
+        padding-right: 12px;
+        text-align: right;
+      }
+
+      .row-right {
+        flex: 1;
       }
     }
   }

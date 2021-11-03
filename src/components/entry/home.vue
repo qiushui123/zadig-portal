@@ -56,6 +56,7 @@ export default {
   created () {
     this.$store.dispatch('GETUSERINFO')
     this.$store.dispatch('getProjectList')
+    this.getAnnouncements()
   }
 }
 </script>

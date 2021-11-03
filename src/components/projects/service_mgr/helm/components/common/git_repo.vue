@@ -164,11 +164,11 @@ import {
   createTemplateServiceAPI
 } from '@api'
 import Gitfile from './gitfile_tree'
+import { mapState } from 'vuex'
 export default {
   name: 'GitRepo',
   props: {
-    value: Boolean,
-    currentService: Object,
+    currentSelect: String,
     controlParam: {
       type: Object,
       default: () => {
@@ -300,7 +300,7 @@ export default {
       })
     },
     closeFileTree () {
-      this.dialogVisible = false
+      this.$store.commit('SERVICE_DIALOG_VISIBLE', false)
       this.$store.dispatch('queryService', {
         projectName: this.$route.params.project_name
       })
@@ -312,7 +312,10 @@ export default {
           type: this.isUpdate ? 'update' : 'create'
         }
       })
-      this.$emit('canUpdateEnv', services)
+
+      this.$store.commit('UPDATE_ENV_BUTTON', true)
+      this.$store.commit('CHART_NAMES', services)
+
       this.$emit('triggleAction')
     },
     changeSelectPath (path) {
@@ -374,19 +377,15 @@ export default {
         this.source.branchName !== ''
       )
     },
-    dialogVisible: {
-      get: function () {
-        return this.value
-      },
-      set: function (value) {
-        this.$emit('input', value)
-      }
-    }
+    ...mapState({
+      currentService: state => state.service_manage.currentService
+    })
   },
   watch: {
     currentService: {
       handler (value) {
-        if (value) {
+        const update = value && (!value.source || value.source !== 'chartTemplate')
+        if (this.currentSelect === 'git' && value && update) {
           if (value.source) {
             const createFrom = value.create_from
             if (value.source === 'publicRepo') {
@@ -420,6 +419,9 @@ export default {
         }
       },
       immediate: true
+    },
+    gitName () {
+      this.$refs.sourceForm && this.$refs.sourceForm.clearValidate()
     }
   },
   mounted () {

@@ -49,7 +49,7 @@
                   <div class="integration-details">
                     {{projectName}}-workflow-dev ,
                     {{projectName}}-workflow-qa ,
-                    {{projectName}}-workflow-ops
+                    {{projectName}}-ops-workflow
                   </div>
                 </div>
               </div>
