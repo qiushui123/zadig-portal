@@ -984,7 +984,7 @@ export function updateEnvTemplateAPI (projectName, payload) {
 
 // Env and Service
 export function createProductAPI (payload, envType = '') {
-  return http.post('/api/aslan/environment/environments', payload)
+  return http.post(`/api/aslan/environment/environments?projectName=${payload.product_name}`, payload)
 }
 
 export function updateServiceAPI (product, service, type, env, data, envType = '') {
