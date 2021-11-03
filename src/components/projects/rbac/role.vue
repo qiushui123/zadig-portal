@@ -68,7 +68,7 @@ export default {
       this.loading = false
     },
     async deleterole (row) {
-      this.$confirm('谨慎操作删除角色', '确认删除此角色?', {
+      this.$confirm('此角色的成员权限也会被删除，请谨慎操作', '确认删除此角色?', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

@@ -18,7 +18,7 @@
         <el-form-item label="手机" prop="phone">
           <el-input size="small" v-model="addUser.phone"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="isAdmin">
+        <el-form-item label="角色">
           <el-radio-group v-model="addUser.isAdmin">
             <el-radio :label="true">管理员</el-radio>
             <el-radio :label="false">普通用户</el-radio>
@@ -206,14 +206,6 @@ export default {
             required: true,
             message: '请输入密码',
             trigger: 'blur'
-          }
-        ],
-        isAdmin: [
-          {
-            type: 'boolean',
-            required: true,
-            message: '请选择角色',
-            trigger: 'change'
           }
         ]
       }
