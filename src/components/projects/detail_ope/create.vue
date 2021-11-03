@@ -175,7 +175,6 @@
                                  filterable
                                  multiple
                                  remote
-                                 :remote-method="remoteMethod"
                                  :loading="loading"
                                  placeholder="请输入用户名搜索用户">
                         <el-option v-for="(user,index) in users"
@@ -284,9 +283,8 @@ export default {
     }
   },
   methods: {
-    getUsers (user_ids) {
+    getUsers () {
       const paload = {
-        uids: user_ids
       }
       usersAPI(paload).then((res) => {
         this.users = this.$utils.deepSortOn(res.users, 'name')
@@ -349,7 +347,6 @@ export default {
     getProject (projectName) {
       getSingleProjectAPI(projectName).then((res) => {
         this.projectForm = res
-        this.getUsers(res.user_ids)
         if (res.team_id === 0) {
           this.projectForm.team_id = null
         }
@@ -419,6 +416,7 @@ export default {
   mounted () {
     if (this.isEdit) {
       this.getProject(this.projectName)
+      this.getUsers()
     }
   }
 }
