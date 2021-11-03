@@ -353,7 +353,7 @@ export default {
     getPresetInfo (projectNameAndEnvName) {
       const [, namespace] = projectNameAndEnvName.split(' / ')
       this.precreateLoading = true
-      precreateWorkflowTaskAPI(this.workflowName, namespace).then(res => {
+      precreateWorkflowTaskAPI(this.workflowMeta.product_tmpl_name, this.workflowName, namespace).then(res => {
         // prepare targets for view
         for (let i = 0; i < res.targets.length; i++) {
           if (this.haveForcedInput) {

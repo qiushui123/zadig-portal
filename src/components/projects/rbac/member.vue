@@ -6,7 +6,12 @@
     </div>
 
     <el-table v-loading="loading" row-key="id" :data="members" style="width: 100%;">
-      <el-table-column label="用户名称">
+      <el-table-column label="用户名">
+        <template slot-scope="scope">
+          <span>{{scope.row.account}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="昵称">
         <template slot-scope="scope">
           <span>{{scope.row.username}}</span>
         </template>

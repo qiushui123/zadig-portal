@@ -111,7 +111,7 @@ export default {
     },
     async fnShowTimer (status, index, workflow) {
       if (status && !workflow.showTimer) {
-        this.pipelineInfo = await workflowAPI(workflow.name).catch(error => console.log(error))
+        this.pipelineInfo = await workflowAPI(workflow.product_tmpl_name, workflow.name).catch(error => console.log(error))
         if (_.get(this.pipelineInfo, 'schedules.items', '[]').length) {
           this.$set(this.source, 'showTimer', true)
           this.$forceUpdate()

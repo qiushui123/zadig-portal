@@ -96,6 +96,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="name" label="昵称"></el-table-column>
         <el-table-column prop="lastLoginTime" label="登录信息">
           <template slot-scope="scope">
             <span v-if="scope.row.lastLoginTime">{{$utils.convertTimestamp(scope.row.lastLoginTime)}}</span>
@@ -189,6 +190,14 @@ export default {
             type: 'email',
             message: '请输入正确的邮箱地址',
             trigger: ['blur', 'change']
+          }
+        ],
+        name: [
+          {
+            type: 'string',
+            required: true,
+            message: '请输入昵称',
+            trigger: 'blur'
           }
         ],
         password: [

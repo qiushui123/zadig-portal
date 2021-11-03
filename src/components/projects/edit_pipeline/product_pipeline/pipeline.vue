@@ -282,7 +282,7 @@ export default {
   },
   created () {
     if (this.editMode) {
-      workflowAPI(this.pipelineName).then(res => {
+      workflowAPI(this.pipelineInfo.product_tmpl_name, this.pipelineName).then(res => {
         this.pipelineInfo = res
         if (!this.pipelineInfo.schedules) {
           this.$set(this.pipelineInfo, 'schedules', {

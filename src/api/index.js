@@ -480,8 +480,8 @@ export function setFavoriteAPI (payload) {
 export function deleteFavoriteAPI (productName, workflowName, type) {
   return http.delete(`/api/aslan/workflow/favorite/${productName}/${workflowName}/${type}?projectName=${productName}`)
 }
-export function workflowAPI (name) {
-  return http.get(`/api/aslan/workflow/workflow/find/${name}`)
+export function workflowAPI (projectName, name) {
+  return http.get(`/api/aslan/workflow/workflow/find/${name}?projectName=${projectName}`)
 }
 
 export function workflowPresetAPI (productName) {
@@ -504,11 +504,11 @@ export function copyWorkflowAPI (projectName, oldName, newName) {
   return http.put(`/api/aslan/workflow/workflow/old/${oldName}/new/${newName}?projectName=${projectName}`)
 }
 
-export function precreateWorkflowTaskAPI (workflowName, envName) {
-  return http.get(`/api/aslan/workflow/workflowtask/preset/${envName}/${workflowName}`)
+export function precreateWorkflowTaskAPI (projectName, workflowName, envName) {
+  return http.get(`/api/aslan/workflow/workflowtask/preset/${envName}/${workflowName}?projectName=${projectName}`)
 }
 export function createWorkflowTaskAPI (productName, envName) {
-  return http.get(`/api/aslan/workflow/workflowtask/targets/${productName}/${envName}`)
+  return http.get(`/api/aslan/workflow/workflowtask/targets/${productName}/${envName}?projectName=${productName}`)
 }
 
 export function getRegistryWhenBuildAPI (projectName) {
@@ -535,8 +535,8 @@ export function cancelWorkflowAPI (projectName, workflowName, taskID) {
   return http.delete(`/api/aslan/workflow/workflowtask/id/${taskID}/pipelines/${workflowName}?projectName=${projectName}`)
 }
 
-export function workflowTaskListAPI (name, start, max, workflowType = '') {
-  return http.get(`/api/aslan/workflow/workflowtask/max/${max}/start/${start}/pipelines/${name}?projectName=${name}&workflowType=${workflowType}`)
+export function workflowTaskListAPI (projectName, name, start, max, workflowType = '') {
+  return http.get(`/api/aslan/workflow/workflowtask/max/${max}/start/${start}/pipelines/${name}?projectName=${projectName}&workflowType=${workflowType}`)
 }
 
 export function workflowTaskDetailAPI (projectName, workflowName, taskID, workflowType = '') {

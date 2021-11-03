@@ -96,6 +96,9 @@ export default {
     }
   },
   computed: {
+    projectName () {
+      return this.$route.params.project_name
+    },
     selectedDeployEnv () {
       return `${this.currentServiceMeta.ns}`
     },
@@ -188,7 +191,7 @@ export default {
   methods: {
     getWorkflow () {
       if (this.workflowType === 'workflow') {
-        workflowAPI(this.workflowName).then(res => {
+        workflowAPI(this.projectName, this.workflowName).then(res => {
           this.workflowMeta = res
           const namespace = this.currentServiceMeta.envName
           const product = this.workflowMeta.product_tmpl_name
@@ -211,7 +214,7 @@ export default {
     precreate (proNameAndNamespace) {
       const [, namespace] = proNameAndNamespace.split(' / ')
       this.precreateLoading = true
-      precreateWorkflowTaskAPI(this.workflowName, namespace).then(res => {
+      precreateWorkflowTaskAPI(this.projectName, this.workflowName, namespace).then(res => {
         // prepare targets for view
         for (let i = 0; i < res.targets.length; i++) {
           if (this.haveForcedInput) {
@@ -433,7 +436,7 @@ export default {
     if (this.workflows && this.workflows.length > 0) {
       this.workflowName = this.workflows[0].name
       if (this.workflowType === 'workflow') {
-        workflowAPI(this.workflowName).then(res => {
+        workflowAPI(this.projectName, this.workflowName).then(res => {
           this.workflowMeta = res
           const namespace = this.currentServiceMeta.envName
           const product = this.workflowMeta.product_tmpl_name
