@@ -180,7 +180,7 @@
                                  placeholder="请输入用户名搜索用户">
                         <el-option v-for="(user,index) in users"
                                    :key="index"
-                                   :label="user.name || user.account"
+                                   :label="user.name ? `${user.account}(${user.name})` : user.account"
                                    :value="user.uid">
                         </el-option>
                       </el-select>
