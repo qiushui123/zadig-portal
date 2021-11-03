@@ -45,18 +45,25 @@
           </el-select>
         </el-form-item>
         <el-form-item label="目标分支">
-          <el-select style="width: 100%;"
+          <el-select v-show="!webhookSwap.repo.is_regular"
+                      style="width: 100%;"
                      v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
                      clearable
-                     placeholder="请选择">
+                     placeholder="请选择分支">
             <el-option v-for="(branch,index) in webhookBranches[webhookSwap.repo.repo_name]"
                        :key="index"
                        :label="branch.name"
                        :value="branch.name">
             </el-option>
           </el-select>
+          <el-input v-show="webhookSwap.repo.is_regular" v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
+          <el-switch
+            v-model="webhookSwap.repo.is_regular"
+            active-text="正则表达式配置"
+            @change="webhookSwap.repo.branch = ''">
+          </el-switch>
         </el-form-item>
         <el-form-item label="部署环境">
           <el-select style="width: 100%;"
@@ -556,7 +563,7 @@ export default {
       this.webhookSwap = {
         name: webhookSwap.main_repo.name,
         description: webhookSwap.main_repo.description,
-        repo: Object.assign({ key: `${webhookSwap.main_repo.repo_owner}/${webhookSwap.main_repo.repo_name}` }, webhookSwap.main_repo),
+        repo: Object.assign({ key: `${webhookSwap.main_repo.repo_owner}/${webhookSwap.main_repo.repo_name}`, is_regular: false }, webhookSwap.main_repo),
         namespace: webhookSwap.workflow_args.namespace.split(','),
         env_update_policy: webhookSwap.workflow_args.env_update_policy ? webhookSwap.workflow_args.env_update_policy : (webhookSwap.workflow_args.base_namespace ? 'base' : 'all'),
         base_namespace: webhookSwap.workflow_args.base_namespace,
