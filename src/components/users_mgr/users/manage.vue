@@ -138,6 +138,7 @@ import {
 } from '@api'
 import bus from '@utils/event_bus'
 import EditUserRole from './editUserRole.vue'
+import { sortBy } from 'lodash'
 export default {
   components: {
     EditUserRole
@@ -243,7 +244,7 @@ export default {
       )
       if (usersData && rolesData) {
         this.totalUser = usersData.totalCount
-        this.users = usersData.users.map(user => {
+        this.users = sortBy(usersData.users.map(user => {
           const roleInfo = rolesData.find(role => {
             return role.uid === user.uid
           })
@@ -253,7 +254,7 @@ export default {
             user.role = ''
           }
           return user
-        })
+        }), 'account')
       }
       this.loading = false
     },
