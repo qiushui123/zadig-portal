@@ -383,6 +383,14 @@ input[type="radio"] {
   font-size: 13px;
 }
 
+.error-container .error-type {
+  color: #ff1949;
+}
+
+.error-container .error-msg {
+  color: #ff1949;
+}
+
 footer {
   display: flex;
   justify-content: center;
