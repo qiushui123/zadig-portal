@@ -31,7 +31,10 @@ export default {
 
 <style lang="less" scoped>
 .module-use {
+  box-sizing: border-box;
   height: 100%;
+  padding: 10px 20px 20px;
+  background-color: #fff;
 
   header {
     padding: 20px 0;
