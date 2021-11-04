@@ -9,9 +9,6 @@ import workflow_list from './modules/workflow_list'
 // Env
 import product_list from './modules/product_list'
 
-// Install Status
-import signup_status from './modules/sign_up_status'
-
 // Sidebar
 import sidebar_status from './modules/sidebar_status'
 
@@ -26,7 +23,6 @@ export default new Vuex.Store({
   modules: {
     login,
     product_list,
-    signup_status,
     workflow_list,
     sidebar_status,
     service_manage

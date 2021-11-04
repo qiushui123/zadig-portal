@@ -512,7 +512,6 @@
 
 <script>
 import { getProductStatus, serviceTypeMap } from '@utils/word_translate'
-import { mapGetters } from 'vuex'
 import {
   envRevisionsAPI, productEnvInfoAPI, productServicesAPI, serviceTemplateAfterRenderAPI, listProductAPI,
   updateServiceAPI, updateK8sEnvAPI, restartPmServiceAPI, restartServiceOriginAPI,
@@ -662,10 +661,7 @@ export default {
           this.$router.push({ path: `${this.envBasePath}`, query: { envName: newValue } })
         }
       }
-    },
-    ...mapGetters([
-      'productList', 'signupStatus'
-    ])
+    }
   },
   methods: {
     editExternalConfig (product_info) {

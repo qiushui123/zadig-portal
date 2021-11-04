@@ -76,7 +76,6 @@
 <script>
 import bus from '@utils/event_bus'
 import _ from 'lodash'
-import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -251,9 +250,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'signupStatus'
-    ]),
     navList () {
       const path = this.$route.path
       if (path.includes('/v1/users')) {

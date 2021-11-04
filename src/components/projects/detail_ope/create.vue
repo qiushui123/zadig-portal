@@ -207,7 +207,6 @@
 <script>
 
 import { usersAPI, createProjectAPI, getSingleProjectAPI, updateSingleProjectAPI } from '@api'
-import { mapGetters } from 'vuex'
 import CusDeliverable from './components/cusDeliverable.vue'
 
 const pinyin = require('pinyin')
@@ -396,9 +395,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'signupStatus'
-    ]),
     currentUserId () {
       return this.$store.state.login.userinfo.uid
     },

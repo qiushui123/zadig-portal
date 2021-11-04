@@ -282,7 +282,6 @@ import {
   createHelmProductEnvAPI
 } from '@api'
 import bus from '@utils/event_bus'
-import { mapGetters } from 'vuex'
 import { uniq, cloneDeep } from 'lodash'
 import { serviceTypeMap } from '@utils/word_translate'
 import HelmEnvTemplate from '../env_detail/components/updateHelmEnvTemp.vue'
@@ -395,7 +394,6 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['signupStatus']),
     projectName () {
       return this.$route.params.project_name
     },

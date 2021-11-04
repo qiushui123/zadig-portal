@@ -220,8 +220,8 @@ export default {
       this.$refs[ref].clearValidate()
     },
     getJiraConfig () {
-      getJiraAPI(id).then((res) => {
-        if (!res.resultCode) {
+      getJiraAPI().then((res) => {
+        if (res) {
           this.$set(this.jira, [0], res)
         } else {
           this.$set(this, 'jira', [])

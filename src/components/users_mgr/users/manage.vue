@@ -132,7 +132,6 @@
 import {
   addUserAPI,
   usersAPI,
-  deleteUserAPI,
   getSystemRoleBindingsAPI,
   addSystemRoleBindingsAPI
 } from '@api'
@@ -257,32 +256,6 @@ export default {
         }), 'account')
       }
       this.loading = false
-    },
-    deleteUser (row) {
-      this.$confirm(`确定删除系统用户 ${row.name}`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          deleteUserAPI(row.id).then(res => {
-            this.$message({
-              type: 'success',
-              message: '删除用户成功'
-            })
-            this.getUsers(
-              this.userPageSize,
-              this.currentPageList,
-              this.searchUser
-            )
-          })
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          })
-        })
     },
     addUserOperation () {
       this.$refs.addUserForm.validate(valid => {

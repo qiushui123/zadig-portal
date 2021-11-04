@@ -10,23 +10,14 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
   methods: {
   },
   computed: {
-    ...mapGetters([
-      'signupStatus'
-    ])
+
   },
   created () {
-    this.$store.dispatch('getSignupStatus').then(() => {
-      if (!this.signupStatus.inited) {
-        this.$router.push('/setup')
-      }
-    }).catch(() => {
-      this.$router.push('/loading')
-    })
+
   }
 }
 </script>

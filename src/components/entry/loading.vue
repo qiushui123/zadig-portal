@@ -26,7 +26,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import { AtomSpinner } from 'epic-spinners'
 import moment from 'moment'
 export default {
@@ -36,30 +35,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'signupStatus'
-    ]),
     processEnv () {
       return process.env
     }
   },
   methods: {
-    checkInit () {
-      this.$store.dispatch('getSignupStatus').then(() => {
-        if (this.signupStatus.inited) {
-          this.$router.push('/')
-        } else {
-          this.$router.push('/setup')
-        }
-      }).catch(() => {
-        setTimeout(() => {
-          this.checkInit()
-        }, 5000)
-      })
-    }
   },
   created () {
-    this.checkInit()
   },
   components: {
     AtomSpinner

@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import { getAnnouncementsAPI } from '@api'
 import sidebar from './home/sidebar.vue'
 import subSidebar from './home/sub_sidebar.vue'
@@ -41,11 +40,6 @@ export default {
         this.announcements = res
       })
     }
-  },
-  computed: {
-    ...mapGetters([
-      'signupStatus'
-    ])
   },
   components: {
     sidebar,

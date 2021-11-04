@@ -253,7 +253,7 @@
      </div>
 </template>
 <script>
-import { getEmailHostAPI, deleteEmailHostAPI, createEmailHostAPI, getEmailServiceAPI, deleteEmailServiceAPI, createEmailServiceAPI } from '@api'
+import { getEmailHostAPI, deleteEmailHostAPI, createEmailHostAPI, updateEmailHostAPI, getEmailServiceAPI, deleteEmailServiceAPI, createEmailServiceAPI, updateeEmailServiceAPI } from '@api'
 export default {
   data () {
     return {
@@ -401,7 +401,7 @@ export default {
       const payload1 = this.mailHostEdit
       const payload2 = this.mailServiceEdit
       Promise.all(refs.map(r => r.validate())).then(() => {
-        Promise.all([createEmailHostAPI(payload1), createEmailServiceAPI(payload2)]).then(
+        Promise.all([updateEmailHostAPI(payload1), updateeEmailServiceAPI(payload2)]).then(
           (res) => {
             this.getMailHostConfig()
             this.getMailServiceConfig()

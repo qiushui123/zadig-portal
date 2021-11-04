@@ -17,7 +17,6 @@
 
 <script>
 import { taskRunningSSEAPI, taskPendingSSEAPI } from '@api'
-import { mapGetters } from 'vuex'
 import bus from '@utils/event_bus'
 import productStatus from './constainer/product_status'
 import testStatus from './constainer/test_status'
@@ -70,10 +69,7 @@ export default {
     },
     pendingCount () {
       return this.task.pending
-    },
-    ...mapGetters([
-      'signupStatus'
-    ])
+    }
   },
   mounted () {
     this.showTaskList('running')
