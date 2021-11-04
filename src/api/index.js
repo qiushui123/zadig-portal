@@ -327,6 +327,10 @@ export function getHelmChartService (projectName) {
   return http.get(`/api/aslan/service/helm/${projectName}?projectName=${projectName}`)
 }
 
+export function updateServicesOrchestrationAPI (projectName, payload) {
+  return http.patch(`/api/aslan/project/products/${projectName}`, payload)
+}
+
 export function getHelmChartServiceFilePath (projectName, serviceName, path) {
   return http.get(`/api/aslan/service/helm/${projectName}/${serviceName}/filePath?dir=${path}&projectName=${projectName}`)
 }
@@ -494,6 +498,10 @@ export function updateWorkflowAPI (data) {
 
 export function deleteWorkflowAPI (projectName, name) {
   return http.delete(`/api/aslan/workflow/workflow/${name}?projectName=${projectName}`)
+}
+
+export function checkRegularAPI (payload) { // {regular: '', branches: []}
+  return http.post(`/api/aslan/code/codehost/branches/regular/check`, payload)
 }
 
 export function copyWorkflowAPI (projectName, oldName, newName) {
@@ -1251,8 +1259,8 @@ export function updateKubernetesTemplateAPI (id, payload) {
   return http.put(`/api/aslan/template/yaml/${id}`, payload)
 }
 
-export function validateKubernetesAPI (payload) {
-  return http.post(`/api/aslan/template/yaml/validation`, payload)
+export function praseKubernetesTemplateAPI (payload) {
+  return http.post(`/api/aslan/template/yaml/getVariables`, payload)
 }
 
 export function getKubernetesAPI (id) {
@@ -1273,10 +1281,6 @@ export function loadServiceFromKubernetesTemplateAPI (payload) {
 
 export function reloadServiceFromKubernetesTemplateAPI (payload) {
   return http.post(`/api/aslan/service/template/reload`, payload)
-}
-
-export function updateKubernetesTemplateVariablesAPI (id, payload) {
-  return http.put(`/api/aslan/template/yaml/${id}/variables`, payload)
 }
 
 // helm env and service
