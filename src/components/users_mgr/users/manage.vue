@@ -9,14 +9,14 @@
         <el-form-item label="密码" prop="password">
           <el-input size="small" v-model="addUser.password"></el-input>
         </el-form-item>
-        <el-form-item label="昵称" prop="name">
-          <el-input size="small" v-model="addUser.name"></el-input>
-        </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input size="small" v-model="addUser.email"></el-input>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
           <el-input size="small" v-model="addUser.phone"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="name">
+          <el-input size="small" v-model="addUser.name"></el-input>
         </el-form-item>
         <el-form-item label="角色" prop="isAdmin">
           <el-radio-group v-model="addUser.isAdmin">
@@ -106,6 +106,7 @@
         <el-table-column label="操作" width="280">
           <template slot-scope="scope">
             <el-button @click="editUserRole(scope.row)" type="primary" size="mini" plain>更改角色</el-button>
+            <el-button v-if="scope.row.identity_type === 'system'" @click="deleteUser(scope.row)" type="danger" size="mini" plain>删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -181,7 +182,7 @@ export default {
         email: [
           {
             type: 'string',
-            required: false,
+            required: true,
             message: '请输入登录邮箱',
             trigger: 'blur'
           },
@@ -256,6 +257,32 @@ export default {
         }), 'account')
       }
       this.loading = false
+    },
+    deleteUser (row) {
+      this.$confirm(`确定删除系统创建用户 ${row.account}`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          deleteUserAPI(row.uid).then(res => {
+            this.$message({
+              type: 'success',
+              message: '删除用户成功'
+            })
+            this.getUsers(
+              this.userPageSize,
+              this.currentPageList,
+              this.searchUser
+            )
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     addUserOperation () {
       this.$refs.addUserForm.validate(valid => {
