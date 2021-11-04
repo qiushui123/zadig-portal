@@ -37,7 +37,7 @@
           label="目标分支"
           prop="repo.branch"
           :rules="[
-          { trigger: 'blur', validator: validateBranch }
+          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] }
         ]"
         >
           <el-input style="width: 100%;" v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
@@ -58,9 +58,9 @@
             ></el-option>
           </el-select>
           <div v-if="checkGitRepo">
-            <el-switch v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = '';matchedBranchNames=[];"></el-switch>
+            <el-switch v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = '';matchedBranchNames=null;"></el-switch>
             <div v-show="webhookSwap.repo.is_regular">
-              <span v-show="matchedBranchNames.length">当前正则匹配到的分支：</span>
+              <span v-show="matchedBranchNames">当前正则匹配到的分支：{{matchedBranchNames && matchedBranchNames.length === 0 ? '无': ''}}</span>
               <span style="display: inline-block; padding-right: 10px;" v-for="branch in matchedBranchNames" :key="branch">{{ branch }}</span>
             </div>
           </div>
@@ -299,7 +299,7 @@ import {
   getAllBranchInfoAPI,
   checkRegularAPI
 } from '@api'
-import { uniqBy, get } from 'lodash'
+import { uniqBy, get, debounce } from 'lodash'
 export default {
   data () {
     const validateName = (rule, value, callback) => {
@@ -318,18 +318,6 @@ export default {
       if (Object.keys(value).length === 0) {
         callback(new Error('请输入代码库'))
       } else {
-        callback()
-      }
-    }
-
-    this.validateBranch = (rule, value, callback) => {
-      if (!value) {
-        callback(new Error('请输入目标分支'))
-        this.matchedBranchNames = []
-      } else {
-        if (this.checkGitRepo && this.webhookSwap.repo.is_regular) {
-          this.checkRegular(value)
-        }
         callback()
       }
     }
@@ -389,7 +377,7 @@ export default {
       webhookAddMode: false,
       showEnvUpdatePolicy: false,
       firstShowPolicy: false,
-      matchedBranchNames: []
+      matchedBranchNames: null
     }
   },
   props: {
@@ -419,15 +407,18 @@ export default {
     }
   },
   methods: {
-    checkRegular (value) {
+    checkRegular: debounce(({ value, that }) => {
+      if (!that.webhookBranches[that.webhookSwap.repo.repo_name]) {
+        return
+      }
       const payload = {
         regular: value,
-        branches: this.webhookBranches[this.webhookSwap.repo.repo_name].map(branch => branch.name) || []
+        branches: that.webhookBranches[that.webhookSwap.repo.repo_name].map(branch => branch.name) || []
       }
       checkRegularAPI(payload).then(res => {
-        this.matchedBranchNames = res || []
+        that.matchedBranchNames = res || []
       })
-    },
+    }, 200),
     validateForm (fn) {
       this.$refs.triggerForm.validate(valid => {
         if (valid) {
@@ -797,12 +788,13 @@ export default {
   computed: {
     showWebhookDialog: {
       get: function () {
-        return this.webhookAddMode ? this.webhookAddMode : this.webhookEditMode
+        const flag = this.webhookAddMode ? this.webhookAddMode : this.webhookEditMode
+        if (!flag) {
+          this.matchedBranchNames = null
+        }
+        return flag
       },
       set: function (newValue) {
-        if (!newValue) {
-          this.matchedBranchNames = []
-        }
         this.webhookAddMode
           ? (this.webhookAddMode = newValue)
           : (this.webhookEditMode = newValue)
@@ -817,6 +809,7 @@ export default {
         repos = uniqBy(repos, value => value.repo_owner + '/' + value.repo_name)
         repos.forEach(repo => {
           repo.key = `${repo.repo_owner}/${repo.repo_name}`
+          repo.is_regular = false
         })
         return repos
       }
@@ -866,6 +859,15 @@ export default {
       if (newVal && !this.gotScheduleRepo) {
         this.getTestReposForSchedules()
         this.gotScheduleRepo = true
+      }
+    },
+    'webhookSwap.repo.branch': {
+      handler (value) {
+        if (!value) {
+          this.matchedBranchNames = null
+        } else if (this.checkGitRepo && this.webhookSwap.repo.is_regular) {
+          this.checkRegular({ value, that: this })
+        }
       }
     }
   },
