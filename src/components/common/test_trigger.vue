@@ -7,10 +7,14 @@
                :close-on-click-modal="false"
                custom-class="add-trigger-dialog"
                center>
-      <el-form :model="webhook"
+      <el-form ref="triggerForm"
+               :model="webhookSwap"
                label-position="left"
-               label-width="90px">
-        <el-form-item label="代码库">
+               label-width="90px"
+               :rules="rules">
+        <el-form-item label="代码库" prop="repo" :rules="[
+          { trigger: ['blur', 'change'], validator: validateRepo }
+        ]">
           <el-select v-model="webhookSwap.repo"
                      size="small"
                      @change="repoChange(webhookSwap.repo)"
@@ -25,8 +29,14 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="目标分支">
-          <el-select v-model="webhookSwap.repo.branch"
+        <el-form-item label="目标分支" prop="repo.branch"
+          :rules="[
+          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] },
+          { trigger: ['blur', 'change'], validator: validateBranch }
+        ]">
+          <el-input v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
+          <el-select v-else
+                     v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
                      clearable
@@ -37,9 +47,11 @@
                        :value="branch.name">
             </el-option>
           </el-select>
+          <el-switch v-if="checkGitRepo" v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = ''"></el-switch>
         </el-form-item>
         <el-form-item v-if="webhookSwap.repo.source==='gerrit'"
-                      label="触发事件">
+                      label="触发事件"
+                      prop="events">
           <el-checkbox-group v-model="webhookSwap.events">
             <el-checkbox style="display: block;"
                          label="change-merged"></el-checkbox>
@@ -59,7 +71,8 @@
 
         </el-form-item>
         <el-form-item v-else-if="webhookSwap.repo.source!=='gerrit'"
-                      label="触发事件">
+                      label="触发事件"
+                      prop="events">
           <el-checkbox-group v-model="webhookSwap.events">
             <el-checkbox label="push"></el-checkbox>
             <el-checkbox label="pull_request"></el-checkbox>
@@ -77,7 +90,8 @@
           <el-checkbox v-model="webhookSwap.auto_cancel"></el-checkbox>
         </el-form-item>
         <el-form-item v-if="webhookSwap.repo.source!=='gerrit'"
-                      label="文件目录">
+                      label="文件目录"
+                      prop="match_folders">
           <el-input :autosize="{ minRows: 4, maxRows: 10}"
                     type="textarea"
                     v-model="webhookSwap.match_folders"
@@ -161,6 +175,45 @@
 import { getBranchInfoByIdAPI } from '@api'
 export default {
   data () {
+    this.validateRepo = (rule, value, callback) => {
+      if (Object.keys(value).length === 0) {
+        callback(new Error('请输入代码库'))
+      } else {
+        callback()
+      }
+    }
+    this.validateBranch = (rule, value, callback) => {
+      let valid = false
+      try {
+        const end = value.lastIndexOf('/')
+        if (value.startsWith('/') && end !== 0 && new RegExp(value.substring(1, end), value.substring(end + 1))) {
+          valid = true
+        }
+      } catch (err) {
+        console.log(err)
+      }
+      if (this.checkGitRepo && this.webhookSwap.repo.is_regular && !valid) {
+        callback(new Error('请确定是否是正则表达式'))
+      } else {
+        callback()
+      }
+    }
+    this.rules = {
+      events: [
+        {
+          required: true,
+          message: '请输入触发事件',
+          trigger: ['blur', 'change']
+        }
+      ],
+      match_folders: [
+        {
+          required: true,
+          message: '请输入文件目录',
+          trigger: ['blur', 'change']
+        }
+      ]
+    }
     return {
       showTriggerParamsDialog: false,
       webhookBranches: {},
@@ -220,8 +273,15 @@ export default {
         events: [],
         match_folders: '/\n!.md'
       }
+      this.$nextTick(() => {
+        this.$refs.triggerForm.clearValidate()
+      })
     },
-    addWebhook () {
+    async addWebhook () {
+      const res = await this.$refs.triggerForm.validate().catch(err => console.log(err))
+      if (!res) {
+        return
+      }
       const webhookSwap = this.$utils.cloneObj(this.webhookSwap)
       webhookSwap.repo.match_folders = webhookSwap.match_folders.split('\n')
       webhookSwap.repo.events = webhookSwap.events
@@ -241,7 +301,11 @@ export default {
       }
       this.webhookAddMode = false
     },
-    saveWebhook () {
+    async saveWebhook () {
+      const res = await this.$refs.triggerForm.validate().catch(err => console.log(err))
+      if (!res) {
+        return
+      }
       const index = this.currenteditWebhookIndex
       const webhookSwap = this.$utils.cloneObj(this.webhookSwap)
       webhookSwap.repo.match_folders = webhookSwap.match_folders.split('\n')
@@ -291,6 +355,9 @@ export default {
       get: function () {
         return this.avaliableRepos
       }
+    },
+    checkGitRepo () {
+      return this.webhookSwap.repo && ['gitlab', 'github'].includes(this.webhookSwap.repo.source)
     }
   },
   components: {

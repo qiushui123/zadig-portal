@@ -37,11 +37,13 @@
           label="目标分支"
           prop="repo.branch"
           :rules="[
-          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] }
+          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] },
+          { trigger: ['blur', 'change'], validator: validateBranch }
         ]"
         >
+          <el-input v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
           <el-select
-            v-show="!webhookSwap.repo.is_regular"
+            v-else
             style="width: 100%;"
             v-model="webhookSwap.repo.branch"
             size="small"
@@ -56,8 +58,7 @@
               :value="branch.name"
             ></el-option>
           </el-select>
-          <el-input v-show="webhookSwap.repo.is_regular" v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
-          <el-switch v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = ''"></el-switch>
+          <el-switch v-if="checkGitRepo" v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = ''"></el-switch>
         </el-form-item>
         <el-form-item label="部署环境" prop="namespace">
           <el-select
@@ -310,6 +311,23 @@ export default {
     this.validateRepo = (rule, value, callback) => {
       if (Object.keys(value).length === 0) {
         callback(new Error('请输入代码库'))
+      } else {
+        callback()
+      }
+    }
+
+    this.validateBranch = (rule, value, callback) => {
+      let valid = false
+      try {
+        const end = value.lastIndexOf('/')
+        if (value.startsWith('/') && end !== 0 && new RegExp(value.substring(1, end), value.substring(end + 1))) {
+          valid = true
+        }
+      } catch (err) {
+        console.log(err)
+      }
+      if (this.checkGitRepo && this.webhookSwap.repo.is_regular && !valid) {
+        callback(new Error('请确定是否是正则表达式'))
       } else {
         callback()
       }
@@ -645,6 +663,7 @@ export default {
       this.webhookAddMode = true
       this.$nextTick(() => {
         this.$refs.webhookNamedRef.focus()
+        this.$refs.triggerForm.clearValidate()
       })
     },
     addWebhook () {
@@ -812,6 +831,9 @@ export default {
         this.presets[0].deploy &&
         this.presets[0].deploy[0].type === 'k8s'
       )
+    },
+    checkGitRepo () {
+      return this.webhookSwap.repo && ['gitlab', 'github'].includes(this.webhookSwap.repo.source)
     }
   },
   watch: {
