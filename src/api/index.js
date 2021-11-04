@@ -506,6 +506,10 @@ export function updateWorkflowAPI (data) {
   return http.put('/api/aslan/workflow/workflow', data)
 }
 
+export function checkRegularAPI (regular) {
+  return http.get(`/api/aslan/system/regular/check?regular=${regular}`)
+}
+
 export function deleteWorkflowAPI (name) {
   return http.delete(`/api/aslan/workflow/workflow/${name}`)
 }

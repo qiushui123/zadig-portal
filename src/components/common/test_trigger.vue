@@ -32,7 +32,7 @@
         <el-form-item label="目标分支" prop="repo.branch"
           :rules="[
           { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] },
-          { trigger: ['blur', 'change'], validator: validateBranch }
+          { trigger: 'blur', validator: validateBranch }
         ]">
           <el-input v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
           <el-select v-else
@@ -172,7 +172,7 @@
 </template>
 
 <script type="text/javascript">
-import { getBranchInfoByIdAPI } from '@api'
+import { getBranchInfoByIdAPI, checkRegularAPI } from '@api'
 export default {
   data () {
     this.validateRepo = (rule, value, callback) => {
@@ -183,17 +183,12 @@ export default {
       }
     }
     this.validateBranch = (rule, value, callback) => {
-      let valid = false
-      try {
-        const end = value.lastIndexOf('/')
-        if (value.startsWith('/') && end !== 0 && new RegExp(value.substring(1, end), value.substring(end + 1))) {
-          valid = true
-        }
-      } catch (err) {
-        console.log(err)
-      }
-      if (this.checkGitRepo && this.webhookSwap.repo.is_regular && !valid) {
-        callback(new Error('请确定是否是正则表达式'))
+      if (this.checkGitRepo && this.webhookSwap.repo.is_regular) {
+        this.checkRegular(value).then(() => {
+          callback()
+        }).catch(() => {
+          callback(new Error('请确定是否是正则表达式'))
+        })
       } else {
         callback()
       }
@@ -252,6 +247,15 @@ export default {
     }
   },
   methods: {
+    checkRegular (value) {
+      return checkRegularAPI(value).then(res => {
+        if (res.valid) {
+          return Promise.resolve(true)
+        } else {
+          return Promise.reject(false)
+        }
+      })
+    },
     editWebhook (index) {
       this.webhookEditMode = true
       this.currenteditWebhookIndex = index
