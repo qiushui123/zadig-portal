@@ -106,6 +106,7 @@
         <el-table-column label="操作" width="280">
           <template slot-scope="scope">
             <el-button @click="editUserRole(scope.row)" type="primary" size="mini" plain>更改角色</el-button>
+            <el-button v-if="scope.row.identity_type === 'system'" @click="deleteUser(scope.row)" type="danger" size="mini" plain>删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -259,13 +260,13 @@ export default {
       this.loading = false
     },
     deleteUser (row) {
-      this.$confirm(`确定删除系统用户 ${row.name}`, '提示', {
+      this.$confirm(`确定删除系统创建用户 ${row.account}`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          deleteUserAPI(row.id).then(res => {
+          deleteUserAPI(row.uid).then(res => {
             this.$message({
               type: 'success',
               message: '删除用户成功'
