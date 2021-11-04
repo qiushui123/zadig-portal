@@ -16,6 +16,7 @@
           { trigger: ['blur', 'change'], validator: validateRepo }
         ]">
           <el-select v-model="webhookSwap.repo"
+                     style="width: 100%;"
                      size="small"
                      @change="repoChange(webhookSwap.repo)"
                      filterable
@@ -31,11 +32,11 @@
         </el-form-item>
         <el-form-item label="目标分支" prop="repo.branch"
           :rules="[
-          { required: true, message: '请输入目标分支', trigger: ['blur', 'change'] },
           { trigger: 'blur', validator: validateBranch }
         ]">
-          <el-input v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
+          <el-input style="width: 100%;" v-if="checkGitRepo && webhookSwap.repo.is_regular"  v-model="webhookSwap.repo.branch" placeholder="请输入正则表达式配置" size="small"></el-input>
           <el-select v-else
+                     style="width: 100%;"
                      v-model="webhookSwap.repo.branch"
                      size="small"
                      filterable
@@ -47,7 +48,13 @@
                        :value="branch.name">
             </el-option>
           </el-select>
-          <el-switch v-if="checkGitRepo" v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = ''"></el-switch>
+          <div v-if="checkGitRepo">
+            <el-switch v-model="webhookSwap.repo.is_regular" active-text="正则表达式配置" @change="webhookSwap.repo.branch = '';matchedBranchNames=[];"></el-switch>
+            <div v-show="webhookSwap.repo.is_regular">
+              <span v-show="matchedBranchNames.length">当前正则匹配到的分支：</span>
+              <span style="display: inline-block; padding-right: 10px;" v-for="branch in matchedBranchNames" :key="branch">{{ branch }}</span>
+            </div>
+          </div>
         </el-form-item>
         <el-form-item v-if="webhookSwap.repo.source==='gerrit'"
                       label="触发事件"
@@ -183,13 +190,13 @@ export default {
       }
     }
     this.validateBranch = (rule, value, callback) => {
-      if (this.checkGitRepo && this.webhookSwap.repo.is_regular) {
-        this.checkRegular(value).then(() => {
-          callback()
-        }).catch(() => {
-          callback(new Error('请确定是否是正则表达式'))
-        })
+      if (!value) {
+        callback(new Error('请输入目标分支'))
+        this.matchedBranchNames = []
       } else {
+        if (this.checkGitRepo && this.webhookSwap.repo.is_regular) {
+          this.checkRegular(value)
+        }
         callback()
       }
     }
@@ -220,7 +227,8 @@ export default {
       },
       currenteditWebhookIndex: null,
       webhookEditMode: false,
-      webhookAddMode: false
+      webhookAddMode: false,
+      matchedBranchNames: []
     }
   },
   props: {
@@ -248,12 +256,12 @@ export default {
   },
   methods: {
     checkRegular (value) {
-      return checkRegularAPI(value).then(res => {
-        if (res.valid) {
-          return Promise.resolve(true)
-        } else {
-          return Promise.reject(false)
-        }
+      const payload = {
+        regular: value,
+        branches: this.webhookBranches[this.webhookSwap.repo.repo_name].map(branch => branch.name) || []
+      }
+      checkRegularAPI(payload).then(res => {
+        this.matchedBranchNames = res || []
       })
     },
     editWebhook (index) {
@@ -352,6 +360,9 @@ export default {
         return this.webhookAddMode ? this.webhookAddMode : this.webhookEditMode
       },
       set: function (newValue) {
+        if (!newValue) {
+          this.matchedBranchNames = []
+        }
         this.webhookAddMode ? this.webhookAddMode = newValue : this.webhookEditMode = newValue
       }
     },
