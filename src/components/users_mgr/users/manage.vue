@@ -9,14 +9,14 @@
         <el-form-item label="密码" prop="password">
           <el-input size="small" v-model="addUser.password"></el-input>
         </el-form-item>
-        <el-form-item label="昵称" prop="name">
-          <el-input size="small" v-model="addUser.name"></el-input>
-        </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input size="small" v-model="addUser.email"></el-input>
         </el-form-item>
         <el-form-item label="手机" prop="phone">
           <el-input size="small" v-model="addUser.phone"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="name">
+          <el-input size="small" v-model="addUser.name"></el-input>
         </el-form-item>
         <el-form-item label="角色" prop="isAdmin">
           <el-radio-group v-model="addUser.isAdmin">
@@ -182,7 +182,7 @@ export default {
         email: [
           {
             type: 'string',
-            required: false,
+            required: true,
             message: '请输入登录邮箱',
             trigger: 'blur'
           },
