@@ -333,7 +333,7 @@ const utils = {
    */
   roleCheck () {
     return {
-      superAdmin: store.get('role').map(item => (item.role)).includes('admin')
+      superAdmin: store.get('role').includes('admin')
     }
   },
   getUserName () {

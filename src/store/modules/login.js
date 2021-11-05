@@ -32,14 +32,7 @@ const actions = {
     const userInfo = await userLoginAPI(args).catch(error => console.log(error))
     if (userInfo) {
       store.set('userInfo', userInfo) // 存储用户信息，包括 Token
-      const roleBinding = await queryUserBindings(userInfo.uid).catch(error => console.log(error))
-      if (roleBinding) {
-        store.set('role', roleBinding) // 存储用户角色信息
-        Message({
-          message: '登录成功，欢迎 ' + userInfo.account,
-          type: 'success'
-        })
-      }
+      context.dispatch('GETUSERROLE')
     }
     return Promise.resolve(userInfo)
   },
@@ -53,9 +46,20 @@ const actions = {
     })
     return Promise.resolve(true)
   },
+  async GETUSERROLE (context) {
+    const userInfo = store.get('userInfo')
+    if (userInfo) {
+      const roleBinding = await queryUserBindings(userInfo.uid).catch(error => console.log(error))
+      if (roleBinding) {
+        const role = roleBinding.map(item => (item.role))
+        store.set('role', role)
+        context.commit('INJECT_ROLE', role)
+      }
+    }
+  },
   async GETUSERINFO (context, args) {
     context.commit('INJECT_PROFILE', store.get('userInfo'))
-    context.commit('INJECT_ROLE', store.get('role').map(item => (item.role)))
+    context.dispatch('GETUSERROLE')
   }
 }
 

@@ -137,7 +137,7 @@
                                @click="deleteHostingEnv(productInfo.product_name,productInfo.env_name)">
                       取消托管</el-button>
 
-                    <el-button v-if="productInfo.status!=='Creating' && (envSource===''||envSource==='spock') && !isPmService"
+                    <el-button v-if="productInfo.status!=='Creating'"
                                type="text"
                                @click="openRecycleEnvDialog()">环境回收</el-button>
                 </template>

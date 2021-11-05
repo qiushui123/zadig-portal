@@ -13,7 +13,7 @@
           size="small"
           placeholder="请输入用户名称进行搜索"
         >
-          <el-option v-for="user in users" :key="user.uid" :label="user.email?`${user.name}(${user.email})`:`${user.name}`" :value="user.uid"></el-option>
+          <el-option v-for="user in users" :key="user.uid" :label="user.name ? `${user.name}(${user.account})` : user.account" :value="user.uid"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="角色名称" prop="name">
