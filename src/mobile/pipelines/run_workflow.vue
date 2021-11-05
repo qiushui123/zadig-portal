@@ -261,7 +261,7 @@ export default {
     precreate (proNameAndNamespace) {
       const [, namespace] = proNameAndNamespace.split(' / ')
       this.precreateLoading = true
-      precreateWorkflowTaskAPI(this.workflowName, namespace).then(res => {
+      precreateWorkflowTaskAPI(this.workflowMeta.product_tmpl_name, this.workflowName, namespace).then(res => {
         for (let i = 0; i < res.targets.length; i++) {
           if (this.haveForcedInput) {
             const old = res.targets[i]

@@ -353,7 +353,7 @@ export default {
     getPresetInfo (projectNameAndEnvName) {
       const [, namespace] = projectNameAndEnvName.split(' / ')
       this.precreateLoading = true
-      precreateWorkflowTaskAPI(this.workflowName, namespace).then(res => {
+      precreateWorkflowTaskAPI(this.workflowMeta.product_tmpl_name, this.workflowName, namespace).then(res => {
         // prepare targets for view
         for (let i = 0; i < res.targets.length; i++) {
           if (this.haveForcedInput) {
@@ -369,8 +369,8 @@ export default {
           }
           const maybeNew = res.targets[i]
           maybeNew.picked = this.haveForcedInput && (`${maybeNew.service_name}/${maybeNew.name}` in this.forcedInputTargetMap)
-          // 只有一个服务时默认选中
-          if (res.targets.length === 1) {
+          // 只有一个服务且存在构建时默认选中
+          if (res.targets.length === 1 && res.targets[0].has_build) {
             maybeNew.picked = true
           }
         }

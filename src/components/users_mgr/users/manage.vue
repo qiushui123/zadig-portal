@@ -72,14 +72,14 @@
               <!-- Details -->
               <div class="name-listing-description">
                 <h3 class="name-listing-title">
-                  {{scope.row.account}}
+                  {{ scope.row.name ? `${scope.row.account}(${scope.row.name})`: scope.row.account }}
                   <el-tag size="mini" effect="plain">{{ scope.row.role === 'admin'?'管理员':'普通用户' }}</el-tag>
                 </h3>
                 <!-- Name Listing Footer -->
                 <div class="name-listing-footer">
                   <ul>
                     <li v-if="scope.row.identity_type">
-                      <i class="el-icon-receiving"></i>
+                      <i class="iconfont" :class="'icon'+scope.row.identity_type"></i>
                       {{identityTypeMap[scope.row.identity_type]}}
                     </li>
                     <li v-if="scope.row.email">
@@ -106,7 +106,7 @@
         <el-table-column label="操作" width="280">
           <template slot-scope="scope">
             <el-button @click="editUserRole(scope.row)" type="primary" size="mini" plain>更改角色</el-button>
-            <el-button v-if="scope.row.identity_type === 'system'" @click="deleteUser(scope.row)" type="danger" size="mini" plain>删除</el-button>
+            <el-button @click="deleteUser(scope.row)" type="danger" size="mini" plain>删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -192,20 +192,20 @@ export default {
             trigger: ['blur', 'change']
           }
         ],
+        name: [
+          {
+            type: 'string',
+            required: true,
+            message: '请输入昵称',
+            trigger: 'blur'
+          }
+        ],
         password: [
           {
             type: 'string',
             required: true,
             message: '请输入密码',
             trigger: 'blur'
-          }
-        ],
-        isAdmin: [
-          {
-            type: 'boolean',
-            required: true,
-            message: '请选择角色',
-            trigger: 'change'
           }
         ]
       }
@@ -428,7 +428,11 @@ export default {
             display: inline-block;
             margin-right: 8px;
             color: #777;
-            font-size: 12px;
+            font-size: 14px;
+
+            .iconfont {
+              font-size: 14px;
+            }
           }
         }
       }

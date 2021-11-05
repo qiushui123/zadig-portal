@@ -186,7 +186,7 @@ export default {
       this.fetchHistory(0, this.pageSize)
     },
     fetchHistory (start, max) {
-      workflowTaskListAPI(this.workflowName, start, max).then(res => {
+      workflowTaskListAPI(this.projectName, this.workflowName, start, max).then(res => {
         res.data.forEach(element => {
           if (element.test_reports) {
             const testArray = []
@@ -246,7 +246,7 @@ export default {
     }
   },
   mounted () {
-    workflowAPI(this.workflowName).then(res => {
+    workflowAPI(this.projectName, this.workflowName).then(res => {
       this.workflow = res
     })
     this.fetchHistory(0, this.pageSize)

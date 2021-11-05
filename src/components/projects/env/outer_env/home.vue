@@ -32,6 +32,14 @@ export default {
       return this.$route.path.includes('/projects/detail/')
     }
   },
+  watch: {
+    productList: {
+      immediate: true,
+      handler () {
+        this.getProducts()
+      }
+    }
+  },
   methods: {
     async getProducts () {
       const projectList = this.productList.filter(product => {
@@ -44,11 +52,12 @@ export default {
         title: '项目列表',
         routerList: routerList
       })
-
       this.loading = false
       if (this.productList.length === 0) {
         this.emptyEnvs = true
         return
+      } else {
+        this.emptyEnvs = false
       }
       this.firstJumpPath = `/v1/envs/detail/${projectList[0].name}?envName=${projectList[0].envs[0]}`
       if (!this.$route.params.project_name) {
@@ -66,8 +75,6 @@ export default {
     }
   },
   mounted () {
-    this.getProducts()
-
     bus.$emit('set-topbar-title', { title: '集成环境', breadcrumb: [] })
   }
 }

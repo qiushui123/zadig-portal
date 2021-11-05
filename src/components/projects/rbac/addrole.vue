@@ -4,13 +4,13 @@
       <el-form-item label="角色名称" prop="name" label-width="100px">
         <el-input size="small" :disabled="isEdit" v-model="form.name"  placeholder="请输入角色名称"></el-input>
       </el-form-item>
-      <el-form-item label="角色类型" label-width="100px"
+      <!-- <el-form-item label="角色类型" label-width="100px"
                       prop="isPublic">
           <el-radio-group v-model="form.isPublic">
             <el-radio :label="true">公共角色</el-radio>
             <el-radio :label="false">私有角色</el-radio>
           </el-radio-group>
-       </el-form-item>
+       </el-form-item> -->
       <el-form-item label="权限列表" prop="permissions" label-width="100px">
         <div class="permissions-group" v-for="(group,group_index) in permissionGroups" :key="group_index">
           <el-checkbox
