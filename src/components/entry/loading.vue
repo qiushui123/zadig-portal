@@ -39,10 +39,6 @@ export default {
       return process.env
     }
   },
-  methods: {
-  },
-  created () {
-  },
   components: {
     AtomSpinner
   }
