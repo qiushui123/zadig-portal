@@ -70,8 +70,8 @@
         </el-form-item>
         <el-form-item label="显示名称"
                       label-width="80px"
-                      prop="displayName">
-          <el-input v-model="mailServiceEdit.displayName"
+                      prop="display_name">
+          <el-input v-model="mailServiceEdit.display_name"
                     placeholder="显示名称"
                     autofocus
                     auto-complete="off"></el-input>
@@ -171,8 +171,8 @@
         </el-form-item>
         <el-form-item label="显示名称"
                       label-width="80px"
-                      prop="displayName">
-          <el-input v-model="mailServiceAdd.displayName"
+                      prop="display_name">
+          <el-input v-model="mailServiceAdd.display_name"
                     placeholder="显示名称"
                     autofocus
                     auto-complete="off"></el-input>
@@ -276,13 +276,13 @@ export default {
       mailServiceAdd: {
         name: '',
         address: '',
-        displayName: '',
+        display_name: '',
         theme: ''
       },
       mailServiceEdit: {
         name: 'string',
         address: 'string',
-        displayName: 'string',
+        display_name: 'string',
         theme: 'string'
       },
       mailRules: {
@@ -316,7 +316,7 @@ export default {
           message: '请填写主题',
           trigger: ['blur', 'change']
         },
-        displayName: {
+        display_name: {
           required: true,
           message: '请填写显示名称',
           trigger: ['blur', 'change']
