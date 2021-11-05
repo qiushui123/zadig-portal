@@ -53,7 +53,7 @@
 
 <script>
 import store from 'storejs'
-import { createOrganizationInfoAPI, installationAnalysisRequestAPI, userLoginAPI } from '@api'
+import { installationAnalysisRequestAPI, userLoginAPI } from '@api'
 export default {
   data () {
     const validatePass = (rule, value, callback) => {
